@@ -104,6 +104,30 @@ namespace Simple.Data.IntegrationTest
             Assert.AreEqual(42, user.Age);
         }
 
+        [TestMethod]
+        public void TestAll()
+        {
+            dynamic database = new Database(new DbConnectionStub { DummyDataTable = CreateDummyDataTable() });
+            foreach (var user in database.Users.All)
+            {
+                Assert.AreEqual("Bob", user.Name);
+                Assert.AreEqual("Secret", user.Password);
+                Assert.AreEqual(42, user.Age);
+            }
+        }
+
+        [TestMethod]
+        public void TestStronglyTypedAll()
+        {
+            dynamic database = new Database(new DbConnectionStub { DummyDataTable = CreateDummyDataTable() });
+            foreach (User user in database.Users.All)
+            {
+                Assert.AreEqual("Bob", user.Name);
+                Assert.AreEqual("Secret", user.Password);
+                Assert.AreEqual(42, user.Age);
+            }
+        }
+
         private static DataTable CreateDummyDataTable()
         {
             var table = new DataTable("Users");

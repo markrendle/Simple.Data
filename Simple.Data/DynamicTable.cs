@@ -46,6 +46,16 @@ namespace Simple.Data
             return success;
         }
 
+        public override bool TryGetMember(GetMemberBinder binder, out object result)
+        {
+            if (binder.Name == "All")
+            {
+                result = GetAll();
+                return true;
+            }
+            return base.TryGetMember(binder, out result);
+        }
+
         public void Insert(dynamic entity)
         {
             var dictionary = entity as IDictionary<string, object>;
@@ -83,6 +93,16 @@ namespace Simple.Data
             string sql = GetFindBySql(_tableName, binder.Name.Substring(9), args);
 
             return _database.Query(sql, args.ToArray());
+        }
+
+        private object GetAll()
+        {
+            return _database.Query(GetAllSql(_tableName));
+        }
+
+        internal static string GetAllSql(string tableName)
+        {
+            return "select * from " + tableName;
         }
 
         internal static string GetFindBySql(string tableName, string methodName, IList<object> args)
