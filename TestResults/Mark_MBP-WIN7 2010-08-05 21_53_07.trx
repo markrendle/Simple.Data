@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestRun id="916dceb7-4667-4c99-b99a-192541335655" name="Mark@MBP-WIN7 2010-08-05 21:53:07" runUser="MBP-Win7\Mark" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <TestSettings name="Local" id="9521515a-ca67-4474-a3a5-0f6218187ced">
+    <Description>These are default test settings for a local test run.</Description>
+    <Deployment enabled="false" runDeploymentRoot="Mark_MBP-WIN7 2010-08-05 21_53_07">
+      <DeploymentItem filename="C:\Workspace\Simple.Data\Simple.Data\bin\Debug\Simple.Data.dll" />
+    </Deployment>
+    <Execution>
+      <TestTypeSpecific />
+      <AgentRule name="Execution Agents">
+      </AgentRule>
+    </Execution>
+  </TestSettings>
+  <Times creation="2010-08-05T21:53:07.8850000+01:00" queuing="2010-08-05T21:53:07.9230000+01:00" start="2010-08-05T21:53:07.9330000+01:00" finish="2010-08-05T21:53:08.8250000+01:00" />
+  <ResultSummary outcome="Completed">
+    <Counters total="15" executed="15" passed="15" error="0" failed="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+  <TestDefinitions>
+    <UnitTest name="TestFindByDynamicTwoColumns" storage="c:\workspace\simple.data\simple.data.integrationtest\bin\debug\simple.data.integrationtest.dll" id="73d3f434-2d47-a6c2-40de-c1b8ccff6ca7">
+      <Execution id="9cedb60d-436b-4f62-b2be-d8dfc2e6956e" />
+      <TestMethod codeBase="C:/Workspace/Simple.Data/Simple.Data.IntegrationTest/bin/Debug/Simple.Data.IntegrationTest.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Simple.Data.IntegrationTest.DatabaseTest, Simple.Data.IntegrationTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="TestFindByDynamicTwoColumns" />
+    </UnitTest>
+    <UnitTest name="TestExecuteWithUpdate" storage="c:\workspace\simple.data\simple.data.integrationtest\bin\debug\simple.data.integrationtest.dll" id="4b24e998-b35a-830b-fc35-093f62d26c9a">
+      <Execution id="b9157830-ae2c-4cf3-aadd-9238d43e1f48" />
+      <TestMethod codeBase="C:/Workspace/Simple.Data/Simple.Data.IntegrationTest/bin/Debug/Simple.Data.IntegrationTest.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Simple.Data.IntegrationTest.DatabaseTest, Simple.Data.IntegrationTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="TestExecuteWithUpdate" />
+    </UnitTest>
+    <UnitTest name="PascalToSnakeTest" storage="c:\workspace\simple.data\simple.data.test\bin\debug\simple.data.unittest.dll" id="fe2fb2de-26bc-cbec-7b45-76b8db24521f">
+      <Execution id="e82c59be-487a-41c5-a137-27ba3165975b" />
+      <TestMethod codeBase="C:/Workspace/Simple.Data/Simple.Data.Test/bin/Debug/Simple.Data.UnitTest.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Simple.Data.UnitTest.DynamicStringExtensionsTest, Simple.Data.UnitTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="PascalToSnakeTest" />
+    </UnitTest>
+    <UnitTest name="TestExecuteWithInsert" storage="c:\workspace\simple.data\simple.data.integrationtest\bin\debug\simple.data.integrationtest.dll" id="b6d1eb81-7e5c-f887-265c-0f9669ec1730">
+      <Execution id="aa3ae872-1a66-471a-8311-d914d28e4f67" />
+      <TestMethod codeBase="C:/Workspace/Simple.Data/Simple.Data.IntegrationTest/bin/Debug/Simple.Data.IntegrationTest.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Simple.Data.IntegrationTest.DatabaseTest, Simple.Data.IntegrationTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="TestExecuteWithInsert" />
+    </UnitTest>
+    <UnitTest name="GetFindBySqlTest" storage="c:\workspace\simple.data\simple.data.test\bin\debug\simple.data.unittest.dll" id="506f1f97-46be-31e7-d307-9da57ec7ed4c">
+      <Execution id="3b7132d5-d9ac-4a2d-9d25-e70f500fe420" />
+      <TestMethod codeBase="C:/Workspace/Simple.Data/Simple.Data.Test/bin/Debug/Simple.Data.UnitTest.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Simple.Data.UnitTest.DynamicTableTest, Simple.Data.UnitTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="GetFindBySqlTest" />
+    </UnitTest>
+    <UnitTest name="DynamicCastTest" storage="c:\workspace\simple.data\simple.data.test\bin\debug\simple.data.unittest.dll" id="8cf518ad-12b6-2e87-6c80-93e1f615dc52">
+      <Execution id="b4c79290-24da-46bf-a79b-3e4fc870a9f4" />
+      <TestMethod codeBase="C:/Workspace/Simple.Data/Simple.Data.Test/bin/Debug/Simple.Data.UnitTest.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Simple.Data.UnitTest.DynamicRecordTest, Simple.Data.UnitTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="DynamicCastTest" />
+    </UnitTest>
+    <UnitTest name="TestStronglyTypedQuery" storage="c:\workspace\simple.data\simple.data.integrationtest\bin\debug\simple.data.integrationtest.dll" id="c558273f-6f33-5cfc-1d47-418d87bbde6e">
+      <Execution id="f37a2184-8cc0-4f1f-8de0-c513eebeb312" />
+      <TestMethod codeBase="C:/Workspace/Simple.Data/Simple.Data.IntegrationTest/bin/Debug/Simple.Data.IntegrationTest.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Simple.Data.IntegrationTest.DatabaseTest, Simple.Data.IntegrationTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="TestStronglyTypedQuery" />
+    </UnitTest>
+    <UnitTest name="DynamicRecordDictionaryConstructorTest" storage="c:\workspace\simple.data\simple.data.test\bin\debug\simple.data.unittest.dll" id="e322e148-11a0-8148-0a94-9c13d2b4ea47">
+      <Execution id="ecbc0f43-2504-46e9-8e14-b7a5fc9d763b" />
+      <TestMethod codeBase="C:/Workspace/Simple.Data/Simple.Data.Test/bin/Debug/Simple.Data.UnitTest.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Simple.Data.UnitTest.DynamicRecordTest, Simple.Data.UnitTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="DynamicRecordDictionaryConstructorTest" />
+    </UnitTest>
+    <UnitTest name="TestInsertOnTable" storage="c:\workspace\simple.data\simple.data.integrationtest\bin\debug\simple.data.integrationtest.dll" id="7265f4db-0adf-7603-7550-7346df59599e">
+      <Execution id="682dcf8e-ee91-49dc-95d0-ce899b8b7b5b" />
+      <TestMethod codeBase="C:/Workspace/Simple.Data/Simple.Data.IntegrationTest/bin/Debug/Simple.Data.IntegrationTest.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Simple.Data.IntegrationTest.DatabaseTest, Simple.Data.IntegrationTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="TestInsertOnTable" />
+    </UnitTest>
+    <UnitTest name="TestQuery" storage="c:\workspace\simple.data\simple.data.integrationtest\bin\debug\simple.data.integrationtest.dll" id="551c2f3b-edf8-3877-659d-9d1c5ef09420">
+      <Execution id="9fb1aebc-28ea-48db-8ad4-a5d05de41c00" />
+      <TestMethod codeBase="C:/Workspace/Simple.Data/Simple.Data.IntegrationTest/bin/Debug/Simple.Data.IntegrationTest.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Simple.Data.IntegrationTest.DatabaseTest, Simple.Data.IntegrationTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="TestQuery" />
+    </UnitTest>
+    <UnitTest name="GetFindByColumnsTest" storage="c:\workspace\simple.data\simple.data.test\bin\debug\simple.data.unittest.dll" id="724733ea-f606-5449-b333-fba278c71e9c">
+      <Execution id="51e9be83-677f-4e75-b146-6d61c3dec292" />
+      <TestMethod codeBase="C:/Workspace/Simple.Data/Simple.Data.Test/bin/Debug/Simple.Data.UnitTest.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Simple.Data.UnitTest.DynamicTableTest, Simple.Data.UnitTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="GetFindByColumnsTest" />
+    </UnitTest>
+    <UnitTest name="TestFindAllByDynamic" storage="c:\workspace\simple.data\simple.data.integrationtest\bin\debug\simple.data.integrationtest.dll" id="516635d3-3c4f-f438-74aa-de7f3e1d68e0">
+      <Execution id="241616df-d7a4-43e1-84d2-299febff68c5" />
+      <TestMethod codeBase="C:/Workspace/Simple.Data/Simple.Data.IntegrationTest/bin/Debug/Simple.Data.IntegrationTest.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Simple.Data.IntegrationTest.DatabaseTest, Simple.Data.IntegrationTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="TestFindAllByDynamic" />
+    </UnitTest>
+    <UnitTest name="TestFindByDynamicSingleColumn" storage="c:\workspace\simple.data\simple.data.integrationtest\bin\debug\simple.data.integrationtest.dll" id="e7b75366-a725-51e0-34a9-16a13606634b">
+      <Execution id="a26cdff3-eead-47a5-b6e7-5318f1c59a45" />
+      <TestMethod codeBase="C:/Workspace/Simple.Data/Simple.Data.IntegrationTest/bin/Debug/Simple.Data.IntegrationTest.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Simple.Data.IntegrationTest.DatabaseTest, Simple.Data.IntegrationTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="TestFindByDynamicSingleColumn" />
+    </UnitTest>
+    <UnitTest name="TestNamedArgumentInsertOnTable" storage="c:\workspace\simple.data\simple.data.integrationtest\bin\debug\simple.data.integrationtest.dll" id="079f1bd8-e7fc-de6d-4fb2-528e7a9adbd6">
+      <Execution id="c62d0de3-26aa-4160-80f6-ff8d4fbe7a51" />
+      <TestMethod codeBase="C:/Workspace/Simple.Data/Simple.Data.IntegrationTest/bin/Debug/Simple.Data.IntegrationTest.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Simple.Data.IntegrationTest.DatabaseTest, Simple.Data.IntegrationTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="TestNamedArgumentInsertOnTable" />
+    </UnitTest>
+    <UnitTest name="DynamicRecordSetterTest" storage="c:\workspace\simple.data\simple.data.test\bin\debug\simple.data.unittest.dll" id="c0a25756-bb74-25b8-19eb-4ff44c47482d">
+      <Execution id="61b5c834-5f26-424b-bfa5-99b13af58245" />
+      <TestMethod codeBase="C:/Workspace/Simple.Data/Simple.Data.Test/bin/Debug/Simple.Data.UnitTest.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Simple.Data.UnitTest.DynamicRecordTest, Simple.Data.UnitTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="DynamicRecordSetterTest" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <TestEntries>
+    <TestEntry testId="079f1bd8-e7fc-de6d-4fb2-528e7a9adbd6" executionId="c62d0de3-26aa-4160-80f6-ff8d4fbe7a51" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4b24e998-b35a-830b-fc35-093f62d26c9a" executionId="b9157830-ae2c-4cf3-aadd-9238d43e1f48" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="506f1f97-46be-31e7-d307-9da57ec7ed4c" executionId="3b7132d5-d9ac-4a2d-9d25-e70f500fe420" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="516635d3-3c4f-f438-74aa-de7f3e1d68e0" executionId="241616df-d7a4-43e1-84d2-299febff68c5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="551c2f3b-edf8-3877-659d-9d1c5ef09420" executionId="9fb1aebc-28ea-48db-8ad4-a5d05de41c00" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="724733ea-f606-5449-b333-fba278c71e9c" executionId="51e9be83-677f-4e75-b146-6d61c3dec292" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7265f4db-0adf-7603-7550-7346df59599e" executionId="682dcf8e-ee91-49dc-95d0-ce899b8b7b5b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="73d3f434-2d47-a6c2-40de-c1b8ccff6ca7" executionId="9cedb60d-436b-4f62-b2be-d8dfc2e6956e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8cf518ad-12b6-2e87-6c80-93e1f615dc52" executionId="b4c79290-24da-46bf-a79b-3e4fc870a9f4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b6d1eb81-7e5c-f887-265c-0f9669ec1730" executionId="aa3ae872-1a66-471a-8311-d914d28e4f67" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c0a25756-bb74-25b8-19eb-4ff44c47482d" executionId="61b5c834-5f26-424b-bfa5-99b13af58245" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c558273f-6f33-5cfc-1d47-418d87bbde6e" executionId="f37a2184-8cc0-4f1f-8de0-c513eebeb312" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e322e148-11a0-8148-0a94-9c13d2b4ea47" executionId="ecbc0f43-2504-46e9-8e14-b7a5fc9d763b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e7b75366-a725-51e0-34a9-16a13606634b" executionId="a26cdff3-eead-47a5-b6e7-5318f1c59a45" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="fe2fb2de-26bc-cbec-7b45-76b8db24521f" executionId="e82c59be-487a-41c5-a137-27ba3165975b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <Results>
+    <UnitTestResult executionId="c62d0de3-26aa-4160-80f6-ff8d4fbe7a51" testId="079f1bd8-e7fc-de6d-4fb2-528e7a9adbd6" testName="TestNamedArgumentInsertOnTable" computerName="MBP-WIN7" duration="00:00:00.0300107" startTime="2010-08-05T21:53:07.9360000+01:00" endTime="2010-08-05T21:53:08.2100000+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c62d0de3-26aa-4160-80f6-ff8d4fbe7a51">
+    </UnitTestResult>
+    <UnitTestResult executionId="b9157830-ae2c-4cf3-aadd-9238d43e1f48" testId="4b24e998-b35a-830b-fc35-093f62d26c9a" testName="TestExecuteWithUpdate" computerName="MBP-WIN7" duration="00:00:00.0091610" startTime="2010-08-05T21:53:08.2200000+01:00" endTime="2010-08-05T21:53:08.2360000+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b9157830-ae2c-4cf3-aadd-9238d43e1f48">
+    </UnitTestResult>
+    <UnitTestResult executionId="3b7132d5-d9ac-4a2d-9d25-e70f500fe420" testId="506f1f97-46be-31e7-d307-9da57ec7ed4c" testName="GetFindBySqlTest" computerName="MBP-WIN7" duration="00:00:00.0265548" startTime="2010-08-05T21:53:08.2460000+01:00" endTime="2010-08-05T21:53:08.5170000+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3b7132d5-d9ac-4a2d-9d25-e70f500fe420">
+    </UnitTestResult>
+    <UnitTestResult executionId="241616df-d7a4-43e1-84d2-299febff68c5" testId="516635d3-3c4f-f438-74aa-de7f3e1d68e0" testName="TestFindAllByDynamic" computerName="MBP-WIN7" duration="00:00:00.0070538" startTime="2010-08-05T21:53:08.5250000+01:00" endTime="2010-08-05T21:53:08.5430000+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="241616df-d7a4-43e1-84d2-299febff68c5">
+    </UnitTestResult>
+    <UnitTestResult executionId="9fb1aebc-28ea-48db-8ad4-a5d05de41c00" testId="551c2f3b-edf8-3877-659d-9d1c5ef09420" testName="TestQuery" computerName="MBP-WIN7" duration="00:00:00.0057579" startTime="2010-08-05T21:53:08.5480000+01:00" endTime="2010-08-05T21:53:08.5580000+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9fb1aebc-28ea-48db-8ad4-a5d05de41c00">
+    </UnitTestResult>
+    <UnitTestResult executionId="51e9be83-677f-4e75-b146-6d61c3dec292" testId="724733ea-f606-5449-b333-fba278c71e9c" testName="GetFindByColumnsTest" computerName="MBP-WIN7" duration="00:00:00.0036427" startTime="2010-08-05T21:53:08.5610000+01:00" endTime="2010-08-05T21:53:08.5680000+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="51e9be83-677f-4e75-b146-6d61c3dec292">
+    </UnitTestResult>
+    <UnitTestResult executionId="682dcf8e-ee91-49dc-95d0-ce899b8b7b5b" testId="7265f4db-0adf-7603-7550-7346df59599e" testName="TestInsertOnTable" computerName="MBP-WIN7" duration="00:00:00.0068207" startTime="2010-08-05T21:53:08.5710000+01:00" endTime="2010-08-05T21:53:08.5900000+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="682dcf8e-ee91-49dc-95d0-ce899b8b7b5b">
+    </UnitTestResult>
+    <UnitTestResult executionId="9cedb60d-436b-4f62-b2be-d8dfc2e6956e" testId="73d3f434-2d47-a6c2-40de-c1b8ccff6ca7" testName="TestFindByDynamicTwoColumns" computerName="MBP-WIN7" duration="00:00:00.0044645" startTime="2010-08-05T21:53:08.5930000+01:00" endTime="2010-08-05T21:53:08.6100000+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9cedb60d-436b-4f62-b2be-d8dfc2e6956e">
+    </UnitTestResult>
+    <UnitTestResult executionId="b4c79290-24da-46bf-a79b-3e4fc870a9f4" testId="8cf518ad-12b6-2e87-6c80-93e1f615dc52" testName="DynamicCastTest" computerName="MBP-WIN7" duration="00:00:00.0128265" startTime="2010-08-05T21:53:08.6120000+01:00" endTime="2010-08-05T21:53:08.6350000+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b4c79290-24da-46bf-a79b-3e4fc870a9f4">
+    </UnitTestResult>
+    <UnitTestResult executionId="aa3ae872-1a66-471a-8311-d914d28e4f67" testId="b6d1eb81-7e5c-f887-265c-0f9669ec1730" testName="TestExecuteWithInsert" computerName="MBP-WIN7" duration="00:00:00.0029240" startTime="2010-08-05T21:53:08.6400000+01:00" endTime="2010-08-05T21:53:08.6530000+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="aa3ae872-1a66-471a-8311-d914d28e4f67">
+    </UnitTestResult>
+    <UnitTestResult executionId="61b5c834-5f26-424b-bfa5-99b13af58245" testId="c0a25756-bb74-25b8-19eb-4ff44c47482d" testName="DynamicRecordSetterTest" computerName="MBP-WIN7" duration="00:00:00.0249620" startTime="2010-08-05T21:53:08.6610000+01:00" endTime="2010-08-05T21:53:08.6900000+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="61b5c834-5f26-424b-bfa5-99b13af58245">
+    </UnitTestResult>
+    <UnitTestResult executionId="f37a2184-8cc0-4f1f-8de0-c513eebeb312" testId="c558273f-6f33-5cfc-1d47-418d87bbde6e" testName="TestStronglyTypedQuery" computerName="MBP-WIN7" duration="00:00:00.0216844" startTime="2010-08-05T21:53:08.6930000+01:00" endTime="2010-08-05T21:53:08.7190000+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f37a2184-8cc0-4f1f-8de0-c513eebeb312">
+    </UnitTestResult>
+    <UnitTestResult executionId="ecbc0f43-2504-46e9-8e14-b7a5fc9d763b" testId="e322e148-11a0-8148-0a94-9c13d2b4ea47" testName="DynamicRecordDictionaryConstructorTest" computerName="MBP-WIN7" duration="00:00:00.0229698" startTime="2010-08-05T21:53:08.7220000+01:00" endTime="2010-08-05T21:53:08.7590000+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ecbc0f43-2504-46e9-8e14-b7a5fc9d763b">
+    </UnitTestResult>
+    <UnitTestResult executionId="a26cdff3-eead-47a5-b6e7-5318f1c59a45" testId="e7b75366-a725-51e0-34a9-16a13606634b" testName="TestFindByDynamicSingleColumn" computerName="MBP-WIN7" duration="00:00:00.0033936" startTime="2010-08-05T21:53:08.7650000+01:00" endTime="2010-08-05T21:53:08.7740000+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a26cdff3-eead-47a5-b6e7-5318f1c59a45">
+    </UnitTestResult>
+    <UnitTestResult executionId="e82c59be-487a-41c5-a137-27ba3165975b" testId="fe2fb2de-26bc-cbec-7b45-76b8db24521f" testName="PascalToSnakeTest" computerName="MBP-WIN7" duration="00:00:00.0003286" startTime="2010-08-05T21:53:08.7780000+01:00" endTime="2010-08-05T21:53:08.7870000+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e82c59be-487a-41c5-a137-27ba3165975b">
+    </UnitTestResult>
+  </Results>
+</TestRun>

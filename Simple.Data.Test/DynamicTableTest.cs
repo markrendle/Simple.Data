@@ -1,9 +1,7 @@
-﻿using Simple.Data;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 
-namespace Simple.Data.Test
+namespace Simple.Data.UnitTest
 {
     
     

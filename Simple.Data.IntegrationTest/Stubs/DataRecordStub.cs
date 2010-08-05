@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Data;
 
-namespace Simple.Data.Test.Stubs
+namespace Simple.Data.IntegrationTest.Stubs
 {
     class DataRecordStub : IDataRecord
     {
-        private readonly Dictionary<string, object> _data;
+        private readonly IDictionary<string, object> _data;
 
-        public DataRecordStub(Dictionary<string, object> data)
+        public DataRecordStub(IDictionary<string, object> data)
         {
             _data = data;
         }

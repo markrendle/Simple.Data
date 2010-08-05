@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Simple.Data.Test.Stubs;
+using Simple.Data.IntegrationTest.Stubs;
 
-namespace Simple.Data.Test
+namespace Simple.Data.IntegrationTest
 {
     [TestClass]
     public class DatabaseTest
@@ -91,6 +92,28 @@ namespace Simple.Data.Test
             Assert.AreEqual("insert into Users (Name,Age) values (@p0,@p1)", DatabaseStub.Sql);
             Assert.AreEqual("Phil", DatabaseStub.Parameters[0]);
             Assert.AreEqual(42, DatabaseStub.Parameters[1]);
+        }
+
+        [TestMethod]
+        public void TestStronglyTypedQuery()
+        {
+            dynamic database = new Database(new DbConnectionStub {DummyDataTable = CreateDummyDataTable()});
+            User user = database.Users.FindByName("Bob");
+            Assert.AreEqual("Bob", user.Name);
+            Assert.AreEqual("Secret", user.Password);
+            Assert.AreEqual(42, user.Age);
+        }
+
+        private static DataTable CreateDummyDataTable()
+        {
+            var table = new DataTable("Users");
+            table.Columns.Add("Name", typeof (string));
+            table.Columns.Add("Password", typeof(string));
+            table.Columns.Add("Age", typeof(int));
+
+            table.LoadDataRow(new object[] {"Bob", "Secret", 42}, true);
+
+            return table;
         }
     }
 }

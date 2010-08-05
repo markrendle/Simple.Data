@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 
-namespace Simple.Data.Test.Stubs
+namespace Simple.Data.IntegrationTest.Stubs
 {
     class DataParameterCollection : Collection<IDataParameter>, IDataParameterCollection
     {

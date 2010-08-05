@@ -9,17 +9,14 @@ namespace Simple.Data
 {
     internal static class DataRecordExtensions
     {
-        public static dynamic ToDynamicRow(this IDataRecord dataRecord)
+        public static dynamic ToDynamicRecord(this IDataRecord dataRecord)
         {
-            var expando = new ExpandoObject();
-            var asDictionary = (IDictionary<string, object>)expando;
+            return new DynamicRecord(dataRecord.ToDictionary());
+        }
 
-            foreach (var fieldName in dataRecord.GetFieldNames())
-            {
-                asDictionary[fieldName] = dataRecord[fieldName];
-            }
-
-            return expando;
+        public static Dictionary<string, object> ToDictionary(this IDataRecord dataRecord)
+        {
+            return dataRecord.GetFieldNames().ToDictionary(fieldName => fieldName, fieldName => dataRecord[fieldName]);
         }
 
         public static IEnumerable<string> GetFieldNames(this IDataRecord dataRecord)

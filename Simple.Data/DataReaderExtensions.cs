@@ -15,7 +15,7 @@ namespace Simple.Data
             {
                 while (reader.Read())
                 {
-                    list.Add(reader.ToDynamicRow());
+                    list.Add(reader.ToDynamicRecord());
                 }
             }
 

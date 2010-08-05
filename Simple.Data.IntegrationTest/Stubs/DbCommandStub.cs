@@ -3,11 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data;
+using Simple.Data.IntegrationTest.Stubs;
 
-namespace Simple.Data.Test.Stubs
+namespace Simple.Data.IntegrationTest.Stubs
 {
     class DbCommandStub : IDbCommand
     {
+        private readonly DbConnectionStub _connection;
+
+        public DbCommandStub(DbConnectionStub connection)
+        {
+            _connection = connection;
+        }
+
         private readonly DataParameterCollection _parameters = new DataParameterCollection();
 
         public void Cancel()
@@ -42,6 +50,10 @@ namespace Simple.Data.Test.Stubs
         public IDataReader ExecuteReader()
         {
             DatabaseStub.Record(this);
+            if (_connection != null && _connection.DummyDataTable != null)
+            {
+                return _connection.DummyDataTable.CreateDataReader();
+            }
             return new DataReaderStub(Enumerable.Empty<IDataRecord>());
         }
 

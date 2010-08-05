@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestRun id="0f799754-b1df-4b62-8293-04117d5973c8" name="Mark@MBP-WIN7 2010-08-05 20:26:34" runUser="MBP-Win7\Mark" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <TestSettings name="Default Test Settings" id="1013c98d-f0e1-4612-9ccc-cbb9587be413">
+    <Deployment runDeploymentRoot="Mark_MBP-WIN7 2010-08-05 20_26_34">
+      <DeploymentItem filename="C:\Workspace\Simple.Data\Simple.Data\bin\Debug\Simple.Data.dll" />
+    </Deployment>
+    <Execution>
+      <TestTypeSpecific />
+      <AgentRule name="Execution Agents">
+      </AgentRule>
+    </Execution>
+  </TestSettings>
+  <Times creation="2010-08-05T20:26:34.5100000+01:00" queuing="2010-08-05T20:26:34.6840000+01:00" start="2010-08-05T20:26:34.7620000+01:00" finish="2010-08-05T20:26:35.2510000+01:00" />
+  <ResultSummary outcome="Completed">
+    <Counters total="1" executed="1" passed="1" error="0" failed="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+  <TestDefinitions>
+    <UnitTest name="DynamicRecordSetterTest" storage="c:\workspace\simple.data\simple.data.test\bin\debug\simple.data.test.dll" id="875bd679-a17f-988d-91f9-ca9f87b9fa31">
+      <Execution id="6e0431dd-c840-470c-ba17-f1a4689eb5ae" />
+      <TestMethod codeBase="C:/Workspace/Simple.Data/Simple.Data.Test/bin/Debug/Simple.Data.Test.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Simple.Data.Test.DynamicRecordTest, Simple.Data.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="DynamicRecordSetterTest" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <TestEntries>
+    <TestEntry testId="875bd679-a17f-988d-91f9-ca9f87b9fa31" executionId="6e0431dd-c840-470c-ba17-f1a4689eb5ae" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <Results>
+    <UnitTestResult executionId="6e0431dd-c840-470c-ba17-f1a4689eb5ae" testId="875bd679-a17f-988d-91f9-ca9f87b9fa31" testName="DynamicRecordSetterTest" computerName="MBP-WIN7" duration="00:00:00.0498374" startTime="2010-08-05T20:26:34.8110000+01:00" endTime="2010-08-05T20:26:35.1540000+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6e0431dd-c840-470c-ba17-f1a4689eb5ae">
+    </UnitTestResult>
+  </Results>
+</TestRun>

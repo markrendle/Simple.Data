@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Data;
+using Simple.Data.IntegrationTest.Stubs;
 
-namespace Simple.Data.Test.Stubs
+namespace Simple.Data.IntegrationTest.Stubs
 {
     class DbConnectionStub : IDbConnection
     {
+        public DataTable DummyDataTable { get; set; }
+
         public IDbTransaction BeginTransaction(IsolationLevel il)
         {
             throw new NotImplementedException();
@@ -47,7 +47,7 @@ namespace Simple.Data.Test.Stubs
 
         public IDbCommand CreateCommand()
         {
-            return new DbCommandStub();
+            return new DbCommandStub(this);
         }
 
         public string Database
