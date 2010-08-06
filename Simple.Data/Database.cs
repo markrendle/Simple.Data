@@ -33,12 +33,12 @@ namespace Simple.Data
             _connectionProvider = connectionProvider;
         }
 
-        public static Database Open()
+        public static dynamic Open()
         {
             return new Database(Properties.Settings.Default.ConnectionString);
         }
 
-        public static Database OpenConnection(string connectionString)
+        public static dynamic OpenConnection(string connectionString)
         {
             return new Database(connectionString);
         }
@@ -48,7 +48,7 @@ namespace Simple.Data
             return new Database(ProviderHelper.GetProviderByFilename(filename));
         }
 
-        public IEnumerable<dynamic> Query(string sql, params object[] values)
+        internal IEnumerable<dynamic> Query(string sql, params object[] values)
         {
             using (var connection = CreateConnection())
             {
@@ -61,7 +61,7 @@ namespace Simple.Data
             }
         }
 
-        public void Execute(string sql, params object[] values)
+        internal void Execute(string sql, params object[] values)
         {
             using (var connection = CreateConnection())
             {
