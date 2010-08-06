@@ -6,10 +6,10 @@ using System.Text;
 
 namespace Simple.Data
 {
-    public class DynamicRecord : DynamicObject
+    public partial class DynamicRecord : DynamicObject
     {
-        private readonly Dictionary<string, object> _data;
-
+        private readonly IDictionary<string, object> _data;
+        
         public DynamicRecord()
         {
             _data = new Dictionary<string, object>();
