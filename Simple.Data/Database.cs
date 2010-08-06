@@ -7,11 +7,13 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Data;
 using System.Dynamic;
+using Simple.Data.SqlCe;
 
 namespace Simple.Data
 {
     public class Database : DynamicObject
     {
+        private readonly IConnectionProvider _connectionProvider;
         private readonly IDbConnection _connection;
         private readonly string _connectionString;
         private readonly CommandHelper _commandHelper = new CommandHelper();
@@ -26,6 +28,11 @@ namespace Simple.Data
             _connection = connection;
         }
 
+        internal Database(IConnectionProvider connectionProvider)
+        {
+            _connectionProvider = connectionProvider;
+        }
+
         public static Database Open()
         {
             return new Database(Properties.Settings.Default.ConnectionString);
@@ -34,6 +41,11 @@ namespace Simple.Data
         public static Database OpenConnection(string connectionString)
         {
             return new Database(connectionString);
+        }
+
+        public static dynamic OpenFile(string filename)
+        {
+            return new Database(ProviderHelper.GetProviderByFilename(filename));
         }
 
         public IEnumerable<dynamic> Query(string sql, params object[] values)
@@ -83,6 +95,7 @@ namespace Simple.Data
 
         internal IDbConnection CreateConnection()
         {
+            if (_connectionProvider != null) return _connectionProvider.CreateConnection();
             // Testability
             return _connection ?? new SqlConnection(_connectionString);
         }

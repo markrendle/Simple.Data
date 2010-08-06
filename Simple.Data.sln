@@ -16,6 +16,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.IntegrationTest
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.UnitTest", "Simple.Data.UnitTest\Simple.Data.UnitTest.csproj", "{1D2908F9-A78B-4EE1-8DAA-D4DBF3937C58}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assemblies", "Assemblies", "{BA656253-3472-4A47-8640-976E89465B6F}"
+	ProjectSection(SolutionItems) = preProject
+		Assemblies\System.Data.SqlServerCe.dll = Assemblies\System.Data.SqlServerCe.dll
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.SqlCeTest", "Simple.Data.SqlCe4Test\Simple.Data.SqlCeTest.csproj", "{29BBCAE1-DF13-40A0-A412-F2F87F4E9351}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Simple.Data.vsmdi
@@ -41,6 +48,10 @@ Global
 		{1D2908F9-A78B-4EE1-8DAA-D4DBF3937C58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D2908F9-A78B-4EE1-8DAA-D4DBF3937C58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D2908F9-A78B-4EE1-8DAA-D4DBF3937C58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29BBCAE1-DF13-40A0-A412-F2F87F4E9351}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29BBCAE1-DF13-40A0-A412-F2F87F4E9351}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29BBCAE1-DF13-40A0-A412-F2F87F4E9351}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29BBCAE1-DF13-40A0-A412-F2F87F4E9351}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
