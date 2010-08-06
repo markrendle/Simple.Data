@@ -40,13 +40,11 @@ namespace Simple.Data
         {
             bool anyPropertiesSet = false;
             var obj = Activator.CreateInstance(binder.Type);
-            foreach (var propertyInfo in binder.Type.GetProperties())
+            foreach (var propertyInfo in
+                binder.Type.GetProperties().Where(propertyInfo => _data.ContainsKey(propertyInfo.Name)))
             {
-                if (_data.ContainsKey(propertyInfo.Name))
-                {
-                    propertyInfo.SetValue(obj, _data[propertyInfo.Name], null);
-                    anyPropertiesSet = true;
-                }
+                propertyInfo.SetValue(obj, _data[propertyInfo.Name], null);
+                anyPropertiesSet = true;
             }
 
             result = anyPropertiesSet ? obj : null;

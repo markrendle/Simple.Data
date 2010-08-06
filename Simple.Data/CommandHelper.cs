@@ -13,14 +13,12 @@ namespace Simple.Data
         {
             var command = connection.CreateCommand();
 
-            var parameters = new IDataParameter[values.Length];
-
             command.CommandText = PrepareCommand(sql, values, command);
 
             return command;
         }
 
-        private static string PrepareCommand(IEnumerable<char> sql, object[] values, IDbCommand command)
+        private static string PrepareCommand(IEnumerable<char> sql, IList<object> values, IDbCommand command)
         {
             int index = 0;
             var sqlBuilder = new StringBuilder();

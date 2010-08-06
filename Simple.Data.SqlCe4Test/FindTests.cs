@@ -23,7 +23,6 @@ namespace Simple.Data.SqlCeTest
         [TestMethod]
         public void TestMethod1()
         {
-            Trace.WriteLine(Environment.CurrentDirectory);
             var provider = ProviderHelper.GetProviderByFilename(DatabasePath);
             Assert.IsInstanceOfType(provider, typeof(SqlCeProvider));
         }
@@ -31,11 +30,36 @@ namespace Simple.Data.SqlCeTest
         [TestMethod]
         public void TestFindById()
         {
-            Trace.WriteLine(Assembly.GetExecutingAssembly().CodeBase);
-            Trace.WriteLine(Environment.CurrentDirectory);
             var db = Database.OpenFile(DatabasePath);
             var user = db.Users.FindById(1);
             Assert.AreEqual(1, user.Id);
+        }
+
+        [TestMethod]
+        public void TestAllCount()
+        {
+            var db = Database.OpenFile(DatabasePath);
+            var count = db.Users.All.Count;
+            Assert.AreEqual(3, count);
+        }
+
+        [TestMethod]
+        public void TestImplicitCast()
+        {
+            var db = Database.OpenFile(DatabasePath);
+            User user = db.Users.FindById(1);
+            Assert.AreEqual(1, user.Id);
+        }
+
+        [TestMethod]
+        public void TestImplicitEnumerableCast()
+        {
+            var db = Database.OpenFile(DatabasePath);
+            foreach (User user in db.Users.All)
+            {
+                Assert.IsNotNull(user);
+            }
+            
         }
     }
 }
