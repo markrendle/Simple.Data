@@ -79,7 +79,9 @@
     <Content Include="Global.asax" />
     <Content Include="Views\People\Get.aspx" />
     <Content Include="Views\People\Index.aspx" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
