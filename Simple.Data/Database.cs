@@ -48,7 +48,7 @@ namespace Simple.Data
             return new Database(ProviderHelper.GetProviderByFilename(filename));
         }
 
-        public IEnumerable<dynamic> Query(string sql, params object[] values)
+        internal IEnumerable<dynamic> Query(string sql, params object[] values)
         {
             using (var connection = CreateConnection())
             {
@@ -61,7 +61,7 @@ namespace Simple.Data
             }
         }
 
-        public void Execute(string sql, params object[] values)
+        internal void Execute(string sql, params object[] values)
         {
             using (var connection = CreateConnection())
             {

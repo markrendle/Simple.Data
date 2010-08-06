@@ -59,7 +59,18 @@ namespace Simple.Data.SqlCeTest
             {
                 Assert.IsNotNull(user);
             }
-            
+        }
+
+        [TestMethod]
+        public void TestInsert()
+        {
+            var db = Database.OpenFile(DatabasePath);
+
+            db.Users.Insert(Name: "Alice", Password: "foo", Age: 29);
+            User user = db.Users.FindByNameAndPassword("Alice", "foo");
+
+            Assert.IsNotNull(user);
+            Assert.AreEqual(29, user.Age);
         }
     }
 }
