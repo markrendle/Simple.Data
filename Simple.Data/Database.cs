@@ -71,6 +71,16 @@ namespace Simple.Data
             Execute(insertSql, data.Values.ToArray());
         }
 
+        public void Update(string table, IDictionary<string, object> data, IDictionary<string, object> criteria)
+        {
+            string set = string.Join(", ", data.Keys.Select(key => key + " = ?"));
+            string where = string.Join(" and ", criteria.Keys.Select(key => key + " = ?"));
+
+            string updateSql = "update " + table + " set " + set + " where " + where;
+
+            Execute(updateSql, data.Values.Concat(criteria.Values).ToArray());
+        }
+
         internal IDbConnection CreateConnection()
         {
             // Testability

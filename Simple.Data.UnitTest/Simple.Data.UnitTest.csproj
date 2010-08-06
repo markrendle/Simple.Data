@@ -53,7 +53,7 @@
     <Compile Include="DataRecordExtensionsTest.cs" />
     <Compile Include="DynamicRecordTest.cs" />
     <Compile Include="DynamicStringExtensionsTest.cs" />
-    <Compile Include="DynamicTableTest.cs" />
+    <Compile Include="FindHelperTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

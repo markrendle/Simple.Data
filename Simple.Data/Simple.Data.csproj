@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BinderHelper.cs" />
     <Compile Include="CommandHelper.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="DataReaderExtensions.cs" />
@@ -47,12 +48,17 @@
     <Compile Include="DynamicRecord.cs" />
     <Compile Include="DynamicStringExtensions.cs" />
     <Compile Include="DynamicTable.cs" />
+    <Compile Include="FindAllByHelper.cs" />
+    <Compile Include="FindByHelper.cs" />
+    <Compile Include="FindHelper.cs" />
+    <Compile Include="InsertHelper.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UpdateHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
