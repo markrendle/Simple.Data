@@ -10,9 +10,9 @@
 <body>
     <%
         var db = Database.Open();
-        var person = db["People"].FindByNameAndPostcode("Mark", "SW1");
+        var person = db.People.FindById(1);
     %>
 
-    <h1><%= person.Name %> - <%= person.Postcode %></h1>
+    <h1><%= person.FirstName %> - <%= person.LastName %></h1>
 </body>
 </html>

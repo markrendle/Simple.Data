@@ -33,12 +33,12 @@ namespace Simple.Data
             _connectionProvider = connectionProvider;
         }
 
-        public static Database Open()
+        public static dynamic Open()
         {
-            return new Database(Properties.Settings.Default.ConnectionString);
+            return new Database(new SqlProvider(Properties.Settings.Default.ConnectionString));
         }
 
-        public static Database OpenConnection(string connectionString)
+        public static dynamic OpenConnection(string connectionString)
         {
             return new Database(connectionString);
         }

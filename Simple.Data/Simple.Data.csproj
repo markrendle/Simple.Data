@@ -66,6 +66,7 @@
     <Compile Include="ProviderHelper.cs" />
     <Compile Include="SqlCe\IFileDatabaseProvider.cs" />
     <Compile Include="SqlCe\SqlCeProvider.cs" />
+    <Compile Include="SqlCe\SqlProvider.cs" />
     <Compile Include="UpdateHelper.cs" />
   </ItemGroup>
   <ItemGroup>
