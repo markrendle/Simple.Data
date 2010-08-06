@@ -103,5 +103,13 @@ namespace Simple.Data
         {
             get { return _commandHelper; }
         }
+
+        public void Delete(string table, IDictionary<string, object> criteria)
+        {
+            string where = string.Join(" and ", criteria.Keys.Select(key => key + " = ?"));
+            string deleteSql = "delete from " + table + " where " + where;
+
+            Execute(deleteSql, criteria.Values.ToArray());
+        }
     }
 }

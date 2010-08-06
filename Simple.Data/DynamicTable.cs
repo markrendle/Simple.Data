@@ -43,6 +43,11 @@ namespace Simple.Data
                 result = new UpdateHelper(_database, _tableName).Run(binder, args);
                 success = true;
             }
+            else if (binder.Name.Equals("Delete", StringComparison.InvariantCultureIgnoreCase))
+            {
+                result = new DeleteHelper(_database, _tableName).Run(binder, args);
+                success = true;
+            }
             else
             {
                 success = base.TryInvokeMember(binder, args, out result);

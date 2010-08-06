@@ -93,6 +93,15 @@ namespace Simple.Data.IntegrationTest
         }
 
         [TestMethod]
+        public void TestDeleteWithNamedArguments()
+        {
+            dynamic database = new Database(new DbConnectionStub());
+            database.Users.Delete(Id: 1);
+            Assert.AreEqual("delete from Users where Id = @p0", DatabaseStub.Sql, true);
+            Assert.AreEqual(1, DatabaseStub.Parameters[0]);
+        }
+
+        [TestMethod]
         public void TestInsertOnTable()
         {
             dynamic person = new ExpandoObject();
