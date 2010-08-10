@@ -28,7 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assemblies", "Assemblies", 
 		Assemblies\System.Data.SqlServerCe.dll = Assemblies\System.Data.SqlServerCe.dll
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.SqlCeTest", "Simple.Data.SqlCe4Test\Simple.Data.SqlCeTest.csproj", "{29BBCAE1-DF13-40A0-A412-F2F87F4E9351}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.SqlCeTest", "Simple.Data.SqlCeTest\Simple.Data.SqlCeTest.csproj", "{29BBCAE1-DF13-40A0-A412-F2F87F4E9351}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
