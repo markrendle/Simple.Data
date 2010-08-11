@@ -7,17 +7,24 @@ namespace Simple.Data.Schema
 {
     class Table
     {
-        private readonly string _name;
+        private readonly string _actualName;
+        private readonly string _homogenizedName;
         private readonly string _schema;
         private readonly DatabaseSchema _databaseSchema;
         private readonly Lazy<ColumnCollection> _lazyColumns;
 
         public Table(string name, string schema, DatabaseSchema databaseSchema)
         {
-            _name = name;
+            _actualName = name;
+            _homogenizedName = name.Homogenize();
             _databaseSchema = databaseSchema;
             _schema = schema;
             _lazyColumns = new Lazy<ColumnCollection>(GetColumns);
+        }
+
+        public string HomogenizedName
+        {
+            get { return _homogenizedName; }
         }
 
         public DatabaseSchema DatabaseSchema
@@ -30,9 +37,9 @@ namespace Simple.Data.Schema
             get { return _schema; }
         }
 
-        public string Name
+        public string ActualName
         {
-            get { return _name; }
+            get { return _actualName; }
         }
 
         public IEnumerable<Column> Columns

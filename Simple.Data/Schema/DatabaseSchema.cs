@@ -42,7 +42,7 @@ namespace Simple.Data.Schema
         {
             return new TableCollection(
                 _database.Query("select TABLE_NAME, TABLE_SCHEMA from INFORMATION_SCHEMA.TABLES")
-                .Select(d => new Table(d.TABLE_NAME.ToString(), d.TABLE_SCHEMA.ToString(), this))
+                .Select(d => new Table(d.TableName.ToString(), d.TableSchema.ToString(), this))
                 );
         }
     }

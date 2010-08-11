@@ -8,23 +8,30 @@ namespace Simple.Data.Schema
 {
     class Column
     {
-        private readonly string _name;
+        private readonly string _actualName;
+        private readonly string _homogenizedName;
 
         public Column(string name)
         {
-            _name = name;
+            _actualName = name;
+            _homogenizedName = name.Homogenize();
         }
 
-        public string Name
+        public string HomogenizedName
         {
-            get { return _name; }
+            get { return _homogenizedName; }
+        }
+
+        public string ActualName
+        {
+            get { return _actualName; }
         }
 
         public static IEnumerable<Column> GetColumnsForTable(Table table)
         {
             return table.DatabaseSchema.Database.Query(
-                "select COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = ?", table.Name)
-                .Select(d => new Column(d.COLUMN_NAME.ToString()));
+                "select COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = ?", table.ActualName)
+                .Select(d => new Column(d.ColumnName.ToString()));
         }
     }
 }

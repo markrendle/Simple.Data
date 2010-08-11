@@ -26,7 +26,7 @@ namespace Simple.Data.SqlCeTest.SchemaTests
         public void TestTables()
         {
             var schema = GetSchema();
-            Assert.AreEqual(1, schema.Tables.Count(t => t.Name == "Users"));
+            Assert.AreEqual(1, schema.Tables.Count(t => t.ActualName == "Users"));
         }
 
         [TestMethod]
@@ -34,7 +34,7 @@ namespace Simple.Data.SqlCeTest.SchemaTests
         {
             var schema = GetSchema();
             var table = schema.FindTable("Users");
-            Assert.AreEqual(1, table.Columns.Count(c => c.Name == "Id"));
+            Assert.AreEqual(1, table.Columns.Count(c => c.ActualName == "Id"));
         }
 
     }

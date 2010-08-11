@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
+using Simple.Data.Schema;
 
 namespace Simple.Data
 {
@@ -15,16 +16,17 @@ namespace Simple.Data
             _data = new Dictionary<string, object>();
         }
 
-        public DynamicRecord(IDictionary<string, object> data)
+        public DynamicRecord(IEnumerable<KeyValuePair<string, object>> data)
         {
-            _data = new Dictionary<string, object>(data);
+            _data = data.Select(kvp => new KeyValuePair<string, object>(kvp.Key.Homogenize(), kvp.Value)).ToDictionary();
         }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            if (_data.ContainsKey(binder.Name))
+            var name = binder.Name.Homogenize();
+            if (_data.ContainsKey(name))
             {
-                result = _data[binder.Name];
+                result = _data[name];
                 return true;
             }
             return base.TryGetMember(binder, out result);
@@ -32,7 +34,7 @@ namespace Simple.Data
 
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
-            _data[binder.Name] = value;
+            _data[binder.Name.Homogenize()] = value;
             return true;
         }
 
@@ -41,9 +43,9 @@ namespace Simple.Data
             bool anyPropertiesSet = false;
             var obj = Activator.CreateInstance(binder.Type);
             foreach (var propertyInfo in
-                binder.Type.GetProperties().Where(propertyInfo => _data.ContainsKey(propertyInfo.Name)))
+                binder.Type.GetProperties().Where(propertyInfo => _data.ContainsKey(propertyInfo.Name.Homogenize())))
             {
-                propertyInfo.SetValue(obj, _data[propertyInfo.Name], null);
+                propertyInfo.SetValue(obj, _data[propertyInfo.Name.Homogenize()], null);
                 anyPropertiesSet = true;
             }
 

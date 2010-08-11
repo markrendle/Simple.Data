@@ -53,6 +53,7 @@
     <Compile Include="DynamicRecord.cs" />
     <Compile Include="DynamicStringExtensions.cs" />
     <Compile Include="DynamicTable.cs" />
+    <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="FindAllByHelper.cs" />
     <Compile Include="FindByHelper.cs" />
     <Compile Include="FindHelper.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Schema\Column.cs" />
     <Compile Include="Schema\ColumnCollection.cs" />
     <Compile Include="Schema\DatabaseSchema.cs" />
+    <Compile Include="Schema\SchemaSpecificStringExtensions.cs" />
     <Compile Include="Schema\Table.cs" />
     <Compile Include="Schema\TableCollection.cs" />
     <Compile Include="SqlCe\IConnectionProvider.cs" />

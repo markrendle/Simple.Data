@@ -36,7 +36,7 @@ namespace Simple.Data.Schema
             try
             {
                 return this
-                    .Where(t => t.Name.Equals(tableName))
+                    .Where(t => t.ActualName.Equals(tableName))
                     .SingleOrDefault();
             }
             catch (InvalidOperationException)
@@ -50,7 +50,7 @@ namespace Simple.Data.Schema
             try
             {
                 return this
-                    .Where(t => t.Name.Equals(tableName, StringComparison.InvariantCultureIgnoreCase))
+                    .Where(t => t.ActualName.Equals(tableName, StringComparison.InvariantCultureIgnoreCase))
                     .SingleOrDefault();
             }
             catch (InvalidOperationException)
