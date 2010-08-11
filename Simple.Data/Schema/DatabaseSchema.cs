@@ -9,53 +9,41 @@ namespace Simple.Data.Schema
 {
     internal class DatabaseSchema
     {
-        private readonly DbConnection _connection;
-        private readonly List<Table> _tables;
+        private readonly Database _database;
+        private readonly Lazy<TableCollection> _lazyTables;
 
-        public DatabaseSchema(Func<IDbConnection> connectionFunc)
+        public DatabaseSchema(Database database)
         {
-            _connection = connectionFunc() as DbConnection;
+            _lazyTables = new Lazy<TableCollection>(CreateTableCollection);
+            _database = database;
+        }
 
-            if (_connection != null)
-            {
-                var tables = _connection.GetSchema("Tables").AsEnumerable()
-                    .Select(row => new Table(row.Field<string>("table_name"), row.Field<string>("table_schema")));
-                _tables = new List<Table>(tables);
-            }
+        public Database Database
+        {
+            get { return _database; }
         }
 
         public bool IsAvailable
         {
-            get { return _connection != null; }
+            get { return _database != null; }
         }
 
-        public Table GetTable(string tableName)
+        public IEnumerable<Table> Tables
         {
-            return GetTableWithExactName(tableName)
-                   ?? GetTableWithPluralName(tableName)
-                   ?? GetTableWithSingularName(tableName);
+            get { return _lazyTables.Value.AsEnumerable(); }
         }
 
-        private Table GetTableWithExactName(string tableName)
+        public Table FindTable(string tableName)
         {
-            return _tables
-                .Where(t => t.Name.Equals(tableName, StringComparison.InvariantCultureIgnoreCase))
-                .FirstOrDefault();
+            return _lazyTables.Value.Find(tableName);
         }
 
-        private Table GetTableWithPluralName(string tableName)
+        private TableCollection CreateTableCollection()
         {
-            return GetTableWithExactName(tableName.Pluralize());
-        }
-
-        private Table GetTableWithSingularName(string tableName)
-        {
-            if (tableName.IsPlural())
-            {
-                return GetTableWithExactName(tableName.Singularize());
-            }
-
-            return null;
+            return new TableCollection(
+                _database.Query("select TABLE_NAME, TABLE_SCHEMA from INFORMATION_SCHEMA.TABLES")
+                .Select(d => new Table(d.TABLE_NAME.ToString(), d.TABLE_SCHEMA.ToString(), this))
+                );
         }
     }
 }

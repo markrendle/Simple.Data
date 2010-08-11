@@ -7,6 +7,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Data;
 using System.Dynamic;
+using Simple.Data.Schema;
 using Simple.Data.SqlCe;
 
 namespace Simple.Data
@@ -123,6 +124,11 @@ namespace Simple.Data
             string deleteSql = "delete from " + table + " where " + where;
 
             Execute(deleteSql, criteria.Values.ToArray());
+        }
+
+        internal DatabaseSchema GetSchema()
+        {
+            return new DatabaseSchema(this);
         }
     }
 }

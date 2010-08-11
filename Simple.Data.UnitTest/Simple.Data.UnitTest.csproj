@@ -57,6 +57,7 @@
     <Compile Include="FindHelperTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringExtensionsTest.cs" />
+    <Compile Include="TableCollectionTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Simple.Data\Simple.Data.csproj">

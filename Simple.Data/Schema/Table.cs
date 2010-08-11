@@ -9,11 +9,20 @@ namespace Simple.Data.Schema
     {
         private readonly string _name;
         private readonly string _schema;
+        private readonly DatabaseSchema _databaseSchema;
+        private readonly Lazy<ColumnCollection> _lazyColumns;
 
-        public Table(string name, string schema)
+        public Table(string name, string schema, DatabaseSchema databaseSchema)
         {
             _name = name;
+            _databaseSchema = databaseSchema;
             _schema = schema;
+            _lazyColumns = new Lazy<ColumnCollection>(GetColumns);
+        }
+
+        public DatabaseSchema DatabaseSchema
+        {
+            get { return _databaseSchema; }
         }
 
         public string Schema
@@ -24,6 +33,21 @@ namespace Simple.Data.Schema
         public string Name
         {
             get { return _name; }
+        }
+
+        public IEnumerable<Column> Columns
+        {
+            get { return _lazyColumns.Value.AsEnumerable(); }
+        }
+
+        public Column FindColumn(string columnName)
+        {
+            return _lazyColumns.Value.Find(columnName);
+        }
+
+        private ColumnCollection GetColumns()
+        {
+            return new ColumnCollection(Column.GetColumnsForTable(this));
         }
     }
 }
