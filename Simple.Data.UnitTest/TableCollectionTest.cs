@@ -19,11 +19,7 @@ namespace Simple.Data.UnitTest
         [TestMethod()]
         public void FindExactMatchTest()
         {
-            const string expected = "Users";
-            var target = new TableCollection {new Table(expected, "", null)};
-            var actual = target.Find("Users");
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(expected, actual.ActualName);
+            Helper("Users", "Users");
         }
 
         /// <summary>
@@ -32,11 +28,7 @@ namespace Simple.Data.UnitTest
         [TestMethod()]
         public void FindCaseInsensitiveMatchTest()
         {
-            const string expected = "USERS";
-            var target = new TableCollection { new Table(expected, "", null) };
-            var actual = target.Find("Users");
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(expected, actual.ActualName);
+            Helper("USERS", "Users");
         }
 
         /// <summary>
@@ -45,11 +37,7 @@ namespace Simple.Data.UnitTest
         [TestMethod()]
         public void FindPluralMatchTest()
         {
-            const string expected = "USERS";
-            var target = new TableCollection { new Table(expected, "", null) };
-            var actual = target.Find("User");
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(expected, actual.ActualName);
+            Helper("Users", "User");
         }
 
         /// <summary>
@@ -58,11 +46,39 @@ namespace Simple.Data.UnitTest
         [TestMethod()]
         public void FindSingularMatchTest()
         {
-            const string expected = "USER";
-            var target = new TableCollection { new Table(expected, "", null) };
-            var actual = target.Find("Users");
+            Helper("User", "Users");
+        }
+
+        [TestMethod]
+        public void FindSnakeFromCamel()
+        {
+            Helper("USER_PROFILE", "UserProfile");
+        }
+
+        [TestMethod]
+        public void FindSnakeFromPluralCamel()
+        {
+            Helper("USER_PROFILE", "UserProfiles");
+        }
+
+        [TestMethod]
+        public void FindCamelFromSnake()
+        {
+            Helper("UserProfile", "USER_PROFILE");
+        }
+
+        [TestMethod]
+        public void FindCamelFromPluralSnake()
+        {
+            Helper("UserProfiles", "USER_PROFILE");
+        }
+
+        private static void Helper(string actualName, string searchName)
+        {
+            var target = new TableCollection { new Table(actualName, "", null) };
+            var actual = target.Find(searchName);
             Assert.IsNotNull(actual);
-            Assert.AreEqual(expected, actual.ActualName);
+            Assert.AreEqual(actualName, actual.ActualName);
         }
     }
 }

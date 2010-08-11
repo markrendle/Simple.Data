@@ -72,6 +72,7 @@
     <Compile Include="Schema\SchemaSpecificStringExtensions.cs" />
     <Compile Include="Schema\Table.cs" />
     <Compile Include="Schema\TableCollection.cs" />
+    <Compile Include="Schema\TableJoin.cs" />
     <Compile Include="SqlCe\IConnectionProvider.cs" />
     <Compile Include="SqlCe\SqlCeProvider.cs" />
     <Compile Include="SqlCe\SqlProvider.cs" />

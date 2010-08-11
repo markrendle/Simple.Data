@@ -11,10 +11,10 @@ namespace Simple.Data.Schema
         private readonly string _actualName;
         private readonly string _homogenizedName;
 
-        public Column(string name)
+        public Column(string actualName)
         {
-            _actualName = name;
-            _homogenizedName = name.Homogenize();
+            _actualName = actualName;
+            _homogenizedName = actualName.Homogenize();
         }
 
         public string HomogenizedName

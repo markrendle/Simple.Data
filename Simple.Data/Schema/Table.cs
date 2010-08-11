@@ -56,5 +56,39 @@ namespace Simple.Data.Schema
         {
             return new ColumnCollection(Column.GetColumnsForTable(this));
         }
+
+        public TableJoin GetMaster(string name)
+        {
+            var master = DatabaseSchema.FindTable(name);
+            if (master != null)
+            {
+                string commonColumnName = GetCommonColumnName(master);
+
+                if (commonColumnName != null)
+                {
+                    return new TableJoin(master, master.FindColumn(commonColumnName), this, FindColumn(commonColumnName));
+                }
+            }
+            return null;
+        }
+
+        private string GetCommonColumnName(Table other)
+        {
+            return other.Columns
+                .Select(c => c.HomogenizedName)
+                .Intersect(this.Columns.Select(c => c.HomogenizedName))
+                .SingleOrDefault();
+        }
+
+        public TableJoin GetDetail(string name)
+        {
+            var detail = DatabaseSchema.FindTable(name);
+            string commonColumnName = GetCommonColumnName(detail);
+            if (detail.Columns.Select(c => c.HomogenizedName).Intersect(this.Columns.Select(c => c.HomogenizedName)).Count() == 1)
+            {
+                return new TableJoin(this, FindColumn(commonColumnName), detail, detail.FindColumn(commonColumnName));
+            }
+            return null;
+        }
     }
 }

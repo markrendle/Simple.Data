@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Dynamic;
+using Simple.Data.Schema;
 
 namespace Simple.Data
 {
@@ -11,7 +12,12 @@ namespace Simple.Data
     {
         public static dynamic ToDynamicRecord(this IDataRecord dataRecord)
         {
-            return new DynamicRecord(dataRecord.ToDictionary());
+            return ToDynamicRecord(dataRecord, null, null);
+        }
+
+        public static dynamic ToDynamicRecord(this IDataRecord dataRecord, string tableName, Database database)
+        {
+            return new DynamicRecord(dataRecord.ToDictionary(), tableName, database);
         }
 
         public static Dictionary<string, object> ToDictionary(this IDataRecord dataRecord)

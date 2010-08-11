@@ -62,6 +62,19 @@ namespace Simple.Data
             }
         }
 
+        internal IEnumerable<dynamic> QueryTable(string tableName, string sql, params object[] values)
+        {
+            using (var connection = CreateConnection())
+            {
+                using (var command = CommandHelper.Create(connection, sql, values))
+                {
+                    connection.Open();
+
+                    return command.ExecuteReader().ToDynamicList(this, tableName);
+                }
+            }
+        }
+
         internal void Execute(string sql, params object[] values)
         {
             using (var connection = CreateConnection())

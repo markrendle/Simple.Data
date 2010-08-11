@@ -21,7 +21,7 @@ namespace Simple.Data
         {
             string sql = GetFindBySql(_tableName, binder.Name.Substring(6), args);
 
-            return _database.Query(sql, args.ToArray()).FirstOrDefault();
+            return _database.QueryTable(_tableName, sql, args.ToArray()).FirstOrDefault();
         }
     }
 }

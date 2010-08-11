@@ -25,50 +25,28 @@ namespace Simple.Data.Schema
         /// <returns>A <see cref="Table"/> if a match is found; otherwise, <c>null</c>.</returns>
         public Table Find(string tableName)
         {
-            return FindTableWithExactName(tableName)
-                   ?? FindTableWithCaseInsensitiveName(tableName)
-                   ?? FindTableWithPluralName(tableName)
-                   ?? FindTableWithSingularName(tableName);
+            return FindTableWithName(tableName.Homogenize())
+                   ?? FindTableWithPluralName(tableName.Homogenize())
+                   ?? FindTableWithSingularName(tableName.Homogenize());
         }
 
-        private Table FindTableWithExactName(string tableName)
+        private Table FindTableWithName(string tableName)
         {
-            try
-            {
-                return this
-                    .Where(t => t.ActualName.Equals(tableName))
-                    .SingleOrDefault();
-            }
-            catch (InvalidOperationException)
-            {
-                throw new AmbiguousObjectNameException(tableName);
-            }
-        }
-
-        private Table FindTableWithCaseInsensitiveName(string tableName)
-        {
-            try
-            {
-                return this
-                    .Where(t => t.ActualName.Equals(tableName, StringComparison.InvariantCultureIgnoreCase))
-                    .SingleOrDefault();
-            }
-            catch (InvalidOperationException)
-            {
-                throw new AmbiguousObjectNameException(tableName);
-            }
+            return this
+                .Where(t => t.HomogenizedName.Equals(tableName))
+                .SingleOrDefault();
         }
 
         private Table FindTableWithPluralName(string tableName)
         {
-            return FindTableWithCaseInsensitiveName(tableName.Pluralize());
+            return FindTableWithName(tableName.Pluralize());
         }
 
         private Table FindTableWithSingularName(string tableName)
         {
             if (tableName.IsPlural())
             {
-                return FindTableWithCaseInsensitiveName(tableName.Singularize());
+                return FindTableWithName(tableName.Singularize());
             }
 
             return null;

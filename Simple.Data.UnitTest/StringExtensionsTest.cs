@@ -1,7 +1,5 @@
-﻿using Simple.Data;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using Simple.Data;
 
 namespace Simple.Data.UnitTest
 {
