@@ -5,7 +5,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data", "Simple.Data\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{10F43335-5672-4BDA-91BB-5311C2BFA409}"
 	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
 		Simple.Data.vsmdi = Simple.Data.vsmdi
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Web", "Simple.Web\Simple.Web.csproj", "{7EE79B24-B842-42FA-AA15-9FB957E1C6D4}"
@@ -27,6 +29,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assemblies", "Assemblies", 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.SqlCeTest", "Simple.Data.SqlCeTest\Simple.Data.SqlCeTest.csproj", "{29BBCAE1-DF13-40A0-A412-F2F87F4E9351}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.SqlTest", "Simple.Data.SqlTest\Simple.Data.SqlTest.csproj", "{EFA5B19B-D24F-497E-AB48-8588ABFD1D01}"
+EndProject
+Project("{C8D11400-126E-41CD-887F-60BD40844F9E}") = "SimpleTest", "SimpleTest\SimpleTest.dbproj", "{67CBC824-A49E-4E9B-A947-360F3DFE65C3}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
@@ -57,6 +63,16 @@ Global
 		{29BBCAE1-DF13-40A0-A412-F2F87F4E9351}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29BBCAE1-DF13-40A0-A412-F2F87F4E9351}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29BBCAE1-DF13-40A0-A412-F2F87F4E9351}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFA5B19B-D24F-497E-AB48-8588ABFD1D01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFA5B19B-D24F-497E-AB48-8588ABFD1D01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFA5B19B-D24F-497E-AB48-8588ABFD1D01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFA5B19B-D24F-497E-AB48-8588ABFD1D01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67CBC824-A49E-4E9B-A947-360F3DFE65C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67CBC824-A49E-4E9B-A947-360F3DFE65C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67CBC824-A49E-4E9B-A947-360F3DFE65C3}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{67CBC824-A49E-4E9B-A947-360F3DFE65C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67CBC824-A49E-4E9B-A947-360F3DFE65C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67CBC824-A49E-4E9B-A947-360F3DFE65C3}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
