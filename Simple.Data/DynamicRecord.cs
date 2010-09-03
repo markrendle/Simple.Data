@@ -90,16 +90,18 @@ namespace Simple.Data
 
         private dynamic GetMaster(TableJoin masterJoin)
         {
-            string sql = string.Format("select * from {0} where {1} = ?", masterJoin.Master.ActualName,
-                                       masterJoin.MasterColumn.ActualName);
-            return _database.QueryTable(masterJoin.Master.ActualName, sql, _data[masterJoin.DetailColumn.HomogenizedName]).FirstOrDefault();
+            var criteria = new Dictionary<string, object>
+                               {{masterJoin.MasterColumn.ActualName, _data[masterJoin.DetailColumn.HomogenizedName]}};
+            var dict = _database.Adapter.Find(masterJoin.Master.ActualName, criteria);
+
+            return dict != null ? new DynamicRecord(dict, masterJoin.Master.ActualName, _database) : null;
         }
 
         private IEnumerable<dynamic> GetDetail(TableJoin detailJoin)
         {
-            string sql = string.Format("select * from {0} where {1} = ?", detailJoin.Detail.ActualName,
-                                       detailJoin.DetailColumn.ActualName);
-            return _database.QueryTable(detailJoin.Detail.ActualName, sql, _data[detailJoin.MasterColumn.HomogenizedName]);
+            var criteria = new Dictionary<string, object> { { detailJoin.DetailColumn.ActualName, _data[detailJoin.MasterColumn.HomogenizedName] } };
+            return _database.Adapter.FindAll(detailJoin.Detail.ActualName, criteria)
+                .Select(dict => new DynamicRecord(dict, detailJoin.Detail.ActualName, _database));
         }
 
         public override bool TrySetMember(SetMemberBinder binder, object value)

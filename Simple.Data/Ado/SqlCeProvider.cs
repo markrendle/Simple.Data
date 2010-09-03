@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Data.SqlServerCe;
-using System.Linq;
-using System.Text;
+﻿using System.Data.SqlServerCe;
 using System.Data;
 
-namespace Simple.Data.SqlCe
+namespace Simple.Data.Ado
 {
     public class SqlCeProvider : IConnectionProvider
     {

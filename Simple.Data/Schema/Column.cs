@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using Simple.Data.Ado;
 
 namespace Simple.Data.Schema
 {
@@ -29,9 +30,10 @@ namespace Simple.Data.Schema
 
         public static IEnumerable<Column> GetColumnsForTable(Table table)
         {
-            return table.DatabaseSchema.Database.Query(
+            
+            return ((AdoAdapter)table.DatabaseSchema.Database.Adapter).Query(
                 "select COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = ?", table.ActualName)
-                .Select(d => new Column(d.ColumnName.ToString()));
+                .Select(d => new Column(d["COLUMN_NAME"].ToString()));
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Data.Common;
+using Simple.Data.Ado;
 
 namespace Simple.Data.Schema
 {
@@ -41,8 +42,8 @@ namespace Simple.Data.Schema
         private TableCollection CreateTableCollection()
         {
             return new TableCollection(
-                _database.Query("select TABLE_NAME, TABLE_SCHEMA from INFORMATION_SCHEMA.TABLES")
-                .Select(d => new Table(d.TableName.ToString(), d.TableSchema.ToString(), this))
+                ((AdoAdapter)_database.Adapter).Query("select TABLE_NAME, TABLE_SCHEMA from INFORMATION_SCHEMA.TABLES")
+                .Select(d => new Table(d["TABLE_NAME"].ToString(), d["TABLE_SCHEMA"].ToString(), this))
                 );
         }
     }

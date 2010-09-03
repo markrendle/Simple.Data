@@ -7,21 +7,26 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Data;
 using System.Dynamic;
+using Simple.Data.Ado;
 using Simple.Data.Schema;
-using Simple.Data.SqlCe;
 
 namespace Simple.Data
 {
     public class Database : DynamicObject
     {
+        private readonly IAdapter _adapter;
         private readonly IConnectionProvider _connectionProvider;
         private readonly IDbConnection _connection;
         private readonly string _connectionString;
-        private readonly CommandHelper _commandHelper = new CommandHelper();
 
         private Database(string connectionString)
         {
             _connectionString = connectionString;
+        }
+
+        internal Database(IAdapter adapter)
+        {
+            _adapter = adapter;
         }
 
         internal Database(IDbConnection connection)
@@ -31,7 +36,13 @@ namespace Simple.Data
 
         internal Database(IConnectionProvider connectionProvider)
         {
+            _adapter = new AdoAdapter(this, connectionProvider);
             _connectionProvider = connectionProvider;
+        }
+
+        public IAdapter Adapter
+        {
+            get { return _adapter; }
         }
 
         public static dynamic Open()
@@ -41,38 +52,12 @@ namespace Simple.Data
 
         public static dynamic OpenConnection(string connectionString)
         {
-            return new Database(connectionString);
+            return new Database(new SqlProvider(connectionString));
         }
 
         public static dynamic OpenFile(string filename)
         {
             return new Database(ProviderHelper.GetProviderByFilename(filename));
-        }
-
-        internal IEnumerable<dynamic> Query(string sql, params object[] values)
-        {
-            using (var connection = CreateConnection())
-            {
-                using (var command = CommandHelper.Create(connection, sql, values))
-                {
-                    connection.Open();
-
-                    return command.ExecuteReader().ToDynamicList();
-                }
-            }
-        }
-
-        internal IEnumerable<dynamic> QueryTable(string tableName, string sql, params object[] values)
-        {
-            using (var connection = CreateConnection())
-            {
-                using (var command = CommandHelper.Create(connection, sql, values))
-                {
-                    connection.Open();
-
-                    return command.ExecuteReader().ToDynamicList(this, tableName);
-                }
-            }
         }
 
         internal void Execute(string sql, params object[] values)
@@ -85,16 +70,6 @@ namespace Simple.Data
                     command.ExecuteNonQuery();
                 }
             }
-        }
-
-        public void Insert(string table, IDictionary<string, object> data)
-        {
-            string columnList = data.Keys.Aggregate((agg, next) => agg + "," + next);
-            string valueList = data.Keys.Select(s => "?").Aggregate((agg, next) => agg + "," + next);
-
-            string insertSql = "insert into " + table + " (" + columnList + ") values (" + valueList + ")";
-
-            Execute(insertSql, data.Values.ToArray());
         }
 
         public void Update(string table, IDictionary<string, object> data, IDictionary<string, object> criteria)
@@ -124,11 +99,6 @@ namespace Simple.Data
         {
             result = new DynamicTable(binder.Name, this);
             return true;
-        }
-
-        internal CommandHelper CommandHelper
-        {
-            get { return _commandHelper; }
         }
 
         public void Delete(string table, IDictionary<string, object> criteria)

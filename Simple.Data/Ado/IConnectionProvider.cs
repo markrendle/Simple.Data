@@ -1,6 +1,6 @@
 using System.Data;
 
-namespace Simple.Data.SqlCe
+namespace Simple.Data.Ado
 {
     public interface IConnectionProvider
     {

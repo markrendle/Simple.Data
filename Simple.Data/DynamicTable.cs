@@ -21,36 +21,48 @@ namespace Simple.Data
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
-            bool success;
+            result = null;
+            bool success = false;
 
-            if (binder.Name.StartsWith("FindBy"))
+            if (binder.Name.Contains("By"))
             {
-                result = new FindByHelper(_database, _tableName).Run(binder, args);
-                success = true;
-            }
-            else if (binder.Name.StartsWith("FindAllBy"))
-            {
-                result = new FindAllByHelper(_database, _tableName).Run(binder, args);
-                success = true;
-            }
-            else if (binder.Name.Equals("Insert", StringComparison.InvariantCultureIgnoreCase))
-            {
-                result = new InsertHelper(_database, _tableName).Run(binder, args);
-                success = true;
-            }
-            else if (binder.Name.StartsWith("UpdateBy"))
-            {
-                result = new UpdateHelper(_database, _tableName).Run(binder, args);
-                success = true;
-            }
-            else if (binder.Name.Equals("Delete", StringComparison.InvariantCultureIgnoreCase))
-            {
-                result = new DeleteHelper(_database, _tableName).Run(binder, args);
-                success = true;
+                var criteria = MethodNameParser.ParseFromBinder(binder, args);
+                if (binder.Name.StartsWith("FindBy"))
+                {
+                    var data = _database.Adapter.Find(_tableName, criteria);
+                    result = data != null ? new DynamicRecord(data, _tableName, _database) : null;
+                    success = true;
+                }
+                else if (binder.Name.StartsWith("FindAllBy"))
+                {
+                    var data = _database.Adapter.FindAll(_tableName, criteria);
+                    result = data != null
+                                 ? data.Select(dict => new DynamicRecord(dict, _tableName, _database))
+                                 : Enumerable.Empty<dynamic>();
+                    success = true;
+                }
+                else if (binder.Name.StartsWith("UpdateBy"))
+                {
+                    result = _database.Adapter.Insert(_tableName, binder.NamedArgumentsToDictionary(args));
+                    success = true;
+                }
             }
             else
             {
-                success = base.TryInvokeMember(binder, args, out result);
+                if (binder.Name.Equals("Insert", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    result = _database.Adapter.Insert(_tableName, binder.NamedArgumentsToDictionary(args));
+                    success = true;
+                }
+                else if (binder.Name.Equals("Delete", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    result = new DeleteHelper(_database, _tableName).Run(binder, args);
+                    success = true;
+                }
+                else
+                {
+                    success = base.TryInvokeMember(binder, args, out result);
+                }
             }
 
             return success;
@@ -71,13 +83,13 @@ namespace Simple.Data
             var dictionary = entity as IDictionary<string, object>;
             if (dictionary != null)
             {
-                _database.Insert(_tableName, dictionary);
+                _database.Adapter.Insert(_tableName, dictionary);
             }
         }
 
         private object GetAll()
         {
-            return _database.Query("select * from " + _tableName);
+            return _database.Adapter.FindAll(_tableName);
         }
     }
 }

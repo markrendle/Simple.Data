@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
-using System.Linq;
 using System.Text;
 
-namespace Simple.Data
+namespace Simple.Data.Ado
 {
-    internal class CommandHelper
+    internal static class CommandHelper
     {
-        internal IDbCommand Create(IDbConnection connection, string sql, object[] values)
+        internal static IDbCommand Create(IDbConnection connection, string sql, IList<object> values)
         {
             var command = connection.CreateCommand();
 

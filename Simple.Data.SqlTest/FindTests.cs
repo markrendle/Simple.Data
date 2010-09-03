@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Simple.Data.SqlCe;
 using System.IO;
 
 namespace Simple.Data.SqlTest

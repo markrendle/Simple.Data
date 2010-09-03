@@ -12,10 +12,20 @@ namespace Simple.Data.IntegrationTest
     [TestClass]
     public class DatabaseTest
     {
+        static Database CreateDatabase()
+        {
+            return new Database(new ConnectionProviderStub());
+        }
+
+        static Database CreateDatabaseWithDummyData()
+        {
+            return new Database(new ConnectionProviderStub((new DbConnectionStub() { DummyDataTable = CreateDummyDataTable()})));
+        }
+
         [TestMethod]
         public void TestFindByDynamicSingleColumn()
         {
-            dynamic database = new Database(new DbConnectionStub());
+            dynamic database = CreateDatabase();
             database.Users.FindByName("Foo");
             Assert.AreEqual("select * from Users where name = @p0", DatabaseStub.Sql, true);
             Assert.AreEqual("Foo", DatabaseStub.Parameters[0]);
@@ -24,7 +34,7 @@ namespace Simple.Data.IntegrationTest
         [TestMethod]
         public void TestFindByDynamicTwoColumns()
         {
-            dynamic database = new Database(new DbConnectionStub());
+            dynamic database = CreateDatabase();
             database.Users.FindByNameAndPassword("Foo", "secret");
             Assert.AreEqual("select * from Users where name = @p0 and password = @p1", DatabaseStub.Sql, true);
             Assert.AreEqual("Foo", DatabaseStub.Parameters[0]);
@@ -34,7 +44,7 @@ namespace Simple.Data.IntegrationTest
         [TestMethod]
         public void TestFindAllByDynamic()
         {
-            dynamic database = new Database(new DbConnectionStub());
+            dynamic database = CreateDatabase();
             database.Users.FindAllByName("Foo");
             Assert.AreEqual("select * from Users where name = @p0", DatabaseStub.Sql, true);
             Assert.AreEqual("Foo", DatabaseStub.Parameters[0]);
@@ -43,7 +53,7 @@ namespace Simple.Data.IntegrationTest
         [TestMethod]
         public void TestQuery()
         {
-            dynamic database = new Database(new DbConnectionStub());
+            dynamic database = CreateDatabase();
             database.Query("select * from Users where name = ? and age > ?", "Bob", 35);
             Assert.AreEqual("select * from Users where name = @p0 and age > @p1", DatabaseStub.Sql, true);
             Assert.AreEqual("Bob", DatabaseStub.Parameters[0]);
@@ -53,7 +63,7 @@ namespace Simple.Data.IntegrationTest
         [TestMethod]
         public void TestExecuteWithInsert()
         {
-            dynamic database = new Database(new DbConnectionStub());
+            dynamic database = CreateDatabase();
             database.Execute("insert into Users values (?,?)", "Bob", 35);
             Assert.AreEqual("insert into Users values (@p0,@p1)", DatabaseStub.Sql);
             Assert.AreEqual("Bob", DatabaseStub.Parameters[0]);
@@ -63,7 +73,7 @@ namespace Simple.Data.IntegrationTest
         [TestMethod]
         public void TestExecuteWithUpdate()
         {
-            dynamic database = new Database(new DbConnectionStub());
+            dynamic database = CreateDatabase();
             database.Execute("update Users set name = ?, age = ? where id = ?", "Bob", 35, 1);
             Assert.AreEqual("update Users set name = @p0, age = @p1 where id = @p2", DatabaseStub.Sql, true);
             Assert.AreEqual("Bob", DatabaseStub.Parameters[0]);
@@ -74,7 +84,7 @@ namespace Simple.Data.IntegrationTest
         [TestMethod]
         public void TestInsertWithNamedArguments()
         {
-            dynamic database = new Database(new DbConnectionStub());
+            dynamic database = CreateDatabase();
             database.Users.Insert(Name: "Steve", Age: 50);
             Assert.AreEqual("insert into Users (Name,Age) values (@p0,@p1)", DatabaseStub.Sql, true);
             Assert.AreEqual("Steve", DatabaseStub.Parameters[0]);
@@ -84,7 +94,7 @@ namespace Simple.Data.IntegrationTest
         [TestMethod]
         public void TestUpdateWithNamedArguments()
         {
-            dynamic database = new Database(new DbConnectionStub());
+            dynamic database = CreateDatabase();
             database.Users.UpdateById(Id: 1, Name: "Steve", Age: 50);
             Assert.AreEqual("update Users set Name = @p0, Age = @p1 where Id = @p2", DatabaseStub.Sql, true);
             Assert.AreEqual("Steve", DatabaseStub.Parameters[0]);
@@ -95,7 +105,7 @@ namespace Simple.Data.IntegrationTest
         [TestMethod]
         public void TestDeleteWithNamedArguments()
         {
-            dynamic database = new Database(new DbConnectionStub());
+            dynamic database = CreateDatabase();
             database.Users.Delete(Id: 1);
             Assert.AreEqual("delete from Users where Id = @p0", DatabaseStub.Sql, true);
             Assert.AreEqual(1, DatabaseStub.Parameters[0]);
@@ -107,7 +117,7 @@ namespace Simple.Data.IntegrationTest
             dynamic person = new ExpandoObject();
             person.Name = "Phil";
             person.Age = 42;
-            dynamic database = new Database(new DbConnectionStub());
+            dynamic database = CreateDatabase();
             database.Users.Insert(person);
             Assert.AreEqual("insert into Users (Name,Age) values (@p0,@p1)", DatabaseStub.Sql, true);
             Assert.AreEqual("Phil", DatabaseStub.Parameters[0]);
@@ -117,7 +127,7 @@ namespace Simple.Data.IntegrationTest
         [TestMethod]
         public void TestStronglyTypedQuery()
         {
-            dynamic database = new Database(new DbConnectionStub {DummyDataTable = CreateDummyDataTable()});
+            dynamic database = CreateDatabaseWithDummyData();
             User user = database.Users.FindByName("Bob");
             Assert.AreEqual("Bob", user.Name);
             Assert.AreEqual("Secret", user.Password);
@@ -127,7 +137,7 @@ namespace Simple.Data.IntegrationTest
         [TestMethod]
         public void TestAll()
         {
-            dynamic database = new Database(new DbConnectionStub { DummyDataTable = CreateDummyDataTable() });
+            dynamic database = CreateDatabaseWithDummyData();
             foreach (var user in database.Users.All)
             {
                 Assert.AreEqual("Bob", user.Name);
@@ -139,7 +149,7 @@ namespace Simple.Data.IntegrationTest
         [TestMethod]
         public void TestStronglyTypedAll()
         {
-            dynamic database = new Database(new DbConnectionStub { DummyDataTable = CreateDummyDataTable() });
+            dynamic database = CreateDatabaseWithDummyData();
             foreach (User user in database.Users.All)
             {
                 Assert.AreEqual("Bob", user.Name);

@@ -5,8 +5,8 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Simple.Data.SqlCe;
 using System.IO;
+using Simple.Data.Ado;
 
 namespace Simple.Data.SqlCeTest
 {

@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="DatabaseTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Stubs\ConnectionProviderStub.cs" />
     <Compile Include="Stubs\DatabaseStub.cs" />
     <Compile Include="Stubs\DataParameterCollection.cs" />
     <Compile Include="Stubs\DataParameterStub.cs" />

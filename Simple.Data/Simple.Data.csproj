@@ -44,8 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ado\AdoAdapter.cs" />
     <Compile Include="BinderHelper.cs" />
-    <Compile Include="CommandHelper.cs" />
+    <Compile Include="Ado\CommandHelper.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="DataReaderExtensions.cs" />
     <Compile Include="DataRecordExtensions.cs" />
@@ -54,10 +55,9 @@
     <Compile Include="DynamicStringExtensions.cs" />
     <Compile Include="DynamicTable.cs" />
     <Compile Include="EnumerableExtensions.cs" />
-    <Compile Include="FindAllByHelper.cs" />
-    <Compile Include="FindByHelper.cs" />
-    <Compile Include="FindHelper.cs" />
-    <Compile Include="InsertHelper.cs" />
+    <Compile Include="Ado\FindHelper.cs" />
+    <Compile Include="IAdapter.cs" />
+    <Compile Include="MethodNameParser.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -73,9 +73,9 @@
     <Compile Include="Schema\Table.cs" />
     <Compile Include="Schema\TableCollection.cs" />
     <Compile Include="Schema\TableJoin.cs" />
-    <Compile Include="SqlCe\IConnectionProvider.cs" />
-    <Compile Include="SqlCe\SqlCeProvider.cs" />
-    <Compile Include="SqlCe\SqlProvider.cs" />
+    <Compile Include="Ado\IConnectionProvider.cs" />
+    <Compile Include="Ado\SqlCeProvider.cs" />
+    <Compile Include="Ado\SqlProvider.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="UpdateHelper.cs" />
   </ItemGroup>
@@ -109,6 +109,9 @@
     <Content Include="sqlcese35.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SqlCe\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

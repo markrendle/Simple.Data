@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Simple.Data.SqlCe;
+using Simple.Data.Ado;
 using System.IO;
 
 namespace Simple.Data

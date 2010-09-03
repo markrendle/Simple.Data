@@ -27,132 +27,31 @@ BEGIN
 END
 
 GO
-IF (DB_ID(N'$(DatabaseName)') IS NOT NULL) 
+
+IF NOT EXISTS (SELECT 1 FROM [master].[dbo].[sysdatabases] WHERE [name] = N'$(DatabaseName)')
 BEGIN
-    ALTER DATABASE [$(DatabaseName)]
-    SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE [$(DatabaseName)];
+    RAISERROR(N'You cannot deploy this update script to target MARK-DEV\SQLSERVER2008. The database for which this script was built, SimpleTest, does not exist on this server.', 16, 127) WITH NOWAIT
+    RETURN
 END
 
 GO
-PRINT N'Creating $(DatabaseName)...'
-GO
-CREATE DATABASE [$(DatabaseName)]
-    ON 
-    PRIMARY(NAME = [SimpleTest], FILENAME = N'$(DefaultDataPath)SimpleTest.mdf')
-    LOG ON (NAME = [SimpleTest_log], FILENAME = N'$(DefaultLogPath)SimpleTest_log.ldf') COLLATE SQL_Latin1_General_CP1_CI_AS
-GO
-EXECUTE sp_dbcmptlevel [$(DatabaseName)], 100;
 
+IF (@@servername != 'MARK-DEV\SQLSERVER2008')
+BEGIN
+    RAISERROR(N'The server name in the build script %s does not match the name of the target server %s. Verify whether your database project settings are correct and whether your build script is up to date.', 16, 127,N'MARK-DEV\SQLSERVER2008',@@servername) WITH NOWAIT
+    RETURN
+END
 
 GO
-IF EXISTS (SELECT 1
-           FROM   [master].[dbo].[sysdatabases]
-           WHERE  [name] = N'$(DatabaseName)')
-    BEGIN
-        ALTER DATABASE [$(DatabaseName)]
-            SET ANSI_NULLS ON,
-                ANSI_PADDING ON,
-                ANSI_WARNINGS ON,
-                ARITHABORT ON,
-                CONCAT_NULL_YIELDS_NULL ON,
-                NUMERIC_ROUNDABORT OFF,
-                QUOTED_IDENTIFIER ON,
-                ANSI_NULL_DEFAULT ON,
-                CURSOR_DEFAULT LOCAL,
-                RECOVERY FULL,
-                CURSOR_CLOSE_ON_COMMIT OFF,
-                AUTO_CREATE_STATISTICS ON,
-                AUTO_SHRINK OFF,
-                AUTO_UPDATE_STATISTICS ON,
-                RECURSIVE_TRIGGERS OFF 
-            WITH ROLLBACK IMMEDIATE;
-        ALTER DATABASE [$(DatabaseName)]
-            SET AUTO_CLOSE OFF 
-            WITH ROLLBACK IMMEDIATE;
-    END
 
-
-GO
-IF EXISTS (SELECT 1
-           FROM   [master].[dbo].[sysdatabases]
-           WHERE  [name] = N'$(DatabaseName)')
-    BEGIN
-        ALTER DATABASE [$(DatabaseName)]
-            SET ALLOW_SNAPSHOT_ISOLATION OFF;
-    END
-
-
-GO
-IF EXISTS (SELECT 1
-           FROM   [master].[dbo].[sysdatabases]
-           WHERE  [name] = N'$(DatabaseName)')
-    BEGIN
-        ALTER DATABASE [$(DatabaseName)]
-            SET READ_COMMITTED_SNAPSHOT OFF;
-    END
-
-
-GO
-IF EXISTS (SELECT 1
-           FROM   [master].[dbo].[sysdatabases]
-           WHERE  [name] = N'$(DatabaseName)')
-    BEGIN
-        ALTER DATABASE [$(DatabaseName)]
-            SET AUTO_UPDATE_STATISTICS_ASYNC OFF,
-                PAGE_VERIFY NONE,
-                DATE_CORRELATION_OPTIMIZATION OFF,
-                DISABLE_BROKER,
-                PARAMETERIZATION SIMPLE,
-                SUPPLEMENTAL_LOGGING OFF 
-            WITH ROLLBACK IMMEDIATE;
-    END
-
-
-GO
-IF IS_SRVROLEMEMBER(N'sysadmin') = 1
-    BEGIN
-        IF EXISTS (SELECT 1
-                   FROM   [master].[dbo].[sysdatabases]
-                   WHERE  [name] = N'$(DatabaseName)')
-            BEGIN
-                EXECUTE sp_executesql N'ALTER DATABASE [$(DatabaseName)]
-    SET TRUSTWORTHY OFF,
-        DB_CHAINING OFF 
-    WITH ROLLBACK IMMEDIATE';
-            END
-    END
-ELSE
-    BEGIN
-        PRINT N'The database settings cannot be modified. You must be a SysAdmin to apply these settings.';
-    END
-
-
-GO
-IF IS_SRVROLEMEMBER(N'sysadmin') = 1
-    BEGIN
-        IF EXISTS (SELECT 1
-                   FROM   [master].[dbo].[sysdatabases]
-                   WHERE  [name] = N'$(DatabaseName)')
-            BEGIN
-                EXECUTE sp_executesql N'ALTER DATABASE [$(DatabaseName)]
-    SET HONOR_BROKER_PRIORITY OFF 
-    WITH ROLLBACK IMMEDIATE';
-            END
-    END
-ELSE
-    BEGIN
-        PRINT N'The database settings cannot be modified. You must be a SysAdmin to apply these settings.';
-    END
-
+IF CAST(DATABASEPROPERTY(N'$(DatabaseName)','IsReadOnly') as bit) = 1
+BEGIN
+    RAISERROR(N'You cannot deploy this update script because the database for which it was built, %s , is set to READ_ONLY.', 16, 127, N'$(DatabaseName)') WITH NOWAIT
+    RETURN
+END
 
 GO
 USE [$(DatabaseName)]
-
-GO
-IF fulltextserviceproperty(N'IsFulltextInstalled') = 1
-    EXECUTE sp_fulltext_database 'enable';
-
 
 GO
 /*
@@ -168,75 +67,6 @@ GO
 */
 
 GO
-PRINT N'Creating [dbo].[Customers]...';
-
-
-GO
-CREATE TABLE [dbo].[Customers] (
-    [CustomerId] INT            IDENTITY (1, 1) NOT NULL,
-    [Name]       NVARCHAR (100) NOT NULL,
-    [Address]    NVARCHAR (200) NULL
-);
-
-
-GO
-PRINT N'Creating [dbo].[Items]...';
-
-
-GO
-CREATE TABLE [dbo].[Items] (
-    [ItemId] INT            IDENTITY (1, 1) NOT NULL,
-    [Name]   NVARCHAR (100) NOT NULL,
-    [Price]  MONEY          NOT NULL
-);
-
-
-GO
-PRINT N'Creating [dbo].[OrderItems]...';
-
-
-GO
-CREATE TABLE [dbo].[OrderItems] (
-    [OrderItemId] INT IDENTITY (1, 1) NOT NULL,
-    [OrderId]     INT NOT NULL,
-    [ItemId]      INT NOT NULL,
-    [Quantity]    INT NOT NULL
-);
-
-
-GO
-PRINT N'Creating [dbo].[Orders]...';
-
-
-GO
-CREATE TABLE [dbo].[Orders] (
-    [OrderId]    INT      IDENTITY (1, 1) NOT NULL,
-    [OrderDate]  DATETIME NOT NULL,
-    [CustomerId] INT      NOT NULL
-);
-
-
-GO
-PRINT N'Creating [dbo].[Users]...';
-
-
-GO
-CREATE TABLE [dbo].[Users] (
-    [Id]       INT            IDENTITY (1, 1) NOT NULL,
-    [Name]     NVARCHAR (100) NOT NULL,
-    [Password] NVARCHAR (100) NOT NULL,
-    [Age]      INT            NOT NULL
-);
-
-
-GO
--- Refactoring step to update target server with deployed transaction logs
-CREATE TABLE  [dbo].[__RefactorLog] (OperationKey UNIQUEIDENTIFIER NOT NULL PRIMARY KEY)
-GO
-sp_addextendedproperty N'microsoft_database_tools_support', N'refactoring log', N'schema', N'dbo', N'table', N'__RefactorLog'
-GO
-
-GO
 /*
 Post-Deployment Script Template							
 --------------------------------------------------------------------------------------
@@ -248,25 +78,5 @@ Post-Deployment Script Template
                SELECT * FROM [$(TableName)]					
 --------------------------------------------------------------------------------------
 */
-
-GO
-IF EXISTS (SELECT 1
-           FROM   [master].[dbo].[sysdatabases]
-           WHERE  [name] = N'$(DatabaseName)')
-    BEGIN
-        DECLARE @VarDecimalSupported AS BIT;
-        SELECT @VarDecimalSupported = 0;
-        IF ((ServerProperty(N'EngineEdition') = 3)
-            AND (((@@microsoftversion / power(2, 24) = 9)
-                  AND (@@microsoftversion & 0xffff >= 3024))
-                 OR ((@@microsoftversion / power(2, 24) = 10)
-                     AND (@@microsoftversion & 0xffff >= 1600))))
-            SELECT @VarDecimalSupported = 1;
-        IF (@VarDecimalSupported > 0)
-            BEGIN
-                EXECUTE sp_db_vardecimal_storage_format N'$(DatabaseName)', 'ON';
-            END
-    END
-
 
 GO
