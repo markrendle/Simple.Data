@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Data;
-using System.Dynamic;
-using Simple.Data.Schema;
 
-namespace Simple.Data
+namespace Simple.Data.Ado
 {
     internal static class DataRecordExtensions
     {

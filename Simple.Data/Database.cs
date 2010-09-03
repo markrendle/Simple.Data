@@ -60,35 +60,6 @@ namespace Simple.Data
             return new Database(ProviderHelper.GetProviderByFilename(filename));
         }
 
-        internal void Execute(string sql, params object[] values)
-        {
-            using (var connection = CreateConnection())
-            {
-                using (var command = CommandHelper.Create(connection, sql, values.ToArray()))
-                {
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-            }
-        }
-
-        public void Update(string table, IDictionary<string, object> data, IDictionary<string, object> criteria)
-        {
-            string set = string.Join(", ", data.Keys.Select(key => key + " = ?"));
-            string where = string.Join(" and ", criteria.Keys.Select(key => key + " = ?"));
-
-            string updateSql = "update " + table + " set " + set + " where " + where;
-
-            Execute(updateSql, data.Values.Concat(criteria.Values).ToArray());
-        }
-
-        internal IDbConnection CreateConnection()
-        {
-            if (_connectionProvider != null) return _connectionProvider.CreateConnection();
-            // Testability
-            return _connection ?? new SqlConnection(_connectionString);
-        }
-
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             return base.TryGetMember(binder, out result)
@@ -99,14 +70,6 @@ namespace Simple.Data
         {
             result = new DynamicTable(binder.Name, this);
             return true;
-        }
-
-        public void Delete(string table, IDictionary<string, object> criteria)
-        {
-            string where = string.Join(" and ", criteria.Keys.Select(key => key + " = ?"));
-            string deleteSql = "delete from " + table + " where " + where;
-
-            Execute(deleteSql, criteria.Values.ToArray());
         }
 
         internal DatabaseSchema GetSchema()

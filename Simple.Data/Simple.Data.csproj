@@ -48,9 +48,8 @@
     <Compile Include="BinderHelper.cs" />
     <Compile Include="Ado\CommandHelper.cs" />
     <Compile Include="Database.cs" />
-    <Compile Include="DataReaderExtensions.cs" />
-    <Compile Include="DataRecordExtensions.cs" />
-    <Compile Include="DeleteHelper.cs" />
+    <Compile Include="Ado\DataReaderExtensions.cs" />
+    <Compile Include="Ado\DataRecordExtensions.cs" />
     <Compile Include="DynamicRecord.cs" />
     <Compile Include="DynamicStringExtensions.cs" />
     <Compile Include="DynamicTable.cs" />
@@ -77,7 +76,6 @@
     <Compile Include="Ado\SqlCeProvider.cs" />
     <Compile Include="Ado\SqlProvider.cs" />
     <Compile Include="StringExtensions.cs" />
-    <Compile Include="UpdateHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -110,9 +108,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="SqlCe\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

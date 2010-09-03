@@ -11,7 +11,14 @@ namespace Simple.Data
         internal static IDictionary<string, object> ParseFromBinder(InvokeMemberBinder binder, IList<object> args)
         {
             if (binder == null) throw new ArgumentNullException("binder");
-            return ParseFromMethodName(binder.Name, args);
+            if (binder.CallInfo.ArgumentNames != null && binder.CallInfo.ArgumentNames.Count > 0)
+            {
+                return ParseFromMethodName(binder.Name, binder.NamedArgumentsToDictionary(args));
+            }
+            else
+            {
+                return ParseFromMethodName(binder.Name, args);
+            }
         }
 
         internal static IDictionary<string, object> ParseFromMethodName(string methodName, IList<object> args)
@@ -22,10 +29,22 @@ namespace Simple.Data
             var columns = GetColumns(RemoveCommandPart(methodName));
 
             if (columns.Count == 0) throw new ArgumentException("No columns specified.");
-            if (columns.Count != args.Count) throw new ArgumentException("Parameter count mismatch.");
 
-            return columns.Select((s, i) => new KeyValuePair<string, object>(s, args[i])).ToDictionary();
+            return columns.Select((s,i) => new KeyValuePair<string, object>(s, args[i])).ToDictionary();
            
+        }
+
+        internal static IDictionary<string, object> ParseFromMethodName(string methodName, IDictionary<string, object> args)
+        {
+            if (args == null) throw new ArgumentNullException("args");
+            if (args.Count == 0) throw new ArgumentException("No parameters specified.");
+
+            var columns = GetColumns(RemoveCommandPart(methodName));
+
+            if (columns.Count == 0) throw new ArgumentException("No columns specified.");
+
+            return columns.Select(s => new KeyValuePair<string, object>(s, args[s])).ToDictionary();
+
         }
 
         internal static string RemoveCommandPart(string methodName)

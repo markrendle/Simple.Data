@@ -35,7 +35,7 @@ namespace Simple.Data.UnitTest
             const string methodName = "FindByThisAndThat";
             IList<object> args = new object[] {1, "Foo"};
             IDictionary<string, object> expected = new Dictionary<string, object> { {"This", 1}, {"That", "Foo"}};
-            IDictionary<string, object> actual = MethodNameParser.ParseFromMethodName(methodName, args);
+            IDictionary<string, object> actual = MethodNameParser.ParseFromMethodName(methodName, expected);
             ListHelper.AssertAreEqual(expected, actual);
         }
 

@@ -43,7 +43,10 @@ namespace Simple.Data
                 }
                 else if (binder.Name.StartsWith("UpdateBy"))
                 {
-                    result = _database.Adapter.Insert(_tableName, binder.NamedArgumentsToDictionary(args));
+                    var data = binder.NamedArgumentsToDictionary(args)
+                        .Where(kvp => !criteria.ContainsKey(kvp.Key))
+                        .ToDictionary();
+                    result = _database.Adapter.Update(_tableName, data, criteria);
                     success = true;
                 }
             }
@@ -56,7 +59,7 @@ namespace Simple.Data
                 }
                 else if (binder.Name.Equals("Delete", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    result = new DeleteHelper(_database, _tableName).Run(binder, args);
+                    result = _database.Adapter.Delete(_tableName, binder.NamedArgumentsToDictionary(args));
                     success = true;
                 }
                 else
@@ -72,7 +75,7 @@ namespace Simple.Data
         {
             if (binder.Name == "All")
             {
-                result = GetAll();
+                result = GetAll().ToList();
                 return true;
             }
             return base.TryGetMember(binder, out result);
@@ -87,9 +90,9 @@ namespace Simple.Data
             }
         }
 
-        private object GetAll()
+        private IEnumerable<dynamic> GetAll()
         {
-            return _database.Adapter.FindAll(_tableName);
+            return _database.Adapter.FindAll(_tableName).Select(dict => new DynamicRecord(dict, _tableName, _database));
         }
     }
 }

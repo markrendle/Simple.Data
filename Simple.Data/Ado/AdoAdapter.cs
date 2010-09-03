@@ -59,26 +59,34 @@ namespace Simple.Data.Ado
             return null;
         }
 
-        internal void Execute(string sql, params object[] values)
+        internal int Execute(string sql, params object[] values)
         {
             using (var connection = CreateConnection())
             {
                 using (var command = CommandHelper.Create(connection, sql, values.ToArray()))
                 {
                     connection.Open();
-                    command.ExecuteNonQuery();
+                    return command.ExecuteNonQuery();
                 }
             }
         }
 
         public int Update(string tableName, IDictionary<string, object> data, IDictionary<string, object> criteria)
         {
-            throw new NotImplementedException();
+            string set = string.Join(", ", data.Keys.Select(key => key + " = ?"));
+            string where = string.Join(" and ", criteria.Keys.Select(key => key + " = ?"));
+
+            string updateSql = "update " + tableName + " set " + set + " where " + where;
+
+            return Execute(updateSql, data.Values.Concat(criteria.Values).ToArray());
         }
 
         public int Delete(string tableName, IDictionary<string, object> criteria)
         {
-            throw new NotImplementedException();
+            string where = string.Join(" and ", criteria.Keys.Select(key => key + " = ?"));
+            string deleteSql = "delete from " + tableName + " where " + where;
+
+            return Execute(deleteSql, criteria.Values.ToArray());
         }
 
         internal IDbConnection CreateConnection()

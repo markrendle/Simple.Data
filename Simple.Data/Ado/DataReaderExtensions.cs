@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Data;
-using Simple.Data.Schema;
 
-namespace Simple.Data
+namespace Simple.Data.Ado
 {
     internal static class DataReaderExtensions
     {
@@ -23,9 +20,9 @@ namespace Simple.Data
             return list.AsEnumerable();
         }
 
-        public static IEnumerable<dynamic> ToDynamicList(this IDataReader reader)
+        public static IEnumerable<object> ToDynamicList(this IDataReader reader)
         {
-            var list = new List<dynamic>();
+            var list = new List<object>();
             using (reader)
             {
                 while (reader.Read())
@@ -37,9 +34,9 @@ namespace Simple.Data
             return list.AsEnumerable();
         }
 
-        public static IEnumerable<dynamic> ToDynamicList(this IDataReader reader, Database database, string tableName)
+        public static IEnumerable<object> ToDynamicList(this IDataReader reader, Database database, string tableName)
         {
-            var list = new List<dynamic>();
+            var list = new List<object>();
             using (reader)
             {
                 while (reader.Read())

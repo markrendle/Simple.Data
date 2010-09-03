@@ -51,37 +51,6 @@ namespace Simple.Data.IntegrationTest
         }
 
         [TestMethod]
-        public void TestQuery()
-        {
-            dynamic database = CreateDatabase();
-            database.Query("select * from Users where name = ? and age > ?", "Bob", 35);
-            Assert.AreEqual("select * from Users where name = @p0 and age > @p1", DatabaseStub.Sql, true);
-            Assert.AreEqual("Bob", DatabaseStub.Parameters[0]);
-            Assert.AreEqual(35, DatabaseStub.Parameters[1]);
-        }
-
-        [TestMethod]
-        public void TestExecuteWithInsert()
-        {
-            dynamic database = CreateDatabase();
-            database.Execute("insert into Users values (?,?)", "Bob", 35);
-            Assert.AreEqual("insert into Users values (@p0,@p1)", DatabaseStub.Sql);
-            Assert.AreEqual("Bob", DatabaseStub.Parameters[0]);
-            Assert.AreEqual(35, DatabaseStub.Parameters[1]);
-        }
-
-        [TestMethod]
-        public void TestExecuteWithUpdate()
-        {
-            dynamic database = CreateDatabase();
-            database.Execute("update Users set name = ?, age = ? where id = ?", "Bob", 35, 1);
-            Assert.AreEqual("update Users set name = @p0, age = @p1 where id = @p2", DatabaseStub.Sql, true);
-            Assert.AreEqual("Bob", DatabaseStub.Parameters[0]);
-            Assert.AreEqual(35, DatabaseStub.Parameters[1]);
-            Assert.AreEqual(1, DatabaseStub.Parameters[2]);
-        }
-
-        [TestMethod]
         public void TestInsertWithNamedArguments()
         {
             dynamic database = CreateDatabase();
