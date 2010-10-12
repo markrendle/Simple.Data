@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Simple.Data.Schema;
 using System.Data;
@@ -38,7 +39,12 @@ namespace Simple.Data
         {
             _tableName = tableName;
             _database = database;
-            _data = data.Select(kvp => new KeyValuePair<string, object>(kvp.Key.Homogenize(), kvp.Value)).ToDictionary();
+            _data = data.Select(kvp => new KeyValuePair<string, object>(kvp.Key.Homogenize(), DbNullToClrNull(kvp.Value))).ToDictionary();
+        }
+
+        private static object DbNullToClrNull(object source)
+        {
+            return source == DBNull.Value ? null : source;
         }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
@@ -114,8 +120,7 @@ namespace Simple.Data
         {
             bool anyPropertiesSet = false;
             var obj = Activator.CreateInstance(binder.Type);
-            foreach (var propertyInfo in
-                binder.Type.GetProperties().Where(propertyInfo => _data.ContainsKey(propertyInfo.Name.Homogenize())))
+            foreach (var propertyInfo in binder.Type.GetProperties().Where(CanSetProperty))
             {
                 propertyInfo.SetValue(obj, _data[propertyInfo.Name.Homogenize()], null);
                 anyPropertiesSet = true;
@@ -124,6 +129,11 @@ namespace Simple.Data
             result = anyPropertiesSet ? obj : null;
 
             return anyPropertiesSet;
+        }
+
+        private bool CanSetProperty(PropertyInfo propertyInfo)
+        {
+            return _data.ContainsKey(propertyInfo.Name.Homogenize()) && !(propertyInfo.PropertyType.IsValueType && _data[propertyInfo.Name.Homogenize()] == null);
         }
     }
 }

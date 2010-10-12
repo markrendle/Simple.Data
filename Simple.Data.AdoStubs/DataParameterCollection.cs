@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using System.Data;
 
-namespace Simple.Data.IntegrationTest.Stubs
+namespace Simple.Data.AdoStubs
 {
     class DataParameterCollection : Collection<IDataParameter>, IDataParameterCollection
     {

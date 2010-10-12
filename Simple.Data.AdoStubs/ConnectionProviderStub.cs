@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
+﻿using System.Data;
 using Simple.Data.Ado;
 
-namespace Simple.Data.IntegrationTest.Stubs
+namespace Simple.Data.AdoStubs
 {
-    class ConnectionProviderStub : IConnectionProvider
+    public class ConnectionProviderStub : IConnectionProvider
     {
         private readonly IDbConnection _connection;
 

@@ -5,7 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Simple.Data.IntegrationTest.Stubs;
+using Simple.Data.AdoStubs;
 
 namespace Simple.Data.IntegrationTest
 {

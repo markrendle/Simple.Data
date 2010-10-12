@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Data;
-using Simple.Data.IntegrationTest.Stubs;
 
-namespace Simple.Data.IntegrationTest.Stubs
+namespace Simple.Data.AdoStubs
 {
-    class DbConnectionStub : IDbConnection
+    public class DbConnectionStub : IDbConnection
     {
         public DataTable DummyDataTable { get; set; }
 
