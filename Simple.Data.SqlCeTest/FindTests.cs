@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using Simple.Data.Ado;
+using Simple.Data.SqlCe35;
 
 namespace Simple.Data.SqlCeTest
 {
@@ -24,7 +25,7 @@ namespace Simple.Data.SqlCeTest
         public void TestMethod1()
         {
             var provider = ProviderHelper.GetProviderByFilename(DatabasePath);
-            Assert.IsInstanceOfType(provider, typeof(SqlCeProvider));
+            Assert.IsInstanceOfType(provider, typeof (SqlCe35Provider));
         }
 
         [TestMethod]

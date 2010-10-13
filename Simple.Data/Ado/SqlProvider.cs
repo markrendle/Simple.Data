@@ -5,7 +5,12 @@ namespace Simple.Data.Ado
 {
     class SqlProvider : IConnectionProvider
     {
-        private readonly string _connectionString;
+        private string _connectionString;
+
+        public SqlProvider()
+        {
+            
+        }
 
         public SqlProvider(string connectionString)
         {
@@ -15,6 +20,11 @@ namespace Simple.Data.Ado
         public IDbConnection CreateConnection()
         {
             return new SqlConnection(_connectionString);
+        }
+
+        public void SetConnectionString(string connectionString)
+        {
+            _connectionString = connectionString;
         }
     }
 }

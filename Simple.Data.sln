@@ -28,13 +28,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assemblies", "Assemblies", 
 		Assemblies\System.Data.SqlServerCe.dll = Assemblies\System.Data.SqlServerCe.dll
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.SqlCeTest", "Simple.Data.SqlCeTest\Simple.Data.SqlCeTest.csproj", "{29BBCAE1-DF13-40A0-A412-F2F87F4E9351}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.SqlCe35Test", "Simple.Data.SqlCeTest\Simple.Data.SqlCe35Test.csproj", "{29BBCAE1-DF13-40A0-A412-F2F87F4E9351}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.SqlTest", "Simple.Data.SqlTest\Simple.Data.SqlTest.csproj", "{EFA5B19B-D24F-497E-AB48-8588ABFD1D01}"
 EndProject
 Project("{C8D11400-126E-41CD-887F-60BD40844F9E}") = "SimpleTest", "SimpleTest\SimpleTest.dbproj", "{67CBC824-A49E-4E9B-A947-360F3DFE65C3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.AdoStubs", "Simple.Data.AdoStubs\Simple.Data.AdoStubs.csproj", "{7AD7B7C2-F06F-494E-BB3C-E60E997F4DFD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.SqlCe35", "Simple.Data.SqlCe35\Simple.Data.SqlCe35.csproj", "{1EDAC58F-C0CC-42E3-AA3A-C4A0175B5273}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
@@ -79,6 +81,10 @@ Global
 		{7AD7B7C2-F06F-494E-BB3C-E60E997F4DFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AD7B7C2-F06F-494E-BB3C-E60E997F4DFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7AD7B7C2-F06F-494E-BB3C-E60E997F4DFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EDAC58F-C0CC-42E3-AA3A-C4A0175B5273}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EDAC58F-C0CC-42E3-AA3A-C4A0175B5273}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EDAC58F-C0CC-42E3-AA3A-C4A0175B5273}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EDAC58F-C0CC-42E3-AA3A-C4A0175B5273}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

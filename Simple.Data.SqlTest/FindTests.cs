@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
+using Simple.Data.Ado;
 
 namespace Simple.Data.SqlTest
 {
@@ -10,6 +11,13 @@ namespace Simple.Data.SqlTest
     [TestClass]
     public class FindTests
     {
+        [TestMethod]
+        public void TestMethod1()
+        {
+            var provider = ProviderHelper.GetProviderByConnectionString("data source=.");
+            Assert.IsInstanceOfType(provider, typeof(SqlProvider));
+        }
+
         [TestMethod]
         public void TestFindById()
         {
