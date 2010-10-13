@@ -25,9 +25,16 @@ namespace Simple.Data.Schema
         /// <returns>A <see cref="Table"/> if a match is found; otherwise, <c>null</c>.</returns>
         public Table Find(string tableName)
         {
-            return FindTableWithName(tableName.Homogenize())
+            var table = FindTableWithName(tableName.Homogenize())
                    ?? FindTableWithPluralName(tableName.Homogenize())
                    ?? FindTableWithSingularName(tableName.Homogenize());
+
+            if (table == null)
+            {
+                throw new UnresolvableObjectException(tableName, "No matching table found, or insufficient permissions.");
+            }
+
+            return table;
         }
 
         private Table FindTableWithName(string tableName)

@@ -56,6 +56,7 @@
     <Compile Include="Ado\AdoAdapter.cs" />
     <Compile Include="BinderHelper.cs" />
     <Compile Include="Ado\CommandHelper.cs" />
+    <Compile Include="Commands\CommandFactory.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Ado\DataReaderExtensions.cs" />
     <Compile Include="Ado\DataRecordExtensions.cs" />
@@ -64,7 +65,12 @@
     <Compile Include="DynamicTable.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Ado\FindHelper.cs" />
+    <Compile Include="Commands\FindAllByCommand.cs" />
+    <Compile Include="Commands\FindByCommand.cs" />
     <Compile Include="IAdapter.cs" />
+    <Compile Include="Commands\ICommand.cs" />
+    <Compile Include="Commands\InsertCommand.cs" />
+    <Compile Include="Commands\DeleteCommand.cs" />
     <Compile Include="MethodNameParser.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -84,6 +90,8 @@
     <Compile Include="Ado\IConnectionProvider.cs" />
     <Compile Include="Ado\SqlProvider.cs" />
     <Compile Include="StringExtensions.cs" />
+    <Compile Include="UnresolvableObjectException.cs" />
+    <Compile Include="Commands\UpdateByCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
