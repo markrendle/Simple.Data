@@ -19,7 +19,7 @@ namespace Simple.Data.SqlCeTest
         public void TestOrderDetail()
         {
             var db = Database.OpenFile(DatabasePath);
-            var order = db.Orders.FindByOrderDate(DateTime.Today);
+            var order = db.Orders.FindByOrderDate(new DateTime(2010, 8, 11));
             IEnumerable<dynamic> orderItems = order.OrderItems;
             var orderItem = orderItems.FirstOrDefault();
             var item = orderItem.Item;

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Simple.Data
 {
-    partial class DynamicRecord : IDictionary<string, object>
+    sealed partial class DynamicRecord : IDictionary<string, object>
     {
         IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
         {

@@ -34,11 +34,18 @@ namespace Simple.Data.Schema
             SerializationInfo info,
             StreamingContext context) : base(info, context)
         {
+            _name = info.GetString("_name");
         }
 
         public string Name
         {
             get { return _name; }
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue("_name", _name);
         }
     }
 }

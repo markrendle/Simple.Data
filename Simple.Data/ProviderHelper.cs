@@ -14,7 +14,6 @@ namespace Simple.Data
     class ProviderHelper
     {
         private static readonly ConcurrentDictionary<string, IConnectionProvider> Cache = new ConcurrentDictionary<string,IConnectionProvider>();
-        private static readonly Lazy<CompositionContainer> Composer = new Lazy<CompositionContainer>(CreateContainer);
 
         public static IConnectionProvider GetProviderByConnectionString(string connectionString)
         {
@@ -28,20 +27,38 @@ namespace Simple.Data
 
         private static IConnectionProvider LoadProvider(string filename)
         {
-            var extension = (Path.GetExtension(filename) ?? "").Substring(1).ToLower();
-            var export = Composer.Value.GetExport<IConnectionProvider>(extension);
+            string extension = GetFileExtension(filename);
 
-            if (export == null) throw new ArgumentException("Unrecognised file.");
+            var provider = ComposeProvider(extension);
 
-            var provider = export.Value;
             provider.SetConnectionString(string.Format("data source={0}", filename));
             return provider;
+        }
+
+        private static string GetFileExtension(string filename)
+        {
+            var extension = Path.GetExtension(filename);;
+
+            if (extension == null) throw new ArgumentException("Unrecognised file.");
+            return extension.TrimStart('.').ToLower();
+        }
+
+        private static IConnectionProvider ComposeProvider(string extension)
+        {
+            using (var container = CreateContainer())
+            {
+                var export = container.GetExport<IConnectionProvider>(extension);
+                if (export == null) throw new ArgumentException("Unrecognised file.");
+                return export.Value;
+            }
         }
 
         private static CompositionContainer CreateContainer()
         {
             var path = Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "");
             path = Path.GetDirectoryName(path);
+            if (path == null) throw new ArgumentException("Unrecognised file.");
+
             var catalog = new DirectoryCatalog(path, "Simple.Data.*.dll");
             return new CompositionContainer(catalog);
         }
