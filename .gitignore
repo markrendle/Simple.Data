@@ -9,3 +9,4 @@ deploy
 *.swp
 *.testsettings
 TestResults/*
+*.dbmdl
