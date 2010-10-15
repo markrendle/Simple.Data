@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Data;
 
-namespace Simple.Data.AdoStubs
+namespace Simple.Data.Mocking.Ado
 {
-    public class DbConnectionStub : IDbConnection
+    public class MockDbConnection : IDbConnection
     {
         public DataTable DummyDataTable { get; set; }
 
@@ -46,7 +46,7 @@ namespace Simple.Data.AdoStubs
 
         public IDbCommand CreateCommand()
         {
-            return new DbCommandStub(this);
+            return new MockDbCommand(this);
         }
 
         public string Database

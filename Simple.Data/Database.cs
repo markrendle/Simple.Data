@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Data.Common;
-using System.Data.SqlClient;
 using System.Data;
 using System.Dynamic;
+using System.Linq;
+using System.Text;
 using Simple.Data.Ado;
+using Simple.Data.Properties;
 using Simple.Data.Schema;
 
 namespace Simple.Data
@@ -15,29 +13,15 @@ namespace Simple.Data
     public class Database : DynamicObject
     {
         private readonly IAdapter _adapter;
-        private readonly IConnectionProvider _connectionProvider;
-        private readonly IDbConnection _connection;
-        private readonly string _connectionString;
-
-        private Database(string connectionString)
-        {
-            _connectionString = connectionString;
-        }
 
         internal Database(IAdapter adapter)
         {
             _adapter = adapter;
         }
 
-        internal Database(IDbConnection connection)
-        {
-            _connection = connection;
-        }
-
         internal Database(IConnectionProvider connectionProvider)
         {
             _adapter = new AdoAdapter(this, connectionProvider);
-            _connectionProvider = connectionProvider;
         }
 
         public IAdapter Adapter
@@ -47,17 +31,17 @@ namespace Simple.Data
 
         public static dynamic Open()
         {
-            return new Database(new SqlProvider(Properties.Settings.Default.ConnectionString));
+            return DatabaseOpener.OpenDefault();
         }
 
         public static dynamic OpenConnection(string connectionString)
         {
-            return new Database(new SqlProvider(connectionString));
+            return DatabaseOpener.OpenConnection(connectionString);
         }
 
         public static dynamic OpenFile(string filename)
         {
-            return new Database(ProviderHelper.GetProviderByFilename(filename));
+            return DatabaseOpener.OpenFile(filename);
         }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)

@@ -1,22 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Data;
 
-namespace Simple.Data.AdoStubs
+namespace Simple.Data.Mocking.Ado
 {
-    class DataRecordStub : IDataRecord
+    class MockDataReader : IDataReader
     {
-        private readonly IDictionary<string, object> _data;
+        private readonly IEnumerator<IDataRecord> _records;
 
-        public DataRecordStub(IDictionary<string, object> data)
+        public MockDataReader(IEnumerable<IDataRecord> records)
         {
-            _data = data;
+            _records = records.GetEnumerator();
+        }
+
+        public void Close()
+        {
+            
+        }
+
+        public int Depth { get; set; }
+
+        public DataTable GetSchemaTable()
+        {
+            return new DataTable();
+        }
+
+        public bool IsClosed
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool NextResult()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Read()
+        {
+            return _records.MoveNext();
+        }
+
+        public int RecordsAffected
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public void Dispose()
+        {
+            
         }
 
         public int FieldCount
         {
-            get { return _data.Count; }
+            get { return _records.Current.FieldCount; }
         }
 
         public bool GetBoolean(int i)
@@ -101,7 +137,7 @@ namespace Simple.Data.AdoStubs
 
         public string GetName(int i)
         {
-            return _data.Keys.ToArray()[i];
+            return _records.Current.GetName(i);
         }
 
         public int GetOrdinal(string name)
@@ -131,7 +167,7 @@ namespace Simple.Data.AdoStubs
 
         public object this[string name]
         {
-            get { return _data[name]; }
+            get { return _records.Current[name]; }
         }
 
         public object this[int i]

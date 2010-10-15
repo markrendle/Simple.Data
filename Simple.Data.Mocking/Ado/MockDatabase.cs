@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using System.Data;
 
-namespace Simple.Data.AdoStubs
+namespace Simple.Data.Mocking.Ado
 {
-    public static class DatabaseStub
+    public static class MockDatabase
     {
         public static void Record(IDbCommand command)
         {

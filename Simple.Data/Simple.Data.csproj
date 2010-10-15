@@ -60,6 +60,7 @@
     <Compile Include="Database.cs" />
     <Compile Include="Ado\DataReaderExtensions.cs" />
     <Compile Include="Ado\DataRecordExtensions.cs" />
+    <Compile Include="DatabaseOpener.cs" />
     <Compile Include="DynamicRecord.cs" />
     <Compile Include="DynamicStringExtensions.cs" />
     <Compile Include="DynamicTable.cs" />
@@ -78,7 +79,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ProviderHelper.cs" />
+    <Compile Include="Ado\ProviderHelper.cs" />
     <Compile Include="Schema\AmbiguousObjectNameException.cs" />
     <Compile Include="Schema\Column.cs" />
     <Compile Include="Schema\ColumnCollection.cs" />

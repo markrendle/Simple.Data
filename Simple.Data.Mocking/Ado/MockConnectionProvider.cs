@@ -2,17 +2,17 @@
 using System.Data;
 using Simple.Data.Ado;
 
-namespace Simple.Data.AdoStubs
+namespace Simple.Data.Mocking.Ado
 {
-    public class ConnectionProviderStub : IConnectionProvider
+    public class MockConnectionProvider : IConnectionProvider
     {
         private readonly IDbConnection _connection;
 
-        public ConnectionProviderStub() : this(new DbConnectionStub())
+        public MockConnectionProvider() : this(new MockDbConnection())
         {
         }
 
-        public ConnectionProviderStub(IDbConnection connection)
+        public MockConnectionProvider(IDbConnection connection)
         {
             _connection = connection;
         }

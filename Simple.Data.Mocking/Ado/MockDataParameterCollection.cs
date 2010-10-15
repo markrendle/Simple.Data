@@ -2,9 +2,9 @@
 using System.Collections.ObjectModel;
 using System.Data;
 
-namespace Simple.Data.AdoStubs
+namespace Simple.Data.Mocking.Ado
 {
-    class DataParameterCollection : Collection<IDataParameter>, IDataParameterCollection
+    class MockDataParameterCollection : Collection<IDataParameter>, IDataParameterCollection
     {
         public bool Contains(string parameterName)
         {

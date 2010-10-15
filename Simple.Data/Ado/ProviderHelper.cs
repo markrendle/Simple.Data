@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
-using System.Data.Common;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using Simple.Data.Ado;
 using System.IO;
 
-namespace Simple.Data
+namespace Simple.Data.Ado
 {
     class ProviderHelper
     {

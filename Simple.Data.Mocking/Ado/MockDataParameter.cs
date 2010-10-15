@@ -1,8 +1,8 @@
 ﻿using System.Data;
 
-namespace Simple.Data.AdoStubs
+namespace Simple.Data.Mocking.Ado
 {
-    class DataParameterStub : IDbDataParameter
+    class MockDataParameter : IDbDataParameter
     {
         public DbType DbType { get; set; }
 

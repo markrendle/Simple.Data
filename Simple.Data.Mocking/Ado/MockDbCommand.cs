@@ -2,18 +2,18 @@
 using System.Linq;
 using System.Data;
 
-namespace Simple.Data.AdoStubs
+namespace Simple.Data.Mocking.Ado
 {
-    class DbCommandStub : IDbCommand
+    class MockDbCommand : IDbCommand
     {
-        private readonly DbConnectionStub _connection;
+        private readonly MockDbConnection _connection;
 
-        public DbCommandStub(DbConnectionStub connection)
+        public MockDbCommand(MockDbConnection connection)
         {
             _connection = connection;
         }
 
-        private readonly DataParameterCollection _parameters = new DataParameterCollection();
+        private readonly MockDataParameterCollection _parameters = new MockDataParameterCollection();
 
         public void Cancel()
         {
@@ -30,12 +30,12 @@ namespace Simple.Data.AdoStubs
 
         public IDbDataParameter CreateParameter()
         {
-            return new DataParameterStub();
+            return new MockDataParameter();
         }
 
         public int ExecuteNonQuery()
         {
-            DatabaseStub.Record(this);
+            MockDatabase.Record(this);
             return 1;
         }
 
@@ -46,17 +46,17 @@ namespace Simple.Data.AdoStubs
 
         public IDataReader ExecuteReader()
         {
-            DatabaseStub.Record(this);
+            MockDatabase.Record(this);
             if (_connection != null && _connection.DummyDataTable != null)
             {
                 return _connection.DummyDataTable.CreateDataReader();
             }
-            return new DataReaderStub(Enumerable.Empty<IDataRecord>());
+            return new MockDataReader(Enumerable.Empty<IDataRecord>());
         }
 
         public object ExecuteScalar()
         {
-            DatabaseStub.Record(this);
+            MockDatabase.Record(this);
             return null;
         }
 
