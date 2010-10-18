@@ -31,6 +31,19 @@ namespace Simple.Data.UnitTest
         }
 
         [TestMethod]
+        public void EqualOperatorReturnsSimpleExpressionWithEqualTypeWhenUsedAsDynamic()
+        {
+            // Arrange
+            dynamic column = new DynamicColumn("foo", "bar");
+
+            // Act
+            var expression = column == 1;
+
+            // Assert
+            DoAsserts(expression, column, 1, SimpleExpressionType.Equal);
+        }
+
+        [TestMethod]
         public void NotEqualOperatorReturnsSimpleExpressionWithNotEqualType()
         {
             // Arrange
