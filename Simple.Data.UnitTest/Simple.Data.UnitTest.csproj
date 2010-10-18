@@ -52,12 +52,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataRecordExtensionsTest.cs" />
+    <Compile Include="DynamicColumnTest.cs" />
     <Compile Include="DynamicRecordTest.cs" />
     <Compile Include="DynamicStringExtensionsTest.cs" />
     <Compile Include="DynamicTableTest.cs" />
     <Compile Include="ListHelper.cs" />
     <Compile Include="MethodNameParserTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SimpleExpressionTest.cs" />
     <Compile Include="StringExtensionsTest.cs" />
     <Compile Include="TableCollectionTest.cs" />
   </ItemGroup>

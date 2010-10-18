@@ -92,6 +92,8 @@
     <Compile Include="Schema\TableJoin.cs" />
     <Compile Include="Ado\IConnectionProvider.cs" />
     <Compile Include="Ado\SqlProvider.cs" />
+    <Compile Include="SimpleExpression.cs" />
+    <Compile Include="SimpleExpressionType.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="UnresolvableObjectException.cs" />
     <Compile Include="Commands\UpdateByCommand.cs" />
