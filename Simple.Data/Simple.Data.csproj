@@ -66,6 +66,7 @@
     <Compile Include="DynamicRecord.cs" />
     <Compile Include="DynamicStringExtensions.cs" />
     <Compile Include="DynamicTable.cs" />
+    <Compile Include="DynamicReference.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Ado\FindHelper.cs" />
     <Compile Include="Commands\FindAllByCommand.cs" />

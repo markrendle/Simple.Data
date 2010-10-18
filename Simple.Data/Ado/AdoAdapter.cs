@@ -23,6 +23,11 @@ namespace Simple.Data.Ado
             return FindAll(tableName, criteria).FirstOrDefault();
         }
 
+        public IDictionary<string, object> Find(string tableName, SimpleExpression criteria)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<IDictionary<string, object>> FindAll(string tableName)
         {
             return Query("select * from " + tableName);

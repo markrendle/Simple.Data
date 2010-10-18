@@ -10,16 +10,16 @@ namespace Simple.Data.UnitTest
     public class DynamicTableTest
     {
         [TestMethod]
-        public void PropertyShouldReturnDynamicColumn()
+        public void PropertyShouldReturnDynamicReference()
         {
             //Arrange
             dynamic table = new DynamicTable("Test", null);
 
             // Act
-            DynamicColumn column = table.TestColumn;
+            DynamicReference column = table.TestColumn;
 
             // Assert
-            Assert.AreEqual("Test", column.TableName);
+            Assert.AreEqual("Test", column.Owner.Name);
             Assert.AreEqual("TestColumn", column.Name);
         }
     }

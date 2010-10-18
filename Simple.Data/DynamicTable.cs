@@ -40,7 +40,7 @@ namespace Simple.Data
                 result = GetAll().ToList();
                 return true;
             }
-            result = new DynamicColumn(_tableName, binder.Name);
+            result = new DynamicReference(binder.Name, new DynamicReference(_tableName));
             return true;
         }
 
