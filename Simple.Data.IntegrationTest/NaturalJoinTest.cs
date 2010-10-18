@@ -12,7 +12,7 @@ namespace Simple.Data.IntegrationTest
     {
         static Database CreateDatabase()
         {
-            return new Database(new MockConnectionProvider());
+            return new Database(new MockConnectionProvider(new MockDbConnection(SchemaHelper.DummySchema())));
         }
 
         [TestMethod]

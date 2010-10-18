@@ -30,10 +30,9 @@ namespace Simple.Data.Schema
 
         public static IEnumerable<Column> GetColumnsForTable(Table table)
         {
-            
-            return ((AdoAdapter)table.DatabaseSchema.Database.Adapter).Query(
-                "select COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = ?", table.ActualName)
-                .Select(d => new Column(d["COLUMN_NAME"].ToString()));
+            var columns = ((AdoAdapter)table.DatabaseSchema.Database.Adapter).GetSchema("Columns", null, table.Schema, table.ActualName);
+
+            return columns.AsEnumerable().Select(row => new Column(row["column_name"].ToString()));
         }
     }
 }

@@ -7,6 +7,7 @@ namespace Simple.Data.Commands
     {
         private static readonly List<ICommand> Commands = new List<ICommand>
                                                               {
+                                                                  new FindCommand(),
                                                                   new FindByCommand(),
                                                                   new FindAllByCommand(),
                                                                   new FindAllCommand(),

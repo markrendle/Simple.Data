@@ -6,6 +6,18 @@ namespace Simple.Data.Mocking.Ado
 {
     public class MockDbConnection : DbConnection
     {
+        private readonly DataSet _schemaDataSet;
+
+        public MockDbConnection()
+        {
+            
+        }
+
+        public MockDbConnection(DataSet schemaDataSet)
+        {
+            _schemaDataSet = schemaDataSet;
+        }
+
         public DataTable DummyDataTable { get; set; }
 
         /// <summary>
@@ -99,6 +111,16 @@ namespace Simple.Data.Mocking.Ado
         public override ConnectionState State
         {
             get { throw new NotImplementedException(); }
+        }
+
+        public override DataTable GetSchema(string collectionName)
+        {
+            if (_schemaDataSet.Tables.Contains(collectionName))
+            {
+                return _schemaDataSet.Tables[collectionName];
+            }
+
+            return null;
         }
     }
 }

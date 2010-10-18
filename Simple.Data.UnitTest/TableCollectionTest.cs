@@ -75,7 +75,7 @@ namespace Simple.Data.UnitTest
 
         private static void Helper(string actualName, string searchName)
         {
-            var target = new TableCollection { new Table(actualName, "", null) };
+            var target = new TableCollection { new Table(actualName, "", "BASE TABLE", null) };
             var actual = target.Find(searchName);
             Assert.IsNotNull(actual);
             Assert.AreEqual(actualName, actual.ActualName);

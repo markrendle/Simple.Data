@@ -10,16 +10,25 @@ namespace Simple.Data.Schema
         private readonly string _actualName;
         private readonly string _homogenizedName;
         private readonly string _schema;
+        private readonly TableType _type;
         private readonly DatabaseSchema _databaseSchema;
         private readonly Lazy<ColumnCollection> _lazyColumns;
 
-        public Table(string name, string schema, DatabaseSchema databaseSchema)
+        public Table(string name, string schema, string type, DatabaseSchema databaseSchema)
         {
             _actualName = name;
             _homogenizedName = name.Homogenize();
             _databaseSchema = databaseSchema;
             _schema = schema;
+            _type = type.Equals("BASE TABLE", StringComparison.InvariantCultureIgnoreCase)
+                        ? TableType.Table
+                        : TableType.View;
             _lazyColumns = new Lazy<ColumnCollection>(GetColumns);
+        }
+
+        public TableType Type1
+        {
+            get { return _type; }
         }
 
         public string HomogenizedName

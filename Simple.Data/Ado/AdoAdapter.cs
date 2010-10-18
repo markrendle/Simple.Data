@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -94,9 +95,19 @@ namespace Simple.Data.Ado
             return Execute(deleteSql, criteria.Values.ToArray());
         }
 
-        internal IDbConnection CreateConnection()
+        internal DbConnection CreateConnection()
         {
             return _connectionProvider.CreateConnection();
+        }
+
+        internal DataTable GetSchema(string collectionName)
+        {
+            return _connectionProvider.GetSchema(collectionName);
+        }
+
+        internal DataTable GetSchema(string collectionName, params string[] restrictionValues)
+        {
+            return _connectionProvider.GetSchema(collectionName, restrictionValues);
         }
     }
 }

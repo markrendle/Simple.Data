@@ -41,10 +41,14 @@ namespace Simple.Data.Schema
 
         private TableCollection CreateTableCollection()
         {
-            return new TableCollection(
-                ((AdoAdapter)_database.Adapter).Query("select TABLE_NAME, TABLE_SCHEMA from INFORMATION_SCHEMA.TABLES")
-                .Select(d => new Table(d["TABLE_NAME"].ToString(), d["TABLE_SCHEMA"].ToString(), this))
-                );
+            var table = ((AdoAdapter) _database.Adapter).GetSchema("Tables");
+
+            var query = table.AsEnumerable().Select(
+                row =>
+                new Table(row["table_name"].ToString(), row["table_schema"].ToString(), row["table_type"].ToString(),
+                          this));
+
+            return new TableCollection(query);
         }
     }
 }

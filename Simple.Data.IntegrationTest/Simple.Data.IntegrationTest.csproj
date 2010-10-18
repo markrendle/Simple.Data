@@ -51,6 +51,7 @@
     <Compile Include="DatabaseTest.cs" />
     <Compile Include="NaturalJoinTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SchemaHelper.cs" />
     <Compile Include="TestTraceListener.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>
