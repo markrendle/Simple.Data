@@ -13,6 +13,35 @@ namespace Simple.Data.UnitTest
     [TestClass()]
     public class DynamicReferenceTest
     {
+        [TestMethod]
+        public void GetDynamicPropertyReturnsNewDynamicReferenceWithTableAndColumn()
+        {
+            // Arrange
+            dynamic table = new DynamicReference("Table");
+
+            // Act
+            DynamicReference column = table.Column;
+
+            // Assert
+            Assert.AreEqual("Column", column.Name);
+            Assert.AreEqual("Table", column.Owner.Name);
+        }
+
+        [TestMethod]
+        public void GetDynamicPropertyDotPropertyReturnsNewDynamicReferenceWithTwoOwners()
+        {
+            // Arrange
+            dynamic table = new DynamicReference("Table1");
+
+            // Act
+            DynamicReference column = table.Table2.Column;
+
+            // Assert
+            Assert.AreEqual("Column", column.Name);
+            Assert.AreEqual("Table2", column.Owner.Name);
+            Assert.AreEqual("Table1", column.Owner.Owner.Name);
+        }
+
         /// <summary>
         ///A test for GetAllObjectNames
         ///</summary>

@@ -47,8 +47,12 @@
     <Compile Include="Ado\MockDataReader.cs" />
     <Compile Include="Ado\MockDataRecord.cs" />
     <Compile Include="Ado\DataRowExtensions.cs" />
-    <Compile Include="Ado\MockDbCommand.cs" />
-    <Compile Include="Ado\MockDbConnection.cs" />
+    <Compile Include="Ado\MockDbCommand.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Ado\MockDbConnection.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="MockHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XElementExtensions.cs" />
