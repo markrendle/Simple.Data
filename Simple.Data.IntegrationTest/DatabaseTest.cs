@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
@@ -104,10 +105,28 @@ namespace Simple.Data.IntegrationTest
         }
 
         [TestMethod]
+        public void TestAllPropertyShouldWriteDeprecatedMessageToTrace()
+        {
+            var traceListener = new TestTraceListener();
+            Trace.Listeners.Add(traceListener);
+
+            dynamic database = CreateDatabaseWithDummyData();
+            foreach (var user in database.Users.All)
+            {
+                Assert.AreEqual("Bob", user.Name);
+                Assert.AreEqual("Secret", user.Password);
+                Assert.AreEqual(42, user.Age);
+                Assert.IsTrue(traceListener.Messages.Contains("deprecated"));
+            }
+
+            Trace.Listeners.Remove(traceListener);
+        }
+
+        [TestMethod]
         public void TestAll()
         {
             dynamic database = CreateDatabaseWithDummyData();
-            foreach (var user in database.Users.All)
+            foreach (var user in database.Users.All())
             {
                 Assert.AreEqual("Bob", user.Name);
                 Assert.AreEqual("Secret", user.Password);

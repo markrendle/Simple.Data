@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Dynamic;
@@ -35,6 +36,7 @@ namespace Simple.Data
         {
             if (binder.Name == "All")
             {
+                Trace.WriteLine("The dynamic 'All' property is deprecated; use the 'All()' method instead.");
                 result = GetAll().ToList();
                 return true;
             }

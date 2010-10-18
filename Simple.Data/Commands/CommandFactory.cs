@@ -9,6 +9,7 @@ namespace Simple.Data.Commands
                                                               {
                                                                   new FindByCommand(),
                                                                   new FindAllByCommand(),
+                                                                  new FindAllCommand(),
                                                                   new UpdateByCommand(),
                                                                   new InsertCommand(),
                                                                   new DeleteCommand()
