@@ -40,7 +40,8 @@ namespace Simple.Data
                 result = GetAll().ToList();
                 return true;
             }
-            return base.TryGetMember(binder, out result);
+            result = new DynamicColumn(_tableName, binder.Name);
+            return true;
         }
 
         public void Insert(dynamic entity)

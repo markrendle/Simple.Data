@@ -131,6 +131,11 @@ namespace Simple.Data
             return anyPropertiesSet;
         }
 
+        public override IEnumerable<string> GetDynamicMemberNames()
+        {
+            return _data.Keys.AsEnumerable();
+        }
+
         private bool CanSetProperty(PropertyInfo propertyInfo)
         {
             return _data.ContainsKey(propertyInfo.Name.Homogenize()) && !(propertyInfo.PropertyType.IsValueType && _data[propertyInfo.Name.Homogenize()] == null);
