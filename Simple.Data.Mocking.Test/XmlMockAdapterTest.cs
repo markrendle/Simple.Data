@@ -36,7 +36,7 @@ namespace Simple.Data.Mocking.Test
         [TestMethod()]
         public void FindTest()
         {
-            var user = Database.Open().Users.FindByEmail("foo");
+            var user = Database.Default.Users.FindByEmail("foo");
             Assert.AreEqual("foo", user.Email);
             Assert.AreEqual("bar", user.Password);
         }
@@ -47,7 +47,7 @@ namespace Simple.Data.Mocking.Test
         [TestMethod()]
         public void All_ShouldReturnTwoUsers()
         {
-            IEnumerable<object> users = Database.Open().Users.All;
+            IEnumerable<object> users = Database.Default.Users.All;
             Assert.AreEqual(2, users.Count());
         }
     }
