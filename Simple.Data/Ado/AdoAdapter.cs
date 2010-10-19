@@ -19,14 +19,10 @@ namespace Simple.Data.Ado
             _connectionProvider = connectionProvider;
         }
 
-        public IDictionary<string, object> Find(string tableName, IDictionary<string, object> criteria)
-        {
-            return FindAll(tableName, criteria).FirstOrDefault();
-        }
-
         public IDictionary<string, object> Find(string tableName, SimpleExpression criteria)
         {
-            throw new NotImplementedException();
+            var commandBuilder = new FindHelper().GetFindByCommand(tableName, criteria);
+            return Query(commandBuilder).FirstOrDefault();
         }
 
         public IEnumerable<IDictionary<string, object>> FindAll(string tableName)
@@ -34,10 +30,23 @@ namespace Simple.Data.Ado
             return Query("select * from " + tableName);
         }
 
-        public IEnumerable<IDictionary<string, object>> FindAll(string tableName, IDictionary<string, object> criteria)
+        public IEnumerable<IDictionary<string, object>> FindAll(string tableName, SimpleExpression criteria)
         {
-            var sql = FindHelper.GetFindBySql(tableName, criteria);
-            return Query(sql, criteria.Values.ToArray());
+            var commandBuilder = new FindHelper().GetFindByCommand(tableName, criteria);
+            return Query(commandBuilder);
+        }
+
+        public IEnumerable<IDictionary<string, object>> Query(ICommandBuilder commandBuilder)
+        {
+            using (var connection = CreateConnection())
+            {
+                using (var command = commandBuilder.GetCommand(connection))
+                {
+                    connection.Open();
+
+                    return command.ExecuteReader().ToDictionaries();
+                }
+            }
         }
 
         public IEnumerable<IDictionary<string, object>> Query(string sql, params object[] values)

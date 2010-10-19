@@ -24,14 +24,9 @@ namespace Simple.Data.Mocking
             _data = new Lazy<XElement>(() => XElement.Parse(xml));
         }
 
-        public IDictionary<string, object> Find(string tableName, IDictionary<string, object> criteria)
-        {
-            return FindAll(tableName, criteria).FirstOrDefault();
-        }
-
         public IDictionary<string, object> Find(string tableName, SimpleExpression criteria)
         {
-            throw new NotImplementedException();
+            return FindAll(tableName, criteria).FirstOrDefault();
         }
 
         public IEnumerable<IDictionary<string, object>> FindAll(string tableName)
@@ -50,6 +45,62 @@ namespace Simple.Data.Mocking
             }
 
             return query.Select(e => e.AttributesToDictionary());
+        }
+
+        public IEnumerable<IDictionary<string, object>> FindAll(string tableName, SimpleExpression criteria)
+        {
+            return
+                GetTableElement(tableName).Elements().Where(GetPredicate(criteria)).Select(
+                    e => e.AttributesToDictionary());
+        }
+
+        private static Func<XElement, bool> GetPredicate(SimpleExpression criteria)
+        {
+            if (criteria.Type == SimpleExpressionType.And || criteria.Type == SimpleExpressionType.Or)
+            {
+                var leftPredicate = GetPredicate((SimpleExpression) criteria.LeftOperand);
+                var rightPredicate = GetPredicate((SimpleExpression)criteria.LeftOperand);
+                return criteria.Type == SimpleExpressionType.And
+                           ? new Func<XElement, bool>(xml => leftPredicate(xml) && rightPredicate(xml))
+                           : new Func<XElement, bool>(xml => leftPredicate(xml) || rightPredicate(xml));
+            }
+            if (criteria.LeftOperand is DynamicReference)
+            {
+                var resolver = BuildReferenceResolver((DynamicReference)criteria.LeftOperand);
+                return xml => resolver(xml) == criteria.RightOperand.ToString();
+            }
+
+            return xml => true;
+        }
+
+        private static Func<XElement, string> BuildReferenceResolver(DynamicReference reference)
+        {
+            var resolver = BuildElementResolver(reference);
+
+            return xml => resolver(xml).TryGetAttributeValue(reference.Name);
+        }
+
+        private static Func<XElement, XElement> BuildElementResolver(DynamicReference reference)
+        {
+            var elementNames = reference.GetAllObjectNames();
+            if (elementNames.Length == 2)
+            {
+                return xml => xml;
+            }
+
+            return BuildNestedElementResolver(elementNames);
+        }
+
+        private static Func<XElement, XElement> BuildNestedElementResolver(IList<string> elementNames)
+        {
+            Func<XElement, XElement> resolver = xml => xml.Element(elementNames[1]);
+            for (int i = 2; i < elementNames.Count - 1; i++)
+            {
+                var nested = resolver;
+                var name = elementNames[i];
+                resolver = xml => nested(xml).Element(name);
+            }
+            return resolver;
         }
 
         private XElement GetTableElement(string tableName)

@@ -15,6 +15,14 @@ namespace Simple.Data.Ado
             return command;
         }
 
+        internal static IDbCommand Create(IDbConnection connection, CommandBuilder commandBuilder)
+        {
+            var command = connection.CreateCommand();
+            command.CommandText = commandBuilder.Text;
+            PrepareCommand(commandBuilder, command);
+            return command;
+        }
+
         private static string PrepareCommand(IEnumerable<char> sql, IList<object> values, IDbCommand command)
         {
             int index = 0;
@@ -37,6 +45,17 @@ namespace Simple.Data.Ado
                 }
             }
             return sqlBuilder.ToString();
+        }
+
+        private static void PrepareCommand(CommandBuilder commandBuilder, IDbCommand command)
+        {
+            foreach (var pair in commandBuilder.Parameters)
+            {
+                var parameter = command.CreateParameter();
+                parameter.ParameterName = pair.Key;
+                parameter.Value = pair.Value;
+                command.Parameters.Add(parameter);
+            }
         }
     }
 }

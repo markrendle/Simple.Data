@@ -28,7 +28,7 @@ namespace Simple.Data.IntegrationTest
         {
             dynamic database = CreateDatabase();
             database.Users.FindByName("Foo");
-            Assert.AreEqual("select * from Users where name = @p0", MockDatabase.Sql, true);
+            Assert.AreEqual("select * from Users where Users.name like @p1", MockDatabase.Sql, true);
             Assert.AreEqual("Foo", MockDatabase.Parameters[0]);
         }
 
@@ -37,7 +37,7 @@ namespace Simple.Data.IntegrationTest
         {
             dynamic database = CreateDatabase();
             database.Users.FindByNameAndPassword("Foo", "secret");
-            Assert.AreEqual("select * from Users where name = @p0 and password = @p1", MockDatabase.Sql, true);
+            Assert.AreEqual("select * from Users where (Users.name like @p1 and Users.password like @p2)", MockDatabase.Sql, true);
             Assert.AreEqual("Foo", MockDatabase.Parameters[0]);
             Assert.AreEqual("secret", MockDatabase.Parameters[1]);
         }
@@ -47,7 +47,7 @@ namespace Simple.Data.IntegrationTest
         {
             dynamic database = CreateDatabase();
             database.Users.FindAllByName("Foo");
-            Assert.AreEqual("select * from Users where name = @p0", MockDatabase.Sql, true);
+            Assert.AreEqual("select * from Users where Users.name like @p1", MockDatabase.Sql, true);
             Assert.AreEqual("Foo", MockDatabase.Parameters[0]);
         }
 

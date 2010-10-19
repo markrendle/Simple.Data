@@ -54,9 +54,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ado\AdoAdapter.cs" />
+    <Compile Include="Ado\CommandBuilder.cs" />
+    <Compile Include="Ado\ExpressionFormatter.cs" />
+    <Compile Include="Ado\ICommandBuilder.cs" />
+    <Compile Include="Ado\IExpressionFormatter.cs" />
     <Compile Include="BinderHelper.cs" />
     <Compile Include="Ado\CommandHelper.cs" />
     <Compile Include="Commands\CommandFactory.cs" />
+    <Compile Include="ExpressionHelper.cs" />
     <Compile Include="Commands\FindAllCommand.cs" />
     <Compile Include="Commands\FindCommand.cs" />
     <Compile Include="Database.cs" />

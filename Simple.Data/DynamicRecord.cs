@@ -98,7 +98,7 @@ namespace Simple.Data
         {
             var criteria = new Dictionary<string, object>
                                {{masterJoin.MasterColumn.ActualName, _data[masterJoin.DetailColumn.HomogenizedName]}};
-            var dict = _database.Adapter.Find(masterJoin.Master.ActualName, criteria);
+            var dict = _database.Adapter.Find(masterJoin.Master.ActualName, ExpressionHelper.CriteriaDictionaryToExpression(masterJoin.Master.ActualName, criteria));
 
             return dict != null ? new DynamicRecord(dict, masterJoin.Master.ActualName, _database) : null;
         }
@@ -106,7 +106,7 @@ namespace Simple.Data
         private IEnumerable<dynamic> GetDetail(TableJoin detailJoin)
         {
             var criteria = new Dictionary<string, object> { { detailJoin.DetailColumn.ActualName, _data[detailJoin.MasterColumn.HomogenizedName] } };
-            return _database.Adapter.FindAll(detailJoin.Detail.ActualName, criteria)
+            return _database.Adapter.FindAll(detailJoin.Detail.ActualName, ExpressionHelper.CriteriaDictionaryToExpression(detailJoin.Detail.ActualName, criteria))
                 .Select(dict => new DynamicRecord(dict, detailJoin.Detail.ActualName, _database));
         }
 
