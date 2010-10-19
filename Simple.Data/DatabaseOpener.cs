@@ -54,7 +54,7 @@ namespace Simple.Data
 
         private static Database OpenDefaultMethod()
         {
-            return new Database(new SqlProvider(Settings.Default.ConnectionString));
+            return new Database(new SqlConnectionProvider(Settings.Default.ConnectionString));
         }
 
         private static Database OpenFileMethod(string filename)
@@ -64,7 +64,7 @@ namespace Simple.Data
 
         private static Database OpenConnectionMethod(string connectionString)
         {
-            return new Database(new SqlProvider(connectionString));
+            return new Database(new SqlConnectionProvider(connectionString));
         }
     }
 }

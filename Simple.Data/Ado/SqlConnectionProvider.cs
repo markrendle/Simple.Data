@@ -1,19 +1,20 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 
 namespace Simple.Data.Ado
 {
-    class SqlProvider : IConnectionProvider
+    class SqlConnectionProvider : IConnectionProvider
     {
         private string _connectionString;
 
-        public SqlProvider()
+        public SqlConnectionProvider()
         {
             
         }
 
-        public SqlProvider(string connectionString)
+        public SqlConnectionProvider(string connectionString)
         {
             _connectionString = connectionString;
         }
@@ -33,6 +34,10 @@ namespace Simple.Data.Ado
             using (var cn = CreateConnection())
             {
                 cn.Open();
+                if (collectionName.Equals("primarykeys", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    
+                }
                 return cn.GetSchema(collectionName);
             }
         }
@@ -44,6 +49,31 @@ namespace Simple.Data.Ado
                 cn.Open();
                 return cn.GetSchema(collectionName, restrictionValues);
             }
+        }
+
+        private DataTable GetPrimaryKeys()
+        {
+            return SelectToDataTable(Properties.Resources.PrimaryKeySql);
+        }
+
+        private DataTable GetForeignKeys()
+        {
+            return SelectToDataTable(Properties.Resources.ForeignKeysSql);
+        }
+
+        private DataTable SelectToDataTable(string sql)
+        {
+            var dataTable = new DataTable();
+            using (var cn = CreateConnection() as SqlConnection)
+            {
+                using (var adapter = new SqlDataAdapter(sql, cn))
+                {
+                    adapter.Fill(dataTable);
+                }
+            }
+
+            return dataTable;
+            
         }
     }
 }

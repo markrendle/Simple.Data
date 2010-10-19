@@ -10,23 +10,23 @@ namespace Simple.Data.Schema
 {
     internal class DatabaseSchema
     {
-        private readonly Database _database;
+        private readonly ISchemaProvider _schemaProvider;
         private readonly Lazy<TableCollection> _lazyTables;
 
-        public DatabaseSchema(Database database)
+        public DatabaseSchema(ISchemaProvider schemaProvider)
         {
             _lazyTables = new Lazy<TableCollection>(CreateTableCollection);
-            _database = database;
+            _schemaProvider = schemaProvider;
         }
 
-        public Database Database
+        public ISchemaProvider SchemaProvider
         {
-            get { return _database; }
+            get { return _schemaProvider; }
         }
 
         public bool IsAvailable
         {
-            get { return _database != null; }
+            get { return _schemaProvider != null; }
         }
 
         public IEnumerable<Table> Tables
@@ -41,7 +41,7 @@ namespace Simple.Data.Schema
 
         private TableCollection CreateTableCollection()
         {
-            var table = ((AdoAdapter) _database.Adapter).GetSchema("Tables");
+            var table = _schemaProvider.GetSchema("Tables");
 
             var query = table.AsEnumerable().Select(
                 row =>

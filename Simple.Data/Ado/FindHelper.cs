@@ -36,6 +36,8 @@ namespace Simple.Data.Ado
         {
             _commandBuilder.Append("select * from " + tableName);
 
+
+
             if (criteria != null)
             {
                 _commandBuilder.Append(" where ");

@@ -43,5 +43,36 @@ namespace Simple.Data
         {
             return source.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         }
+
+        public static IEnumerable<T> SkipLast<T>(this IEnumerable<T> source)
+        {
+            var buffer = default(T);
+            var enumerator = source.GetEnumerator();
+            if (enumerator.MoveNext())
+            {
+                buffer = enumerator.Current;
+            }
+            while (enumerator.MoveNext())
+            {
+                yield return buffer;
+                buffer = enumerator.Current;
+            }
+        }
+
+        public static IEnumerable<Tuple<T,T>> ToTuplePairs<T>(this IEnumerable<T> source)
+        {
+            var buffer = default(T);
+            var enumerator = source.GetEnumerator();
+            if (enumerator.MoveNext())
+            {
+                buffer = enumerator.Current;
+            }
+            while (enumerator.MoveNext())
+            {
+                yield return Tuple.Create(buffer, enumerator.Current);
+                buffer = enumerator.Current;
+            }
+            
+        }
     }
 }

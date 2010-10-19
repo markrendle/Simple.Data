@@ -18,8 +18,12 @@ namespace Simple.Data.IntegrationTest
         [TestMethod]
         public void NaturalJoinCreatesCorrectCommand()
         {
+            // Arrange
             dynamic database = CreateDatabase();
-            database.Customer.Find(database.Customer.Orders.OrderDate == new DateTime(2010, 1, 1));
+            DateTime orderDate = new DateTime(2010, 1, 1);
+            database.Customer.Find(database.Customer.Orders.OrderDate == orderDate);
+            Assert.AreEqual("select * from Customer join Orders on Customer.CustomerId = Orders.CustomerId where Orders.OrderDate = @p1", MockDatabase.Sql);
+            Assert.AreEqual(orderDate, MockDatabase.Parameters[0]);
         }
     }
 }

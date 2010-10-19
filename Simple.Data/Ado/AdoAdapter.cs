@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using Simple.Data.Schema;
 
 namespace Simple.Data.Ado
 {
@@ -12,11 +13,13 @@ namespace Simple.Data.Ado
     {
         private readonly Database _database;
         private readonly IConnectionProvider _connectionProvider;
+        private readonly ISchemaProvider _schemaProvider;
 
         public AdoAdapter(Database database, IConnectionProvider connectionProvider)
         {
             _database = database;
             _connectionProvider = connectionProvider;
+            _schemaProvider = new SqlSchemaProvider(_connectionProvider);
         }
 
         public IDictionary<string, object> Find(string tableName, SimpleExpression criteria)
@@ -111,12 +114,17 @@ namespace Simple.Data.Ado
 
         internal DataTable GetSchema(string collectionName)
         {
-            return _connectionProvider.GetSchema(collectionName);
+            return _schemaProvider.GetSchema(collectionName);
         }
 
         internal DataTable GetSchema(string collectionName, params string[] restrictionValues)
         {
-            return _connectionProvider.GetSchema(collectionName, restrictionValues);
+            return _schemaProvider.GetSchema(collectionName, restrictionValues);
+        }
+
+        internal DatabaseSchema GetSchema()
+        {
+            return new DatabaseSchema(new SqlSchemaProvider(_connectionProvider));
         }
     }
 }

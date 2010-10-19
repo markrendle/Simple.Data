@@ -16,7 +16,7 @@ namespace Simple.Data.SqlTest
         public void TestMethod1()
         {
             var provider = ProviderHelper.GetProviderByConnectionString("data source=.");
-            Assert.IsInstanceOfType(provider, typeof(SqlProvider));
+            Assert.IsInstanceOfType(provider, typeof(SqlConnectionProvider));
         }
 
         [TestMethod]

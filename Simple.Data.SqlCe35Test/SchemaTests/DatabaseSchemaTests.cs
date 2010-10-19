@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Simple.Data.Ado;
 using Simple.Data.Schema;
 
 namespace Simple.Data.SqlCeTest.SchemaTests
@@ -19,7 +20,7 @@ namespace Simple.Data.SqlCeTest.SchemaTests
         private static DatabaseSchema GetSchema()
         {
             Database db = Database.OpenFile(DatabasePath);
-            return db.GetSchema();
+            return ((AdoAdapter)db.Adapter).GetSchema();
         }
 
         [TestMethod]

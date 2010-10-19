@@ -4,6 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Simple.Data.Ado;
 using Simple.Data.Schema;
 using System.Data;
 
@@ -69,11 +70,15 @@ namespace Simple.Data
 
         private bool TryGetMaster(string name, out object result)
         {
-            var masterJoin = _database.GetSchema().FindTable(_tableName).GetMaster(name);
-            if (masterJoin != null)
+            var adoAdapter = _database.Adapter as AdoAdapter;
+            if (adoAdapter != null)
             {
-                result = GetMaster(masterJoin);
-                return true;
+                var masterJoin = adoAdapter.GetSchema().FindTable(_tableName).GetMaster(name);
+                if (masterJoin != null)
+                {
+                    result = GetMaster(masterJoin);
+                    return true;
+                }
             }
             result = null;
             return false;
@@ -83,11 +88,15 @@ namespace Simple.Data
         {
             if (_tableName != null)
             {
-                var detailJoin = _database.GetSchema().FindTable(_tableName).GetDetail(name);
-                if (detailJoin != null)
+                var adoAdapter = _database.Adapter as AdoAdapter;
+                if (adoAdapter != null)
                 {
-                    result = GetDetail(detailJoin);
-                    return true;
+                    var detailJoin = adoAdapter.GetSchema().FindTable(_tableName).GetDetail(name);
+                    if (detailJoin != null)
+                    {
+                        result = GetDetail(detailJoin);
+                        return true;
+                    }
                 }
             }
             result = null;

@@ -108,14 +108,5 @@ namespace Simple.Data
             result = new DynamicTable(binder.Name, this);
             return true;
         }
-
-        /// <summary>
-        /// Gets the schema.
-        /// </summary>
-        /// <returns></returns>
-        internal DatabaseSchema GetSchema()
-        {
-            return new DatabaseSchema(this);
-        }
     }
 }

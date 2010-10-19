@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 
@@ -13,6 +14,8 @@ namespace Simple.Data.Schema
         private readonly TableType _type;
         private readonly DatabaseSchema _databaseSchema;
         private readonly Lazy<ColumnCollection> _lazyColumns;
+        private readonly Lazy<Key> _lazyPrimaryKey;
+        private readonly Lazy<ForeignKeyCollection> _lazyForeignKeys;
 
         public Table(string name, string schema, string type, DatabaseSchema databaseSchema)
         {
@@ -24,9 +27,11 @@ namespace Simple.Data.Schema
                         ? TableType.Table
                         : TableType.View;
             _lazyColumns = new Lazy<ColumnCollection>(GetColumns);
+            _lazyPrimaryKey = new Lazy<Key>(GetPrimaryKey);
+            _lazyForeignKeys = new Lazy<ForeignKeyCollection>(GetForeignKeys);
         }
 
-        public TableType Type1
+        public TableType Type
         {
             get { return _type; }
         }
@@ -61,9 +66,46 @@ namespace Simple.Data.Schema
             return _lazyColumns.Value.Find(columnName);
         }
 
+        public Key PrimaryKey
+        {
+            get { return _lazyPrimaryKey.Value; }
+        }
+
+        public ForeignKeyCollection ForeignKeys
+        {
+            get { return _lazyForeignKeys.Value; }
+        }
+
         private ColumnCollection GetColumns()
         {
             return new ColumnCollection(Column.GetColumnsForTable(this));
+        }
+
+        private Key GetPrimaryKey()
+        {
+            var columns = _databaseSchema.SchemaProvider.GetSchema("PrimaryKeys", ActualName).AsEnumerable()
+                .OrderBy(row => (int) row["ORDINAL_POSITION"])
+                .Select(row => row["COLUMN_NAME"].ToString())
+                .ToArray();
+
+            return new Key(columns);
+        }
+
+        private ForeignKeyCollection GetForeignKeys()
+        {
+            var collection = new ForeignKeyCollection();
+
+            var keys = _databaseSchema.SchemaProvider.GetSchema("ForeignKeys", ActualName).AsEnumerable()
+                .GroupBy(row => row["UNIQUE_TABLE_NAME"].ToString());
+
+            foreach (var key in keys)
+            {
+                var columns = key.OrderBy(row => (int)row["ORDINAL_POSITION"]).Select(row => row["COLUMN_NAME"].ToString()).ToArray();
+                var uniqueColumns = key.OrderBy(row => (int)row["ORDINAL_POSITION"]).Select(row => row["UNIQUE_COLUMN_NAME"].ToString()).ToArray();
+                collection.Add(new ForeignKey(columns, key.Key, uniqueColumns));
+            }
+
+            return collection;
         }
 
         public TableJoin GetMaster(string name)

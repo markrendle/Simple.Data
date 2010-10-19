@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Simple.Data.Ado;
 using Simple.Data.Schema;
 
 namespace Simple.Data.SqlTest.SchemaTests
@@ -9,14 +10,10 @@ namespace Simple.Data.SqlTest.SchemaTests
     [TestClass]
     public class DatabaseSchemaTests
     {
-        private static readonly string DatabasePath = Path.Combine(
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8)),
-            "TestDatabase.sdf");
-
         private static DatabaseSchema GetSchema()
         {
             Database db = Database.OpenConnection(Properties.Settings.Default.ConnectionString);
-            return db.GetSchema();
+            return ((AdoAdapter)db.Adapter).GetSchema();
         }
 
         [TestMethod]
@@ -34,5 +31,24 @@ namespace Simple.Data.SqlTest.SchemaTests
             Assert.AreEqual(1, table.Columns.Count(c => c.ActualName == "Id"));
         }
 
+        [TestMethod]
+        public void TestPrimaryKey()
+        {
+            var schema = GetSchema();
+            var table = schema.FindTable("Customers");
+            Assert.AreEqual(1, table.PrimaryKey.Length);
+            Assert.AreEqual("CustomerId", table.PrimaryKey[0]);
+        }
+
+        [TestMethod]
+        public void TestForeignKey()
+        {
+            var schema = GetSchema();
+            var table = schema.FindTable("Orders");
+            var fkey = table.ForeignKeys.Single();
+            Assert.AreEqual("CustomerId", fkey.Columns[0]);
+            Assert.AreEqual("Customers", fkey.UniqueTable);
+            Assert.AreEqual("CustomerId", fkey.UniqueColumns[0]);
+        }
     }
 }

@@ -12,7 +12,7 @@ namespace Simple.Data.Ado
 
         public static IConnectionProvider GetProviderByConnectionString(string connectionString)
         {
-            return new SqlProvider(connectionString);
+            return new SqlConnectionProvider(connectionString);
         }
 
         public static IConnectionProvider GetProviderByFilename(string filename)
