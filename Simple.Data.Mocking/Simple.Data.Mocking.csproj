@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ado\DataTableExtensions.cs" />
     <Compile Include="Ado\MockConnectionProvider.cs" />
     <Compile Include="Ado\MockDatabase.cs" />
     <Compile Include="Ado\MockDataParameterCollection.cs" />
@@ -53,6 +54,7 @@
     <Compile Include="Ado\MockDbConnection.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Ado\MockSchemaProvider.cs" />
     <Compile Include="MockHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XElementExtensions.cs" />

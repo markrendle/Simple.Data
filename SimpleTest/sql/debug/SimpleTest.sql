@@ -10,8 +10,8 @@ SET NUMERIC_ROUNDABORT OFF;
 
 GO
 :setvar DatabaseName "SimpleTest"
-:setvar DefaultDataPath "D:\SQL Server\MSSQL10_50.SQLSERVER2008\MSSQL\DATA\"
-:setvar DefaultLogPath "D:\SQL Server\MSSQL10_50.SQLSERVER2008\MSSQL\DATA\"
+:setvar DefaultDataPath "C:\Program Files\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\DATA\"
+:setvar DefaultLogPath "C:\Program Files\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\DATA\"
 
 GO
 USE [master]
@@ -30,15 +30,15 @@ GO
 
 IF NOT EXISTS (SELECT 1 FROM [master].[dbo].[sysdatabases] WHERE [name] = N'$(DatabaseName)')
 BEGIN
-    RAISERROR(N'You cannot deploy this update script to target MARK-DEV\SQLSERVER2008. The database for which this script was built, SimpleTest, does not exist on this server.', 16, 127) WITH NOWAIT
+    RAISERROR(N'You cannot deploy this update script to target MACBOOK. The database for which this script was built, SimpleTest, does not exist on this server.', 16, 127) WITH NOWAIT
     RETURN
 END
 
 GO
 
-IF (@@servername != 'MARK-DEV\SQLSERVER2008')
+IF (@@servername != 'MACBOOK')
 BEGIN
-    RAISERROR(N'The server name in the build script %s does not match the name of the target server %s. Verify whether your database project settings are correct and whether your build script is up to date.', 16, 127,N'MARK-DEV\SQLSERVER2008',@@servername) WITH NOWAIT
+    RAISERROR(N'The server name in the build script %s does not match the name of the target server %s. Verify whether your database project settings are correct and whether your build script is up to date.', 16, 127,N'MACBOOK',@@servername) WITH NOWAIT
     RETURN
 END
 

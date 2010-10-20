@@ -24,6 +24,11 @@ namespace Simple.Data.Ado
             return new SqlConnection(_connectionString);
         }
 
+        public ISchemaProvider GetSchemaProvider()
+        {
+            return new SqlSchemaProvider(this);
+        }
+
         public void SetConnectionString(string connectionString)
         {
             _connectionString = connectionString;

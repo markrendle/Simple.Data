@@ -37,6 +37,11 @@ namespace Simple.Data.SqlCe35
             return new SqlCeConnection(_connectionString);
         }
 
+        public ISchemaProvider GetSchemaProvider()
+        {
+            throw new NotImplementedException();
+        }
+
         public DataTable GetSchema(string collectionName)
         {
             if (collectionName.Equals("tables", StringComparison.InvariantCultureIgnoreCase))

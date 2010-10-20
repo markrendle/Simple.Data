@@ -28,6 +28,11 @@ namespace Simple.Data.Mocking.Ado
             return _connection;
         }
 
+        public ISchemaProvider GetSchemaProvider()
+        {
+            return new MockSchemaProvider();
+        }
+
         public DataTable GetSchema(string collectionName)
         {
             throw new NotImplementedException();

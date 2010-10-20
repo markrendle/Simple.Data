@@ -47,7 +47,7 @@ namespace Simple.Data.SqlTest.SchemaTests
             var table = schema.FindTable("Orders");
             var fkey = table.ForeignKeys.Single();
             Assert.AreEqual("CustomerId", fkey.Columns[0]);
-            Assert.AreEqual("Customers", fkey.UniqueTable);
+            Assert.AreEqual("Customers", fkey.MasterTable);
             Assert.AreEqual("CustomerId", fkey.UniqueColumns[0]);
         }
     }

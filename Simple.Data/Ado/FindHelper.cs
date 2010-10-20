@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Simple.Data.Schema;
 
 namespace Simple.Data.Ado
 {
     internal class FindHelper
     {
+        private readonly DatabaseSchema _schema;
         private readonly ICommandBuilder _commandBuilder;
         private readonly IExpressionFormatter _expressionFormatter;
 
-        public FindHelper()
+        public FindHelper(DatabaseSchema schema)
         {
+            _schema = schema;
             _commandBuilder = new CommandBuilder();
             _expressionFormatter = new ExpressionFormatter(_commandBuilder);
         }
@@ -35,8 +38,8 @@ namespace Simple.Data.Ado
         public ICommandBuilder GetFindByCommand(string tableName, SimpleExpression criteria)
         {
             _commandBuilder.Append("select * from " + tableName);
-
-
+            _commandBuilder.Append(" ");
+            _commandBuilder.Append(new Joiner(JoinType.Inner, _schema).GetJoinClauses(tableName, criteria));
 
             if (criteria != null)
             {

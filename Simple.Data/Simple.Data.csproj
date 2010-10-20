@@ -59,11 +59,13 @@
     <Compile Include="Ado\ICommandBuilder.cs" />
     <Compile Include="Ado\IExpressionFormatter.cs" />
     <Compile Include="Ado\ISchemaProvider.cs" />
+    <Compile Include="Ado\JoinType.cs" />
+    <Compile Include="Ado\SchemaResolutionException.cs" />
     <Compile Include="Ado\SqlSchemaProvider.cs" />
     <Compile Include="BinderHelper.cs" />
     <Compile Include="Ado\CommandHelper.cs" />
     <Compile Include="Commands\CommandFactory.cs" />
-    <Compile Include="Commands\Joiner.cs" />
+    <Compile Include="Ado\Joiner.cs" />
     <Compile Include="ExpressionHelper.cs" />
     <Compile Include="Commands\FindAllCommand.cs" />
     <Compile Include="Commands\FindCommand.cs" />
@@ -72,13 +74,14 @@
     <Compile Include="Ado\DataRecordExtensions.cs" />
     <Compile Include="DatabaseOpener.cs" />
     <Compile Include="DynamicRecord.cs" />
-    <Compile Include="DynamicStringExtensions.cs" />
+    <Compile Include="Extensions\DynamicStringExtensions.cs" />
     <Compile Include="DynamicTable.cs" />
     <Compile Include="DynamicReference.cs" />
-    <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Ado\FindHelper.cs" />
     <Compile Include="Commands\FindAllByCommand.cs" />
     <Compile Include="Commands\FindByCommand.cs" />
+    <Compile Include="Extensions\SerializationInfoExtensions.cs" />
     <Compile Include="IAdapter.cs" />
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\InsertCommand.cs" />
@@ -110,9 +113,10 @@
     <Compile Include="Ado\IConnectionProvider.cs" />
     <Compile Include="Ado\SqlConnectionProvider.cs" />
     <Compile Include="Schema\TableType.cs" />
+    <Compile Include="SimpleDataException.cs" />
     <Compile Include="SimpleExpression.cs" />
     <Compile Include="SimpleExpressionType.cs" />
-    <Compile Include="StringExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="UnresolvableObjectException.cs" />
     <Compile Include="Commands\UpdateByCommand.cs" />
   </ItemGroup>
