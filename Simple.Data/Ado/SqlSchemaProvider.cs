@@ -36,11 +36,11 @@ namespace Simple.Data.Ado
 
         public DataTable GetSchema(string collectionName, params string[] restrictionValues)
         {
-            if (collectionName.Equals("primarykeys", StringComparison.InvariantCultureIgnoreCase))
+            if (collectionName.Equals("PRIMARY_KEYS", StringComparison.InvariantCultureIgnoreCase))
             {
                 return GetPrimaryKeys(restrictionValues[0]);
             }
-            if (collectionName.Equals("foreignkeys", StringComparison.InvariantCultureIgnoreCase))
+            if (collectionName.Equals("FOREIGN_KEYS", StringComparison.InvariantCultureIgnoreCase))
             {
                 return GetForeignKeys(restrictionValues[0]);
             }

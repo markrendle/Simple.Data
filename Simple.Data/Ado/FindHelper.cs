@@ -20,7 +20,7 @@ namespace Simple.Data.Ado
 
         public string GetFindBySql(string tableName, IDictionary<string, object> criteria)
         {
-            var sqlBuilder = new StringBuilder("select * from " + tableName);
+            var sqlBuilder = new StringBuilder(GetSelectClause(tableName));
             var keyword = "where";
 
             foreach (var criterion in criteria)
@@ -37,7 +37,7 @@ namespace Simple.Data.Ado
 
         public ICommandBuilder GetFindByCommand(string tableName, SimpleExpression criteria)
         {
-            _commandBuilder.Append("select * from " + tableName);
+            _commandBuilder.Append(GetSelectClause(tableName));
             _commandBuilder.Append(" ");
             _commandBuilder.Append(new Joiner(JoinType.Inner, _schema).GetJoinClauses(tableName, criteria));
 
@@ -48,6 +48,11 @@ namespace Simple.Data.Ado
             }
 
             return _commandBuilder;
+        }
+
+        private string GetSelectClause(string tableName)
+        {
+            return string.Format("select {0}.* from {0}", tableName);
         }
     }
 }

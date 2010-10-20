@@ -67,6 +67,30 @@ GO
 */
 
 GO
+PRINT N'Dropping FK_Orders_Customers...';
+
+
+GO
+ALTER TABLE [dbo].[Orders] DROP CONSTRAINT [FK_Orders_Customers];
+
+
+GO
+PRINT N'Dropping PK_Customers...';
+
+
+GO
+ALTER TABLE [dbo].[Customers] DROP CONSTRAINT [PK_Customers];
+
+
+GO
+PRINT N'Dropping PK_Orders...';
+
+
+GO
+ALTER TABLE [dbo].[Orders] DROP CONSTRAINT [PK_Orders];
+
+
+GO
 /*
 Post-Deployment Script Template							
 --------------------------------------------------------------------------------------
