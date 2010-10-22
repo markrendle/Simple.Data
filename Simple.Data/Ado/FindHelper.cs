@@ -15,7 +15,7 @@ namespace Simple.Data.Ado
         {
             _schema = schema;
             _commandBuilder = new CommandBuilder();
-            _expressionFormatter = new ExpressionFormatter(_commandBuilder);
+            _expressionFormatter = new ExpressionFormatter(_commandBuilder, _schema);
         }
 
         public string GetFindBySql(string tableName, IDictionary<string, object> criteria)
@@ -52,7 +52,7 @@ namespace Simple.Data.Ado
 
         private string GetSelectClause(string tableName)
         {
-            return string.Format("select {0}.* from {0}", tableName);
+            return string.Format("select {0}.* from {0}", _schema.FindTable(tableName).ActualName);
         }
     }
 }

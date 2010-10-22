@@ -32,7 +32,7 @@ namespace Simple.Data.Ado
 
         public IEnumerable<IDictionary<string, object>> FindAll(string tableName)
         {
-            return Query("select * from " + tableName);
+            return Query("select * from " + _schema.FindTable(tableName).ActualName);
         }
 
         public IEnumerable<IDictionary<string, object>> FindAll(string tableName, SimpleExpression criteria)

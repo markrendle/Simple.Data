@@ -63,7 +63,8 @@ namespace Simple.Data.Schema
 
         public Column FindColumn(string columnName)
         {
-            return _lazyColumns.Value.Find(columnName);
+            var columns = _lazyColumns.Value;
+            return columns.Find(columnName);
         }
 
         public Key PrimaryKey
