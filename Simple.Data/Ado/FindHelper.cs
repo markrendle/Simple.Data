@@ -18,23 +18,6 @@ namespace Simple.Data.Ado
             _expressionFormatter = new ExpressionFormatter(_commandBuilder, _schema);
         }
 
-        public string GetFindBySql(string tableName, IDictionary<string, object> criteria)
-        {
-            var sqlBuilder = new StringBuilder(GetSelectClause(tableName));
-            var keyword = "where";
-
-            foreach (var criterion in criteria)
-            {
-                sqlBuilder.AppendFormat(" {0} {1} = ?", keyword, criterion.Key);
-                if (keyword == "where")
-                {
-                    keyword = "and";
-                }
-            }
-
-            return sqlBuilder.ToString();
-        }
-
         public ICommandBuilder GetFindByCommand(string tableName, SimpleExpression criteria)
         {
             _commandBuilder.Append(GetSelectClause(tableName));
@@ -52,7 +35,7 @@ namespace Simple.Data.Ado
 
         private string GetSelectClause(string tableName)
         {
-            return string.Format("select {0}.* from {0}", _schema.FindTable(tableName).ActualName);
+            return string.Format("select {0}.* from {0}", _schema.FindTable(tableName).QuotedName);
         }
     }
 }

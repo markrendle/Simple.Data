@@ -49,16 +49,22 @@ namespace Simple.Data.Ado
         private string MakeJoinText(ForeignKey foreignKey)
         {
             var builder = new StringBuilder(JoinKeyword);
-            builder.AppendFormat(" JOIN {2} ON ({0}.{1} = {2}.{3}", foreignKey.MasterTable, foreignKey.UniqueColumns[0],
-                                 foreignKey.DetailTable, foreignKey.Columns[0]);
+            builder.AppendFormat(" JOIN {0} ON (", _schema.QuoteObjectName(foreignKey.DetailTable));
+            builder.Append(FormatJoinExpression(foreignKey, 0));
 
             for (int i = 1; i < foreignKey.Columns.Length; i++)
             {
-                builder.AppendFormat(" AND {0}.{1} = {2}.{3}", foreignKey.MasterTable, foreignKey.UniqueColumns[i],
-                                 foreignKey.DetailTable, foreignKey.Columns[i]);
+                builder.Append(" AND ");
+                builder.Append(FormatJoinExpression(foreignKey, i));
             }
             builder.Append(")");
             return builder.ToString();
+        }
+
+        private string FormatJoinExpression(ForeignKey foreignKey, int columnIndex)
+        {
+            return string.Format("{0}.{1} = {2}.{3}", _schema.QuoteObjectName(foreignKey.MasterTable), _schema.QuoteObjectName(foreignKey.UniqueColumns[columnIndex]),
+                                 _schema.QuoteObjectName(foreignKey.DetailTable), _schema.QuoteObjectName(foreignKey.Columns[columnIndex]));
         }
 
         private string JoinKeyword

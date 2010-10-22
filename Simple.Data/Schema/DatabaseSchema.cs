@@ -50,5 +50,12 @@ namespace Simple.Data.Schema
 
             return new TableCollection(query);
         }
+
+        public string QuoteObjectName(string unquotedName)
+        {
+            if (unquotedName == null) throw new ArgumentNullException("unquotedName");
+            if (unquotedName.StartsWith("[")) return unquotedName; // because it actually is quoted.
+            return "[" + unquotedName + "]";
+        }
     }
 }

@@ -57,7 +57,7 @@ namespace Simple.Data.Ado
             if (!ReferenceEquals(reference, null))
             {
                 var table = _schema.FindTable(reference.Owner.Name);
-                return table.ActualName + "." + table.FindColumn(reference.Name).ActualName;
+                return table.QuotedName + "." + table.FindColumn(reference.Name).QuotedName;
             }
 
             return _commandBuilder.AddParameter(value);

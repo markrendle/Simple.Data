@@ -21,7 +21,7 @@ namespace Simple.Data.IntegrationTest
                                           new[] {"dbo", "Orders", "OrderDate"});
             MockSchemaProvider.SetPrimaryKeys(new object[] {"dbo", "Customer", "CustomerId", 0});
             MockSchemaProvider.SetForeignKeys(new object[] {"dbo", "Orders", "CustomerId", "dbo", "Customer", "CustomerId", 0});
-            return new Database(new MockConnectionProvider(new MockDbConnection(SchemaHelper.DummySchema())));
+            return new Database(new MockConnectionProvider(new MockDbConnection()));
         }
 
         [TestMethod]
@@ -31,7 +31,7 @@ namespace Simple.Data.IntegrationTest
             dynamic database = CreateDatabase();
             DateTime orderDate = new DateTime(2010, 1, 1);
             var expectedSql =
-                "select Customer.* from Customer join Orders on (Customer.CustomerId = Orders.CustomerId) where Orders.OrderDate = @p1";
+                "select [Customer].* from [Customer] join [Orders] on ([Customer].[CustomerId] = [Orders].[CustomerId]) where [Orders].[OrderDate] = @p1";
 
             // Act
             database.Customer.Find(database.Customer.Orders.OrderDate == orderDate);

@@ -56,6 +56,11 @@ namespace Simple.Data.Schema
             get { return _actualName; }
         }
 
+        public string QuotedName
+        {
+            get { return _databaseSchema.QuoteObjectName(_actualName); }
+        }
+
         public IEnumerable<Column> Columns
         {
             get { return _lazyColumns.Value.AsEnumerable(); }

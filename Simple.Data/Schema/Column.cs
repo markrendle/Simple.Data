@@ -10,11 +10,13 @@ namespace Simple.Data.Schema
     class Column
     {
         private readonly string _actualName;
+        private readonly Table _table;
         private readonly string _homogenizedName;
 
-        public Column(string actualName)
+        public Column(string actualName, Table table)
         {
             _actualName = actualName;
+            _table = table;
             _homogenizedName = actualName.Homogenize();
         }
 
@@ -28,11 +30,16 @@ namespace Simple.Data.Schema
             get { return _actualName; }
         }
 
+        public string QuotedName
+        {
+            get { return _table.DatabaseSchema.QuoteObjectName(_actualName); }
+        }
+
         public static IEnumerable<Column> GetColumnsForTable(Table table)
         {
             var columns = table.DatabaseSchema.SchemaProvider.GetSchema("COLUMNS", null, table.Schema, table.ActualName);
 
-            return columns.AsEnumerable().Select(row => new Column(row["COLUMN_NAME"].ToString()));
+            return columns.AsEnumerable().Select(row => new Column(row["COLUMN_NAME"].ToString(), table));
         }
     }
 }

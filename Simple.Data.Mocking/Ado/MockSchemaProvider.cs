@@ -9,10 +9,17 @@ namespace Simple.Data.Mocking.Ado
 {
     public class MockSchemaProvider : ISchemaProvider
     {
-        private static readonly IDictionary<string, DataTable> Tables = new Dictionary<string, DataTable>();
+        [ThreadStatic]
+        private static IDictionary<string, DataTable> _tables;
+
+        private static IDictionary<string, DataTable> Tables
+        {
+            get { return _tables ?? (_tables = new Dictionary<string, DataTable>()); }
+        }
 
         public static void SetTables(params object[][] rows)
         {
+            Tables.Remove("TABLES");
             var table = new DataTable("TABLES");
             table.AddColumns("TABLE_SCHEMA", "TABLE_NAME", "TABLE_TYPE");
             table.AddRows(rows);
@@ -21,6 +28,7 @@ namespace Simple.Data.Mocking.Ado
 
         public static void SetColumns(params object[][] rows)
         {
+            Tables.Remove("COLUMNS");
             var table = new DataTable("COLUMNS");
             table.AddColumns("TABLE_SCHEMA", "TABLE_NAME", "COLUMN_NAME");
             table.AddRows(rows);
