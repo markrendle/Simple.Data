@@ -7,8 +7,8 @@ namespace Simple.Data.UnitTest
     
     
     /// <summary>
-    ///This is a test class for TableCollectionTest and is intended
-    ///to contain all TableCollectionTest Unit Tests
+    ///This is a test class for TableCollection and is intended
+    ///to contain all TableCollection Unit Tests
     ///</summary>
     [TestClass()]
     public class TableCollectionTest
@@ -75,7 +75,7 @@ namespace Simple.Data.UnitTest
 
         private static void Helper(string actualName, string searchName)
         {
-            var target = new TableCollection { new Table(actualName, "", "BASE TABLE", null) };
+            var target = new TableCollection { new Table(actualName, "", TableType.Table) };
             var actual = target.Find(searchName);
             Assert.IsNotNull(actual);
             Assert.AreEqual(actualName, actual.ActualName);

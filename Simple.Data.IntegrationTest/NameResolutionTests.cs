@@ -20,7 +20,7 @@ namespace Simple.Data.IntegrationTest
                                           new[] { "dbo", "Orders", "CustomerId" },
                                           new[] { "dbo", "Orders", "OrderDate" });
             MockSchemaProvider.SetPrimaryKeys(new object[] { "dbo", "Customer", "CustomerId", 0 });
-            MockSchemaProvider.SetForeignKeys(new object[] { "dbo", "Orders", "CustomerId", "dbo", "Customer", "CustomerId", 0 });
+            MockSchemaProvider.SetForeignKeys(new object[] { "FK_Orders_Customer", "dbo", "Orders", "CustomerId", "dbo", "Customer", "CustomerId", 0 });
             return new Database(new MockConnectionProvider(new MockDbConnection()));
         }
 
@@ -50,7 +50,7 @@ namespace Simple.Data.IntegrationTest
                                           new[] { "dbo", "ORDER", "CUSTOMER_ID" },
                                           new[] { "dbo", "ORDER", "ORDER_DATE" });
             MockSchemaProvider.SetPrimaryKeys(new object[] { "dbo", "CUSTOMER", "CUSTOMER_ID", 0 });
-            MockSchemaProvider.SetForeignKeys(new object[] { "dbo", "ORDER", "CUSTOMER_ID", "dbo", "CUSTOMER", "CUSTOMER_ID", 0 });
+            MockSchemaProvider.SetForeignKeys(new object[] { "FK_ORDER_CUSTOMER", "dbo", "ORDER", "CUSTOMER_ID", "dbo", "CUSTOMER", "CUSTOMER_ID", 0 });
             return new Database(new MockConnectionProvider(new MockDbConnection(SchemaHelper.DummySchema())));
         }
 

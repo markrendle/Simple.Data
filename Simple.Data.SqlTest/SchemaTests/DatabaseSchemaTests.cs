@@ -28,7 +28,8 @@ namespace Simple.Data.SqlTest.SchemaTests
         {
             var schema = GetSchema();
             var table = schema.FindTable("Users");
-            Assert.AreEqual(1, table.Columns.Count(c => c.ActualName == "Id"));
+            var columns = table.Columns.ToList();
+            Assert.AreEqual(1, columns.Count(c => c.ActualName == "Id"));
         }
 
         [TestMethod]

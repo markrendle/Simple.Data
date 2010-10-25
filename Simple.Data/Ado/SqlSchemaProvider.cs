@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
@@ -17,37 +18,57 @@ namespace Simple.Data.Ado
             _connectionProvider = connectionProvider;
         }
 
-        public DataTable GetSchema(string collectionName)
+        public IEnumerable<Table> GetTables()
         {
             using (var cn = _connectionProvider.CreateConnection())
             {
                 cn.Open();
-                if (collectionName.Equals("primarykeys", StringComparison.InvariantCultureIgnoreCase))
+
+                foreach (var row in cn.GetSchema("TABLES").AsEnumerable())
                 {
-                    return GetPrimaryKeys();
+                    yield return new Table(row["TABLE_NAME"].ToString(), row["TABLE_SCHEMA"].ToString(),
+                        row["TABLE_TYPE"].ToString() == "BASE TABLE" ? TableType.Table : TableType.View);
                 }
-                if (collectionName.Equals("foreignkeys", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return GetForeignKeys();
-                }
-                return cn.GetSchema(collectionName);
             }
         }
 
-        public DataTable GetSchema(string collectionName, params string[] restrictionValues)
+        public IEnumerable<Column> GetColumns(Table table)
         {
-            if (collectionName.Equals("PRIMARY_KEYS", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return GetPrimaryKeys(restrictionValues[0]);
-            }
-            if (collectionName.Equals("FOREIGN_KEYS", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return GetForeignKeys(restrictionValues[0]);
-            }
             using (var cn = _connectionProvider.CreateConnection())
             {
                 cn.Open();
-                return cn.GetSchema(collectionName, restrictionValues);
+
+                foreach (var row in cn.GetSchema("COLUMNS", new[] {null, table.Schema, table.ActualName}).AsEnumerable())
+                {
+                    yield return new Column(row["COLUMN_NAME"].ToString(), table);
+                }
+            }
+        }
+
+        public Key GetPrimaryKey(Table table)
+        {
+            return new Key(GetPrimaryKeys(table.ActualName).AsEnumerable()
+                .Where(
+                    row =>
+                    row["TABLE_SCHEMA"].ToString() == table.Schema && row["TABLE_NAME"].ToString() == table.ActualName)
+                    .OrderBy(row => (int)row["ORDINAL_POSITION"])
+                    .Select(row => row["COLUMN_NAME"].ToString()));
+        }
+
+        public IEnumerable<ForeignKey> GetForeignKeys(Table table)
+        {
+            var groups = GetForeignKeys(table.ActualName).AsEnumerable()
+                .Where(row =>
+                    row["TABLE_SCHEMA"].ToString() == table.Schema && row["TABLE_NAME"].ToString() == table.ActualName)
+                .GroupBy(row => row["CONSTRAINT_NAME"].ToString())
+                .ToList();
+
+            foreach (var group in groups)
+            {
+                yield return new ForeignKey(group.First()["TABLE_NAME"].ToString(),
+                    group.Select(row => row["COLUMN_NAME"].ToString()),
+                    group.First()["UNIQUE_TABLE_NAME"].ToString(),
+                    group.Select(row => row["UNIQUE_COLUMN_NAME"].ToString()));
             }
         }
 

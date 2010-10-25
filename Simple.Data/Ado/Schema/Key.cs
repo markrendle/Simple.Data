@@ -1,11 +1,14 @@
-﻿namespace Simple.Data.Ado.Schema
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace Simple.Data.Ado.Schema
 {
-    class Key
+    public sealed class Key
     {
         private readonly string[] _columns;
-        public Key(string[] columns)
+        public Key(IEnumerable<string> columns)
         {
-            _columns = columns;
+            _columns = columns.ToArray();
         }
 
         public string this[int index]

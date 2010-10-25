@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.Common;
 using Simple.Data.Ado;
+using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Mocking.Ado
 {

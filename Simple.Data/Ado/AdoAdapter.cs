@@ -114,16 +114,6 @@ namespace Simple.Data.Ado
             return _connectionProvider.CreateConnection();
         }
 
-        internal DataTable GetSchema(string collectionName)
-        {
-            return _schemaProvider.GetSchema(collectionName);
-        }
-
-        internal DataTable GetSchema(string collectionName, params string[] restrictionValues)
-        {
-            return _schemaProvider.GetSchema(collectionName, restrictionValues);
-        }
-
         internal DatabaseSchema GetSchema()
         {
             return new DatabaseSchema(_connectionProvider.GetSchemaProvider());

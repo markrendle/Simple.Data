@@ -58,7 +58,7 @@
     <Compile Include="Ado\ExpressionFormatter.cs" />
     <Compile Include="Ado\ICommandBuilder.cs" />
     <Compile Include="Ado\IExpressionFormatter.cs" />
-    <Compile Include="Ado\ISchemaProvider.cs" />
+    <Compile Include="Ado\Schema\ISchemaProvider.cs" />
     <Compile Include="Ado\JoinType.cs" />
     <Compile Include="Ado\SchemaResolutionException.cs" />
     <Compile Include="Ado\SqlSchemaProvider.cs" />

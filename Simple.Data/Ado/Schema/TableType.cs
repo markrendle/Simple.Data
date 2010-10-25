@@ -1,6 +1,6 @@
 ﻿namespace Simple.Data.Ado.Schema
 {
-    enum TableType
+    public enum TableType
     {
         Table,
         View

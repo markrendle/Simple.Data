@@ -1,4 +1,5 @@
 using System.Data.Common;
+using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {

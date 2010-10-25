@@ -1,13 +1,15 @@
-﻿namespace Simple.Data.Ado.Schema
+﻿using System.Collections.Generic;
+
+namespace Simple.Data.Ado.Schema
 {
-    class ForeignKey
+    public sealed class ForeignKey
     {
         private readonly Key _columns;
         private readonly string _detailTable;
         private readonly string _masterTable;
         private readonly Key _masterColumns;
 
-        public ForeignKey(string detailTable, string[] columns, string masterTable, string[] masterColumns)
+        public ForeignKey(string detailTable, IEnumerable<string> columns, string masterTable, IEnumerable<string> masterColumns)
         {
             _columns = new Key(columns);
             _detailTable = detailTable;

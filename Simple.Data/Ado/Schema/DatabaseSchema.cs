@@ -38,14 +38,7 @@ namespace Simple.Data.Ado.Schema
 
         private TableCollection CreateTableCollection()
         {
-            var table = _schemaProvider.GetSchema("TABLES");
-
-            var query = table.AsEnumerable().Select(
-                row =>
-                new Table(row["TABLE_NAME"].ToString(), row["TABLE_SCHEMA"].ToString(), row["TABLE_TYPE"].ToString(),
-                          this));
-
-            return new TableCollection(query);
+            return new TableCollection(_schemaProvider.GetTables().Select(table => new Table(table.ActualName, table.Schema, table.Type, this)));
         }
 
         public string QuoteObjectName(string unquotedName)

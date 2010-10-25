@@ -5,10 +5,9 @@ using System.Linq;
 
 namespace Simple.Data.Ado.Schema
 {
-    class Table
+    public class Table
     {
         private readonly string _actualName;
-        private readonly string _homogenizedName;
         private readonly string _schema;
         private readonly TableType _type;
         private readonly DatabaseSchema _databaseSchema;
@@ -16,15 +15,19 @@ namespace Simple.Data.Ado.Schema
         private readonly Lazy<Key> _lazyPrimaryKey;
         private readonly Lazy<ForeignKeyCollection> _lazyForeignKeys;
 
-        public Table(string name, string schema, string type, DatabaseSchema databaseSchema)
+        public Table(string name, string schema, TableType type)
         {
             _actualName = name;
-            _homogenizedName = name.Homogenize();
+            _schema = schema;
+            _type = type;
+        }
+
+        internal Table(string name, string schema, TableType type, DatabaseSchema databaseSchema)
+        {
+            _actualName = name;
             _databaseSchema = databaseSchema;
             _schema = schema;
-            _type = type.Equals("BASE TABLE", StringComparison.InvariantCultureIgnoreCase)
-                        ? TableType.Table
-                        : TableType.View;
+            _type = type;
             _lazyColumns = new Lazy<ColumnCollection>(GetColumns);
             _lazyPrimaryKey = new Lazy<Key>(GetPrimaryKey);
             _lazyForeignKeys = new Lazy<ForeignKeyCollection>(GetForeignKeys);
@@ -35,12 +38,12 @@ namespace Simple.Data.Ado.Schema
             get { return _type; }
         }
 
-        public string HomogenizedName
+        internal string HomogenizedName
         {
-            get { return _homogenizedName; }
+            get { return ActualName.Homogenize(); }
         }
 
-        public DatabaseSchema DatabaseSchema
+        internal DatabaseSchema DatabaseSchema
         {
             get { return _databaseSchema; }
         }
@@ -55,65 +58,66 @@ namespace Simple.Data.Ado.Schema
             get { return _actualName; }
         }
 
-        public string QuotedName
+        internal string QuotedName
         {
             get { return _databaseSchema.QuoteObjectName(_actualName); }
         }
 
-        public IEnumerable<Column> Columns
+        internal IEnumerable<Column> Columns
         {
             get { return _lazyColumns.Value.AsEnumerable(); }
         }
 
-        public Column FindColumn(string columnName)
+        internal Column FindColumn(string columnName)
         {
             var columns = _lazyColumns.Value;
             return columns.Find(columnName);
         }
 
-        public Key PrimaryKey
+        internal Key PrimaryKey
         {
             get { return _lazyPrimaryKey.Value; }
         }
 
-        public ForeignKeyCollection ForeignKeys
+        internal ForeignKeyCollection ForeignKeys
         {
             get { return _lazyForeignKeys.Value; }
         }
 
         private ColumnCollection GetColumns()
         {
-            return new ColumnCollection(Column.GetColumnsForTable(this));
+            return new ColumnCollection(_databaseSchema.SchemaProvider.GetColumns(this));
         }
 
         private Key GetPrimaryKey()
         {
-            var columns = _databaseSchema.SchemaProvider.GetSchema("PRIMARY_KEYS", ActualName).AsEnumerable()
-                .OrderBy(row => (int) row["ORDINAL_POSITION"])
-                .Select(row => row["COLUMN_NAME"].ToString())
-                .ToArray();
+            return _databaseSchema.SchemaProvider.GetPrimaryKey(this);
+            //var columns = _databaseSchema.SchemaProvider.GetSchema("PRIMARY_KEYS", ActualName).AsEnumerable()
+            //    .OrderBy(row => (int) row["ORDINAL_POSITION"])
+            //    .Select(row => row["COLUMN_NAME"].ToString())
+            //    .ToArray();
 
-            return new Key(columns);
+            //return new Key(columns);
         }
 
         private ForeignKeyCollection GetForeignKeys()
         {
             var collection = new ForeignKeyCollection();
 
-            var keys = _databaseSchema.SchemaProvider.GetSchema("FOREIGN_KEYS", ActualName).AsEnumerable()
-                .GroupBy(row => row["UNIQUE_TABLE_NAME"].ToString());
+            //var keys = _databaseSchema.SchemaProvider.GetSchema("FOREIGN_KEYS", ActualName).AsEnumerable()
+            //    .GroupBy(row => row["UNIQUE_TABLE_NAME"].ToString());
 
-            foreach (var key in keys)
+            foreach (var key in _databaseSchema.SchemaProvider.GetForeignKeys(this))
             {
-                var columns = key.OrderBy(row => (int)row["ORDINAL_POSITION"]).Select(row => row["COLUMN_NAME"].ToString()).ToArray();
-                var uniqueColumns = key.OrderBy(row => (int)row["ORDINAL_POSITION"]).Select(row => row["UNIQUE_COLUMN_NAME"].ToString()).ToArray();
-                collection.Add(new ForeignKey(ActualName, columns, key.Key, uniqueColumns));
+                //var columns = key.OrderBy(row => (int)row["ORDINAL_POSITION"]).Select(row => row["COLUMN_NAME"].ToString()).ToArray();
+                //var uniqueColumns = key.OrderBy(row => (int)row["ORDINAL_POSITION"]).Select(row => row["UNIQUE_COLUMN_NAME"].ToString()).ToArray();
+                collection.Add(key);
             }
 
             return collection;
         }
 
-        public TableJoin GetMaster(string name)
+        internal TableJoin GetMaster(string name)
         {
             var master = DatabaseSchema.FindTable(name);
             if (master != null)
@@ -136,7 +140,7 @@ namespace Simple.Data.Ado.Schema
                 .SingleOrDefault();
         }
 
-        public TableJoin GetDetail(string name)
+        internal TableJoin GetDetail(string name)
         {
             var detail = DatabaseSchema.FindTable(name);
             string commonColumnName = GetCommonColumnName(detail);

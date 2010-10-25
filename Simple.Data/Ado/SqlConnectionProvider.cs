@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {

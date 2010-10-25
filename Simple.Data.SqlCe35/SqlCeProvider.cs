@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Data.SqlServerCe;
 using System.Data;
 using Simple.Data.Ado;
+using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.SqlCe35
 {
