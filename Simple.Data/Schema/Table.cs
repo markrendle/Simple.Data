@@ -56,6 +56,11 @@ namespace Simple.Data.Schema
             get { return _actualName; }
         }
 
+        public string QuotedName
+        {
+            get { return _databaseSchema.QuoteObjectName(_actualName); }
+        }
+
         public IEnumerable<Column> Columns
         {
             get { return _lazyColumns.Value.AsEnumerable(); }
@@ -63,7 +68,8 @@ namespace Simple.Data.Schema
 
         public Column FindColumn(string columnName)
         {
-            return _lazyColumns.Value.Find(columnName);
+            var columns = _lazyColumns.Value;
+            return columns.Find(columnName);
         }
 
         public Key PrimaryKey
@@ -83,7 +89,7 @@ namespace Simple.Data.Schema
 
         private Key GetPrimaryKey()
         {
-            var columns = _databaseSchema.SchemaProvider.GetSchema("PrimaryKeys", ActualName).AsEnumerable()
+            var columns = _databaseSchema.SchemaProvider.GetSchema("PRIMARY_KEYS", ActualName).AsEnumerable()
                 .OrderBy(row => (int) row["ORDINAL_POSITION"])
                 .Select(row => row["COLUMN_NAME"].ToString())
                 .ToArray();
@@ -95,14 +101,14 @@ namespace Simple.Data.Schema
         {
             var collection = new ForeignKeyCollection();
 
-            var keys = _databaseSchema.SchemaProvider.GetSchema("ForeignKeys", ActualName).AsEnumerable()
+            var keys = _databaseSchema.SchemaProvider.GetSchema("FOREIGN_KEYS", ActualName).AsEnumerable()
                 .GroupBy(row => row["UNIQUE_TABLE_NAME"].ToString());
 
             foreach (var key in keys)
             {
                 var columns = key.OrderBy(row => (int)row["ORDINAL_POSITION"]).Select(row => row["COLUMN_NAME"].ToString()).ToArray();
                 var uniqueColumns = key.OrderBy(row => (int)row["ORDINAL_POSITION"]).Select(row => row["UNIQUE_COLUMN_NAME"].ToString()).ToArray();
-                collection.Add(new ForeignKey(columns, key.Key, uniqueColumns));
+                collection.Add(new ForeignKey(ActualName, columns, key.Key, uniqueColumns));
             }
 
             return collection;

@@ -8,19 +8,26 @@ namespace Simple.Data.Schema
     class ForeignKey
     {
         private readonly Key _columns;
-        private readonly string _uniqueTable;
-        private readonly Key _uniqueColumns;
+        private readonly string _detailTable;
+        private readonly string _masterTable;
+        private readonly Key _masterColumns;
 
-        public ForeignKey(string[] columns, string uniqueTable, string[] uniqueColumns)
+        public ForeignKey(string detailTable, string[] columns, string masterTable, string[] masterColumns)
         {
             _columns = new Key(columns);
-            _uniqueTable = uniqueTable;
-            _uniqueColumns = new Key(uniqueColumns);
+            _detailTable = detailTable;
+            _masterTable = masterTable;
+            _masterColumns = new Key(masterColumns);
+        }
+
+        public string DetailTable
+        {
+            get { return _detailTable; }
         }
 
         public Key UniqueColumns
         {
-            get { return _uniqueColumns; }
+            get { return _masterColumns; }
         }
 
         public Key Columns
@@ -28,9 +35,9 @@ namespace Simple.Data.Schema
             get { return _columns; }
         }
 
-        public string UniqueTable
+        public string MasterTable
         {
-            get { return _uniqueTable; }
+            get { return _masterTable; }
         }
     }
 }

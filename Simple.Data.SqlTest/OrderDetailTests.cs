@@ -14,7 +14,7 @@ namespace Simple.Data.SqlTest
         public void TestOrderDetail()
         {
             var db = DatabaseHelper.Open();
-            var order = db.Orders.FindByOrderDate(new DateTime(2010,9,1));
+            var order = db.Orders.FindByOrderDate(new DateTime(2010,10,10));
             IEnumerable<dynamic> orderItems = order.OrderItems;
             var orderItem = orderItems.FirstOrDefault();
             var item = orderItem.Item;

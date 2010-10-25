@@ -17,7 +17,7 @@ namespace Simple.Data.Schema
         /// <param name="item">The element from which to extract the key.</param>
         protected override string GetKeyForItem(ForeignKey item)
         {
-            return item.UniqueTable;
+            return item.MasterTable;
         }
     }
 }

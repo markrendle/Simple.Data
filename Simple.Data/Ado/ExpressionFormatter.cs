@@ -2,17 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Simple.Data.Schema;
 
 namespace Simple.Data.Ado
 {
     class ExpressionFormatter : IExpressionFormatter
     {
         private readonly ICommandBuilder _commandBuilder;
+        private readonly DatabaseSchema _schema;
         private readonly Dictionary<SimpleExpressionType, Func<SimpleExpression, string>> _expressionFormatters;
 
-        public ExpressionFormatter(ICommandBuilder commandBuilder)
+        public ExpressionFormatter(ICommandBuilder commandBuilder, DatabaseSchema schema)
         {
             _commandBuilder = commandBuilder;
+            _schema = schema;
             _expressionFormatters = new Dictionary<SimpleExpressionType, Func<SimpleExpression, string>>
                   {
                       {SimpleExpressionType.And, LogicalExpressionToWhereClause},
@@ -53,7 +56,8 @@ namespace Simple.Data.Ado
             var reference = value as DynamicReference;
             if (!ReferenceEquals(reference, null))
             {
-                return reference.Owner.Name + "." + reference.Name;
+                var table = _schema.FindTable(reference.Owner.Name);
+                return table.QuotedName + "." + table.FindColumn(reference.Name).QuotedName;
             }
 
             return _commandBuilder.AddParameter(value);

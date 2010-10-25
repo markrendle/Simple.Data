@@ -41,14 +41,21 @@ namespace Simple.Data.Schema
 
         private TableCollection CreateTableCollection()
         {
-            var table = _schemaProvider.GetSchema("Tables");
+            var table = _schemaProvider.GetSchema("TABLES");
 
             var query = table.AsEnumerable().Select(
                 row =>
-                new Table(row["table_name"].ToString(), row["table_schema"].ToString(), row["table_type"].ToString(),
+                new Table(row["TABLE_NAME"].ToString(), row["TABLE_SCHEMA"].ToString(), row["TABLE_TYPE"].ToString(),
                           this));
 
             return new TableCollection(query);
+        }
+
+        public string QuoteObjectName(string unquotedName)
+        {
+            if (unquotedName == null) throw new ArgumentNullException("unquotedName");
+            if (unquotedName.StartsWith("[")) return unquotedName; // because it actually is quoted.
+            return "[" + unquotedName + "]";
         }
     }
 }

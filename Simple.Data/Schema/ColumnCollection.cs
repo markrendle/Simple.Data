@@ -25,8 +25,15 @@ namespace Simple.Data.Schema
         /// <returns>A <see cref="Column"/> if a match is found; otherwise, <c>null</c>.</returns>
         public Column Find(string columnName)
         {
-            return FindColumnWithExactName(columnName)
-                   ?? FindColumnWithCaseInsensitiveName(columnName);
+            return FindColumnWithName(columnName);
+        }
+
+        private Column FindColumnWithName(string columnName)
+        {
+            columnName = columnName.Homogenize();
+            return this
+                .Where(c => c.HomogenizedName.Equals(columnName))
+                .SingleOrDefault();
         }
 
         private Column FindColumnWithExactName(string columnName)

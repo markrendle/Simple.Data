@@ -14,28 +14,30 @@ namespace Simple.Data.Ado
         private readonly Database _database;
         private readonly IConnectionProvider _connectionProvider;
         private readonly ISchemaProvider _schemaProvider;
+        private readonly DatabaseSchema _schema;
 
         public AdoAdapter(Database database, IConnectionProvider connectionProvider)
         {
             _database = database;
             _connectionProvider = connectionProvider;
-            _schemaProvider = new SqlSchemaProvider(_connectionProvider);
+            _schemaProvider = _connectionProvider.GetSchemaProvider();
+            _schema = new DatabaseSchema(_schemaProvider);
         }
 
         public IDictionary<string, object> Find(string tableName, SimpleExpression criteria)
         {
-            var commandBuilder = new FindHelper().GetFindByCommand(tableName, criteria);
+            var commandBuilder = new FindHelper(_schema).GetFindByCommand(tableName, criteria);
             return Query(commandBuilder).FirstOrDefault();
         }
 
         public IEnumerable<IDictionary<string, object>> FindAll(string tableName)
         {
-            return Query("select * from " + tableName);
+            return Query("select * from " + _schema.FindTable(tableName).ActualName);
         }
 
         public IEnumerable<IDictionary<string, object>> FindAll(string tableName, SimpleExpression criteria)
         {
-            var commandBuilder = new FindHelper().GetFindByCommand(tableName, criteria);
+            var commandBuilder = new FindHelper(_schema).GetFindByCommand(tableName, criteria);
             return Query(commandBuilder);
         }
 
@@ -124,7 +126,7 @@ namespace Simple.Data.Ado
 
         internal DatabaseSchema GetSchema()
         {
-            return new DatabaseSchema(new SqlSchemaProvider(_connectionProvider));
+            return new DatabaseSchema(_connectionProvider.GetSchemaProvider());
         }
     }
 }
