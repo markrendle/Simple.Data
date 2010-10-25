@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading;
 using Simple.Data.Ado;
 using Simple.Data.Properties;
-using Simple.Data.Schema;
 
 namespace Simple.Data
 {

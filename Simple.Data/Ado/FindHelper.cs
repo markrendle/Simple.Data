@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Simple.Data.Schema;
+using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {

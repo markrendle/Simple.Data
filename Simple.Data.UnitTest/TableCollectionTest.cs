@@ -1,4 +1,4 @@
-﻿using Simple.Data.Schema;
+﻿using Simple.Data.Ado.Schema;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 

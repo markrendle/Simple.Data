@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Simple.Data.Ado;
-using Simple.Data.Schema;
+using Simple.Data.Ado.Schema;
 using System.Data;
 
 namespace Simple.Data

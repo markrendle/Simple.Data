@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Simple.Data.Schema;
+using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {

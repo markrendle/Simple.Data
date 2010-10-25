@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Simple.Data.Schema
+﻿namespace Simple.Data.Ado.Schema
 {
     class Key
     {

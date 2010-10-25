@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using Simple.Data.Ado;
 
-namespace Simple.Data.Schema
+namespace Simple.Data.Ado.Schema
 {
     class Column
     {

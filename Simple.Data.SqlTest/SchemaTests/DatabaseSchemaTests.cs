@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Simple.Data.Ado;
-using Simple.Data.Schema;
+using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.SqlTest.SchemaTests
 {
