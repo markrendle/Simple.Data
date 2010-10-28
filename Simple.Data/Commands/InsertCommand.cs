@@ -12,7 +12,13 @@ namespace Simple.Data.Commands
 
         public object Execute(Database database, string tableName, InvokeMemberBinder binder, object[] args)
         {
-            return database.Adapter.Insert(tableName, binder.NamedArgumentsToDictionary(args));
+            var dictionary = database.Adapter.Insert(tableName, binder.NamedArgumentsToDictionary(args));
+            if (dictionary != null)
+            {
+                return new DynamicRecord(dictionary);
+            }
+
+            return null;
         }
     }
 }

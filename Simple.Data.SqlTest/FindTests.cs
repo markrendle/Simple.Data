@@ -59,10 +59,11 @@ namespace Simple.Data.SqlTest
         {
             var db = DatabaseHelper.Open();
 
-            db.Users.Insert(Name: "Alice", Password: "foo", Age: 29);
-            User user = db.Users.FindByNameAndPassword("Alice", "foo");
+            var user = db.Users.Insert(Name: "Alice", Password: "foo", Age: 29);
 
             Assert.IsNotNull(user);
+            Assert.AreEqual("Alice", user.Name);
+            Assert.AreEqual("foo", user.Password);
             Assert.AreEqual(29, user.Age);
         }
     }
