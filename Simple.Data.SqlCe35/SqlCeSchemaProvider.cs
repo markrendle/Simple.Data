@@ -1,56 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Data.SqlClient;
+using System.Data.SqlServerCe;
 using System.Linq;
 using System.Text;
+using Simple.Data.Ado;
 using Simple.Data.Ado.Schema;
 
-namespace Simple.Data.Ado
+namespace Simple.Data.SqlCe35
 {
-    class SqlSchemaProvider : ISchemaProvider
+    public class SqlCeSchemaProvider : ISchemaProvider
     {
         private readonly IConnectionProvider _connectionProvider;
 
-        public SqlSchemaProvider(IConnectionProvider connectionProvider)
+        public SqlCeSchemaProvider(IConnectionProvider connectionProvider)
         {
             _connectionProvider = connectionProvider;
         }
 
         public IEnumerable<Table> GetTables()
         {
-            using (var cn = _connectionProvider.CreateConnection())
+            foreach (var row in _GetTables().AsEnumerable())
             {
-                cn.Open();
-
-                foreach (var row in cn.GetSchema("TABLES").AsEnumerable())
-                {
-                    yield return new Table(row["TABLE_NAME"].ToString(), row["TABLE_SCHEMA"].ToString(),
-                        row["TABLE_TYPE"].ToString() == "BASE TABLE" ? TableType.Table : TableType.View);
-                }
+                yield return new Table(row["TABLE_NAME"].ToString(), null,
+                    row["TABLE_TYPE"].ToString() == "BASE TABLE" ? TableType.Table : TableType.View);
             }
         }
 
         public IEnumerable<Column> GetColumns(Table table)
         {
-            using (var cn = _connectionProvider.CreateConnection())
+            foreach (var row in _GetColumns(table).AsEnumerable())
             {
-                cn.Open();
-
-                foreach (var row in _GetColumns(table).AsEnumerable())
-                {
-                    yield return new Column(row["name"].ToString(), table, (bool)row["is_identity"]);
-                }
+                yield return new Column(row["COLUMN_NAME"].ToString(), table);
             }
         }
 
         public Key GetPrimaryKey(Table table)
         {
             return new Key(GetPrimaryKeys(table.ActualName).AsEnumerable()
-                .Where(
-                    row =>
-                    row["TABLE_SCHEMA"].ToString() == table.Schema && row["TABLE_NAME"].ToString() == table.ActualName)
+                .Where(row => row["TABLE_NAME"].ToString() == table.ActualName)
                     .OrderBy(row => (int)row["ORDINAL_POSITION"])
                     .Select(row => row["COLUMN_NAME"].ToString()));
         }
@@ -58,8 +47,7 @@ namespace Simple.Data.Ado
         public IEnumerable<ForeignKey> GetForeignKeys(Table table)
         {
             var groups = GetForeignKeys(table.ActualName).AsEnumerable()
-                .Where(row =>
-                    row["TABLE_SCHEMA"].ToString() == table.Schema && row["TABLE_NAME"].ToString() == table.ActualName)
+                .Where(row => row["TABLE_NAME"].ToString() == table.ActualName)
                 .GroupBy(row => row["CONSTRAINT_NAME"].ToString())
                 .ToList();
 
@@ -72,13 +60,14 @@ namespace Simple.Data.Ado
             }
         }
 
+        private DataTable _GetTables()
+        {
+            return SelectToDataTable("SELECT TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES");
+        }
+
         private DataTable _GetColumns(Table table)
         {
-            var columnSelect =
-                string.Format(
-                    "SELECT name, is_identity from sys.columns where object_id = object_id('{0}.{1}', 'TABLE')",
-                    table.Schema, table.ActualName);
-            return SelectToDataTable(columnSelect);
+            return SelectToDataTable("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + table.ActualName + "'");
         }
 
         private DataTable GetPrimaryKeys()
@@ -110,9 +99,9 @@ namespace Simple.Data.Ado
         private DataTable SelectToDataTable(string sql)
         {
             var dataTable = new DataTable();
-            using (var cn = _connectionProvider.CreateConnection() as SqlConnection)
+            using (var cn = _connectionProvider.CreateConnection() as SqlCeConnection)
             {
-                using (var adapter = new SqlDataAdapter(sql, cn))
+                using (var adapter = new SqlCeDataAdapter(sql, cn))
                 {
                     adapter.Fill(dataTable);
                 }

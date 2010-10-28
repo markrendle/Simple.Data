@@ -51,5 +51,19 @@ namespace Simple.Data.SqlTest.SchemaTests
             Assert.AreEqual("Customers", fkey.MasterTable);
             Assert.AreEqual("CustomerId", fkey.UniqueColumns[0]);
         }
+
+        [TestMethod]
+        public void TestIdentityIsTrueWhenItShouldBe()
+        {
+            var column = GetSchema().FindTable("Customers").FindColumn("CustomerId");
+            Assert.IsTrue(column.IsIdentity);
+        }
+
+        [TestMethod]
+        public void TestIdentityIsFalseWhenItShouldBe()
+        {
+            var column = GetSchema().FindTable("Customers").FindColumn("Name");
+            Assert.IsFalse(column.IsIdentity);
+        }
     }
 }

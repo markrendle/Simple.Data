@@ -81,9 +81,9 @@ namespace Simple.Data.SqlCe35.Properties {
         ///                         INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS kcu ON kcu.CONSTRAINT_NAME = tc.CONSTRAINT_NAME AND kcu.TABLE_NAME = tc.TABLE_NAME
         ///WHERE        (tc.CONSTRAINT_TYPE = &apos;PRIMARY KEY&apos;).
         /// </summary>
-        internal static string PrimaryKeysSql {
+        internal static string PrimaryKeySql {
             get {
-                return ResourceManager.GetString("PrimaryKeysSql", resourceCulture);
+                return ResourceManager.GetString("PrimaryKeySql", resourceCulture);
             }
         }
     }

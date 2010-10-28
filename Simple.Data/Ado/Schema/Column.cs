@@ -7,10 +7,16 @@ namespace Simple.Data.Ado.Schema
     {
         private readonly string _actualName;
         private readonly Table _table;
+        private readonly bool _isIdentity;
 
-        public Column(string actualName, Table table)
+        public Column(string actualName, Table table) : this(actualName, table, false)
+        {
+        }
+
+        public Column(string actualName, Table table, bool isIdentity)
         {
             _actualName = actualName;
+            _isIdentity = isIdentity;
             _table = table;
         }
 
@@ -27,6 +33,11 @@ namespace Simple.Data.Ado.Schema
         public string QuotedName
         {
             get { return _table.DatabaseSchema.QuoteObjectName(_actualName); }
+        }
+
+        public bool IsIdentity
+        {
+            get { return _isIdentity; }
         }
     }
 }

@@ -49,6 +49,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SqlCeProvider.cs" />
+    <Compile Include="SqlCeSchemaProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Simple.Data\Simple.Data.csproj">
