@@ -21,6 +21,11 @@ namespace Simple.Data.Ado
                       {SimpleExpressionType.And, LogicalExpressionToWhereClause},
                       {SimpleExpressionType.Or, LogicalExpressionToWhereClause},
                       {SimpleExpressionType.Equal, EqualExpressionToWhereClause},
+                      {SimpleExpressionType.NotEqual, NotEqualExpressionToWhereClause},
+                      {SimpleExpressionType.GreaterThan, expr => BinaryExpressionToWhereClause(expr, ">")},
+                      {SimpleExpressionType.GreaterThanOrEqual, expr => BinaryExpressionToWhereClause(expr, ">=")},
+                      {SimpleExpressionType.LessThan, expr => BinaryExpressionToWhereClause(expr, "<")},
+                      {SimpleExpressionType.LessThanOrEqual, expr => BinaryExpressionToWhereClause(expr, "<=")},
                   };
         }
 
@@ -48,6 +53,20 @@ namespace Simple.Data.Ado
         {
             return string.Format("{0} {1} {2}", FormatObject(expression.LeftOperand),
                                  expression.RightOperand is string ? "LIKE" : "=",
+                                 FormatObject(expression.RightOperand));
+        }
+
+        private string NotEqualExpressionToWhereClause(SimpleExpression expression)
+        {
+            return string.Format("{0} {1} {2}", FormatObject(expression.LeftOperand),
+                                 expression.RightOperand is string ? "NOT LIKE" : "!=",
+                                 FormatObject(expression.RightOperand));
+        }
+
+        private string BinaryExpressionToWhereClause(SimpleExpression expression, string comparisonOperator)
+        {
+            return string.Format("{0} {1} {2}", FormatObject(expression.LeftOperand),
+                                 comparisonOperator,
                                  FormatObject(expression.RightOperand));
         }
 

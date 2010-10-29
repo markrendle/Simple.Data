@@ -32,6 +32,54 @@ namespace Simple.Data.IntegrationTest
         }
 
         [TestMethod]
+        public void TestFindEqualWithInt32()
+        {
+            TestDatabase.Users.Find(TestDatabase.Users.Id == 1);
+            Assert.AreEqual("select [Users].* from [Users] where [Users].[Id] = @p1", MockDatabase.Sql, true);
+            Assert.AreEqual(1, MockDatabase.Parameters[0]);
+        }
+
+        [TestMethod]
+        public void TestFindNotEqualWithInt32()
+        {
+            TestDatabase.Users.Find(TestDatabase.Users.Id != 1);
+            Assert.AreEqual("select [Users].* from [Users] where [Users].[Id] != @p1", MockDatabase.Sql, true);
+            Assert.AreEqual(1, MockDatabase.Parameters[0]);
+        }
+
+        [TestMethod]
+        public void TestFindGreaterThanWithInt32()
+        {
+            TestDatabase.Users.Find(TestDatabase.Users.Id > 1);
+            Assert.AreEqual("select [Users].* from [Users] where [Users].[Id] > @p1", MockDatabase.Sql, true);
+            Assert.AreEqual(1, MockDatabase.Parameters[0]);
+        }
+
+        [TestMethod]
+        public void TestFindGreaterThanOrEqualWithInt32()
+        {
+            TestDatabase.Users.Find(TestDatabase.Users.Id >= 1);
+            Assert.AreEqual("select [Users].* from [Users] where [Users].[Id] >= @p1", MockDatabase.Sql, true);
+            Assert.AreEqual(1, MockDatabase.Parameters[0]);
+        }
+
+        [TestMethod]
+        public void TestFindLessThanWithInt32()
+        {
+            TestDatabase.Users.Find(TestDatabase.Users.Id < 1);
+            Assert.AreEqual("select [Users].* from [Users] where [Users].[Id] < @p1", MockDatabase.Sql, true);
+            Assert.AreEqual(1, MockDatabase.Parameters[0]);
+        }
+
+        [TestMethod]
+        public void TestFindLessThanOrEqualWithInt32()
+        {
+            TestDatabase.Users.Find(TestDatabase.Users.Id <= 1);
+            Assert.AreEqual("select [Users].* from [Users] where [Users].[Id] <= @p1", MockDatabase.Sql, true);
+            Assert.AreEqual(1, MockDatabase.Parameters[0]);
+        }
+
+        [TestMethod]
         public void TestFindByDynamicSingleColumn()
         {
             TestDatabase.Users.FindByName("Foo");
