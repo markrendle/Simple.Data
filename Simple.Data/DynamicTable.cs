@@ -55,7 +55,7 @@ namespace Simple.Data
 
         private IEnumerable<dynamic> GetAll()
         {
-            return _database.Adapter.FindAll(_tableName).Select(dict => new DynamicRecord(dict, _tableName, _database));
+            return _database.Adapter.Find(_tableName, null).Select(dict => new DynamicRecord(dict, _tableName, _database));
         }
     }
 }

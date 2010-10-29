@@ -14,7 +14,7 @@ namespace Simple.Data.Commands
         public object Execute(Database database, string tableName, InvokeMemberBinder binder, object[] args)
         {
             var criteria = ExpressionHelper.CriteriaDictionaryToExpression(tableName, MethodNameParser.ParseFromBinder(binder, args));
-            var data = database.Adapter.FindAll(tableName, criteria);
+            var data = database.Adapter.Find(tableName, criteria);
             return data != null
                          ? data.Select(dict => new DynamicRecord(dict, tableName, database))
                          : Enumerable.Empty<object>();

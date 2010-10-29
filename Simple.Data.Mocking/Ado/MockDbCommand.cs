@@ -53,21 +53,6 @@ namespace Simple.Data.Mocking.Ado
             return 1;
         }
 
-        public IDataReader arse(CommandBehavior behavior)
-        {
-            return ExecuteReader();
-        }
-
-        public IDataReader arse()
-        {
-            MockDatabase.Record(this);
-            if (_connection != null && _connection.DummyDataTable != null)
-            {
-                return _connection.DummyDataTable.CreateDataReader();
-            }
-            return new MockDataReader(Enumerable.Empty<IDataRecord>());
-        }
-
         public override object ExecuteScalar()
         {
             MockDatabase.Record(this);

@@ -29,7 +29,7 @@ namespace Simple.Data.IntegrationTest
         {
             // Arrange
             dynamic database = CreateDatabaseWithSingularNames();
-            DateTime orderDate = new DateTime(2010, 1, 1);
+            var orderDate = new DateTime(2010, 1, 1);
             const string expectedSql = "select [Customer].* from [Customer] join [Orders] on ([Customer].[CustomerId] = [Orders].[CustomerId]) where [Orders].[OrderDate] = @p1";
 
             // Act
@@ -59,7 +59,7 @@ namespace Simple.Data.IntegrationTest
         {
             // Arrange
             dynamic database = CreateDatabaseWithShoutyNames();
-            DateTime orderDate = new DateTime(2010, 1, 1);
+            var orderDate = new DateTime(2010, 1, 1);
             const string expectedSql = "select [CUSTOMER].* from [CUSTOMER] join [ORDER] on ([CUSTOMER].[CUSTOMER_ID] = [ORDER].[CUSTOMER_ID])"
             + " where [ORDER].[ORDER_DATE] = @p1";
 

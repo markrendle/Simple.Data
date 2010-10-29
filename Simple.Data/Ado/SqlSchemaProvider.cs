@@ -38,7 +38,7 @@ namespace Simple.Data.Ado
             {
                 cn.Open();
 
-                foreach (var row in _GetColumns(table).AsEnumerable())
+                foreach (var row in GetColumnsDataTable(table).AsEnumerable())
                 {
                     yield return new Column(row["name"].ToString(), table, (bool)row["is_identity"]);
                 }
@@ -72,7 +72,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        private DataTable _GetColumns(Table table)
+        private DataTable GetColumnsDataTable(Table table)
         {
             var columnSelect =
                 string.Format(

@@ -30,7 +30,7 @@ namespace Simple.Data.Commands
         /// <returns></returns>
         public object Execute(Database database, string tableName, InvokeMemberBinder binder, object[] args)
         {
-            return database.Adapter.FindAll(tableName)
+            return database.Adapter.Find(tableName, null)
                 .Select(dict => new DynamicRecord(dict, tableName, database));
         }
     }

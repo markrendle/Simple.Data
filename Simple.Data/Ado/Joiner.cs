@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Simple.Data.Ado.Schema;
+using Simple.Data.Extensions;
 
 namespace Simple.Data.Ado
 {
@@ -72,14 +73,14 @@ namespace Simple.Data.Ado
             get { return _joinType == JoinType.Inner ? string.Empty : "LEFT"; }
         }
 
-        private IEnumerable<Tuple<string,string>> GetTablePairs(SimpleExpression expression)
+        private static IEnumerable<Tuple<string,string>> GetTablePairs(SimpleExpression expression)
         {
             return GetReferencesFromExpression(expression)
                 .SelectMany(dr => dr.GetAllObjectNames().SkipLast().ToTuplePairs())
                 .Distinct();
         }
 
-        private IEnumerable<DynamicReference> GetReferencesFromExpression(SimpleExpression expression)
+        private static IEnumerable<DynamicReference> GetReferencesFromExpression(SimpleExpression expression)
         {
             if (expression.Type == SimpleExpressionType.And || expression.Type == SimpleExpressionType.Or)
             {

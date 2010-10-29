@@ -17,7 +17,7 @@ namespace Simple.Data
     public class Database : DynamicObject
     {
         private readonly IAdapter _adapter;
-        private static readonly Lazy<dynamic> _default = new Lazy<dynamic>(Open, LazyThreadSafetyMode.ExecutionAndPublication);
+        private static readonly Lazy<dynamic> LazyDefault = new Lazy<dynamic>(Open, LazyThreadSafetyMode.ExecutionAndPublication);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Database"/> class.
@@ -34,7 +34,7 @@ namespace Simple.Data
         /// <param name="connectionProvider">The connection provider to use with <see cref="AdoAdapter"/> for data access.</param>
         internal Database(IConnectionProvider connectionProvider)
         {
-            _adapter = new AdoAdapter(this, connectionProvider);
+            _adapter = new AdoAdapter(connectionProvider);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Simple.Data
         /// <value>The default database.</value>
         public static dynamic Default
         {
-            get { return _default.Value; }
+            get { return LazyDefault.Value; }
         }
 
         /// <summary>

@@ -15,7 +15,7 @@ namespace Simple.Data.Commands
         public object Execute(Database database, string tableName, InvokeMemberBinder binder, object[] args)
         {
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(tableName, MethodNameParser.ParseFromBinder(binder, args));
-            var data = database.Adapter.Find(tableName, criteriaExpression);
+            var data = database.Adapter.Find(tableName, criteriaExpression).FirstOrDefault();
             return data != null ? new DynamicRecord(data, tableName, database) : null;
         }
     }

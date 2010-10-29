@@ -21,7 +21,7 @@ namespace Simple.Data.SqlCe35
 
         public IEnumerable<Table> GetTables()
         {
-            foreach (var row in _GetTables().AsEnumerable())
+            foreach (var row in GetTablesDataTable().AsEnumerable())
             {
                 yield return new Table(row["TABLE_NAME"].ToString(), null,
                     row["TABLE_TYPE"].ToString() == "BASE TABLE" ? TableType.Table : TableType.View);
@@ -30,7 +30,7 @@ namespace Simple.Data.SqlCe35
 
         public IEnumerable<Column> GetColumns(Table table)
         {
-            foreach (var row in _GetColumns(table).AsEnumerable())
+            foreach (var row in GetColumnsDataTable(table).AsEnumerable())
             {
                 yield return new Column(row["COLUMN_NAME"].ToString(), table);
             }
@@ -60,12 +60,12 @@ namespace Simple.Data.SqlCe35
             }
         }
 
-        private DataTable _GetTables()
+        private DataTable GetTablesDataTable()
         {
             return SelectToDataTable("SELECT TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES");
         }
 
-        private DataTable _GetColumns(Table table)
+        private DataTable GetColumnsDataTable(Table table)
         {
             return SelectToDataTable("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + table.ActualName + "'");
         }

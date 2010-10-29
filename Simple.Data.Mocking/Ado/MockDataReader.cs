@@ -145,7 +145,7 @@ namespace Simple.Data.Mocking.Ado
         }
 
         /// <summary>
-        /// Reads a stream of characters from the specified column, starting at location indicated by <paramref name="dataIndex"/>, into the buffer, starting at the location indicated by <paramref name="bufferIndex"/>.
+        /// Reads a stream of characters from the specified column, starting at location indicated by <paramref name="dataOffset"/>, into the buffer, starting at the location indicated by <paramref name="bufferOffset"/>.
         /// </summary>
         /// <returns>
         /// The actual number of characters read.

@@ -32,7 +32,7 @@ namespace Simple.Data.Ado
 
         private static string GetFileExtension(string filename)
         {
-            var extension = Path.GetExtension(filename);;
+            var extension = Path.GetExtension(filename);
 
             if (extension == null) throw new ArgumentException("Unrecognised file.");
             return extension.TrimStart('.').ToLower();

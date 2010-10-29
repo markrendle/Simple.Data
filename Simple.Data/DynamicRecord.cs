@@ -7,6 +7,7 @@ using System.Text;
 using Simple.Data.Ado;
 using Simple.Data.Ado.Schema;
 using System.Data;
+using Simple.Data.Extensions;
 
 namespace Simple.Data
 {
@@ -56,7 +57,7 @@ namespace Simple.Data
                 result = _data[name];
                 return true;
             }
-            else if (TryGetJoinResults(name, out result))
+            if (TryGetJoinResults(name, out result))
             {
                 return true;
             }
@@ -107,7 +108,7 @@ namespace Simple.Data
         {
             var criteria = new Dictionary<string, object>
                                {{masterJoin.MasterColumn.ActualName, _data[masterJoin.DetailColumn.HomogenizedName]}};
-            var dict = _database.Adapter.Find(masterJoin.Master.ActualName, ExpressionHelper.CriteriaDictionaryToExpression(masterJoin.Master.ActualName, criteria));
+            var dict = _database.Adapter.Find(masterJoin.Master.ActualName, ExpressionHelper.CriteriaDictionaryToExpression(masterJoin.Master.ActualName, criteria)).FirstOrDefault();
 
             return dict != null ? new DynamicRecord(dict, masterJoin.Master.ActualName, _database) : null;
         }
@@ -115,7 +116,7 @@ namespace Simple.Data
         private IEnumerable<dynamic> GetDetail(TableJoin detailJoin)
         {
             var criteria = new Dictionary<string, object> { { detailJoin.DetailColumn.ActualName, _data[detailJoin.MasterColumn.HomogenizedName] } };
-            return _database.Adapter.FindAll(detailJoin.Detail.ActualName, ExpressionHelper.CriteriaDictionaryToExpression(detailJoin.Detail.ActualName, criteria))
+            return _database.Adapter.Find(detailJoin.Detail.ActualName, ExpressionHelper.CriteriaDictionaryToExpression(detailJoin.Detail.ActualName, criteria))
                 .Select(dict => new DynamicRecord(dict, detailJoin.Detail.ActualName, _database));
         }
 

@@ -34,33 +34,5 @@ namespace Simple.Data.Ado.Schema
                 .Where(c => c.HomogenizedName.Equals(columnName))
                 .SingleOrDefault();
         }
-
-        private Column FindColumnWithExactName(string columnName)
-        {
-            try
-            {
-                return this
-                    .Where(c => c.ActualName.Equals(columnName))
-                    .SingleOrDefault();
-            }
-            catch (InvalidOperationException)
-            {
-                throw new AmbiguousObjectNameException(columnName);
-            }
-        }
-
-        private Column FindColumnWithCaseInsensitiveName(string columnName)
-        {
-            try
-            {
-                return this
-                    .Where(c => c.ActualName.Equals(columnName, StringComparison.InvariantCultureIgnoreCase))
-                    .SingleOrDefault();
-            }
-            catch (InvalidOperationException)
-            {
-                throw new AmbiguousObjectNameException(columnName);
-            }
-        }
     }
 }

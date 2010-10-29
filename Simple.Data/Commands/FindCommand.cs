@@ -32,7 +32,7 @@ namespace Simple.Data.Commands
         {
             if (args.Length == 1 && args[0] is SimpleExpression)
             {
-                var data = database.Adapter.Find(tableName, (SimpleExpression) args[0]);
+                var data = database.Adapter.Find(tableName, (SimpleExpression) args[0]).FirstOrDefault();
                 return data != null ? new DynamicRecord(data, tableName, database) : null;
             }
 

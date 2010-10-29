@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
+using Simple.Data.Extensions;
 
 namespace Simple.Data
 {
@@ -15,10 +16,7 @@ namespace Simple.Data
             {
                 return ParseFromMethodName(binder.Name, binder.NamedArgumentsToDictionary(args));
             }
-            else
-            {
-                return ParseFromMethodName(binder.Name, args);
-            }
+            return ParseFromMethodName(binder.Name, args);
         }
 
         internal static IDictionary<string, object> ParseFromMethodName(string methodName, IList<object> args)

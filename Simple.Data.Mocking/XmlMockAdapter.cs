@@ -24,31 +24,14 @@ namespace Simple.Data.Mocking
             _data = new Lazy<XElement>(() => XElement.Parse(xml));
         }
 
-        public IDictionary<string, object> Find(string tableName, SimpleExpression criteria)
-        {
-            return FindAll(tableName, criteria).FirstOrDefault();
-        }
-
-        public IEnumerable<IDictionary<string, object>> FindAll(string tableName)
+        private IEnumerable<IDictionary<string, object>> FindAll(string tableName)
         {
             return GetTableElement(tableName).Elements().Select(e => e.AttributesToDictionary());
         }
 
-        public IEnumerable<IDictionary<string, object>> FindAll(string tableName, IDictionary<string, object> criteria)
+        public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
-            var query = GetTableElement(tableName).Elements();
-            foreach (var criterion in criteria)
-            {
-                var column = criterion.Key;
-                var value = criterion.Value;
-                query = query.Where(xe => xe.TryGetAttributeValue(column).Equals(value.ToString()));
-            }
-
-            return query.Select(e => e.AttributesToDictionary());
-        }
-
-        public IEnumerable<IDictionary<string, object>> FindAll(string tableName, SimpleExpression criteria)
-        {
+            if (criteria == null) return FindAll(tableName);
             return
                 GetTableElement(tableName).Elements().Where(GetPredicate(criteria)).Select(
                     e => e.AttributesToDictionary());
@@ -61,7 +44,7 @@ namespace Simple.Data.Mocking
                 var leftPredicate = GetPredicate((SimpleExpression) criteria.LeftOperand);
                 var rightPredicate = GetPredicate((SimpleExpression)criteria.LeftOperand);
                 return criteria.Type == SimpleExpressionType.And
-                           ? new Func<XElement, bool>(xml => leftPredicate(xml) && rightPredicate(xml))
+                           ? (xml => leftPredicate(xml) && rightPredicate(xml))
                            : new Func<XElement, bool>(xml => leftPredicate(xml) || rightPredicate(xml));
             }
             if (criteria.LeftOperand is DynamicReference)
