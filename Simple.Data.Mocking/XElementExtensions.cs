@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -14,7 +15,31 @@ namespace Simple.Data.Mocking
 
         public static IDictionary<string, object> AttributesToDictionary(this XElement element)
         {
-            return element.Attributes().ToDictionary(a => a.Name.ToString(), a => (object)a.Value);
+            return element.Attributes().ToDictionary(a => a.Name.ToString(), a => ConvertValue(a,element.Parent));
+        }
+
+        private static object ConvertValue(XAttribute attribute, XElement tableElement)
+        {
+            var typeName = tableElement.Attribute(attribute.Name);
+            if (typeName != null)
+            {
+                var type = Type.GetType(typeName.Value);
+                if (type != null)
+                {
+                    return ConvertValue(attribute.Value, type);
+                }
+            }
+            return attribute.Value;
+        }
+
+        private static object ConvertValue(string value, Type type)
+        {
+            var parseMethod = type.GetMethod("Parse", new Type[0]);
+            if (parseMethod != null)
+            {
+                return parseMethod.Invoke(null, new[] {value});
+            }
+            return Convert.ChangeType(value, type);
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Simple.Data.Mocking.Test
         {
             MockHelper.UseMockAdapter(
                 new XmlMockAdapter(
-                    @"<Root><Users><User Email=""foo"" Password=""bar""/><User Email=""baz"" Password=""quux""/></Users></Root>"));
+                    @"<Root><Users Id=""System.Int32""><User Id=""1"" Email=""foo"" Password=""bar""/><User Email=""baz"" Password=""quux""/></Users></Root>"));
         }
 
         //[TestCleanup()]
@@ -37,6 +37,7 @@ namespace Simple.Data.Mocking.Test
         public void FindTest()
         {
             var user = Database.Default.Users.FindByEmail("foo");
+            Assert.AreEqual(1, user.Id);
             Assert.AreEqual("foo", user.Email);
             Assert.AreEqual("bar", user.Password);
         }
