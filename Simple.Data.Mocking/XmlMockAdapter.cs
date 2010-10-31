@@ -9,11 +9,6 @@ namespace Simple.Data.Mocking
     {
         private readonly Lazy<XElement> _data;
 
-        public XElement Data
-        {
-            get { return _data.Value; }
-        }
-
         public XmlMockAdapter(XElement element)
         {
             _data = new Lazy<XElement>(() => element);
@@ -24,89 +19,57 @@ namespace Simple.Data.Mocking
             _data = new Lazy<XElement>(() => XElement.Parse(xml));
         }
 
-        private IEnumerable<IDictionary<string, object>> FindAll(string tableName)
+        public XElement Data
         {
-            return GetTableElement(tableName).Elements().Select(e => e.AttributesToDictionary());
+            get { return _data.Value; }
         }
 
         public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
             if (criteria == null) return FindAll(tableName);
-            return
-                GetTableElement(tableName).Elements().Where(GetPredicate(criteria)).Select(
-                    e => e.AttributesToDictionary());
+            return GetTableElement(tableName).Elements()
+                .Where(XmlPredicateBuilder.GetPredicate(criteria))
+                .Select(e => e.AttributesToDictionary());
         }
-
-        private static Func<XElement, bool> GetPredicate(SimpleExpression criteria)
-        {
-            if (criteria.Type == SimpleExpressionType.And || criteria.Type == SimpleExpressionType.Or)
-            {
-                var leftPredicate = GetPredicate((SimpleExpression) criteria.LeftOperand);
-                var rightPredicate = GetPredicate((SimpleExpression)criteria.LeftOperand);
-                return criteria.Type == SimpleExpressionType.And
-                           ? (xml => leftPredicate(xml) && rightPredicate(xml))
-                           : new Func<XElement, bool>(xml => leftPredicate(xml) || rightPredicate(xml));
-            }
-            if (criteria.LeftOperand is DynamicReference)
-            {
-                var resolver = BuildReferenceResolver((DynamicReference)criteria.LeftOperand);
-                return xml => resolver(xml) == criteria.RightOperand.ToString();
-            }
-
-            return xml => true;
-        }
-
-        private static Func<XElement, string> BuildReferenceResolver(DynamicReference reference)
-        {
-            var resolver = BuildElementResolver(reference);
-
-            return xml => resolver(xml).TryGetAttributeValue(reference.Name);
-        }
-
-        private static Func<XElement, XElement> BuildElementResolver(DynamicReference reference)
-        {
-            var elementNames = reference.GetAllObjectNames();
-            if (elementNames.Length == 2)
-            {
-                return xml => xml;
-            }
-
-            return BuildNestedElementResolver(elementNames);
-        }
-
-        private static Func<XElement, XElement> BuildNestedElementResolver(IList<string> elementNames)
-        {
-            Func<XElement, XElement> resolver = xml => xml.Element(elementNames[1]);
-            for (int i = 2; i < elementNames.Count - 1; i++)
-            {
-                var nested = resolver;
-                var name = elementNames[i];
-                resolver = xml => nested(xml).Element(name);
-            }
-            return resolver;
-        }
-
-        private XElement GetTableElement(string tableName)
-        {
-            var tableElement = Data.Element(tableName);
-            if (tableElement == null) throw new UnresolvableObjectException(tableName);
-            return tableElement;
-        }
-
 
         public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
         {
             throw new NotImplementedException();
         }
 
-        public int Update(string tableName, IDictionary<string, object> data, IDictionary<string, object> criteria)
+        public int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
         {
-            throw new NotImplementedException();
+            int updated = 0;
+            var elementsToUpdate = GetTableElement(tableName).Elements()
+                .Where(XmlPredicateBuilder.GetPredicate(criteria));
+
+            foreach (var element in elementsToUpdate)
+            {
+                foreach (var kvp in data)
+                {
+                    element.SetAttributeValue(kvp.Key, kvp.Value);
+                }
+                updated++;
+            }
+
+            return updated;
         }
 
         public int Delete(string tableName, IDictionary<string, object> criteria)
         {
             throw new NotImplementedException();
+        }
+
+        private IEnumerable<IDictionary<string, object>> FindAll(string tableName)
+        {
+            return GetTableElement(tableName).Elements().Select(e => e.AttributesToDictionary());
+        }
+
+        private XElement GetTableElement(string tableName)
+        {
+            XElement tableElement = Data.Element(tableName);
+            if (tableElement == null) throw new UnresolvableObjectException(tableName);
+            return tableElement;
         }
     }
 }

@@ -135,7 +135,7 @@ namespace Simple.Data.IntegrationTest
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
             database.Users.UpdateById(Id: 1, Name: "Steve", Age: 50);
-            Assert.AreEqual("update [Users] set [Name] = @p0, [Age] = @p1 where [Id] = @p2".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual("update [Users] set [Name] = @p1, [Age] = @p2 where [Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
             Assert.AreEqual(50, mockDatabase.Parameters[1]);
             Assert.AreEqual(1, mockDatabase.Parameters[2]);

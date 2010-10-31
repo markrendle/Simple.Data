@@ -53,6 +53,7 @@
     <Compile Include="MockConnectionSchemaTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XmlMockAdapterTest.cs" />
+    <Compile Include="XmlMockAdapterUpdateTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Simple.Data.Mocking\Simple.Data.Mocking.csproj">

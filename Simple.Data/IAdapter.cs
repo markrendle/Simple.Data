@@ -34,7 +34,7 @@ namespace Simple.Data
         /// <param name="data">The new values.</param>
         /// <param name="criteria">The values to use as criteria for the update.</param>
         /// <returns>The number of records affected by the update operation.</returns>
-        int Update(string tableName, IDictionary<string, object> data, IDictionary<string, object> criteria);
+        int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria);
 
         /// <summary>
         /// Deletes from the specified table.

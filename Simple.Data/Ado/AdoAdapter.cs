@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using Simple.Data.Ado.Schema;
@@ -119,16 +117,23 @@ namespace Simple.Data.Ado
             }
         }
 
-        public int Update(string tableName, IDictionary<string, object> data, IDictionary<string, object> criteria)
+        public int Execute(ICommandBuilder commandBuilder)
         {
-            var table = _schema.FindTable(tableName);
+            using (var connection = CreateConnection())
+            {
+                using (var command = commandBuilder.GetCommand(connection))
+                {
+                    connection.Open();
 
-            string set = string.Join(", ", data.Keys.Select(key => table.FindColumn(key).QuotedName + " = ?"));
-            string where = string.Join(" and ", criteria.Keys.Select(key => table.FindColumn(key).QuotedName + " = ?"));
+                    return command.ExecuteNonQuery();
+                }
+            }
+        }
 
-            string updateSql = "update " + table.QuotedName + " set " + set + " where " + where;
-
-            return Execute(updateSql, data.Values.Concat(criteria.Values).ToArray());
+        public int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
+        {
+            var commandBuilder = new UpdateHelper(_schema).GetUpdateByCommand(tableName, data, criteria);
+            return Execute(commandBuilder);
         }
 
         public int Delete(string tableName, IDictionary<string, object> criteria)
