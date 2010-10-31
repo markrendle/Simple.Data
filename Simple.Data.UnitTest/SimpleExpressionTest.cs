@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Simple.Data.UnitTest
 {
-    [TestClass]
+    [TestFixture]
     public class SimpleExpressionTest
     {
         // ReSharper disable InconsistentNaming
-        [TestMethod]
+        [Test]
         public void BitwiseAndOperatorCombinesTwoExpressions()
         {
             // Arrange
@@ -26,7 +26,7 @@ namespace Simple.Data.UnitTest
             Assert.AreEqual(SimpleExpressionType.And, newExpr.Type);
         }
 
-        [TestMethod]
+        [Test]
         public void BitwiseOrOperatorCombinesTwoExpressions()
         {
             // Arrange
@@ -42,7 +42,7 @@ namespace Simple.Data.UnitTest
             Assert.AreEqual(SimpleExpressionType.Or, newExpr.Type);
         }
 
-        [TestMethod]
+        [Test]
         public void CompoundOperatorsRespectParentheses_AndOrAnd()
         {
             // Arrange
@@ -67,7 +67,7 @@ namespace Simple.Data.UnitTest
         }
 
 
-        [TestMethod]
+        [Test]
         public void CompoundExpressionsEvaluateAndOperatorsFirst()
         {
             // Arrange
@@ -113,7 +113,7 @@ namespace Simple.Data.UnitTest
         /// Checks the order in which expressions are combined.
         /// Where the expression is A & B & C & D, the grouping should be (((A & B) & C) & D)
         /// </summary>
-        [TestMethod]
+        [Test]
         public void CompoundExpressionsEvaluateRightToLeft_AndAndAnd()
         {
             CompoundExpressionEvaluationOrderHelper((e1,e2,e3,e4) => e1 & e2 & e3 & e4);
@@ -123,7 +123,7 @@ namespace Simple.Data.UnitTest
         /// Checks the order in which expressions are combined.
         /// Where the expression is A | B | C | D, the grouping should be (((A | B) | C) | D)
         /// </summary>
-        [TestMethod]
+        [Test]
         public void CompoundExpressionsEvaluateRightToLeft_OrOrOr()
         {
             CompoundExpressionEvaluationOrderHelper((e1, e2, e3, e4) => e1 | e2 | e3 | e4);

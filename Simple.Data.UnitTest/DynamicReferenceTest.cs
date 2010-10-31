@@ -1,5 +1,5 @@
 ﻿using Simple.Data;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System;
 
 namespace Simple.Data.UnitTest
@@ -10,10 +10,10 @@ namespace Simple.Data.UnitTest
     ///This is a test class for DynamicTableOrColumnTest and is intended
     ///to contain all DynamicTableOrColumnTest Unit Tests
     ///</summary>
-    [TestClass()]
+    [TestFixture()]
     public class DynamicReferenceTest
     {
-        [TestMethod]
+        [Test]
         public void GetDynamicPropertyReturnsNewDynamicReferenceWithTableAndColumn()
         {
             // Arrange
@@ -27,7 +27,7 @@ namespace Simple.Data.UnitTest
             Assert.AreEqual("Table", column.Owner.Name);
         }
 
-        [TestMethod]
+        [Test]
         public void GetDynamicPropertyDotPropertyReturnsNewDynamicReferenceWithTwoOwners()
         {
             // Arrange
@@ -45,7 +45,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for GetAllObjectNames
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void GetAllObjectNamesTest()
         {
             // Arrange
@@ -61,7 +61,7 @@ namespace Simple.Data.UnitTest
             Assert.AreEqual("Column", names[2]);
         }
 
-        [TestMethod]
+        [Test]
         public void FromStringTest()
         {
             // Act
@@ -81,7 +81,7 @@ namespace Simple.Data.UnitTest
             Assert.AreEqual(expressionType, expression.Type);
         }
 
-        [TestMethod]
+        [Test]
         public void EqualOperatorReturnsSimpleExpressionWithEqualType()
         {
             // Arrange
@@ -94,7 +94,7 @@ namespace Simple.Data.UnitTest
             DoAsserts(expression, column, 1, SimpleExpressionType.Equal);
         }
 
-        [TestMethod]
+        [Test]
         public void EqualOperatorReturnsSimpleExpressionWithEqualTypeWhenUsedAsDynamic()
         {
             // Arrange
@@ -107,7 +107,7 @@ namespace Simple.Data.UnitTest
             DoAsserts(expression, column, 1, SimpleExpressionType.Equal);
         }
 
-        [TestMethod]
+        [Test]
         public void NotEqualOperatorReturnsSimpleExpressionWithNotEqualType()
         {
             // Arrange
@@ -120,7 +120,7 @@ namespace Simple.Data.UnitTest
             DoAsserts(expression, column, 1, SimpleExpressionType.NotEqual);
         }
 
-        [TestMethod]
+        [Test]
         public void LessThanOperatorReturnsSimpleExpressionWithLessThanType()
         {
             // Arrange
@@ -133,7 +133,7 @@ namespace Simple.Data.UnitTest
             DoAsserts(expression, column, 1, SimpleExpressionType.LessThan);
         }
 
-        [TestMethod]
+        [Test]
         public void LessThanOrEqualOperatorReturnsSimpleExpressionWithLessThanOrEqualType()
         {
             // Arrange
@@ -146,7 +146,7 @@ namespace Simple.Data.UnitTest
             DoAsserts(expression, column, 1, SimpleExpressionType.LessThanOrEqual);
         }
 
-        [TestMethod]
+        [Test]
         public void GreaterThanOperatorReturnsSimpleExpressionWithGreaterThanType()
         {
             // Arrange
@@ -159,7 +159,7 @@ namespace Simple.Data.UnitTest
             DoAsserts(expression, column, 1, SimpleExpressionType.GreaterThan);
         }
 
-        [TestMethod]
+        [Test]
         public void GreaterThanOrEqualOperatorReturnsSimpleExpressionWithGreaterThanOrEqualType()
         {
             // Arrange

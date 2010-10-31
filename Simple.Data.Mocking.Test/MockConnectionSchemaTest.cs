@@ -3,14 +3,14 @@ using System.Data;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Simple.Data.Mocking.Test
 {
-    [TestClass]
+    [TestFixture]
     public class MockConnectionSchemaTest
     {
-        [TestMethod]
+        [Test]
         public void TestMethod1()
         {
         }

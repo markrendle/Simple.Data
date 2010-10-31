@@ -4,13 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Simple.Data.Ado;
 using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.SqlCeTest.SchemaTests
 {
-    [TestClass]
+    [TestFixture]
     public class DatabaseSchemaTests
     {
         private static readonly string DatabasePath = Path.Combine(
@@ -23,14 +23,14 @@ namespace Simple.Data.SqlCeTest.SchemaTests
             return ((AdoAdapter)db.Adapter).GetSchema();
         }
 
-        [TestMethod]
+        [Test]
         public void TestTables()
         {
             var schema = GetSchema();
             Assert.AreEqual(1, schema.Tables.Count(t => t.ActualName == "Users"));
         }
 
-        [TestMethod]
+        [Test]
         public void TestColumns()
         {
             var schema = GetSchema();
@@ -38,14 +38,14 @@ namespace Simple.Data.SqlCeTest.SchemaTests
             Assert.AreEqual(1, table.Columns.Count(c => c.ActualName == "Id"));
         }
 
-        [TestMethod]
+        [Test]
         public void TestPrimaryKey()
         {
             var schema = GetSchema();
             Assert.AreEqual("CustomerId", schema.FindTable("Customers").PrimaryKey[0]);
         }
 
-        [TestMethod]
+        [Test]
         [Ignore]
         public void TestForeignKey()
         {
@@ -57,21 +57,21 @@ namespace Simple.Data.SqlCeTest.SchemaTests
             Assert.AreEqual("CustomerId", foreignKey.UniqueColumns[0]);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSingularResolution()
         {
             Assert.AreEqual("OrderItems",
                 GetSchema().FindTable("OrderItem").ActualName);
         }
 
-        [TestMethod]
+        [Test]
         public void TestShoutySingularResolution()
         {
             Assert.AreEqual("OrderItems",
                 GetSchema().FindTable("ORDER_ITEM").ActualName);
         }
 
-        [TestMethod]
+        [Test]
         public void TestShoutyPluralResolution()
         {
             Assert.AreEqual("OrderItems",

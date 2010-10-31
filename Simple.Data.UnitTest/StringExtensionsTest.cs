@@ -1,5 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
+using NUnit.Framework;
 using Simple.Data.Extensions;
 
 namespace Simple.Data.UnitTest
@@ -10,13 +10,13 @@ namespace Simple.Data.UnitTest
     ///This is a test class for StringExtensionsTest and is intended
     ///to contain all StringExtensionsTest Unit Tests
     ///</summary>
-    [TestClass()]
+    [TestFixture()]
     public class StringExtensionsTest
     {
         /// <summary>
         ///A test for IsPlural
         ///</summary>
-        [TestMethod]
+        [Test]
         public void IsPluralLowercaseUsersShouldReturnTrue()
         {
             Assert.IsTrue("Users".IsPlural());
@@ -25,7 +25,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for IsPlural
         ///</summary>
-        [TestMethod]
+        [Test]
         public void IsPluralUppercaseUsersShouldReturnTrue()
         {
             Assert.IsTrue("USERS".IsPlural());
@@ -34,7 +34,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for IsPlural
         ///</summary>
-        [TestMethod]
+        [Test]
         public void IsPluralLowercaseUsersShouldReturnFalse()
         {
             Assert.IsFalse("User".IsPlural());
@@ -43,7 +43,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for IsPlural
         ///</summary>
-        [TestMethod]
+        [Test]
         public void IsPluralUppercaseUserShouldReturnFalse()
         {
             Assert.IsFalse("USER".IsPlural());
@@ -52,7 +52,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for Pluralize
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void PluralizeUserShouldReturnUsers()
         {
             Assert.AreEqual("Users", "User".Pluralize());
@@ -61,7 +61,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for Pluralize
         ///</summary>
-        [TestMethod()]
+        [Test()]
 // ReSharper disable InconsistentNaming
         public void PluralizeUSERShouldReturnUSERS()
 // ReSharper restore InconsistentNaming
@@ -72,7 +72,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for Singularize
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void SingularizeUsersShouldReturnUser()
         {
             Assert.AreEqual("User", "Users".Singularize());
@@ -81,7 +81,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for Singularize
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void SingularizeUserShouldReturnUser()
         {
             Assert.AreEqual("User", "User".Singularize());
@@ -90,7 +90,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for Singularize
         ///</summary>
-        [TestMethod()]
+        [Test()]
 // ReSharper disable InconsistentNaming
         public void SingularizeUSERSShouldReturnUSER()
 // ReSharper restore InconsistentNaming
@@ -101,7 +101,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for IsAllUpperCase
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void IsAllUpperCaseTrueTest()
         {
             Assert.IsTrue("USERS".IsAllUpperCase());
@@ -110,7 +110,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for IsAllUpperCase
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void IsAllUpperCaseProperFalseTest()
         {
             Assert.IsFalse("Users".IsAllUpperCase());
@@ -119,7 +119,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for IsAllUpperCase
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void IsAllUpperCasePascalFalseTest()
         {
             Assert.IsFalse("MoreUsers".IsAllUpperCase());
@@ -128,7 +128,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for IsAllUpperCase
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void IsAllUpperCaseLowerFalseTest()
         {
             Assert.IsFalse("users".IsAllUpperCase());
@@ -137,7 +137,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for IsAllUpperCase
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void IsAllUpperCaseMixedFalseTest()
         {
             Assert.IsFalse("CUSTOMEr".IsAllUpperCase());

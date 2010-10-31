@@ -1,5 +1,5 @@
-﻿using Simple.Data;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
+using Simple.Data;
 using System;
 using System.Collections.Generic;
 
@@ -11,13 +11,13 @@ namespace Simple.Data.UnitTest
     ///This is a test class for MethodNameParserTest and is intended
     ///to contain all MethodNameParserTest Unit Tests
     ///</summary>
-    [TestClass()]
+    [TestFixture()]
     public class MethodNameParserTest
     {
         /// <summary>
         ///A test for GetColumns
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void GetColumnsTest()
         {
             const string methodName = "ThisAndThat";
@@ -29,7 +29,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for ParseFromMethodName
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void ParseFromMethodNameTest()
         {
             const string methodName = "FindByThisAndThat";
@@ -42,25 +42,25 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for RemoveCommandPart
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void RemoveCommandPartFindByTest()
         {
             RemoveCommandPartHelper("ThisAndThat", "FindByThisAndThat");
         }
 
-        [TestMethod()]
+        [Test()]
         public void RemoveCommandPartFindAllByTest()
         {
             RemoveCommandPartHelper("ThisAndThat", "FindAllByThisAndThat");
         }
 
-        [TestMethod()]
+        [Test()]
         public void RemoveCommandPartUpdateByTest()
         {
             RemoveCommandPartHelper("ThisAndThat", "UpdateByThisAndThat");
         }
 
-        [TestMethod()]
+        [Test()]
         public void RemoveCommandPartDeleteByTest()
         {
             RemoveCommandPartHelper("ThisAndThat", "DeleteByThisAndThat");

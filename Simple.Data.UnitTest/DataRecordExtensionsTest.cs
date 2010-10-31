@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using NUnit.Framework;
 using Simple.Data;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Data;
 
@@ -12,13 +12,13 @@ namespace Simple.Data.UnitTest
     ///This is a test class for DataRecordExtensionsTest and is intended
     ///to contain all DataRecordExtensionsTest Unit Tests
     ///</summary>
-    [TestClass()]
+    [TestFixture()]
     public class DataRecordExtensionsTest
     {
         /// <summary>
         ///A test for ToDynamicRow
         ///</summary>
-//        [TestMethod()]
+//        [Test()]
         public void ToDynamicRowTest()
         {
             var data = new Dictionary<string, object>

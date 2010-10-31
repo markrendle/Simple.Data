@@ -1,7 +1,7 @@
 ﻿// ReSharper disable InconsistentNaming
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Simple.Data.Mocking.Test
 {
@@ -9,10 +9,10 @@ namespace Simple.Data.Mocking.Test
     ///This is a test class for XmlStubAdapterTest and is intended
     ///to contain all XmlStubAdapterTest Unit Tests
     ///</summary>
-    [TestClass]
+    [TestFixture]
     public class XmlMockAdapterTest
     {
-        [TestInitialize]
+        [TestFixtureSetUp]
         public void MyTestInitialize()
         {
             MockHelper.UseMockAdapter(
@@ -24,7 +24,7 @@ namespace Simple.Data.Mocking.Test
         /// <summary>
         ///A test for Find
         ///</summary>
-        [TestMethod]
+        [Test]
         public void FindByEmail_ShouldFindRecord()
         {
             dynamic user = Database.Default.Users.FindByEmail("foo");
@@ -36,7 +36,7 @@ namespace Simple.Data.Mocking.Test
         /// <summary>
         ///A test for Find
         ///</summary>
-        [TestMethod]
+        [Test]
         public void FindById_ShouldFindRecord()
         {
             dynamic user = Database.Default.Users.FindById(1);
@@ -46,7 +46,7 @@ namespace Simple.Data.Mocking.Test
         /// <summary>
         ///A test for All
         ///</summary>
-        [TestMethod]
+        [Test]
         public void All_ShouldReturnTwoUsers()
         {
             IEnumerable<object> users = Database.Default.Users.All;

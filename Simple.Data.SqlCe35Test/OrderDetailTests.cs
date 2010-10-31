@@ -4,18 +4,18 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Simple.Data.SqlCeTest
 {
-    [TestClass]
+    [TestFixture]
     public class OrderDetailTests
     {
         private static readonly string DatabasePath = Path.Combine(
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8)),
             "TestDatabase.sdf");
 
-        [TestMethod]
+        [Test]
         public void TestOrderDetail()
         {
             var db = Database.OpenFile(DatabasePath);

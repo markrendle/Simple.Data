@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Simple.Data.Extensions;
 
 namespace Simple.Data.UnitTest
 {
-    [TestClass]
+    [TestFixture]
     public class DynamicStringExtensionsTest
     {
-        [TestMethod]
+        [Test]
         public void PascalToSnakeTest()
         {
             var actual = "NameAndPostcode".ToSnakeCase();

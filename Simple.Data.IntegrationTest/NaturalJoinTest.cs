@@ -3,16 +3,17 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Simple.Data.Mocking.Ado;
 
 namespace Simple.Data.IntegrationTest
 {
-    [TestClass]
+    [TestFixture]
     public class NaturalJoinTest
     {
         static Database CreateDatabase()
         {
+            MockSchemaProvider.Reset();
             MockSchemaProvider.SetTables(new[] {"dbo", "Customer", "BASE TABLE"},
                                          new[] {"dbo", "Orders", "BASE TABLE"});
             MockSchemaProvider.SetColumns(new[] {"dbo", "Customer", "CustomerId"},
@@ -24,20 +25,21 @@ namespace Simple.Data.IntegrationTest
             return new Database(new MockConnectionProvider(new MockDbConnection()));
         }
 
-        [TestMethod]
+        [Test]
         public void NaturalJoinCreatesCorrectCommand()
         {
             // Arrange
             dynamic database = CreateDatabase();
             var orderDate = new DateTime(2010, 1, 1);
-            const string expectedSql = "select [Customer].* from [Customer] join [Orders] on ([Customer].[CustomerId] = [Orders].[CustomerId]) where [Orders].[OrderDate] = @p1";
+            const string expectedSql =
+                "select [Customer].* from [Customer] join [Orders] on ([Customer].[CustomerId] = [Orders].[CustomerId]) where [Orders].[OrderDate] = @p1";
 
             // Act
             database.Customer.Find(database.Customer.Orders.OrderDate == orderDate);
-            var actualSql = Regex.Replace(MockDatabase.Sql, @"\s+", " ");
+            var actualSql = Regex.Replace(MockDatabase.Sql, @"\s+", " ").ToLowerInvariant();
 
             // Assert
-            Assert.AreEqual(expectedSql, actualSql, true);
+            Assert.AreEqual(expectedSql.ToLowerInvariant(), actualSql);
             Assert.AreEqual(orderDate, MockDatabase.Parameters[0]);
         }
     }

@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Simple.Data.SqlTest
 {
-    [TestClass]
+    [TestFixture]
     public class NaturalJoinTest
     {
-        [TestMethod]
+        [Test]
         public void CustomerDotOrdersDotOrderDateShouldReturnOneRow()
         {
             var db = DatabaseHelper.Open();

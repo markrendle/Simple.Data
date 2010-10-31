@@ -104,5 +104,10 @@ namespace Simple.Data.Mocking.Ado
                     group.Select(row => row["UNIQUE_COLUMN_NAME"].ToString()));
             }
         }
+
+        public static void Reset()
+        {
+            Tables.Clear();
+        }
     }
 }

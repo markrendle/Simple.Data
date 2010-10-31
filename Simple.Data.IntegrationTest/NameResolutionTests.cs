@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Simple.Data.Mocking.Ado;
 
 namespace Simple.Data.IntegrationTest
 {
-    [TestClass]
+    [TestFixture]
     public class NameResolutionTests
     {
         static Database CreateDatabaseWithSingularNames()
         {
+            MockSchemaProvider.Reset();
             MockSchemaProvider.SetTables(new[] { "dbo", "Customer", "BASE TABLE" },
                                          new[] { "dbo", "Orders", "BASE TABLE" });
             MockSchemaProvider.SetColumns(new[] { "dbo", "Customer", "CustomerId" },
@@ -24,25 +25,27 @@ namespace Simple.Data.IntegrationTest
             return new Database(new MockConnectionProvider(new MockDbConnection()));
         }
 
-        [TestMethod]
+        [Test]
         public void NaturalJoinCreatesCorrectCommand()
         {
             // Arrange
             dynamic database = CreateDatabaseWithSingularNames();
             var orderDate = new DateTime(2010, 1, 1);
-            const string expectedSql = "select [Customer].* from [Customer] join [Orders] on ([Customer].[CustomerId] = [Orders].[CustomerId]) where [Orders].[OrderDate] = @p1";
+            string expectedSql =
+                "select [Customer].* from [Customer] join [Orders] on ([Customer].[CustomerId] = [Orders].[CustomerId]) where [Orders].[OrderDate] = @p1".ToLowerInvariant();
 
             // Act
             database.Customer.Find(database.Customers.Orders.OrderDate == orderDate);
 
 
             // Assert
-            Assert.AreEqual(expectedSql, MockDatabase.Sql, true);
+            Assert.AreEqual(expectedSql, MockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual(orderDate, MockDatabase.Parameters[0]);
         }
 
         static Database CreateDatabaseWithShoutyNames()
         {
+            MockSchemaProvider.Reset();
             MockSchemaProvider.SetTables(new[] { "dbo", "CUSTOMER", "BASE TABLE" },
                                          new[] { "dbo", "ORDER", "BASE TABLE" });
             MockSchemaProvider.SetColumns(new[] { "dbo", "CUSTOMER", "CUSTOMER_ID" },
@@ -54,21 +57,21 @@ namespace Simple.Data.IntegrationTest
             return new Database(new MockConnectionProvider(new MockDbConnection(SchemaHelper.DummySchema())));
         }
 
-        [TestMethod]
+        [Test]
         public void NaturalJoinWithShoutyCaseCreatesCorrectCommand()
         {
             // Arrange
             dynamic database = CreateDatabaseWithShoutyNames();
             var orderDate = new DateTime(2010, 1, 1);
-            const string expectedSql = "select [CUSTOMER].* from [CUSTOMER] join [ORDER] on ([CUSTOMER].[CUSTOMER_ID] = [ORDER].[CUSTOMER_ID])"
-            + " where [ORDER].[ORDER_DATE] = @p1";
+            string expectedSql = "select [CUSTOMER].* from [CUSTOMER] join [ORDER] on ([CUSTOMER].[CUSTOMER_ID] = [ORDER].[CUSTOMER_ID])"
+                                 + " where [ORDER].[ORDER_DATE] = @p1";
 
             // Act
             database.Customer.Find(database.Customers.Orders.OrderDate == orderDate);
 
 
             // Assert
-            Assert.AreEqual(expectedSql, MockDatabase.Sql, true);
+            Assert.AreEqual(expectedSql.ToLowerInvariant(), MockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual(orderDate, MockDatabase.Parameters[0]);
         }
     }

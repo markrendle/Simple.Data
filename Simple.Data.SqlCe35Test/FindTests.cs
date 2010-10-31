@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System.IO;
 using Simple.Data.Ado;
 using Simple.Data.SqlCe35;
@@ -14,21 +14,21 @@ namespace Simple.Data.SqlCeTest
     /// <summary>
     /// Summary description for FindTests
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class FindTests
     {
         private static readonly string DatabasePath = Path.Combine(
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8)),
             "TestDatabase.sdf");
 
-        [TestMethod]
+        [Test]
         public void TestMethod1()
         {
             var provider = ProviderHelper.GetProviderByFilename(DatabasePath);
-            Assert.IsInstanceOfType(provider, typeof (SqlCe35Provider));
+            Assert.IsInstanceOf(typeof (SqlCe35Provider), provider);
         }
 
-        [TestMethod]
+        [Test]
         public void TestFindById()
         {
             var db = Database.OpenFile(DatabasePath);
@@ -36,7 +36,7 @@ namespace Simple.Data.SqlCeTest
             Assert.AreEqual(1, user.Id);
         }
 
-        [TestMethod]
+        [Test]
         public void TestAllCount()
         {
             var db = Database.OpenFile(DatabasePath);
@@ -44,7 +44,7 @@ namespace Simple.Data.SqlCeTest
             Assert.AreEqual(3, count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestImplicitCast()
         {
             var db = Database.OpenFile(DatabasePath);
@@ -52,7 +52,7 @@ namespace Simple.Data.SqlCeTest
             Assert.AreEqual(1, user.Id);
         }
 
-        [TestMethod]
+        [Test]
         public void TestImplicitEnumerableCast()
         {
             var db = Database.OpenFile(DatabasePath);
@@ -62,7 +62,7 @@ namespace Simple.Data.SqlCeTest
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestInsert()
         {
             var db = Database.OpenFile(DatabasePath);

@@ -1,5 +1,5 @@
 ﻿using Simple.Data.Ado.Schema;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System;
 
 namespace Simple.Data.UnitTest
@@ -10,13 +10,13 @@ namespace Simple.Data.UnitTest
     ///This is a test class for TableCollection and is intended
     ///to contain all TableCollection Unit Tests
     ///</summary>
-    [TestClass()]
+    [TestFixture()]
     public class TableCollectionTest
     {
         /// <summary>
         ///A test for Find
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void FindExactMatchTest()
         {
             Helper("Users", "Users");
@@ -25,7 +25,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for Find
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void FindCaseInsensitiveMatchTest()
         {
             Helper("USERS", "Users");
@@ -34,7 +34,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for Find
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void FindPluralMatchTest()
         {
             Helper("Users", "User");
@@ -43,31 +43,31 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for Find
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void FindSingularMatchTest()
         {
             Helper("User", "Users");
         }
 
-        [TestMethod]
+        [Test]
         public void FindSnakeFromCamel()
         {
             Helper("USER_PROFILE", "UserProfile");
         }
 
-        [TestMethod]
+        [Test]
         public void FindSnakeFromPluralCamel()
         {
             Helper("USER_PROFILE", "UserProfiles");
         }
 
-        [TestMethod]
+        [Test]
         public void FindCamelFromSnake()
         {
             Helper("UserProfile", "USER_PROFILE");
         }
 
-        [TestMethod]
+        [Test]
         public void FindCamelFromPluralSnake()
         {
             Helper("UserProfiles", "USER_PROFILE");

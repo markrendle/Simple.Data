@@ -1,6 +1,6 @@
 ﻿using System.Data.SqlClient;
 using System.Reflection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System.IO;
 using Simple.Data.Ado;
 
@@ -9,17 +9,17 @@ namespace Simple.Data.SqlTest
     /// <summary>
     /// Summary description for FindTests
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class FindTests
     {
-        [TestMethod]
+        [Test]
         public void TestMethod1()
         {
             var provider = ProviderHelper.GetProviderByConnectionString("data source=.");
-            Assert.IsInstanceOfType(provider, typeof(SqlConnectionProvider));
+            Assert.IsInstanceOf(typeof(SqlConnectionProvider), provider);
         }
 
-        [TestMethod]
+        [Test]
         public void TestFindById()
         {
             var db = DatabaseHelper.Open();
@@ -27,7 +27,7 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, user.Id);
         }
 
-        [TestMethod]
+        [Test]
         [Ignore] // This won't work until the database gets reset before every run.
         public void TestAllCount()
         {
@@ -36,7 +36,7 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(3, count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestImplicitCast()
         {
             var db = DatabaseHelper.Open();
@@ -44,7 +44,7 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, user.Id);
         }
 
-        [TestMethod]
+        [Test]
         public void TestImplicitEnumerableCast()
         {
             var db = DatabaseHelper.Open();
@@ -54,7 +54,7 @@ namespace Simple.Data.SqlTest
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestInsert()
         {
             var db = DatabaseHelper.Open();

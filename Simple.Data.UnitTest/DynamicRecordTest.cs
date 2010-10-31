@@ -1,5 +1,5 @@
 ﻿using Simple.Data;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 
@@ -11,13 +11,13 @@ namespace Simple.Data.UnitTest
     ///This is a test class for DynamicRecordTest and is intended
     ///to contain all DynamicRecordTest Unit Tests
     ///</summary>
-    [TestClass()]
+    [TestFixture()]
     public class DynamicRecordTest
     {
         /// <summary>
         ///A test for DynamicRecord Constructor
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void DynamicRecordDictionaryConstructorTest()
         {
             IDictionary<string, object> data = new Dictionary<string, object>
@@ -33,7 +33,7 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for DynamicRecord Constructor
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void DynamicRecordSetterTest()
         {
             dynamic target = new DynamicRecord();
@@ -41,7 +41,7 @@ namespace Simple.Data.UnitTest
             Assert.AreEqual("Bob", target.Name);
         }
 
-        [TestMethod]
+        [Test]
         public void DynamicCastTest()
         {
             dynamic target = new DynamicRecord();

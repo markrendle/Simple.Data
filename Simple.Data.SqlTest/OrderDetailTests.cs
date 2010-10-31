@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Simple.Data.SqlTest
 {
-    [TestClass]
+    [TestFixture]
     public class OrderDetailTests
     {
-        [TestMethod]
+        [Test]
         public void TestOrderDetail()
         {
             var db = DatabaseHelper.Open();
