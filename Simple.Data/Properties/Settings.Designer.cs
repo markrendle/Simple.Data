@@ -8,6 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+
 namespace Simple.Data.Properties {
     
     
@@ -27,9 +29,20 @@ namespace Simple.Data.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
         [global::System.Configuration.DefaultSettingValueAttribute("data source=.\\SQLSERVER2008;initial catalog=Simple;integrated security=true")]
+        [Obsolete("Use DefaultConnectionString instead.")]
         public string ConnectionString {
             get {
                 return ((string)(this["ConnectionString"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
+        [global::System.Configuration.DefaultSettingValueAttribute("data source=.\\SQLSERVER2008;initial catalog=Simple;integrated security=true")]
+        public string DefaultConnectionString {
+            get {
+                return ((string)(this["DefaultConnectionString"]));
             }
         }
     }

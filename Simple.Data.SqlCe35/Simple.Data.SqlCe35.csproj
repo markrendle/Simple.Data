@@ -48,8 +48,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SqlCeProvider.cs" />
-    <Compile Include="SqlCeSchemaProvider.cs" />
+    <Compile Include="SqlCe35ConnectionProvider.cs" />
+    <Compile Include="SqlCe35SchemaProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Simple.Data\Simple.Data.csproj">

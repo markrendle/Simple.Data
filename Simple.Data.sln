@@ -38,6 +38,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.Mocking.Test", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.SqlCe35Test", "Simple.Data.SqlCe35Test\Simple.Data.SqlCe35Test.csproj", "{29BBCAE1-DF13-40A0-A412-F2F87F4E9351}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.SqlServer", "Simple.Data.SqlServer\Simple.Data.SqlServer.csproj", "{E24F1C0F-3DCD-4BE5-9A6E-78EF6CB392A1}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Simple.Data.vsmdi
@@ -85,6 +87,10 @@ Global
 		{29BBCAE1-DF13-40A0-A412-F2F87F4E9351}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29BBCAE1-DF13-40A0-A412-F2F87F4E9351}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29BBCAE1-DF13-40A0-A412-F2F87F4E9351}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E24F1C0F-3DCD-4BE5-9A6E-78EF6CB392A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E24F1C0F-3DCD-4BE5-9A6E-78EF6CB392A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E24F1C0F-3DCD-4BE5-9A6E-78EF6CB392A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E24F1C0F-3DCD-4BE5-9A6E-78EF6CB392A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

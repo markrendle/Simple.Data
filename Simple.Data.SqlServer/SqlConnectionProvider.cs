@@ -1,12 +1,13 @@
-﻿using System;
-using System.Data;
+﻿using System.ComponentModel.Composition;
 using System.Data.Common;
 using System.Data.SqlClient;
+using Simple.Data.Ado;
 using Simple.Data.Ado.Schema;
 
-namespace Simple.Data.Ado
+namespace Simple.Data.SqlServer
 {
-    class SqlConnectionProvider : IConnectionProvider
+    [Export("sql", typeof(IConnectionProvider))]
+    public class SqlConnectionProvider : IConnectionProvider
     {
         private string _connectionString;
 

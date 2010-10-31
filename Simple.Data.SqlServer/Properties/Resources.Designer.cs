@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Simple.Data.Properties {
+namespace Simple.Data.SqlServer.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Simple.Data.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Simple.Data.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Simple.Data.SqlServer.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,37 @@ namespace Simple.Data.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to select rc.CONSTRAINT_NAME, fkcu.TABLE_SCHEMA, fkcu.TABLE_NAME, fkcu.COLUMN_NAME,
+        ///pkcu.TABLE_SCHEMA AS UNIQUE_TABLE_SCHEMA, pkcu.TABLE_NAME AS UNIQUE_TABLE_NAME, pkcu.COLUMN_NAME AS UNIQUE_COLUMN_NAME,
+        ///fkcu.ORDINAL_POSITION
+        ///FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS rc
+        ///JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE fkcu ON rc.CONSTRAINT_NAME = fkcu.CONSTRAINT_NAME
+        ///JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE pkcu ON rc.UNIQUE_CONSTRAINT_NAME = pkcu.CONSTRAINT_NAME
+        ///WHERE fkcu.ORDINAL_POSITION = pkcu.ORDINAL_ [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ForeignKeysSql {
+            get {
+                return ResourceManager.GetString("ForeignKeysSql", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to select kcu.TABLE_SCHEMA, kcu.TABLE_NAME, kcu.CONSTRAINT_NAME, tc.CONSTRAINT_TYPE, kcu.COLUMN_NAME, kcu.ORDINAL_POSITION
+        ///  from INFORMATION_SCHEMA.TABLE_CONSTRAINTS as tc
+        ///  join INFORMATION_SCHEMA.KEY_COLUMN_USAGE as kcu
+        ///    on kcu.CONSTRAINT_SCHEMA = tc.CONSTRAINT_SCHEMA
+        ///   and kcu.CONSTRAINT_NAME = tc.CONSTRAINT_NAME
+        ///   and kcu.TABLE_SCHEMA = tc.TABLE_SCHEMA
+        ///   and kcu.TABLE_NAME = tc.TABLE_NAME
+        /// where tc.CONSTRAINT_TYPE = &apos;PRIMARY KEY&apos;.
+        /// </summary>
+        internal static string PrimaryKeySql {
+            get {
+                return ResourceManager.GetString("PrimaryKeySql", resourceCulture);
             }
         }
     }

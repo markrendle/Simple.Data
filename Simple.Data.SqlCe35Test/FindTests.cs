@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
@@ -25,7 +26,7 @@ namespace Simple.Data.SqlCeTest
         public void TestMethod1()
         {
             var provider = ProviderHelper.GetProviderByFilename(DatabasePath);
-            Assert.IsInstanceOf(typeof (SqlCe35Provider), provider);
+            Assert.IsInstanceOf(typeof (SqlCe35ConnectionProvider), provider);
         }
 
         [Test]
@@ -37,11 +38,11 @@ namespace Simple.Data.SqlCeTest
         }
 
         [Test]
-        public void TestAllCount()
+        public void TestAll()
         {
             var db = Database.OpenFile(DatabasePath);
-            var count = db.Users.All.Count;
-            Assert.AreEqual(3, count);
+            var all = new List<dynamic>(db.Users.All());
+            Assert.IsNotEmpty(all);
         }
 
         [Test]

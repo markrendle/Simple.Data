@@ -42,15 +42,8 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.SqlServerCe, Version=3.5.1.50, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Assemblies\System.Data.SqlServerCe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ado\AdoAdapter.cs" />
@@ -61,7 +54,6 @@
     <Compile Include="Ado\Schema\ISchemaProvider.cs" />
     <Compile Include="Ado\JoinType.cs" />
     <Compile Include="Ado\SchemaResolutionException.cs" />
-    <Compile Include="Ado\SqlSchemaProvider.cs" />
     <Compile Include="BinderHelper.cs" />
     <Compile Include="Ado\CommandHelper.cs" />
     <Compile Include="Commands\CommandFactory.cs" />
@@ -111,7 +103,6 @@
     <Compile Include="Ado\Schema\TableCollection.cs" />
     <Compile Include="Ado\Schema\TableJoin.cs" />
     <Compile Include="Ado\IConnectionProvider.cs" />
-    <Compile Include="Ado\SqlConnectionProvider.cs" />
     <Compile Include="Ado\Schema\TableType.cs" />
     <Compile Include="SimpleDataException.cs" />
     <Compile Include="SimpleExpression.cs" />
@@ -133,12 +124,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\PrimaryKeySql.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ForeignKeysSql.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

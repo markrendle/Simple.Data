@@ -12,15 +12,23 @@ namespace Simple.Data.Ado
 
         public static IConnectionProvider GetProviderByConnectionString(string connectionString)
         {
-            return new SqlConnectionProvider(connectionString);
+            return Cache.GetOrAdd(connectionString, LoadProviderByConnectionString);
         }
 
         public static IConnectionProvider GetProviderByFilename(string filename)
         {
-            return Cache.GetOrAdd(filename, LoadProvider);
+            return Cache.GetOrAdd(filename, LoadProviderByFilename);
         }
 
-        private static IConnectionProvider LoadProvider(string filename)
+        private static IConnectionProvider LoadProviderByConnectionString(string connectionString)
+        {
+            var provider = ComposeProvider("sql");
+
+            provider.SetConnectionString(connectionString);
+            return provider;
+        }
+
+        private static IConnectionProvider LoadProviderByFilename(string filename)
         {
             string extension = GetFileExtension(filename);
 

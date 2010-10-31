@@ -3,6 +3,7 @@ using System.Reflection;
 using NUnit.Framework;
 using System.IO;
 using Simple.Data.Ado;
+using Simple.Data.SqlServer;
 
 namespace Simple.Data.SqlTest
 {
