@@ -9,14 +9,12 @@ namespace Simple.Data.Mocking.Ado
     public class MockConnectionProvider : IConnectionProvider
     {
         private readonly DbConnection _connection;
+        private readonly MockSchemaProvider _mockSchemaProvider;
 
-        public MockConnectionProvider() : this(new MockDbConnection())
-        {
-        }
-
-        public MockConnectionProvider(DbConnection connection)
+        public MockConnectionProvider(DbConnection connection, MockSchemaProvider mockSchemaProvider)
         {
             _connection = connection;
+            _mockSchemaProvider = mockSchemaProvider;
         }
 
         public void SetConnectionString(string connectionString)
@@ -31,17 +29,12 @@ namespace Simple.Data.Mocking.Ado
 
         public ISchemaProvider GetSchemaProvider()
         {
-            return new MockSchemaProvider();
+            return _mockSchemaProvider;
         }
 
-        public DataTable GetSchema(string collectionName)
+        public string ConnectionString
         {
-            throw new NotImplementedException();
-        }
-
-        public DataTable GetSchema(string collectionName, params string[] restrictionValues)
-        {
-            throw new NotImplementedException();
+            get { return _connection.ConnectionString; }
         }
     }
 }

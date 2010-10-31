@@ -9,5 +9,6 @@ namespace Simple.Data.Ado.Schema
         IEnumerable<Column> GetColumns(Table table);
         Key GetPrimaryKey(Table table);
         IEnumerable<ForeignKey> GetForeignKeys(Table table);
+        string QuoteObjectName(string unquotedName);
     }
 }

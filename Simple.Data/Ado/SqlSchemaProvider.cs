@@ -15,12 +15,18 @@ namespace Simple.Data.Ado
 
         public SqlSchemaProvider(IConnectionProvider connectionProvider)
         {
+            if (connectionProvider == null) throw new ArgumentNullException("connectionProvider");
             _connectionProvider = connectionProvider;
+        }
+
+        public IConnectionProvider ConnectionProvider
+        {
+            get { return _connectionProvider; }
         }
 
         public IEnumerable<Table> GetTables()
         {
-            using (var cn = _connectionProvider.CreateConnection())
+            using (var cn = ConnectionProvider.CreateConnection())
             {
                 cn.Open();
 
@@ -34,7 +40,8 @@ namespace Simple.Data.Ado
 
         public IEnumerable<Column> GetColumns(Table table)
         {
-            using (var cn = _connectionProvider.CreateConnection())
+            if (table == null) throw new ArgumentNullException("table");
+            using (var cn = ConnectionProvider.CreateConnection())
             {
                 cn.Open();
 
@@ -47,6 +54,7 @@ namespace Simple.Data.Ado
 
         public Key GetPrimaryKey(Table table)
         {
+            if (table == null) throw new ArgumentNullException("table");
             return new Key(GetPrimaryKeys(table.ActualName).AsEnumerable()
                 .Where(
                     row =>
@@ -57,6 +65,7 @@ namespace Simple.Data.Ado
 
         public IEnumerable<ForeignKey> GetForeignKeys(Table table)
         {
+            if (table == null) throw new ArgumentNullException("table");
             var groups = GetForeignKeys(table.ActualName).AsEnumerable()
                 .Where(row =>
                     row["TABLE_SCHEMA"].ToString() == table.Schema && row["TABLE_NAME"].ToString() == table.ActualName)
@@ -70,6 +79,13 @@ namespace Simple.Data.Ado
                     group.First()["UNIQUE_TABLE_NAME"].ToString(),
                     group.Select(row => row["UNIQUE_COLUMN_NAME"].ToString()));
             }
+        }
+
+        public string QuoteObjectName(string unquotedName)
+        {
+            if (unquotedName == null) throw new ArgumentNullException("unquotedName");
+            if (unquotedName.StartsWith("[")) return unquotedName;
+            return string.Concat("[", unquotedName, "]");
         }
 
         private DataTable GetColumnsDataTable(Table table)
@@ -110,7 +126,7 @@ namespace Simple.Data.Ado
         private DataTable SelectToDataTable(string sql)
         {
             var dataTable = new DataTable();
-            using (var cn = _connectionProvider.CreateConnection() as SqlConnection)
+            using (var cn = ConnectionProvider.CreateConnection() as SqlConnection)
             {
                 using (var adapter = new SqlDataAdapter(sql, cn))
                 {

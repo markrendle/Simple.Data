@@ -30,7 +30,7 @@ namespace Simple.Data.Mocking.Ado
         /// <param name="behavior">An instance of <see cref="T:System.Data.CommandBehavior"/>.</param>
         protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
         {
-            MockDatabase.Record(this);
+            _connection.MockDatabase.Record(this);
             if (_connection != null && _connection.DummyDataTable != null)
             {
                 return _connection.DummyDataTable.CreateDataReader();
@@ -49,13 +49,13 @@ namespace Simple.Data.Mocking.Ado
 
         public override int ExecuteNonQuery()
         {
-            MockDatabase.Record(this);
+            _connection.MockDatabase.Record(this);
             return 1;
         }
 
         public override object ExecuteScalar()
         {
-            MockDatabase.Record(this);
+            _connection.MockDatabase.Record(this);
             return null;
         }
 

@@ -8,5 +8,6 @@ namespace Simple.Data.Ado
         void SetConnectionString(string connectionString);
         DbConnection CreateConnection();
         ISchemaProvider GetSchemaProvider();
+        string ConnectionString { get; }
     }
 }

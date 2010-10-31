@@ -34,5 +34,10 @@ namespace Simple.Data.Ado
         {
             _connectionString = connectionString;
         }
+
+        public string ConnectionString
+        {
+            get { return _connectionString; }
+        }
     }
 }

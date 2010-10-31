@@ -10,77 +10,71 @@ namespace Simple.Data.Mocking.Ado
 {
     public class MockSchemaProvider : ISchemaProvider
     {
-        [ThreadStatic]
-        private static IDictionary<string, DataTable> _tables;
+        private readonly IDictionary<string, DataTable> _tables = new Dictionary<string, DataTable>();
 
-        private static IDictionary<string, DataTable> Tables
+        public void SetTables(params object[][] rows)
         {
-            get { return _tables ?? (_tables = new Dictionary<string, DataTable>()); }
-        }
-
-        public static void SetTables(params object[][] rows)
-        {
-            Tables.Remove("TABLES");
+            _tables.Remove("TABLES");
             var table = new DataTable("TABLES");
             table.AddColumns("TABLE_SCHEMA", "TABLE_NAME", "TABLE_TYPE");
             table.AddRows(rows);
-            Tables.Add("TABLES", table);
+            _tables.Add("TABLES", table);
         }
 
-        public static void SetColumns(params object[][] rows)
+        public void SetColumns(params object[][] rows)
         {
-            Tables.Remove("COLUMNS");
+            _tables.Remove("COLUMNS");
             var table = new DataTable("COLUMNS");
             table.AddColumns("TABLE_SCHEMA", "TABLE_NAME", "COLUMN_NAME");
             table.AddRows(rows);
-            Tables.Add("COLUMNS", table);
+            _tables.Add("COLUMNS", table);
         }
 
-        public static void SetPrimaryKeys(params object[][] rows)
+        public void SetPrimaryKeys(params object[][] rows)
         {
             var table = new DataTable("PRIMARY_KEYS");
             table.AddColumns("TABLE_SCHEMA", "TABLE_NAME", "COLUMN_NAME");
             table.Columns.Add("ORDINAL_POSITION", typeof (int));
             table.AddRows(rows);
-            Tables.Add("PRIMARY_KEYS", table);
+            _tables.Add("PRIMARY_KEYS", table);
         }
 
-        public static void SetForeignKeys(params object[][] rows)
+        public void SetForeignKeys(params object[][] rows)
         {
             var table = new DataTable("FOREIGN_KEYS");
             table.AddColumns("CONSTRAINT_NAME", "TABLE_SCHEMA", "TABLE_NAME", "COLUMN_NAME",
                              "UNIQUE_TABLE_SCHEMA", "UNIQUE_TABLE_NAME", "UNIQUE_COLUMN_NAME");
             table.Columns.Add("ORDINAL_POSITION", typeof(int));
             table.AddRows(rows);
-            Tables.Add("FOREIGN_KEYS", table);
+            _tables.Add("FOREIGN_KEYS", table);
         }
 
         public DataTable GetSchema(string collectionName)
         {
-            return Tables[collectionName];
+            return _tables[collectionName];
         }
 
         public DataTable GetSchema(string collectionName, params string[] restrictionValues)
         {
-            return Tables[collectionName];
+            return _tables[collectionName];
         }
 
         public IEnumerable<Table> GetTables()
         {
-            return Tables["TABLES"].AsEnumerable()
+            return _tables["TABLES"].AsEnumerable()
                 .Select(row => new Table(row["TABLE_NAME"].ToString(), row["TABLE_SCHEMA"].ToString(), TableType.Table));
         }
 
         public IEnumerable<Column> GetColumns(Table table)
         {
-            return Tables["COLUMNS"].AsEnumerable()
+            return _tables["COLUMNS"].AsEnumerable()
                 .Where(row => row["TABLE_SCHEMA"].ToString() == table.Schema && row["TABLE_NAME"].ToString() == table.ActualName)
                 .Select(row => new Column(row["COLUMN_NAME"].ToString(), table));
         }
 
         public Key GetPrimaryKey(Table table)
         {
-            return new Key(Tables["PRIMARY_KEYS"].AsEnumerable()
+            return new Key(_tables["PRIMARY_KEYS"].AsEnumerable()
                 .Where(
                     row =>
                     row["TABLE_SCHEMA"].ToString() == table.Schema && row["TABLE_NAME"].ToString() == table.ActualName)
@@ -90,7 +84,7 @@ namespace Simple.Data.Mocking.Ado
 
         public IEnumerable<ForeignKey> GetForeignKeys(Table table)
         {
-            var groups = Tables["FOREIGN_KEYS"].AsEnumerable()
+            var groups = _tables["FOREIGN_KEYS"].AsEnumerable()
                 .Where(row =>
                     row["TABLE_SCHEMA"].ToString() == table.Schema && row["TABLE_NAME"].ToString() == table.ActualName)
                 .GroupBy(row => row["CONSTRAINT_NAME"].ToString())
@@ -105,9 +99,16 @@ namespace Simple.Data.Mocking.Ado
             }
         }
 
-        public static void Reset()
+        public string QuoteObjectName(string unquotedName)
         {
-            Tables.Clear();
+            if (unquotedName == null) throw new ArgumentNullException("unquotedName");
+            if (unquotedName.StartsWith("[")) return unquotedName;
+            return string.Concat("[", unquotedName, "]");
+        }
+
+        public void Reset()
+        {
+            _tables.Clear();
         }
     }
 }

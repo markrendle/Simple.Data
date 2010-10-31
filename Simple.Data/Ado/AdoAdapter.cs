@@ -12,14 +12,12 @@ namespace Simple.Data.Ado
     internal class AdoAdapter : IAdapter
     {
         private readonly IConnectionProvider _connectionProvider;
-        private readonly ISchemaProvider _schemaProvider;
         private readonly DatabaseSchema _schema;
 
         public AdoAdapter(IConnectionProvider connectionProvider)
         {
             _connectionProvider = connectionProvider;
-            _schemaProvider = _connectionProvider.GetSchemaProvider();
-            _schema = new DatabaseSchema(_schemaProvider);
+            _schema = DatabaseSchema.Get(_connectionProvider);
         }
 
         public IDictionary<string, object> FindSingle(string tableName, SimpleExpression criteria)
@@ -150,7 +148,7 @@ namespace Simple.Data.Ado
 
         internal DatabaseSchema GetSchema()
         {
-            return new DatabaseSchema(_connectionProvider.GetSchemaProvider());
+            return DatabaseSchema.Get(_connectionProvider);
         }
     }
 }

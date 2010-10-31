@@ -60,6 +60,13 @@ namespace Simple.Data.SqlCe35
             }
         }
 
+        public string QuoteObjectName(string unquotedName)
+        {
+            if (unquotedName == null) throw new ArgumentNullException("unquotedName");
+            if (unquotedName.StartsWith("[")) return unquotedName;
+            return string.Concat("[", unquotedName, "]");
+        }
+
         private DataTable GetTablesDataTable()
         {
             return SelectToDataTable("SELECT TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES");
