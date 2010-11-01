@@ -20,7 +20,6 @@ namespace Simple.Data.Mocking.Test
                     @"<Root><Users Id=""System.Int32""><User Id=""1"" Email=""foo"" Password=""bar""/><User Email=""baz"" Password=""quux""/></Users></Root>"));
         }
 
-
         /// <summary>
         ///A test for Find
         ///</summary>

@@ -63,7 +63,16 @@ namespace Simple.Data.Mocking
         /// <returns>The number of records which were deleted.</returns>
         public int Delete(string tableName, SimpleExpression criteria)
         {
-            throw new NotImplementedException();
+            var tableElement = GetTableElement(tableName);
+            var elementsToDelete = GetTableElement(tableName).Elements()
+                .Where(XmlPredicateBuilder.GetPredicate(criteria))
+                .ToList();
+            int deleted = elementsToDelete.Count;
+            foreach (var element in elementsToDelete)
+            {
+                element.Remove();
+            }
+            return deleted;
         }
 
         private IEnumerable<IDictionary<string, object>> FindAll(string tableName)
