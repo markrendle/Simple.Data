@@ -2,20 +2,18 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using Simple.Data.Ado;
 using Simple.Data.Ado.Schema;
-using System.Data;
 using Simple.Data.Extensions;
 
 namespace Simple.Data
 {
     public partial class DynamicRecord : DynamicObject
     {
+        private readonly IDictionary<string, object> _data;
         private readonly Database _database;
         private readonly string _tableName;
-        private readonly IDictionary<string, object> _data;
 
         public DynamicRecord()
         {
@@ -41,7 +39,9 @@ namespace Simple.Data
         {
             _tableName = tableName;
             _database = database;
-            _data = data.Select(kvp => new KeyValuePair<string, object>(kvp.Key.Homogenize(), DbNullToClrNull(kvp.Value))).ToDictionary();
+            _data =
+                data.Select(kvp => new KeyValuePair<string, object>(kvp.Key.Homogenize(), DbNullToClrNull(kvp.Value))).
+                    ToDictionary();
         }
 
         private static object DbNullToClrNull(object source)
@@ -51,7 +51,7 @@ namespace Simple.Data
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            var name = binder.Name.Homogenize();
+            string name = binder.Name.Homogenize();
             if (_data.ContainsKey(name))
             {
                 result = _data[name];
@@ -66,7 +66,7 @@ namespace Simple.Data
 
         private bool TryGetJoinResults(string name, out object result)
         {
-            return name.IsPlural() ? TryGetDetail(name, out result) :(TryGetMaster(name, out result));
+            return name.IsPlural() ? TryGetDetail(name, out result) : (TryGetMaster(name, out result));
         }
 
         private bool TryGetMaster(string name, out object result)
@@ -74,7 +74,7 @@ namespace Simple.Data
             var adoAdapter = _database.Adapter as AdoAdapter;
             if (adoAdapter != null)
             {
-                var masterJoin = adoAdapter.GetSchema().FindTable(_tableName).GetMaster(name);
+                TableJoin masterJoin = adoAdapter.GetSchema().FindTable(_tableName).GetMaster(name);
                 if (masterJoin != null)
                 {
                     result = GetMaster(masterJoin);
@@ -92,7 +92,7 @@ namespace Simple.Data
                 var adoAdapter = _database.Adapter as AdoAdapter;
                 if (adoAdapter != null)
                 {
-                    var detailJoin = adoAdapter.GetSchema().FindTable(_tableName).GetDetail(name);
+                    TableJoin detailJoin = adoAdapter.GetSchema().FindTable(_tableName).GetDetail(name);
                     if (detailJoin != null)
                     {
                         result = GetDetail(detailJoin);
@@ -108,15 +108,21 @@ namespace Simple.Data
         {
             var criteria = new Dictionary<string, object>
                                {{masterJoin.MasterColumn.ActualName, _data[masterJoin.DetailColumn.HomogenizedName]}};
-            var dict = _database.Adapter.Find(masterJoin.Master.ActualName, ExpressionHelper.CriteriaDictionaryToExpression(masterJoin.Master.ActualName, criteria)).FirstOrDefault();
+            IDictionary<string, object> dict =
+                _database.Adapter.Find(masterJoin.Master.ActualName,
+                                       ExpressionHelper.CriteriaDictionaryToExpression(masterJoin.Master.ActualName,
+                                                                                       criteria)).FirstOrDefault();
 
             return dict != null ? new DynamicRecord(dict, masterJoin.Master.ActualName, _database) : null;
         }
 
         private IEnumerable<dynamic> GetDetail(TableJoin detailJoin)
         {
-            var criteria = new Dictionary<string, object> { { detailJoin.DetailColumn.ActualName, _data[detailJoin.MasterColumn.HomogenizedName] } };
-            return _database.Adapter.Find(detailJoin.Detail.ActualName, ExpressionHelper.CriteriaDictionaryToExpression(detailJoin.Detail.ActualName, criteria))
+            var criteria = new Dictionary<string, object>
+                               {{detailJoin.DetailColumn.ActualName, _data[detailJoin.MasterColumn.HomogenizedName]}};
+            return _database.Adapter.Find(detailJoin.Detail.ActualName,
+                                          ExpressionHelper.CriteriaDictionaryToExpression(detailJoin.Detail.ActualName,
+                                                                                          criteria))
                 .Select(dict => new DynamicRecord(dict, detailJoin.Detail.ActualName, _database));
         }
 
@@ -128,27 +134,12 @@ namespace Simple.Data
 
         public override bool TryConvert(ConvertBinder binder, out object result)
         {
-            bool anyPropertiesSet = false;
-            var obj = Activator.CreateInstance(binder.Type);
-            foreach (var propertyInfo in binder.Type.GetProperties().Where(CanSetProperty))
-            {
-                propertyInfo.SetValue(obj, _data[propertyInfo.Name.Homogenize()], null);
-                anyPropertiesSet = true;
-            }
-
-            result = anyPropertiesSet ? obj : null;
-
-            return anyPropertiesSet;
+            return new ConcreteTypeCreator(binder.Type).TryCreate(_data, out result);
         }
 
         public override IEnumerable<string> GetDynamicMemberNames()
         {
             return _data.Keys.AsEnumerable();
-        }
-
-        private bool CanSetProperty(PropertyInfo propertyInfo)
-        {
-            return _data.ContainsKey(propertyInfo.Name.Homogenize()) && !(propertyInfo.PropertyType.IsValueType && _data[propertyInfo.Name.Homogenize()] == null);
         }
     }
 }
