@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Simple.Data.Ado;
 using Simple.Data.Ado.Schema;
 using Simple.Data.Extensions;
@@ -11,6 +12,7 @@ namespace Simple.Data
 {
     public partial class DynamicRecord : DynamicObject
     {
+        private readonly ConcreteObject _concreteObject = new ConcreteObject();
         private readonly HomogenizedKeyDictionary _data;
         private readonly Database _database;
         private readonly string _tableName;
@@ -127,7 +129,8 @@ namespace Simple.Data
 
         public override bool TryConvert(ConvertBinder binder, out object result)
         {
-            return new ConcreteTypeCreator(binder.Type).TryCreate(_data, out result);
+            result = _concreteObject.Get(binder.Type, _data);
+            return result != null;
         }
 
         public override IEnumerable<string> GetDynamicMemberNames()

@@ -53,6 +53,18 @@ namespace Simple.Data.UnitTest
             Assert.AreEqual(42, user.Age);
         }
 
+        [Test]
+        public void DynamicCastShouldReturnSameObjectOnSubsequentCalls()
+        {
+            dynamic target = new DynamicRecord();
+            target.Name = "Bob";
+            target.Age = 42;
+
+            User user1 = target;
+            User user2 = target;
+            Assert.AreSame(user1, user2);
+        }
+
         internal class User
         {
             public string Name { get; set; }
