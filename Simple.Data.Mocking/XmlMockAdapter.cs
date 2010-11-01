@@ -89,6 +89,13 @@ namespace Simple.Data.Mocking
             return deleted;
         }
 
+        public IEnumerable<string> GetKeyFieldNames(string tableName)
+        {
+            var keyAttribute = GetTableElement(tableName).Attribute("_keys");
+            if (keyAttribute == null) return Enumerable.Empty<string>();
+            return keyAttribute.Value.Split(',');
+        }
+
         private IEnumerable<IDictionary<string, object>> FindAll(string tableName)
         {
             return GetTableElement(tableName).Elements().Select(e => e.AttributesToDictionary());

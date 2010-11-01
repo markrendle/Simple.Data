@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Dynamic;
 using System.Linq;
+using Simple.Data.Ado.Schema;
 using Simple.Data.Extensions;
 
 namespace Simple.Data.Commands
@@ -9,8 +10,7 @@ namespace Simple.Data.Commands
     {
         public bool IsCommandFor(string method)
         {
-            return method.StartsWith("UpdateBy") ||
-                   method.StartsWith("update_by_", StringComparison.InvariantCultureIgnoreCase);
+            return method.Homogenize().StartsWith("updateby", StringComparison.InvariantCultureIgnoreCase);
         }
 
         public object Execute(Database database, string tableName, InvokeMemberBinder binder, object[] args)

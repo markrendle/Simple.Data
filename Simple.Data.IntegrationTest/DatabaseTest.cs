@@ -24,6 +24,7 @@ namespace Simple.Data.IntegrationTest
                                           new[] { "dbo", "Users", "Name" },
                                           new[] { "dbo", "Users", "Password" },
                                           new[] { "dbo", "Users", "Age" });
+            mockSchemaProvider.SetPrimaryKeys(new object[] {"dbo", "Users", "Id", 0});
             return new Database(new MockConnectionProvider(new MockDbConnection(mockDatabase), mockSchemaProvider));
         }
 
@@ -135,6 +136,40 @@ namespace Simple.Data.IntegrationTest
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
             database.Users.UpdateById(Id: 1, Name: "Steve", Age: 50);
+            Assert.AreEqual("update [Users] set [Name] = @p1, [Age] = @p2 where [Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
+            Assert.AreEqual(50, mockDatabase.Parameters[1]);
+            Assert.AreEqual(1, mockDatabase.Parameters[2]);
+        }
+
+        [Test]
+        public void TestUpdateWithDynamicObject()
+        {
+            var mockDatabase = new MockDatabase();
+            dynamic database = CreateDatabase(mockDatabase);
+            dynamic record = new DynamicRecord();
+            record.Id = 1;
+            record.Name = "Steve";
+            record.Age = 50;
+            database.Users.Update(record);
+            Assert.AreEqual("update [Users] set [Name] = @p1, [Age] = @p2 where [Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
+            Assert.AreEqual(50, mockDatabase.Parameters[1]);
+            Assert.AreEqual(1, mockDatabase.Parameters[2]);
+        }
+
+        [Test]
+        public void TestUpdateWithStaticObject()
+        {
+            var mockDatabase = new MockDatabase();
+            dynamic database = CreateDatabase(mockDatabase);
+            var user = new User
+                           {
+                               Id = 1,
+                               Name = "Steve",
+                               Age = 50
+                           };
+            database.Users.Update(user);
             Assert.AreEqual("update [Users] set [Name] = @p1, [Age] = @p2 where [Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
             Assert.AreEqual(50, mockDatabase.Parameters[1]);

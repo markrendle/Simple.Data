@@ -28,7 +28,7 @@ namespace Simple.Data
         IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data);
 
         /// <summary>
-        /// Updates the specified "table".
+        /// Updates the specified "table" according to specified criteria.
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
         /// <param name="data">The new values.</param>
@@ -43,5 +43,12 @@ namespace Simple.Data
         /// <param name="criteria">The expression to use as criteria for the delete operation.</param>
         /// <returns>The number of records which were deleted.</returns>
         int Delete(string tableName, SimpleExpression criteria);
+
+        /// <summary>
+        /// Gets the names of the fields which comprise the unique identifier for the specified table.
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <returns></returns>
+        IEnumerable<string> GetKeyFieldNames(string tableName);
     }
 }

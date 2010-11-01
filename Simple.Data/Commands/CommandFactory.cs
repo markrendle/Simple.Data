@@ -12,6 +12,7 @@ namespace Simple.Data.Commands
                                                                   new FindAllByCommand(),
                                                                   new FindAllCommand(),
                                                                   new UpdateByCommand(),
+                                                                  new UpdateCommand(),
                                                                   new InsertCommand(),
                                                                   new DeleteByCommand()
                                                               };

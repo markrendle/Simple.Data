@@ -20,5 +20,10 @@ namespace Simple.Data.Ado.Schema
         {
             get { return _columns.Length; }
         }
+
+        public IEnumerable<string> AsEnumerable()
+        {
+            return _columns.AsEnumerable();
+        }
     }
 }

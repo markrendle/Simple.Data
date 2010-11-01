@@ -50,6 +50,11 @@ namespace Simple.Data.Ado
             return null;
         }
 
+        public void Update(string tableName, IDictionary<string, object> data)
+        {
+            
+        }
+
         public int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
         {
             var commandBuilder = new UpdateHelper(_schema).GetUpdateCommand(tableName, data, criteria);
@@ -66,6 +71,16 @@ namespace Simple.Data.Ado
         {
             var commandBuilder = new DeleteHelper(_schema).GetDeleteCommand(tableName, criteria);
             return Execute(commandBuilder);
+        }
+
+        /// <summary>
+        /// Gets the names of the fields which comprise the unique identifier for the specified table.
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <returns>A list of field names; an empty list if no key is defined.</returns>
+        public IEnumerable<string> GetKeyFieldNames(string tableName)
+        {
+            return _schema.FindTable(tableName).PrimaryKey.AsEnumerable();
         }
 
         private IEnumerable<IDictionary<string, object>> FindAll(string tableName)

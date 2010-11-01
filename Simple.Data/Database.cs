@@ -41,7 +41,7 @@ namespace Simple.Data
         /// Gets the adapter being used by the <see cref="Database"/> instance.
         /// </summary>
         /// <value>The adapter.</value>
-        public IAdapter Adapter
+        internal IAdapter Adapter
         {
             get { return _adapter; }
         }
