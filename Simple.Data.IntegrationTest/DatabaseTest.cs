@@ -147,7 +147,7 @@ namespace Simple.Data.IntegrationTest
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
             database.Users.Delete(Id: 1);
-            Assert.AreEqual("delete from [Users] where [Id] = @p0".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual("delete from [Users] where [Users].[Id] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual(1, mockDatabase.Parameters[0]);
         }
 

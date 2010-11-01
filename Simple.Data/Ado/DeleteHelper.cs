@@ -6,22 +6,22 @@ using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
-    internal class UpdateHelper
+    internal class DeleteHelper
     {
         private readonly DatabaseSchema _schema;
         private readonly ICommandBuilder _commandBuilder;
         private readonly IExpressionFormatter _expressionFormatter;
 
-        public UpdateHelper(DatabaseSchema schema)
+        public DeleteHelper(DatabaseSchema schema)
         {
             _schema = schema;
             _commandBuilder = new CommandBuilder();
             _expressionFormatter = new ExpressionFormatter(_commandBuilder, _schema);
         }
 
-        public ICommandBuilder GetUpdateCommand(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
+        public ICommandBuilder GetDeleteCommand(string tableName, SimpleExpression criteria)
         {
-            _commandBuilder.Append(GetUpdateClause(tableName, data));
+            _commandBuilder.Append(GetDeleteClause(tableName));
 
             if (criteria != null)
             {
@@ -32,14 +32,10 @@ namespace Simple.Data.Ado
             return _commandBuilder;
         }
 
-        private string GetUpdateClause(string tableName, IDictionary<string, object> data)
+        private string GetDeleteClause(string tableName)
         {
             var table = _schema.FindTable(tableName);
-            var setClause = string.Join(", ",
-                data.Select(
-                    kvp =>
-                    string.Format("{0} = {1}", table.FindColumn(kvp.Key).QuotedName, _commandBuilder.AddParameter(kvp.Value))));
-            return string.Format("update {0} set {1}", table.QuotedName, setClause);
+            return string.Concat("delete from ", table.QuotedName);
         }
     }
 }

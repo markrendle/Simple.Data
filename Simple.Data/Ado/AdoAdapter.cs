@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
@@ -18,17 +19,6 @@ namespace Simple.Data.Ado
             _schema = DatabaseSchema.Get(_connectionProvider);
         }
 
-        public IDictionary<string, object> FindSingle(string tableName, SimpleExpression criteria)
-        {
-            var commandBuilder = new FindHelper(_schema).GetFindByCommand(tableName, criteria);
-            return Query(commandBuilder).FirstOrDefault();
-        }
-
-        public IEnumerable<IDictionary<string, object>> FindAll(string tableName)
-        {
-            return Query("select * from " + _schema.FindTable(tableName).ActualName);
-        }
-
         public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
             if (criteria == null) return FindAll(tableName);
@@ -37,37 +27,12 @@ namespace Simple.Data.Ado
             return Query(commandBuilder);
         }
 
-        public IEnumerable<IDictionary<string, object>> Query(ICommandBuilder commandBuilder)
-        {
-            using (var connection = CreateConnection())
-            {
-                using (var command = commandBuilder.GetCommand(connection))
-                {
-                    connection.Open();
-
-                    return command.ExecuteReader().ToDictionaries();
-                }
-            }
-        }
-
-        public IEnumerable<IDictionary<string, object>> Query(string sql, params object[] values)
-        {
-            using (var connection = CreateConnection())
-            {
-                using (var command = CommandHelper.Create(connection, sql, values))
-                {
-                    connection.Open();
-
-                    return command.ExecuteReader().ToDictionaries();
-                }
-            }
-        }
-        
         public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
         {
             var table = _schema.FindTable(tableName);
 
-            string columnList = data.Keys.Select(s => table.FindColumn(s).QuotedName).Aggregate((agg, next) => agg + "," + next);
+            string columnList =
+                data.Keys.Select(s => table.FindColumn(s).QuotedName).Aggregate((agg, next) => agg + "," + next);
             string valueList = data.Keys.Select(s => "?").Aggregate((agg, next) => agg + "," + next);
 
             string insertSql = "insert into " + table.QuotedName + " (" + columnList + ") values (" + valueList + ")";
@@ -83,6 +48,55 @@ namespace Simple.Data.Ado
 
             Execute(insertSql, data.Values.ToArray());
             return null;
+        }
+
+        public int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
+        {
+            var commandBuilder = new UpdateHelper(_schema).GetUpdateCommand(tableName, data, criteria);
+            return Execute(commandBuilder);
+        }
+
+        /// <summary>
+        /// Deletes from the specified table.
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="criteria">The expression to use as criteria for the delete operation.</param>
+        /// <returns>The number of records which were deleted.</returns>
+        public int Delete(string tableName, SimpleExpression criteria)
+        {
+            var commandBuilder = new DeleteHelper(_schema).GetDeleteCommand(tableName, criteria);
+            return Execute(commandBuilder);
+        }
+
+        private IEnumerable<IDictionary<string, object>> FindAll(string tableName)
+        {
+            return Query("select * from " + _schema.FindTable(tableName).ActualName);
+        }
+
+        private IEnumerable<IDictionary<string, object>> Query(ICommandBuilder commandBuilder)
+        {
+            using (DbConnection connection = CreateConnection())
+            {
+                using (IDbCommand command = commandBuilder.GetCommand(connection))
+                {
+                    connection.Open();
+
+                    return command.ExecuteReader().ToDictionaries();
+                }
+            }
+        }
+
+        private IEnumerable<IDictionary<string, object>> Query(string sql, params object[] values)
+        {
+            using (var connection = CreateConnection())
+            {
+                using (var command = CommandHelper.Create(connection, sql, values))
+                {
+                    connection.Open();
+
+                    return command.ExecuteReader().ToDictionaries();
+                }
+            }
         }
 
         internal IDictionary<string, object> ExecuteSingletonQuery(string sql, params object[] values)
@@ -117,7 +131,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        public int Execute(ICommandBuilder commandBuilder)
+        private int Execute(ICommandBuilder commandBuilder)
         {
             using (var connection = CreateConnection())
             {
@@ -128,22 +142,6 @@ namespace Simple.Data.Ado
                     return command.ExecuteNonQuery();
                 }
             }
-        }
-
-        public int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
-        {
-            var commandBuilder = new UpdateHelper(_schema).GetUpdateByCommand(tableName, data, criteria);
-            return Execute(commandBuilder);
-        }
-
-        public int Delete(string tableName, IDictionary<string, object> criteria)
-        {
-            var table = _schema.FindTable(tableName);
-
-            string where = string.Join(" and ", criteria.Keys.Select(key => table.FindColumn(key).QuotedName + " = ?"));
-            string deleteSql = "delete from " + table.QuotedName + " where " + where;
-
-            return Execute(deleteSql, criteria.Values.ToArray());
         }
 
         internal DbConnection CreateConnection()

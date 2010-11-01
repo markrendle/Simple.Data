@@ -55,7 +55,13 @@ namespace Simple.Data.Mocking
             return updated;
         }
 
-        public int Delete(string tableName, IDictionary<string, object> criteria)
+        /// <summary>
+        /// Deletes from the specified table.
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="criteria">The expression to use as criteria for the delete operation.</param>
+        /// <returns>The number of records which were deleted.</returns>
+        public int Delete(string tableName, SimpleExpression criteria)
         {
             throw new NotImplementedException();
         }

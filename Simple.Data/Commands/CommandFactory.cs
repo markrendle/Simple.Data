@@ -13,7 +13,7 @@ namespace Simple.Data.Commands
                                                                   new FindAllCommand(),
                                                                   new UpdateByCommand(),
                                                                   new InsertCommand(),
-                                                                  new DeleteCommand()
+                                                                  new DeleteByCommand()
                                                               };
 
         public static ICommand GetCommandFor(string method)
