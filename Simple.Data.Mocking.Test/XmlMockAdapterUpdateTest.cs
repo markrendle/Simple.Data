@@ -44,5 +44,19 @@ namespace Simple.Data.Mocking.Test
             var element = _mockAdapter.Data.Element("Users").Elements().Where(e => e.Attribute("Id") != null && e.Attribute("Id").Value == "3").SingleOrDefault();
             Assert.IsNull(element);
         }
+
+        [Test]
+        public void TestInsert()
+        {
+            var row = Database.Default.Users.Insert(Id: 4, Email: "bob", Password: "secret");
+            Assert.AreEqual(4, row.Id);
+            Assert.AreEqual("bob", row.Email);
+            Assert.AreEqual("secret", row.Password);
+            var element = _mockAdapter.Data.Element("Users").Elements().Where(e => e.Attribute("Id") != null && e.Attribute("Id").Value == "4").SingleOrDefault();
+            Assert.IsNotNull(element);
+            Assert.AreEqual("4", element.Attribute("Id").Value);
+            Assert.AreEqual("bob", element.Attribute("Email").Value);
+            Assert.AreEqual("secret", element.Attribute("Password").Value);
+        }
     }
 }

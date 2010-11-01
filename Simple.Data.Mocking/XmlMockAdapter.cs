@@ -34,7 +34,21 @@ namespace Simple.Data.Mocking
 
         public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
         {
-            throw new NotImplementedException();
+            var tableElement = GetTableElement(tableName);
+            if (tableElement == null)
+            {
+                tableElement = new XElement(tableName);
+                Data.Add(tableElement);
+            }
+            var rowNameElement = tableElement.Elements().FirstOrDefault();
+            var rowName = rowNameElement != null ? rowNameElement.Name : tableName + "_row";
+            var element = new XElement(rowName);
+            foreach (var kvp in data)
+            {
+                element.Add(new XAttribute(kvp.Key, kvp.Value));
+            }
+            tableElement.Add(element);
+            return data;
         }
 
         public int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)

@@ -18,7 +18,8 @@ namespace Simple.Data.UnitTest
         /// <summary>
         ///A test for ToDynamicRow
         ///</summary>
-//        [Test()]
+        [Test()]
+        [Ignore]
         public void ToDynamicRowTest()
         {
             var data = new Dictionary<string, object>

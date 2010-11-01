@@ -11,18 +11,18 @@ namespace Simple.Data
 {
     public partial class DynamicRecord : DynamicObject
     {
-        private readonly IDictionary<string, object> _data;
+        private readonly HomogenizedKeyDictionary _data;
         private readonly Database _database;
         private readonly string _tableName;
 
         public DynamicRecord()
         {
-            _data = new Dictionary<string, object>();
+            _data = new HomogenizedKeyDictionary();
         }
 
         public DynamicRecord(Database database)
         {
-            _data = new Dictionary<string, object>();
+            _data = new HomogenizedKeyDictionary();
             _database = database;
         }
 
@@ -39,25 +39,17 @@ namespace Simple.Data
         {
             _tableName = tableName;
             _database = database;
-            _data =
-                data.Select(kvp => new KeyValuePair<string, object>(kvp.Key.Homogenize(), DbNullToClrNull(kvp.Value))).
-                    ToDictionary();
-        }
-
-        private static object DbNullToClrNull(object source)
-        {
-            return source == DBNull.Value ? null : source;
+            _data = new HomogenizedKeyDictionary(data);
         }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            string name = binder.Name.Homogenize();
-            if (_data.ContainsKey(name))
+            if (_data.ContainsKey(binder.Name))
             {
-                result = _data[name];
+                result = _data[binder.Name];
                 return true;
             }
-            if (TryGetJoinResults(name, out result))
+            if (TryGetJoinResults(binder.Name, out result))
             {
                 return true;
             }
@@ -66,6 +58,7 @@ namespace Simple.Data
 
         private bool TryGetJoinResults(string name, out object result)
         {
+            name = name.Homogenize();
             return name.IsPlural() ? TryGetDetail(name, out result) : (TryGetMaster(name, out result));
         }
 

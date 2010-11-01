@@ -61,6 +61,7 @@
     <Compile Include="Commands\CommandFactory.cs" />
     <Compile Include="Ado\Joiner.cs" />
     <Compile Include="ConcreteTypeCreator.cs" />
+    <Compile Include="HomogenizedKeyDictionary.cs" />
     <Compile Include="ExpressionHelper.cs" />
     <Compile Include="Commands\FindAllCommand.cs" />
     <Compile Include="Commands\FindCommand.cs" />

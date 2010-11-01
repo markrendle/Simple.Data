@@ -35,7 +35,7 @@ namespace Simple.Data.UnitTest
         ///A test for IsPlural
         ///</summary>
         [Test]
-        public void IsPluralLowercaseUsersShouldReturnFalse()
+        public void IsPluralLowercaseUserShouldReturnFalse()
         {
             Assert.IsFalse("User".IsPlural());
         }

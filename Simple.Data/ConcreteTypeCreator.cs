@@ -21,13 +21,13 @@ namespace Simple.Data
             get { return _concreteType; }
         }
 
-        public bool TryCreate(IDictionary<string, object> data, out object result)
+        public bool TryCreate(HomogenizedKeyDictionary data, out object result)
         {
             bool anyPropertiesSet = false;
             var obj = Activator.CreateInstance(_concreteType);
             foreach (var propertyInfo in _concreteType.GetProperties().Where(pi => CanSetProperty(pi, data)))
             {
-                propertyInfo.SetValue(obj, data[propertyInfo.Name.Homogenize()], null);
+                propertyInfo.SetValue(obj, data[propertyInfo.Name], null);
                 anyPropertiesSet = true;
             }
 
@@ -35,9 +35,10 @@ namespace Simple.Data
 
             return anyPropertiesSet;
         }
-        private bool CanSetProperty(PropertyInfo propertyInfo, IDictionary<string,object> data)
+
+        private static bool CanSetProperty(PropertyInfo propertyInfo, HomogenizedKeyDictionary data)
         {
-            return data.ContainsKey(propertyInfo.Name.Homogenize()) && !(propertyInfo.PropertyType.IsValueType && data[propertyInfo.Name.Homogenize()] == null);
+            return data.ContainsKey(propertyInfo.Name) && !(propertyInfo.PropertyType.IsValueType && data[propertyInfo.Name] == null);
         }
     }
 }
