@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Simple.Data.Extensions;
 
 namespace Simple.Data.Ado.Schema
 {

@@ -61,7 +61,15 @@ namespace Simple.Data.Mocking
             {
                 foreach (var kvp in data)
                 {
-                    element.SetAttributeValue(kvp.Key, kvp.Value);
+                    var attribute = element.TryGetAttribute(kvp.Key);
+                    if (attribute != null)
+                    {
+                        attribute.Value = kvp.Value.ToString();
+                    }
+                    else
+                    {
+                        element.SetAttributeValue(kvp.Key, kvp.Value);
+                    }
                 }
                 updated++;
             }

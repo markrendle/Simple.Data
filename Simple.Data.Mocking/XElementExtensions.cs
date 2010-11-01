@@ -2,14 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using Simple.Data.Extensions;
 
 namespace Simple.Data.Mocking
 {
     static class XElementExtensions
     {
+        public static XAttribute TryGetAttribute(this XElement element, XName attributeName)
+        {
+            var attribute = element.Attribute(attributeName) ??
+                            element.Attributes().SingleOrDefault(
+                                a => a.Name.ToString().Homogenize() == attributeName.ToString().Homogenize());
+            return attribute;
+        }
+
         public static string TryGetAttributeValue(this XElement element, XName attributeName)
         {
-            var attribute = element.Attribute(attributeName);
+            var attribute = element.Attribute(attributeName) ??
+                            element.Attributes().SingleOrDefault(
+                                a => a.Name.ToString().Homogenize() == attributeName.ToString().Homogenize());
             return attribute == null ? null : attribute.Value;
         }
 

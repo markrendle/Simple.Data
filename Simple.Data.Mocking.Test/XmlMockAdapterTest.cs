@@ -19,7 +19,12 @@ namespace Simple.Data.Mocking.Test
         {
             _mockAdapter =
                 new XmlMockAdapter(
-                    @"<Root><Users Id=""System.Int32""><User Id=""1"" Email=""foo"" Password=""bar""/><User Id=""2"" Email=""bar"" Password=""quux""/><User Id=""3"" Email=""baz"" Password=""quux""/></Users></Root>");
+                    @"<Root><Users _keys=""Id"" Id=""System.Int32"">
+<User Id=""1"" Email=""foo"" Password=""bar""/>
+<User Id=""2"" Email=""bar"" Password=""quux""/>
+<User Id=""3"" Email=""baz"" Password=""quux""/>
+<User Id=""4"" Email=""baz"" Password=""quux""/>
+</Users></Root>");
             MockHelper.UseMockAdapter(_mockAdapter);
         }
 
@@ -53,11 +58,22 @@ namespace Simple.Data.Mocking.Test
         }
 
         [Test]
-        public void TestUpdate()
+        public void TestUpdateBy()
         {
             int updated = Database.Default.Users.UpdateById(Id: 1, Email: "quux");
             Assert.AreEqual(1, updated);
             var element = _mockAdapter.Data.Element("Users").Elements().Where(e => e.Attribute("Id") != null && e.Attribute("Id").Value == "1").Single();
+            Assert.AreEqual("quux", element.Attribute("Email").Value);
+        }
+
+        [Test]
+        public void TestUpdate()
+        {
+            dynamic record = new DynamicRecord();
+            record.Id = 4;
+            record.Email = "quux";
+            Database.Default.Users.Update(record);
+            var element = _mockAdapter.Data.Element("Users").Elements().Where(e => e.Attribute("Id") != null && e.Attribute("Id").Value == "4").Single();
             Assert.AreEqual("quux", element.Attribute("Email").Value);
         }
 
@@ -82,13 +98,13 @@ namespace Simple.Data.Mocking.Test
         [Test]
         public void TestInsert()
         {
-            var row = Database.Default.Users.Insert(Id: 4, Email: "bob", Password: "secret");
-            Assert.AreEqual(4, row.Id);
+            var row = Database.Default.Users.Insert(Id: 5, Email: "bob", Password: "secret");
+            Assert.AreEqual(5, row.Id);
             Assert.AreEqual("bob", row.Email);
             Assert.AreEqual("secret", row.Password);
-            var element = _mockAdapter.Data.Element("Users").Elements().Where(e => e.Attribute("Id") != null && e.Attribute("Id").Value == "4").SingleOrDefault();
+            var element = _mockAdapter.Data.Element("Users").Elements().Where(e => e.Attribute("Id") != null && e.Attribute("Id").Value == "5").SingleOrDefault();
             Assert.IsNotNull(element);
-            Assert.AreEqual("4", element.Attribute("Id").Value);
+            Assert.AreEqual("5", element.Attribute("Id").Value);
             Assert.AreEqual("bob", element.Attribute("Email").Value);
             Assert.AreEqual("secret", element.Attribute("Password").Value);
         }
