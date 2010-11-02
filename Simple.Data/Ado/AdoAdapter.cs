@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using Simple.Data.Ado.Schema;
@@ -24,7 +25,7 @@ namespace Simple.Data.Ado
             if (criteria == null) return FindAll(tableName);
 
             var commandBuilder = new FindHelper(_schema).GetFindByCommand(tableName, criteria);
-            return Query(commandBuilder);
+            return ExecuteQuery(commandBuilder);
         }
 
         public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
@@ -48,11 +49,6 @@ namespace Simple.Data.Ado
 
             Execute(insertSql, data.Values.ToArray());
             return null;
-        }
-
-        public void Update(string tableName, IDictionary<string, object> data)
-        {
-            
         }
 
         public int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
@@ -85,32 +81,42 @@ namespace Simple.Data.Ado
 
         private IEnumerable<IDictionary<string, object>> FindAll(string tableName)
         {
-            return Query("select * from " + _schema.FindTable(tableName).ActualName);
+            return ExecuteQuery("select * from " + _schema.FindTable(tableName).ActualName);
         }
 
-        private IEnumerable<IDictionary<string, object>> Query(ICommandBuilder commandBuilder)
+        private IEnumerable<IDictionary<string, object>> ExecuteQuery(ICommandBuilder commandBuilder)
         {
-            using (DbConnection connection = CreateConnection())
+            using (var connection = CreateConnection())
             {
-                using (IDbCommand command = commandBuilder.GetCommand(connection))
+                using (var command = commandBuilder.GetCommand(connection))
                 {
-                    connection.Open();
-
-                    return command.ExecuteReader().ToDictionaries();
+                    return TryExecuteQuery(connection, command);
                 }
             }
         }
 
-        private IEnumerable<IDictionary<string, object>> Query(string sql, params object[] values)
+        private IEnumerable<IDictionary<string, object>> ExecuteQuery(string sql, params object[] values)
         {
             using (var connection = CreateConnection())
             {
                 using (var command = CommandHelper.Create(connection, sql, values))
                 {
-                    connection.Open();
-
-                    return command.ExecuteReader().ToDictionaries();
+                    return TryExecuteQuery(connection, command);
                 }
+            }
+        }
+
+        private static IEnumerable<IDictionary<string, object>> TryExecuteQuery(DbConnection connection, IDbCommand command)
+        {
+            try
+            {
+                connection.Open();
+
+                return command.ExecuteReader().ToDictionaries();
+            }
+            catch (DbException ex)
+            {
+                throw new AdoAdapterException(ex.Message, command);
             }
         }
 
@@ -120,13 +126,20 @@ namespace Simple.Data.Ado
             {
                 using (var command = CommandHelper.Create(connection, sql, values.ToArray()))
                 {
-                    connection.Open();
-                    using (var reader = command.ExecuteReader())
+                    try
                     {
-                        if (reader.Read())
+                        connection.Open();
+                        using (var reader = command.ExecuteReader())
                         {
-                            return reader.ToDictionary();
+                            if (reader.Read())
+                            {
+                                return reader.ToDictionary();
+                            }
                         }
+                    }
+                    catch (DbException ex)
+                    {
+                        throw new AdoAdapterException(ex.Message, command);
                     }
                 }
             }
@@ -140,8 +153,7 @@ namespace Simple.Data.Ado
             {
                 using (var command = CommandHelper.Create(connection, sql, values.ToArray()))
                 {
-                    connection.Open();
-                    return command.ExecuteNonQuery();
+                    return TryExecute(connection, command);
                 }
             }
         }
@@ -152,10 +164,21 @@ namespace Simple.Data.Ado
             {
                 using (var command = commandBuilder.GetCommand(connection))
                 {
-                    connection.Open();
-
-                    return command.ExecuteNonQuery();
+                    return TryExecute(connection, command);
                 }
+            }
+        }
+
+        private static int TryExecute(DbConnection connection, IDbCommand command)
+        {
+            try
+            {
+                connection.Open();
+                return command.ExecuteNonQuery();
+            }
+            catch (DbException ex)
+            {
+                throw new AdoAdapterException(ex.Message, command);
             }
         }
 

@@ -49,7 +49,9 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="AdapterException.cs" />
     <Compile Include="Ado\AdoAdapter.cs" />
+    <Compile Include="Ado\AdoAdapterException.cs" />
     <Compile Include="Ado\CommandBuilder.cs" />
     <Compile Include="Ado\DeleteHelper.cs" />
     <Compile Include="Ado\ExpressionFormatter.cs" />
