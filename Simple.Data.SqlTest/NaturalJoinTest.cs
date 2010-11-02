@@ -14,6 +14,7 @@ namespace Simple.Data.SqlTest
         {
             var db = DatabaseHelper.Open();
             var row = db.Customers.Find(db.Customers.Orders.OrderDate == new DateTime(2010, 10, 10));
+            Assert.IsNotNull(row);
             Assert.AreEqual("Test", row.Name);
         }
     }

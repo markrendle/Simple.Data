@@ -1,12 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using Simple.Data.Ado;
-using Simple.Data.Properties;
 
 namespace Simple.Data
 {
@@ -16,8 +15,9 @@ namespace Simple.Data
     /// </summary>
     public class Database : DynamicObject
     {
-        private readonly IAdapter _adapter;
         private static readonly Lazy<dynamic> LazyDefault = new Lazy<dynamic>(Open, LazyThreadSafetyMode.ExecutionAndPublication);
+        private readonly ConcurrentDictionary<string, DynamicTable> _tables = new ConcurrentDictionary<string, DynamicTable>();
+        private readonly IAdapter _adapter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Database"/> class.
@@ -98,14 +98,18 @@ namespace Simple.Data
         /// </returns>
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            return base.TryGetMember(binder, out result)
-                   || NewDynamicTable(binder, out result);
+            return GetDynamicTable(binder, out result);
         }
 
-        private bool NewDynamicTable(GetMemberBinder binder, out object result)
+        private bool GetDynamicTable(GetMemberBinder binder, out object result)
         {
-            result = new DynamicTable(binder.Name, this);
+            result = _tables.GetOrAdd(binder.Name, CreateDynamicTable);
             return true;
+        }
+
+        private DynamicTable CreateDynamicTable(string name)
+        {
+            return new DynamicTable(name, this);
         }
     }
 }

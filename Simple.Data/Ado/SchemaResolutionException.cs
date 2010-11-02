@@ -9,17 +9,17 @@ namespace Simple.Data.Ado
     [Serializable]
     public class SchemaResolutionException : SimpleDataException
     {
-        public SchemaResolutionException() : base(typeof(AdoAdapter))
+        public SchemaResolutionException() : base()
         {
         }
 
         public SchemaResolutionException(string message)
-            : base(message, typeof(AdoAdapter))
+            : base(message)
         {
         }
 
         public SchemaResolutionException(string message, Exception inner)
-            : base(message, inner, typeof(AdoAdapter))
+            : base(message, inner)
         {
         }
 
