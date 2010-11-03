@@ -25,13 +25,18 @@ namespace Simple.Data.Commands
                 throw new NotSupportedException("Adapter does not support key-based update for this object.");
             }
 
-            var record = ObjectToDictionary(args[0]);
+            return UpdateByKeyFields(tableName, database, args[0], keyFieldNames);
+        }
+
+        internal static object UpdateByKeyFields(string tableName, Database database, object entity, IEnumerable<string> keyFieldNames)
+        {
+            var record = ObjectToDictionary(entity);
             var criteria = GetCriteria(keyFieldNames, record);
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteria);
             return database.Adapter.Update(tableName, record, criteriaExpression);
         }
 
-        private static Dictionary<string, object> GetCriteria(string[] keyFieldNames, IDictionary<string, object> record)
+        private static Dictionary<string, object> GetCriteria(IEnumerable<string> keyFieldNames, IDictionary<string, object> record)
         {
             var criteria = new Dictionary<string, object>();
 

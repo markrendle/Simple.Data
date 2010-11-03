@@ -159,6 +159,22 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestUpdateByWithDynamicObject()
+        {
+            var mockDatabase = new MockDatabase();
+            dynamic database = CreateDatabase(mockDatabase);
+            dynamic record = new DynamicRecord();
+            record.Id = 1;
+            record.Name = "Steve";
+            record.Age = 50;
+            database.Users.UpdateById(record);
+            Assert.AreEqual("update [Users] set [Name] = @p1, [Age] = @p2 where [Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
+            Assert.AreEqual(50, mockDatabase.Parameters[1]);
+            Assert.AreEqual(1, mockDatabase.Parameters[2]);
+        }
+
+        [Test]
         public void TestUpdateWithStaticObject()
         {
             var mockDatabase = new MockDatabase();
@@ -177,11 +193,39 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestUpdateByWithStaticObject()
+        {
+            var mockDatabase = new MockDatabase();
+            dynamic database = CreateDatabase(mockDatabase);
+            var user = new User
+                           {
+                               Id = 1,
+                               Name = "Steve",
+                               Age = 50
+                           };
+            database.Users.UpdateById(user);
+            Assert.AreEqual("update [Users] set [Name] = @p1, [Age] = @p2 where [Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
+            Assert.AreEqual(50, mockDatabase.Parameters[1]);
+            Assert.AreEqual(1, mockDatabase.Parameters[2]);
+        }
+
+        [Test]
         public void TestDeleteWithNamedArguments()
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
             database.Users.Delete(Id: 1);
+            Assert.AreEqual("delete from [Users] where [Users].[Id] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual(1, mockDatabase.Parameters[0]);
+        }
+
+        [Test]
+        public void TestDeleteBy()
+        {
+            var mockDatabase = new MockDatabase();
+            dynamic database = CreateDatabase(mockDatabase);
+            database.Users.DeleteById(1);
             Assert.AreEqual("delete from [Users] where [Users].[Id] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual(1, mockDatabase.Parameters[0]);
         }

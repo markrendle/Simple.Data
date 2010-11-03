@@ -15,6 +15,12 @@ namespace Simple.Data.Commands
 
         public object Execute(Database database, string tableName, InvokeMemberBinder binder, object[] args)
         {
+            if (binder.HasSingleUnnamedArgument())
+            {
+                return UpdateCommand.UpdateByKeyFields(tableName, database, args[0],
+                                                MethodNameParser.ParseCriteriaNamesFromMethodName(binder.Name));
+            }
+
             var criteria = MethodNameParser.ParseFromBinder(binder, args);
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteria);
             var data = binder.NamedArgumentsToDictionary(args)
