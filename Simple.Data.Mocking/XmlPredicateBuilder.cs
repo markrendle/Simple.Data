@@ -21,17 +21,17 @@ namespace Simple.Data.Mocking
             if (criteria.LeftOperand is DynamicReference)
             {
                 var resolver = BuildReferenceResolver((DynamicReference)criteria.LeftOperand);
-                return xml => resolver(xml) == criteria.RightOperand.ToString();
+                return xml => Equals(resolver(xml), criteria.RightOperand);
             }
 
             return xml => true;
         }
 
-        private static Func<XElement, string> BuildReferenceResolver(DynamicReference reference)
+        private static Func<XElement, object> BuildReferenceResolver(DynamicReference reference)
         {
             var resolver = BuildElementResolver(reference);
 
-            return xml => resolver(xml).TryGetAttributeValue(reference.Name);
+            return xml => resolver(xml).TryGetAttribute(reference.Name).ConvertValue();
         }
 
         private static Func<XElement, XElement> BuildElementResolver(DynamicReference reference)

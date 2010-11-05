@@ -1,4 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -19,8 +20,8 @@ namespace Simple.Data.Mocking.Test
         {
             _mockAdapter =
                 new XmlMockAdapter(
-                    @"<Root><Users _keys=""Id"" Id=""System.Int32"">
-<User Id=""1"" Email=""foo"" Password=""bar""/>
+                    @"<Root><Users _keys=""Id"" Id=""System.Int32"" Key=""System.Guid"">
+<User Id=""1"" Email=""foo"" Password=""bar"" Key=""4A1c8a8a-238d-443e-8ab2-bdf046a91fd7""/>
 <User Id=""2"" Email=""bar"" Password=""quux""/>
 <User Id=""3"" Email=""baz"" Password=""quux""/>
 <User Id=""4"" Email=""baz"" Password=""quux""/>
@@ -35,6 +36,20 @@ namespace Simple.Data.Mocking.Test
         public void FindByEmail_ShouldFindRecord()
         {
             dynamic user = Database.Default.Users.FindByEmail("foo");
+            Assert.AreEqual(1, user.Id);
+            Assert.AreEqual("foo", user.Email);
+            Assert.AreEqual("bar", user.Password);
+        }
+
+        /// <summary>
+        ///A test for Find
+        ///</summary>
+        [Test]
+        public void FindByKey_ShouldFindRecord()
+        {
+            var key = Guid.Parse("4a1c8a8a-238d-443e-8ab2-bdf046a91fd7");
+            dynamic user = Database.Default.Users.FindByKey(key);
+            Assert.IsNotNull(user);
             Assert.AreEqual(1, user.Id);
             Assert.AreEqual("foo", user.Email);
             Assert.AreEqual("bar", user.Password);
