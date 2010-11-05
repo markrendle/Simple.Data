@@ -29,7 +29,15 @@ namespace Simple.Data
             if (columns.Count == 0) throw new ArgumentException("No columns specified.");
 
             return columns.Select((s,i) => new KeyValuePair<string, object>(s, args[i])).ToDictionary();
-           
+        }
+
+        internal static IEnumerable<string> ParseCriteriaNamesFromMethodName(string methodName)
+        {
+            var columns = GetColumns(RemoveCommandPart(methodName));
+
+            if (columns.Count == 0) throw new ArgumentException("No columns specified.");
+
+            return columns.AsEnumerable();
         }
 
         internal static IDictionary<string, object> ParseFromMethodName(string methodName, IDictionary<string, object> args)

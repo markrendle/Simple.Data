@@ -21,7 +21,7 @@ namespace Simple.Data.Commands
 
         private static IDictionary<string, object> DoInsert(InvokeMemberBinder binder, object[] args, Database database, string tableName)
         {
-            return InvokeHasSingleUnnamedArgument(binder)
+            return binder.HasSingleUnnamedArgument()
                 ?
                 InsertEntity(args[0], database, tableName)
                 :
@@ -31,11 +31,6 @@ namespace Simple.Data.Commands
         private static IDictionary<string, object> InsertDictionary(InvokeMemberBinder binder, object[] args, Database database, string tableName)
         {
             return database.Adapter.Insert(tableName, binder.NamedArgumentsToDictionary(args));
-        }
-
-        private static bool InvokeHasSingleUnnamedArgument(InvokeMemberBinder binder)
-        {
-            return binder.CallInfo.ArgumentCount == 1 && string.IsNullOrWhiteSpace(binder.CallInfo.ArgumentNames[0]);
         }
 
         private static IDictionary<string,object> InsertEntity(object entity, Database database, string tableName)
