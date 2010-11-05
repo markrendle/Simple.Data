@@ -21,7 +21,9 @@ namespace Simple.Data.Mocking.Test
             _mockAdapter =
                 new XmlMockAdapter(
                     @"<Root><Users _keys=""Id"" Id=""System.Int32"" Key=""System.Guid"">
-<User Id=""1"" Email=""foo"" Password=""bar"" Key=""4A1c8a8a-238d-443e-8ab2-bdf046a91fd7""/>
+<User Id=""1"" Email=""foo"" Password=""bar"" Key=""4A1c8a8a-238d-443e-8ab2-bdf046a91fd7"">
+  <Pets><Pet Name=""Fido""/></Pets>
+</User>
 <User Id=""2"" Email=""bar"" Password=""quux""/>
 <User Id=""3"" Email=""baz"" Password=""quux""/>
 <User Id=""4"" Email=""baz"" Password=""quux""/>
@@ -63,6 +65,13 @@ namespace Simple.Data.Mocking.Test
         {
             dynamic user = Database.Default.Users.FindById(1);
             Assert.AreEqual(1, user.Id);
+        }
+
+        [Test]
+        public void UserShouldHavePet()
+        {
+            dynamic user = Database.Default.Users.FindById(1);
+            Assert.IsNotNull(user.Pets);
         }
 
         [Test]
