@@ -11,14 +11,14 @@ namespace Simple.Data.UnitTest
     {
         // ReSharper disable InconsistentNaming
         [Test]
-        public void BitwiseAndOperatorCombinesTwoExpressions()
+        public void AndOperatorCombinesTwoExpressions()
         {
             // Arrange
             var expr1 = new SimpleExpression(1, 1, SimpleExpressionType.Equal);
             var expr2 = new SimpleExpression(2, 2, SimpleExpressionType.Equal);
 
             // Act
-            var newExpr = expr1 & expr2;
+            var newExpr = expr1 && expr2;
 
             // Assert
             Assert.AreEqual(expr1, newExpr.LeftOperand);
@@ -27,14 +27,14 @@ namespace Simple.Data.UnitTest
         }
 
         [Test]
-        public void BitwiseOrOperatorCombinesTwoExpressions()
+        public void OrOperatorCombinesTwoExpressions()
         {
             // Arrange
             var expr1 = new SimpleExpression(1, 1, SimpleExpressionType.Equal);
             var expr2 = new SimpleExpression(2, 2, SimpleExpressionType.Equal);
 
             // Act
-            var newExpr = expr1 | expr2;
+            var newExpr = expr1 || expr2;
 
             // Assert
             Assert.AreEqual(expr1, newExpr.LeftOperand);
@@ -52,7 +52,7 @@ namespace Simple.Data.UnitTest
             var expr4 = new SimpleExpression(4, 4, SimpleExpressionType.Equal);
 
             // Act
-            var newExpr = (expr1 & expr2) | (expr3 & expr4);
+            var newExpr = (expr1 && expr2) || (expr3 && expr4);
             var leftExpr = newExpr.LeftOperand as SimpleExpression;
             var rightExpr = newExpr.RightOperand as SimpleExpression;
 
@@ -77,7 +77,7 @@ namespace Simple.Data.UnitTest
             var expr4 = new SimpleExpression(4, 4, SimpleExpressionType.Equal);
 
             // Act
-            var newExpr = expr1 & expr2 | expr3 & expr4;
+            var newExpr = expr1 && expr2 || expr3 && expr4;
             var leftExpr = newExpr.LeftOperand as SimpleExpression;
             var rightExpr = newExpr.RightOperand as SimpleExpression;
 

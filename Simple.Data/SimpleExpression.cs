@@ -71,5 +71,15 @@ namespace Simple.Data
         {
             return new SimpleExpression(left, right, SimpleExpressionType.Or);
         }
+
+        public static bool operator true(SimpleExpression foo)
+        {
+            return false;
+        }
+
+        public static bool operator false(SimpleExpression foo)
+        {
+            return false;
+        }
     }
 }
