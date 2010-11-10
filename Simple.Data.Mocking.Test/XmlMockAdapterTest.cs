@@ -132,6 +132,20 @@ namespace Simple.Data.Mocking.Test
             Assert.AreEqual("bob", element.Attribute("Email").Value);
             Assert.AreEqual("secret", element.Attribute("Password").Value);
         }
+
+        [Test]
+        public void IsValidRelation_Users_Pets_ShouldReturnTrue()
+        {
+            Assert.IsTrue(_mockAdapter.IsValidRelation("Users", "Pets"));
+        }
+
+        [Test]
+        public void Users_Pets_ShouldReturn_OneRow_WithName_Fido()
+        {
+            IEnumerable<dynamic> pets = Database.Default.Users.FindById(1).Pets;
+            Assert.AreEqual(1, pets.Count());
+            Assert.AreEqual("Fido", pets.Single().Name);
+        }
     }
 }
 

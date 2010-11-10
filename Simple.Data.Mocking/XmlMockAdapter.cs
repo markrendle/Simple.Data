@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 namespace Simple.Data.Mocking
 {
-    public class XmlMockAdapter : IAdapter
+    public class XmlMockAdapter : IAdapter, IAdapterWithRelation
     {
         private readonly Lazy<XElement> _data;
 
@@ -114,6 +114,39 @@ namespace Simple.Data.Mocking
             XElement tableElement = Data.Element(tableName);
             if (tableElement == null) throw new UnresolvableObjectException(tableName);
             return tableElement;
+        }
+
+        /// <summary>
+        /// Determines whether a relation is valid.
+        /// </summary>
+        /// <param name="tableName">Name of the known table.</param>
+        /// <param name="relatedTableName">Name of the table to test.</param>
+        /// <returns>
+        /// 	<c>true</c> if there is a valid relation; otherwise, <c>false</c>.
+        /// </returns>
+        public bool IsValidRelation(string tableName, string relatedTableName)
+        {
+            return GetTableElement(tableName).Elements().Any(e => e.Element(relatedTableName) != null);
+        }
+
+        /// <summary>
+        /// Finds data from a "table" related to the specified "table".
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="row"></param>
+        /// <param name="relatedTableName"></param>
+        /// <returns>The list of records matching the criteria. If no records are found, return an empty list.</returns>
+        /// <remarks>When implementing the <see cref="IAdapter"/> interface, if relationships are not possible, throw a <see cref="NotSupportedException"/>.</remarks>
+        public IEnumerable<IDictionary<string, object>> FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName)
+        {
+            var criteria = ExpressionHelper.CriteriaDictionaryToExpression(tableName, row);
+            return GetTableElement(tableName).Elements()
+                .Where(XmlPredicateBuilder.GetPredicate(criteria))
+                .Single()
+                .Element(relatedTableName)
+                .Elements()
+                .Select(e => e.AttributesToDictionary());
+
         }
     }
 }
