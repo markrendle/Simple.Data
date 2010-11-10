@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<feed xml:base="http://myaccount.tables.core.windows.net/" 
+      xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" 
+	  xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" 
+	  xmlns="http://www.w3.org/2005/Atom">
+  <title type="text">Tables</title>
+  <id>http://myaccount.tables.core.windows.net/Tables</id>
+  <updated>2009-01-04T17:18:54.7062347Z</updated>
+  <link rel="self" title="Tables" href="Tables" />
+  <entry>
+    <id>http://myaccount.tables.core.windows.net/Tables('mytable')</id>
+    <title type="text"></title>
+    <updated>2009-01-04T17:18:54.7062347Z</updated>
+    <author>
+      <name />
+    </author>
+    <link rel="edit" title="Tables" href="Tables('mytable')" />
+    <category term="myaccount.Tables" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme" />
+    <content type="application/xml">
+      <m:properties>
+        <d:TableName>mytable</d:TableName>
+      </m:properties>
+    </content>
+  </entry>
+</feed>

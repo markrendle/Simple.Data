@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<feed xml:base="http://myaccount.tables.core.windows.net/" xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns="http://www.w3.org/2005/Atom">
+  <title type="text">Customers</title>
+  <id>http://myaccount.tables.core.windows.net/Customers</id>
+  <updated>2008-10-01T15:26:13Z</updated>
+  <link rel="self" title="Customers" href="Customers" />
+  <entry m:etag="W/&quot;datetime'2008-10-01T15%3A26%3A04.6812774Z'&quot;">
+  <id>http://myaccount.tables.core.windows.net/Customers(PartitionKey='Customer03',RowKey='')</id>
+    <title type="text"></title>
+    <updated>2008-10-01T15:26:13Z</updated>
+    <author>
+      <name />
+    </author>
+    <link rel="edit" title="Customers" href="Customers (PartitionKey='Customer03',RowKey='')" />
+    <category term="myaccount.Customers" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme" />
+    <content type="application/xml">
+      <m:properties>
+        <d:PartitionKey>Customer03</d:PartitionKey>
+        <d:RowKey></d:RowKey>
+        <d:Timestamp m:type="Edm.DateTime">2008-10-01T15:26:04.6812774Z</d:Timestamp>
+        <d:Address>123 Lakeview Blvd, Redmond WA 98052</d:Address>
+        <d:CustomerSince m:type="Edm.DateTime">2008-10-01T15:25:05.2852025Z</d:CustomerSince>
+        <d:Discount m:type="Edm.Double">10</d:Discount>
+        <d:Rating m:type="Edm.Int32">3</d:Rating>
+      </m:properties>
+    </content>
+  </entry>
+</feed>
