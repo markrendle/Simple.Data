@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:c="http://schemas.next.lib/tests">
+  <c:child>
+    <c:sub>Foo</c:sub>
+  </c:child>  
+  <c:child>
+    <c:sub>Bar</c:sub>
+  </c:child>  
+</root>
