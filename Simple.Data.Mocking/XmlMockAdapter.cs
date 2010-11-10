@@ -140,13 +140,17 @@ namespace Simple.Data.Mocking
         public IEnumerable<IDictionary<string, object>> FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName)
         {
             var criteria = ExpressionHelper.CriteriaDictionaryToExpression(tableName, row);
-            return GetTableElement(tableName).Elements()
+            var relatedTableElement = GetTableElement(tableName).Elements()
                 .Where(XmlPredicateBuilder.GetPredicate(criteria))
                 .Single()
-                .Element(relatedTableName)
-                .Elements()
-                .Select(e => e.AttributesToDictionary());
+                .Element(relatedTableName);
 
+            if (relatedTableElement != null && relatedTableElement.HasElements)
+            {
+                return relatedTableElement.Elements().Select(e => e.AttributesToDictionary());
+            }
+
+            return Enumerable.Empty<IDictionary<string, object>>();
         }
     }
 }

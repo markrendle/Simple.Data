@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NExtLib.TestExtensions;
 using NUnit.Framework;
 
-namespace NExtLib.Unit
+namespace Simple.NExtLib.Unit
 {
     public static class ShouldExtensions
     {

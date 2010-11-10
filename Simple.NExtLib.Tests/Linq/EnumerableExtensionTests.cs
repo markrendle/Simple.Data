@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using NExtLib.Unit;
 using NUnit.Framework;
 using Simple.NExtLib.Linq;
+using Simple.NExtLib.Unit;
 
 namespace Simple.NExtLib.Tests.Linq
 {

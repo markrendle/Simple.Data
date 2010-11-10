@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using System.Xml.Linq;
-using NExtLib.Unit;
+using Simple.NExtLib.Unit;
 
 namespace Simple.NExtLib.Tests.Xml.Linq
 {

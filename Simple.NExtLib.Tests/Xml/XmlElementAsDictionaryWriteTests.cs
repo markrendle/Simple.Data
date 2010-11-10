@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NExtLib.Unit;
 using NUnit.Framework;
 using System.Xml.Linq;
 using System.Diagnostics;
+using Simple.NExtLib.Unit;
 using Simple.NExtLib.Xml;
 
 namespace Simple.NExtLib.Tests.Xml

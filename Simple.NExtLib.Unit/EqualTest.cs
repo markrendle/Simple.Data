@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
-namespace NExtLib.TestExtensions
+namespace Simple.NExtLib.Unit
 {
     public class EqualTest : IBinaryTest
     {

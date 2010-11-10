@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using NExtLib;
-using NExtLib.Unit;
+using Simple.NExtLib.Unit;
 
 namespace Simple.NExtLib.Tests
 {

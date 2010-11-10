@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace NExtLib.TestExtensions
+﻿namespace Simple.NExtLib.Unit
 {
     public class GenericBinaryTest
     {
