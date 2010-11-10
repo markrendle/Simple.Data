@@ -91,6 +91,7 @@
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\InsertCommand.cs" />
     <Compile Include="Commands\DeleteByCommand.cs" />
+    <Compile Include="IAdapterWithRelation.cs" />
     <Compile Include="MethodNameParser.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
