@@ -10,3 +10,4 @@ deploy
 *.testsettings
 TestResults/*
 *.dbmdl
+Releases/2*
