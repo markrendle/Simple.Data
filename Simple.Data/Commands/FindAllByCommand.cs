@@ -15,9 +15,9 @@ namespace Simple.Data.Commands
         {
             var criteria = ExpressionHelper.CriteriaDictionaryToExpression(tableName, MethodNameParser.ParseFromBinder(binder, args));
             var data = database.Adapter.Find(tableName, criteria);
-            return data != null
+            return new DynamicEnumerable(data != null
                          ? data.Select(dict => new DynamicRecord(dict, tableName, database))
-                         : Enumerable.Empty<object>();
+                         : Enumerable.Empty<DynamicRecord>());
         }
     }
 }

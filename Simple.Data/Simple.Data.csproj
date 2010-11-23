@@ -68,6 +68,7 @@
     <Compile Include="Commands\UpdateCommand.cs" />
     <Compile Include="ConcreteObject.cs" />
     <Compile Include="ConcreteTypeCreator.cs" />
+    <Compile Include="DynamicEnumerable.cs" />
     <Compile Include="Extensions\BinderExtensions.cs" />
     <Compile Include="Extensions\IDictionaryExtensions.cs" />
     <Compile Include="HomogenizedKeyDictionary.cs" />

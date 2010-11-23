@@ -1,4 +1,6 @@
-﻿using System.Data.SqlClient;
+﻿using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using System.IO;
@@ -26,6 +28,14 @@ namespace Simple.Data.SqlTest
             var db = DatabaseHelper.Open();
             var user = db.Users.FindById(1);
             Assert.AreEqual(1, user.Id);
+        }
+
+        [Test]
+        public void TestFindAllByName()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<User> users = db.Users.FindAllByName("Bob").Cast<User>();
+            Assert.AreEqual(1, users.Count());
         }
 
         [Test]
