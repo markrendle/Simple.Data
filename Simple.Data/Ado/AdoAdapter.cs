@@ -104,13 +104,9 @@ namespace Simple.Data.Ado
 
         private IEnumerable<IDictionary<string, object>> ExecuteQuery(string sql, params object[] values)
         {
-            using (var connection = CreateConnection())
-            {
-                using (var command = CommandHelper.Create(connection, sql, values))
-                {
-                    return TryExecuteQuery(connection, command);
-                }
-            }
+            var connection = CreateConnection();
+            var command = CommandHelper.Create(connection, sql, values);
+            return command.ToAsyncEnumerable();
         }
 
         private static IEnumerable<IDictionary<string, object>> TryExecuteQuery(DbConnection connection, IDbCommand command)

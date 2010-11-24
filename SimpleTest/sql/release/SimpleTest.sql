@@ -37,7 +37,10 @@ END
 GO
 PRINT N'Creating $(DatabaseName)...'
 GO
-CREATE DATABASE [$(DatabaseName)] COLLATE SQL_Latin1_General_CP1_CI_AS
+CREATE DATABASE [$(DatabaseName)]
+    ON 
+    PRIMARY(NAME = [SimpleTest], FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\DATA\SimpleTest.mdf', SIZE = 2304 KB, FILEGROWTH = 1024 KB)
+    LOG ON (NAME = [SimpleTest_log], FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\DATA\SimpleTest_log.ldf', SIZE = 1024 KB, MAXSIZE = 2097152 MB, FILEGROWTH = 10 %) COLLATE SQL_Latin1_General_CP1_CI_AS
 GO
 EXECUTE sp_dbcmptlevel [$(DatabaseName)], 100;
 
@@ -177,6 +180,15 @@ CREATE TABLE [dbo].[Customers] (
 
 
 GO
+PRINT N'Creating PK_Customers...';
+
+
+GO
+ALTER TABLE [dbo].[Customers]
+    ADD CONSTRAINT [PK_Customers] PRIMARY KEY CLUSTERED ([CustomerId] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
+
+
+GO
 PRINT N'Creating [dbo].[Items]...';
 
 
@@ -214,6 +226,15 @@ CREATE TABLE [dbo].[Orders] (
 
 
 GO
+PRINT N'Creating PK_Orders...';
+
+
+GO
+ALTER TABLE [dbo].[Orders]
+    ADD CONSTRAINT [PK_Orders] PRIMARY KEY CLUSTERED ([OrderId] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
+
+
+GO
 PRINT N'Creating [dbo].[Users]...';
 
 
@@ -224,6 +245,15 @@ CREATE TABLE [dbo].[Users] (
     [Password] NVARCHAR (100) NOT NULL,
     [Age]      INT            NOT NULL
 );
+
+
+GO
+PRINT N'Creating FK_Orders_Customers...';
+
+
+GO
+ALTER TABLE [dbo].[Orders] WITH NOCHECK
+    ADD CONSTRAINT [FK_Orders_Customers] FOREIGN KEY ([CustomerId]) REFERENCES [dbo].[Customers] ([CustomerId]) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 
 GO
@@ -245,6 +275,18 @@ Post-Deployment Script Template
                SELECT * FROM [$(TableName)]					
 --------------------------------------------------------------------------------------
 */
+
+GO
+PRINT N'Checking existing data against newly created constraints';
+
+
+GO
+USE [$(DatabaseName)];
+
+
+GO
+ALTER TABLE [dbo].[Orders] WITH CHECK CHECK CONSTRAINT [FK_Orders_Customers];
+
 
 GO
 IF EXISTS (SELECT 1

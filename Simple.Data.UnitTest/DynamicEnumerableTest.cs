@@ -18,12 +18,32 @@ namespace Simple.Data.UnitTest
         }
 
         [Test]
+        public void TestOfType()
+        {
+            dynamic test = new DynamicEnumerable(new dynamic[] { "Hello", 1 });
+            IEnumerable<int> ints = test.OfType<int>();
+            Assert.AreEqual(1, ints.Count());
+            Assert.AreEqual(1, ints.Single());
+        }
+
+        [Test]
         public void TestCastWithClass()
         {
             var dict = new Dictionary<string, object> {{"Name", "Bob"}};
             dynamic test = new DynamicEnumerable(new[] {new DynamicRecord(dict)});
             IEnumerable<Foo> foos = test.Cast<Foo>();
             Assert.AreEqual(1, foos.Count());
+        }
+
+        [Test]
+        public void TestCastWithForeach()
+        {
+            var dict = new Dictionary<string, object> { { "Name", "Bob" } };
+            dynamic test = new DynamicEnumerable(new[] { new DynamicRecord(dict) });
+            foreach (Foo foo in test)
+            {
+                Assert.AreEqual("Bob", foo.Name);
+            }
         }
 
         class Foo

@@ -253,7 +253,14 @@ namespace Simple.Data.IntegrationTest
             var traceListener = new TestTraceListener();
             Trace.Listeners.Add(traceListener);
 
-            var dummy = database.Users.All;
+            try
+            {
+                var dummy = database.Users.All;
+            }
+            catch (InvalidOperationException)
+            {
+                // Ignore it
+            }
             Assert.IsTrue(traceListener.Messages.Contains("deprecated"));
 
             Trace.Listeners.Remove(traceListener);

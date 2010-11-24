@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using Microsoft.CSharp.RuntimeBinder;
 
 namespace Simple.Data
 {
@@ -22,9 +23,26 @@ namespace Simple.Data
             return _list.Select(item => (T) item);
         }
 
-        public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
+        public IEnumerable<T> OfType<T>()
         {
-            return base.TryInvokeMember(binder, args, out result);
+            foreach (var item in _list)
+            {
+                bool success = true;
+                T cast;
+                try
+                {
+                    cast = (T) item;
+                }
+                catch (RuntimeBinderException)
+                {
+                    cast = default(T);
+                    success = false;
+                }
+                if (success)
+                {
+                    yield return cast;
+                }
+            }
         }
 
         /// <summary>

@@ -7,6 +7,7 @@ namespace Simple.Data.Mocking.Ado
     public class MockDbConnection : DbConnection
     {
         private readonly MockDatabase _mockDatabase;
+        private ConnectionState _state = ConnectionState.Closed;
 
         public MockDbConnection(MockDatabase mockDatabase)
         {
@@ -34,7 +35,7 @@ namespace Simple.Data.Mocking.Ado
 
         public override void Close()
         {
-            
+            _state = ConnectionState.Closed;
         }
 
         /// <summary>
@@ -90,7 +91,7 @@ namespace Simple.Data.Mocking.Ado
 
         public override void Open()
         {
-            
+            _state = ConnectionState.Open;
         }
 
         /// <summary>
@@ -107,7 +108,7 @@ namespace Simple.Data.Mocking.Ado
 
         public override ConnectionState State
         {
-            get { throw new NotImplementedException(); }
+            get { return _state; }
         }
     }
 }

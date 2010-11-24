@@ -41,7 +41,7 @@ namespace Simple.Data.SqlCeTest
         public void TestAll()
         {
             var db = Database.OpenFile(DatabasePath);
-            var all = new List<dynamic>(db.Users.All());
+            var all = new List<dynamic>(db.Users.All().Cast<dynamic>());
             Assert.IsNotEmpty(all);
         }
 
