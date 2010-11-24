@@ -83,7 +83,11 @@ namespace Simple.Data.Mocking.Ado
         /// <returns>
         /// The connection to the data source.
         /// </returns>
-        protected override DbConnection DbConnection { get; set; }
+        protected override DbConnection DbConnection
+        {
+            get { return _connection; }
+            set {}
+        }
 
         /// <summary>
         /// Gets the collection of <see cref="T:System.Data.Common.DbParameter"/> objects.

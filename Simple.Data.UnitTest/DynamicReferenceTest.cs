@@ -23,8 +23,8 @@ namespace Simple.Data.UnitTest
             DynamicReference column = table.Column;
 
             // Assert
-            Assert.AreEqual("Column", column.Name);
-            Assert.AreEqual("Table", column.Owner.Name);
+            Assert.AreEqual("Column", column.GetName());
+            Assert.AreEqual("Table", column.GetOwner().GetName());
         }
 
         [Test]
@@ -37,9 +37,9 @@ namespace Simple.Data.UnitTest
             DynamicReference column = table.Table2.Column;
 
             // Assert
-            Assert.AreEqual("Column", column.Name);
-            Assert.AreEqual("Table2", column.Owner.Name);
-            Assert.AreEqual("Table1", column.Owner.Owner.Name);
+            Assert.AreEqual("Column", column.GetName());
+            Assert.AreEqual("Table2", column.GetOwner().GetName());
+            Assert.AreEqual("Table1", column.GetOwner().GetOwner().GetName());
         }
 
         /// <summary>
@@ -68,10 +68,10 @@ namespace Simple.Data.UnitTest
             var actual = DynamicReference.FromString("One.Two.Three");
 
             // Assert
-            Assert.AreEqual("Three", actual.Name);
-            Assert.AreEqual("Two", actual.Owner.Name);
-            Assert.AreEqual("One", actual.Owner.Owner.Name);
-            Assert.IsNull(actual.Owner.Owner.Owner);
+            Assert.AreEqual("Three", actual.GetName());
+            Assert.AreEqual("Two", actual.GetOwner().GetName());
+            Assert.AreEqual("One", actual.GetOwner().GetOwner().GetName());
+            Assert.IsNull(actual.GetOwner().GetOwner().GetOwner());
         }
 
         private static void DoAsserts<T>(SimpleExpression expression, DynamicReference column, T rightOperand, SimpleExpressionType expressionType)

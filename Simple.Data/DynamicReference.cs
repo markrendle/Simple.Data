@@ -28,19 +28,19 @@ namespace Simple.Data
         /// <summary>
         /// Gets the owner of the referenced object; <c>null</c> if the object is top-level.
         /// </summary>
-        /// <value>The owner.</value>
-        public DynamicReference Owner
+        /// <returns>The owner.</returns>
+        public DynamicReference GetOwner()
         {
-            get { return _owner; }
+            return _owner;
         }
 
         /// <summary>
         /// Gets the name of the referenced object.
         /// </summary>
-        /// <value>The name.</value>
-        public string Name
+        /// <returns>The name.</returns>
+        public string GetName()
         {
-            get { return _name; }
+            return _name;
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Simple.Data
         /// <returns></returns>
         public string[] GetAllObjectNames()
         {
-            if (ReferenceEquals(Owner, null)) return new[] {_name};
+            if (ReferenceEquals(GetOwner(), null)) return new[] {_name};
             return _owner.GetAllObjectNames().Concat(new[] {_name}).ToArray();
         }
 

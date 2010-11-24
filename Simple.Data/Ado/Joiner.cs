@@ -24,11 +24,12 @@ namespace Simple.Data.Ado
         public string GetJoinClauses(string mainTableName, SimpleExpression expression)
         {
             _done.AddOrUpdate(mainTableName, string.Empty, (s, o) => string.Empty);
-            foreach (var tablePair in GetTablePairs(expression))
+            var tablePairs = GetTablePairs(expression);
+            foreach (var tablePair in tablePairs)
             {
                 AddJoin(tablePair.Item1, tablePair.Item2);
             }
-            return string.Join(" ", _done.Values.Where(s => !string.IsNullOrWhiteSpace(s)));
+            return string.Join(" ", tablePairs.Select(tp => _done[tp.Item2]));
         }
 
         private void AddJoin(string table1Name, string table2Name)
@@ -44,13 +45,13 @@ namespace Simple.Data.Ado
             if (foreignKey == null) throw new SchemaResolutionException(
                 string.Format("Could not join '{0}' and '{1}'", table1.ActualName, table2.ActualName));
 
-            _done.GetOrAdd(table2Name, s => MakeJoinText(foreignKey));
+            _done.GetOrAdd(table2Name, s => MakeJoinText(table2, foreignKey));
         }
 
-        private string MakeJoinText(ForeignKey foreignKey)
+        private string MakeJoinText(Table rightTable, ForeignKey foreignKey)
         {
             var builder = new StringBuilder(JoinKeyword);
-            builder.AppendFormat(" JOIN {0} ON (", _schema.QuoteObjectName(foreignKey.DetailTable));
+            builder.AppendFormat(" JOIN {0} ON (", rightTable.QuotedName);
             builder.Append(FormatJoinExpression(foreignKey, 0));
 
             for (int i = 1; i < foreignKey.Columns.Length; i++)

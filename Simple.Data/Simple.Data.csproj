@@ -60,6 +60,9 @@
     <Compile Include="AdapterException.cs" />
     <Compile Include="Ado\AdoAdapter.cs" />
     <Compile Include="Ado\AdoAdapterException.cs" />
+    <Compile Include="Ado\AdoAdapterFinder.cs" />
+    <Compile Include="Ado\AdoAdapterInserter.cs" />
+    <Compile Include="Ado\AdoAdapterRelatedFinder.cs" />
     <Compile Include="Ado\CommandBuilder.cs" />
     <Compile Include="Ado\DbCommandExtensions.cs" />
     <Compile Include="Ado\DataReaderObservableRunner.cs" />

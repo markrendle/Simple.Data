@@ -65,7 +65,7 @@ namespace Simple.Data.SqlServer
         public IEnumerable<ForeignKey> GetForeignKeys(Table table)
         {
             if (table == null) throw new ArgumentNullException("table");
-            var groups = GetForeignKeys(table.ActualName).AsEnumerable()
+            var groups = GetForeignKeys(table.ActualName)
                 .Where(row =>
                     row["TABLE_SCHEMA"].ToString() == table.Schema && row["TABLE_NAME"].ToString() == table.ActualName)
                 .GroupBy(row => row["CONSTRAINT_NAME"].ToString())
@@ -114,12 +114,11 @@ namespace Simple.Data.SqlServer
                 .CopyToDataTable();
         }
 
-        private DataTable GetForeignKeys(string tableName)
+        private EnumerableRowCollection<DataRow> GetForeignKeys(string tableName)
         {
             return GetForeignKeys().AsEnumerable()
                 .Where(
-                    row => row["TABLE_NAME"].ToString().Equals(tableName, StringComparison.InvariantCultureIgnoreCase))
-                .CopyToDataTable();
+                    row => row["TABLE_NAME"].ToString().Equals(tableName, StringComparison.InvariantCultureIgnoreCase));
         }
 
         private DataTable SelectToDataTable(string sql)

@@ -19,8 +19,8 @@ namespace Simple.Data.UnitTest
             DynamicReference column = table.TestColumn;
 
             // Assert
-            Assert.AreEqual("Test", column.Owner.Name);
-            Assert.AreEqual("TestColumn", column.Name);
+            Assert.AreEqual("Test", column.GetOwner().GetName());
+            Assert.AreEqual("TestColumn", column.GetName());
         }
     }
 }

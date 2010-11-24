@@ -31,7 +31,7 @@ namespace Simple.Data.Mocking
         {
             var resolver = BuildElementResolver(reference);
 
-            return xml => resolver(xml).TryGetAttribute(reference.Name).ConvertValue();
+            return xml => resolver(xml).TryGetAttribute(reference.GetName()).ConvertValue();
         }
 
         private static Func<XElement, XElement> BuildElementResolver(DynamicReference reference)
