@@ -79,6 +79,7 @@
     <Compile Include="Ado\UpdateHelper.cs" />
     <Compile Include="BinderHelper.cs" />
     <Compile Include="Ado\CommandHelper.cs" />
+    <Compile Include="CachingAdapterFactory.cs" />
     <Compile Include="Commands\CommandFactory.cs" />
     <Compile Include="Ado\Joiner.cs" />
     <Compile Include="Commands\UpdateCommand.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\InsertCommand.cs" />
     <Compile Include="Commands\DeleteByCommand.cs" />
+    <Compile Include="IAdapterFactory.cs" />
     <Compile Include="IAdapterWithRelation.cs" />
     <Compile Include="MefHelper.cs" />
     <Compile Include="MethodNameParser.cs" />

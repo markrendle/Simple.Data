@@ -7,24 +7,31 @@ using Simple.Data.Properties;
 
 namespace Simple.Data
 {
-    internal static class DatabaseOpener
+    public interface IDatabaseOpener
     {
-        private static readonly IAdapterFactory AdapterFactory = new AdapterFactory();
+        Database OpenDefault();
+        Database OpenFile(string filename);
+        Database OpenConnection(string connectionString);
+    }
+
+    internal class DatabaseOpener : IDatabaseOpener
+    {
+        private static readonly IAdapterFactory AdapterFactory = new CachingAdapterFactory();
         private static Func<Database> _openDefault = OpenDefaultMethod;
         private static Func<string, Database> _openFile = OpenFileMethod;
         private static Func<string, Database> _openConnection = OpenConnectionMethod;
 
-        public static Database OpenDefault()
+        public Database OpenDefault()
         {
             return _openDefault();
         }
 
-        public static Database OpenFile(string filename)
+        public Database OpenFile(string filename)
         {
             return _openFile(filename);
         }
 
-        public static Database OpenConnection(string connectionString)
+        public Database OpenConnection(string connectionString)
         {
             return _openConnection(connectionString);
         }

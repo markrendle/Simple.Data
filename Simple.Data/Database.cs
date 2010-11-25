@@ -15,6 +15,7 @@ namespace Simple.Data
     /// </summary>
     public class Database : DynamicObject
     {
+        private static readonly IDatabaseOpener DatabaseOpener = new DatabaseOpener();
         private static readonly Lazy<dynamic> LazyDefault = new Lazy<dynamic>(Open, LazyThreadSafetyMode.ExecutionAndPublication);
         private readonly ConcurrentDictionary<string, DynamicTable> _tables = new ConcurrentDictionary<string, DynamicTable>();
         private readonly Adapter _adapter;
@@ -29,21 +30,17 @@ namespace Simple.Data
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Database"/> class.
-        /// </summary>
-        /// <param name="connectionProvider">The connection provider to use with <see cref="AdoAdapter"/> for data access.</param>
-        internal Database(IConnectionProvider connectionProvider)
-        {
-            _adapter = new AdoAdapter(connectionProvider);
-        }
-
-        /// <summary>
         /// Gets the adapter being used by the <see cref="Database"/> instance.
         /// </summary>
         /// <value>The adapter.</value>
         internal Adapter Adapter
         {
             get { return _adapter; }
+        }
+
+        public static IDatabaseOpener Opener
+        {
+            get { return DatabaseOpener; }
         }
 
         /// <summary>
