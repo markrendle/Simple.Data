@@ -17,13 +17,13 @@ namespace Simple.Data
     {
         private static readonly Lazy<dynamic> LazyDefault = new Lazy<dynamic>(Open, LazyThreadSafetyMode.ExecutionAndPublication);
         private readonly ConcurrentDictionary<string, DynamicTable> _tables = new ConcurrentDictionary<string, DynamicTable>();
-        private readonly IAdapter _adapter;
+        private readonly Adapter _adapter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Database"/> class.
         /// </summary>
         /// <param name="adapter">The adapter to use for data access.</param>
-        internal Database(IAdapter adapter)
+        internal Database(Adapter adapter)
         {
             _adapter = adapter;
         }
@@ -41,7 +41,7 @@ namespace Simple.Data
         /// Gets the adapter being used by the <see cref="Database"/> instance.
         /// </summary>
         /// <value>The adapter.</value>
-        internal IAdapter Adapter
+        internal Adapter Adapter
         {
             get { return _adapter; }
         }

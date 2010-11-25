@@ -58,6 +58,7 @@
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AdapterException.cs" />
+    <Compile Include="AdapterFactory.cs" />
     <Compile Include="Ado\AdoAdapter.cs" />
     <Compile Include="Ado\AdoAdapterException.cs" />
     <Compile Include="Ado\AdoAdapterFinder.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="DynamicEnumerable.cs" />
     <Compile Include="Extensions\BinderExtensions.cs" />
     <Compile Include="Extensions\IDictionaryExtensions.cs" />
+    <Compile Include="Extensions\ObjectEx.cs" />
     <Compile Include="HomogenizedKeyDictionary.cs" />
     <Compile Include="ExpressionHelper.cs" />
     <Compile Include="Commands\FindAllCommand.cs" />
@@ -103,11 +105,12 @@
     <Compile Include="Commands\FindAllByCommand.cs" />
     <Compile Include="Commands\FindByCommand.cs" />
     <Compile Include="Extensions\SerializationInfoExtensions.cs" />
-    <Compile Include="IAdapter.cs" />
+    <Compile Include="Adapter.cs" />
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\InsertCommand.cs" />
     <Compile Include="Commands\DeleteByCommand.cs" />
     <Compile Include="IAdapterWithRelation.cs" />
+    <Compile Include="MefHelper.cs" />
     <Compile Include="MethodNameParser.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -158,7 +161,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"$(SolutionDir)Releases\CopyReleases.cmd" "$(SolutionDir)"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

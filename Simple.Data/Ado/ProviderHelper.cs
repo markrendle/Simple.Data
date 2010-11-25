@@ -48,22 +48,7 @@ namespace Simple.Data.Ado
 
         private static IConnectionProvider ComposeProvider(string extension)
         {
-            using (var container = CreateContainer())
-            {
-                var export = container.GetExport<IConnectionProvider>(extension);
-                if (export == null) throw new ArgumentException("Unrecognised file.");
-                return export.Value;
-            }
-        }
-
-        private static CompositionContainer CreateContainer()
-        {
-            var path = Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "");
-            path = Path.GetDirectoryName(path);
-            if (path == null) throw new ArgumentException("Unrecognised file.");
-
-            var catalog = new DirectoryCatalog(path, "Simple.Data.*.dll");
-            return new CompositionContainer(catalog);
+            return MefHelper.Compose<IConnectionProvider>(extension);
         }
     }
 }

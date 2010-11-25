@@ -9,6 +9,7 @@ namespace Simple.Data
 {
     internal static class DatabaseOpener
     {
+        private static readonly IAdapterFactory AdapterFactory = new AdapterFactory();
         private static Func<Database> _openDefault = OpenDefaultMethod;
         private static Func<string, Database> _openFile = OpenFileMethod;
         private static Func<string, Database> _openConnection = OpenConnectionMethod;
@@ -34,7 +35,7 @@ namespace Simple.Data
             _openFile = _openConnection = (ignore) => database;
         }
 
-        public static void UseMockAdapter(IAdapter adapter)
+        public static void UseMockAdapter(Adapter adapter)
         {
             _openDefault = () => new Database(adapter);
             _openFile = _openConnection = (ignore) => new Database(adapter);
@@ -46,7 +47,7 @@ namespace Simple.Data
             _openFile = _openConnection = (ignore) => databaseCreator();
         }
 
-        public static void UseMockAdapter(Func<IAdapter> adapterCreator)
+        public static void UseMockAdapter(Func<Adapter> adapterCreator)
         {
             _openDefault = () => new Database(adapterCreator());
             _openFile = _openConnection = (ignore) => new Database(adapterCreator());
@@ -54,21 +55,27 @@ namespace Simple.Data
 
         private static Database OpenDefaultMethod()
         {
-            if (!string.IsNullOrWhiteSpace(Settings.Default.DefaultConnectionString))
-            {
-                return new Database(ProviderHelper.GetProviderByConnectionString(Settings.Default.DefaultConnectionString));
-            }
-            return new Database(ProviderHelper.GetProviderByConnectionString(Settings.Default.ConnectionString));
+            return OpenConnectionMethod(DefaultConnectionString);
         }
 
         private static Database OpenFileMethod(string filename)
         {
-            return new Database(ProviderHelper.GetProviderByFilename(filename));
+            return new Database(AdapterFactory.Create("Ado", new { Filename = filename }));
         }
 
         private static Database OpenConnectionMethod(string connectionString)
         {
-            return new Database(ProviderHelper.GetProviderByConnectionString(connectionString));
+            return new Database(AdapterFactory.Create("Ado", new { ConnectionString = connectionString }));
+        }
+
+        private static string DefaultConnectionString
+        {
+            get
+            {
+                return !string.IsNullOrWhiteSpace(Settings.Default.DefaultConnectionString)
+                           ? Settings.Default.DefaultConnectionString
+                           : Settings.Default.ConnectionString;
+            }
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 namespace Simple.Data.Mocking
 {
-    public class XmlMockAdapter : IAdapter, IAdapterWithRelation
+    public class XmlMockAdapter : Adapter, IAdapterWithRelation
     {
         private readonly Lazy<XElement> _data;
 
@@ -24,7 +24,7 @@ namespace Simple.Data.Mocking
             get { return _data.Value; }
         }
 
-        public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
+        public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
             if (criteria == null) return FindAll(tableName);
             return GetTableElement(tableName).Elements()
@@ -32,7 +32,7 @@ namespace Simple.Data.Mocking
                 .Select(e => e.AttributesToDictionary());
         }
 
-        public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
+        public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
         {
             var tableElement = GetTableElement(tableName);
             if (tableElement == null)
@@ -51,7 +51,7 @@ namespace Simple.Data.Mocking
             return data;
         }
 
-        public int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
+        public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
         {
             int updated = 0;
             var elementsToUpdate = GetTableElement(tableName).Elements()
@@ -83,7 +83,7 @@ namespace Simple.Data.Mocking
         /// <param name="tableName">Name of the table.</param>
         /// <param name="criteria">The expression to use as criteria for the delete operation.</param>
         /// <returns>The number of records which were deleted.</returns>
-        public int Delete(string tableName, SimpleExpression criteria)
+        public override int Delete(string tableName, SimpleExpression criteria)
         {
             var tableElement = GetTableElement(tableName);
             var elementsToDelete = GetTableElement(tableName).Elements()
@@ -97,7 +97,7 @@ namespace Simple.Data.Mocking
             return deleted;
         }
 
-        public IEnumerable<string> GetKeyFieldNames(string tableName)
+        public override IEnumerable<string> GetKeyFieldNames(string tableName)
         {
             var keyAttribute = GetTableElement(tableName).Attribute("_keys");
             if (keyAttribute == null) return Enumerable.Empty<string>();
@@ -136,7 +136,7 @@ namespace Simple.Data.Mocking
         /// <param name="row"></param>
         /// <param name="relatedTableName"></param>
         /// <returns>The list of records matching the criteria. If no records are found, return an empty list.</returns>
-        /// <remarks>When implementing the <see cref="IAdapter"/> interface, if relationships are not possible, throw a <see cref="NotSupportedException"/>.</remarks>
+        /// <remarks>When implementing the <see cref="Adapter"/> interface, if relationships are not possible, throw a <see cref="NotSupportedException"/>.</remarks>
         public IEnumerable<IDictionary<string, object>> FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName)
         {
             var criteria = ExpressionHelper.CriteriaDictionaryToExpression(tableName, row);

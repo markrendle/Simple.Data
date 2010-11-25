@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Simple.Data
 {
-    public interface IAdapterWithRelation : IAdapter
+    public interface IAdapterWithRelation
     {
         /// <summary>
         /// Determines whether a relation is valid.
@@ -24,7 +24,7 @@ namespace Simple.Data
         /// <param name="row"></param>
         /// <param name="relatedTableName"></param>
         /// <returns>The list of records matching the criteria. If no records are found, return an empty list.</returns>
-        /// <remarks>When implementing the <see cref="IAdapter"/> interface, if relationships are not possible, throw a <see cref="NotSupportedException"/>.</remarks>
+        /// <remarks>When implementing the <see cref="Adapter"/> interface, if relationships are not possible, throw a <see cref="NotSupportedException"/>.</remarks>
         IEnumerable<IDictionary<string, object>> FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName);
     }
 }

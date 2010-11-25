@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
+using Simple.Data.Ado;
 using Simple.Data.Mocking.Ado;
 
 namespace Simple.Data.IntegrationTest
@@ -22,7 +23,7 @@ namespace Simple.Data.IntegrationTest
                                           new[] { "dbo", "Orders", "OrderDate" });
             mockSchemaProvider.SetPrimaryKeys(new object[] { "dbo", "Customer", "CustomerId", 0 });
             mockSchemaProvider.SetForeignKeys(new object[] { "FK_Orders_Customer", "dbo", "Orders", "CustomerId", "dbo", "Customer", "CustomerId", 0 });
-            return new Database(new MockConnectionProvider(new MockDbConnection(mockDatabase), mockSchemaProvider));
+            return new Database(new AdoAdapter(new MockConnectionProvider(new MockDbConnection(mockDatabase), mockSchemaProvider)));
         }
 
         [Test]
@@ -55,7 +56,7 @@ namespace Simple.Data.IntegrationTest
                                           new[] { "dbo", "ORDER", "ORDER_DATE" });
             mockSchemaProvider.SetPrimaryKeys(new object[] { "dbo", "CUSTOMER", "CUSTOMER_ID", 0 });
             mockSchemaProvider.SetForeignKeys(new object[] { "FK_ORDER_CUSTOMER", "dbo", "ORDER", "CUSTOMER_ID", "dbo", "CUSTOMER", "CUSTOMER_ID", 0 });
-            return new Database(new MockConnectionProvider(new MockDbConnection(mockDatabase), mockSchemaProvider));
+            return new Database(new AdoAdapter(new MockConnectionProvider(new MockDbConnection(mockDatabase), mockSchemaProvider)));
         }
 
         [Test]

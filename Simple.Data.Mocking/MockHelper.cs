@@ -17,12 +17,12 @@ namespace Simple.Data.Mocking
             DatabaseOpener.UseMockDatabase(mockDatabaseCreator);
         }
 
-        public static void UseMockAdapter(IAdapter mockAdapter)
+        public static void UseMockAdapter(Adapter mockAdapter)
         {
             DatabaseOpener.UseMockAdapter(mockAdapter);
         }
 
-        public static void UseMockAdapter(Func<IAdapter> mockAdapterCreator)
+        public static void UseMockAdapter(Func<Adapter> mockAdapterCreator)
         {
             DatabaseOpener.UseMockAdapter(mockAdapterCreator());
         }

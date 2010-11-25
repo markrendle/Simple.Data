@@ -1,22 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Data;
 using System.Data.Common;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
-    internal class AdoAdapter : IAdapter, IAdapterWithRelation
+    [Export("Ado", typeof(Adapter))]
+    internal class AdoAdapter : Adapter, IAdapterWithRelation
     {
-        private readonly IConnectionProvider _connectionProvider;
-        private readonly DatabaseSchema _schema;
-        private readonly Lazy<AdoAdapterRelatedFinder> _relatedFinder;
+        private IConnectionProvider _connectionProvider;
+        private DatabaseSchema _schema;
+        private Lazy<AdoAdapterRelatedFinder> _relatedFinder;
 
-        public AdoAdapter(IConnectionProvider connectionProvider)
+        public AdoAdapter()
+        {
+            
+        }
+
+        internal AdoAdapter(IConnectionProvider connectionProvider)
         {
             _connectionProvider = connectionProvider;
+            _schema = DatabaseSchema.Get(_connectionProvider);
+            _relatedFinder = new Lazy<AdoAdapterRelatedFinder>(CreateRelatedFinder);
+        }
+
+        protected override void OnSetup()
+        {
+            var settingsKeys = ((IDictionary<string, object>) Settings).Keys;
+            if (settingsKeys.Contains("ConnectionString"))
+            {
+                _connectionProvider = ProviderHelper.GetProviderByConnectionString(Settings.ConnectionString);
+            }
+            else if (settingsKeys.Contains("Filename"))
+            {
+                _connectionProvider = ProviderHelper.GetProviderByFilename(Settings.Filename);
+            }
             _schema = DatabaseSchema.Get(_connectionProvider);
             _relatedFinder = new Lazy<AdoAdapterRelatedFinder>(CreateRelatedFinder);
         }
@@ -26,17 +49,17 @@ namespace Simple.Data.Ado
             return new AdoAdapterRelatedFinder(this);
         }
 
-        public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
+        public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
             return new AdoAdapterFinder(this).Find(tableName, criteria);
         }
 
-        public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
+        public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
         {
             return new AdoAdapterInserter(this).Insert(tableName, data);
         }
 
-        public int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
+        public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
         {
             var commandBuilder = new UpdateHelper(_schema).GetUpdateCommand(tableName, data, criteria);
             return Execute(commandBuilder);
@@ -48,7 +71,7 @@ namespace Simple.Data.Ado
         /// <param name="tableName">Name of the table.</param>
         /// <param name="criteria">The expression to use as criteria for the delete operation.</param>
         /// <returns>The number of records which were deleted.</returns>
-        public int Delete(string tableName, SimpleExpression criteria)
+        public override int Delete(string tableName, SimpleExpression criteria)
         {
             var commandBuilder = new DeleteHelper(_schema).GetDeleteCommand(tableName, criteria);
             return Execute(commandBuilder);
@@ -59,7 +82,7 @@ namespace Simple.Data.Ado
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
         /// <returns>A list of field names; an empty list if no key is defined.</returns>
-        public IEnumerable<string> GetKeyFieldNames(string tableName)
+        public override IEnumerable<string> GetKeyFieldNames(string tableName)
         {
             return _schema.FindTable(tableName).PrimaryKey.AsEnumerable();
         }
@@ -118,7 +141,7 @@ namespace Simple.Data.Ado
         /// <param name="row"></param>
         /// <param name="relatedTableName"></param>
         /// <returns>The list of records matching the criteria. If no records are found, return an empty list.</returns>
-        /// <remarks>When implementing the <see cref="IAdapter"/> interface, if relationships are not possible, throw a <see cref="NotSupportedException"/>.</remarks>
+        /// <remarks>When implementing the <see cref="Adapter"/> interface, if relationships are not possible, throw a <see cref="NotSupportedException"/>.</remarks>
         public IEnumerable<IDictionary<string, object>> FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName)
         {
             return _relatedFinder.Value.FindRelated(tableName, row, relatedTableName);
