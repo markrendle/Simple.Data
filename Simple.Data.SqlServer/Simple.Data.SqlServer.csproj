@@ -54,6 +54,10 @@
     <Compile Include="SqlSchemaProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Simple.Data.Ado\Simple.Data.Ado.csproj">
+      <Project>{ECC2D7DB-EC7F-44B6-B09F-5B471C629685}</Project>
+      <Name>Simple.Data.Ado</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Simple.Data\Simple.Data.csproj">
       <Project>{148CEE80-2E84-4ABD-B5AB-20415B2BBD21}</Project>
       <Name>Simple.Data</Name>

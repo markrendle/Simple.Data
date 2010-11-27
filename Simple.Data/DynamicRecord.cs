@@ -4,8 +4,6 @@ using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using Simple.Data.Ado;
-using Simple.Data.Ado.Schema;
 using Simple.Data.Extensions;
 
 namespace Simple.Data

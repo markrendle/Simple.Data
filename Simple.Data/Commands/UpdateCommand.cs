@@ -4,7 +4,6 @@ using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Simple.Data.Ado.Schema;
 using Simple.Data.Extensions;
 
 namespace Simple.Data.Commands

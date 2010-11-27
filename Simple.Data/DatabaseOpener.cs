@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Simple.Data.Ado;
 using Simple.Data.Properties;
 
 namespace Simple.Data

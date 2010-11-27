@@ -57,6 +57,10 @@
     <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Simple.Data.Ado\Simple.Data.Ado.csproj">
+      <Project>{ECC2D7DB-EC7F-44B6-B09F-5B471C629685}</Project>
+      <Name>Simple.Data.Ado</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Simple.Data.Mocking\Simple.Data.Mocking.csproj">
       <Project>{292611F6-BBBD-492D-891C-0D9FB4BF5433}</Project>
       <Name>Simple.Data.Mocking</Name>

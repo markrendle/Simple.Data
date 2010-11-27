@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Dynamic;
 using System.Linq;
-using Simple.Data.Ado.Schema;
 using Simple.Data.Extensions;
 
 namespace Simple.Data.Commands

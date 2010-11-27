@@ -4,8 +4,8 @@ using System;
 
 namespace Simple.Data.UnitTest
 {
-    
-    
+
+
     /// <summary>
     ///This is a test class for TableCollection and is intended
     ///to contain all TableCollection Unit Tests

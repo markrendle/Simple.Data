@@ -59,29 +59,9 @@
     </Compile>
     <Compile Include="AdapterException.cs" />
     <Compile Include="AdapterFactory.cs" />
-    <Compile Include="Ado\AdoAdapter.cs" />
-    <Compile Include="Ado\AdoAdapterException.cs" />
-    <Compile Include="Ado\AdoAdapterFinder.cs" />
-    <Compile Include="Ado\AdoAdapterInserter.cs" />
-    <Compile Include="Ado\AdoAdapterRelatedFinder.cs" />
-    <Compile Include="Ado\CommandBuilder.cs" />
-    <Compile Include="Ado\DbCommandExtensions.cs" />
-    <Compile Include="Ado\DataReaderObservableRunner.cs" />
-    <Compile Include="Ado\DbCommandObservableEx.cs" />
-    <Compile Include="Ado\DeleteHelper.cs" />
-    <Compile Include="Ado\ExpressionFormatter.cs" />
-    <Compile Include="Ado\ICommandBuilder.cs" />
-    <Compile Include="Ado\IExpressionFormatter.cs" />
-    <Compile Include="Ado\ObservableDataReader.cs" />
-    <Compile Include="Ado\Schema\ISchemaProvider.cs" />
-    <Compile Include="Ado\JoinType.cs" />
-    <Compile Include="Ado\SchemaResolutionException.cs" />
-    <Compile Include="Ado\UpdateHelper.cs" />
     <Compile Include="BinderHelper.cs" />
-    <Compile Include="Ado\CommandHelper.cs" />
     <Compile Include="CachingAdapterFactory.cs" />
     <Compile Include="Commands\CommandFactory.cs" />
-    <Compile Include="Ado\Joiner.cs" />
     <Compile Include="Commands\UpdateCommand.cs" />
     <Compile Include="ConcreteObject.cs" />
     <Compile Include="ConcreteTypeCreator.cs" />
@@ -94,15 +74,12 @@
     <Compile Include="Commands\FindAllCommand.cs" />
     <Compile Include="Commands\FindCommand.cs" />
     <Compile Include="Database.cs" />
-    <Compile Include="Ado\DataReaderExtensions.cs" />
-    <Compile Include="Ado\DataRecordExtensions.cs" />
     <Compile Include="DatabaseOpener.cs" />
     <Compile Include="DynamicRecord.cs" />
     <Compile Include="Extensions\DynamicStringExtensions.cs" />
     <Compile Include="DynamicTable.cs" />
     <Compile Include="DynamicReference.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
-    <Compile Include="Ado\FindHelper.cs" />
     <Compile Include="Commands\FindAllByCommand.cs" />
     <Compile Include="Commands\FindByCommand.cs" />
     <Compile Include="Extensions\SerializationInfoExtensions.cs" />
@@ -125,20 +102,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Ado\ProviderHelper.cs" />
-    <Compile Include="Ado\Schema\AmbiguousObjectNameException.cs" />
-    <Compile Include="Ado\Schema\Column.cs" />
-    <Compile Include="Ado\Schema\ColumnCollection.cs" />
-    <Compile Include="Ado\Schema\DatabaseSchema.cs" />
-    <Compile Include="Ado\Schema\ForeignKey.cs" />
-    <Compile Include="Ado\Schema\ForeignKeyCollection.cs" />
-    <Compile Include="Ado\Schema\Key.cs" />
-    <Compile Include="Ado\Schema\SchemaSpecificStringExtensions.cs" />
-    <Compile Include="Ado\Schema\Table.cs" />
-    <Compile Include="Ado\Schema\TableCollection.cs" />
-    <Compile Include="Ado\Schema\TableJoin.cs" />
-    <Compile Include="Ado\IConnectionProvider.cs" />
-    <Compile Include="Ado\Schema\TableType.cs" />
     <Compile Include="SimpleDataException.cs" />
     <Compile Include="SimpleExpression.cs" />
     <Compile Include="SimpleExpressionType.cs" />

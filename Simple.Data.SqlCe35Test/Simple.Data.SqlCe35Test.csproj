@@ -87,6 +87,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Simple.Data.Ado\Simple.Data.Ado.csproj">
+      <Project>{ECC2D7DB-EC7F-44B6-B09F-5B471C629685}</Project>
+      <Name>Simple.Data.Ado</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Simple.Data.SqlCe35\Simple.Data.SqlCe35.csproj">
       <Project>{1EDAC58F-C0CC-42E3-AA3A-C4A0175B5273}</Project>
       <Name>Simple.Data.SqlCe35</Name>
