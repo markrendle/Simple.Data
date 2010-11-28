@@ -65,6 +65,11 @@
     <Compile Include="JoinType.cs" />
     <Compile Include="ObservableDataReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="ProviderHelper.cs" />
     <Compile Include="SchemaResolutionException.cs" />
     <Compile Include="Schema\AmbiguousObjectNameException.cs" />
@@ -80,6 +85,8 @@
     <Compile Include="Schema\TableCollection.cs" />
     <Compile Include="Schema\TableJoin.cs" />
     <Compile Include="Schema\TableType.cs" />
+    <Compile Include="TableName.cs" />
+    <Compile Include="TupleExtensions.cs" />
     <Compile Include="UpdateHelper.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -89,7 +96,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

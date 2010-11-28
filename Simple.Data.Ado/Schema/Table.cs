@@ -64,6 +64,11 @@ namespace Simple.Data.Ado.Schema
             get { return _databaseSchema.QuoteObjectName(_actualName); }
         }
 
+        internal string QualifiedName
+        {
+            get { return _databaseSchema.QuoteObjectName(_schema) + '.' + _databaseSchema.QuoteObjectName(_actualName); }
+        }
+
         internal IEnumerable<Column> Columns
         {
             get { return _lazyColumns.Value.AsEnumerable(); }

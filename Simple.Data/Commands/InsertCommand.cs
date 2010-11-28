@@ -14,9 +14,9 @@ namespace Simple.Data.Commands
             return method.Equals("insert", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public object Execute(Database database, string tableName, InvokeMemberBinder binder, object[] args)
+        public object Execute(Database database, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            return DoInsert(binder, args, database, tableName).ToDynamicRecord(tableName, database);
+            return DoInsert(binder, args, database, table.GetQualifiedName()).ToDynamicRecord(table.GetQualifiedName(), database);
         }
 
         private static IDictionary<string, object> DoInsert(InvokeMemberBinder binder, object[] args, Database database, string tableName)

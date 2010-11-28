@@ -12,7 +12,7 @@ namespace Simple.Data.Ado
     {
         private readonly JoinType _joinType;
         private readonly DatabaseSchema _schema;
-        private readonly ConcurrentDictionary<string, string> _done = new ConcurrentDictionary<string, string>();
+        private readonly ConcurrentDictionary<TableName, string> _done = new ConcurrentDictionary<TableName, string>();
 
         public Joiner(JoinType joinType, DatabaseSchema schema)
         {
@@ -21,10 +21,10 @@ namespace Simple.Data.Ado
             _schema = schema;
         }
 
-        public string GetJoinClauses(string mainTableName, SimpleExpression expression)
+        public string GetJoinClauses(TableName mainTableName, SimpleExpression expression)
         {
             _done.AddOrUpdate(mainTableName, string.Empty, (s, o) => string.Empty);
-            var tablePairs = GetTablePairs(expression);
+            var tablePairs = GetTableNames(expression, mainTableName.Schema);
             foreach (var tablePair in tablePairs)
             {
                 AddJoin(tablePair.Item1, tablePair.Item2);
@@ -32,15 +32,15 @@ namespace Simple.Data.Ado
             return string.Join(" ", tablePairs.Select(tp => _done[tp.Item2]));
         }
 
-        private void AddJoin(string table1Name, string table2Name)
+        private void AddJoin(TableName table1Name, TableName table2Name)
         {
             var table1 = _schema.FindTable(table1Name);
             var table2 = _schema.FindTable(table2Name);
 
             var foreignKey =
-                table2.ForeignKeys.SingleOrDefault(fk => fk.MasterTable == table1.ActualName)
+                table2.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == table1.Schema && fk.MasterTable.Table == table1.ActualName)
                 ??
-                table1.ForeignKeys.SingleOrDefault(fk => fk.MasterTable == table2.ActualName);
+                table1.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == table2.Schema && fk.MasterTable.Table == table2.ActualName);
 
             if (foreignKey == null) throw new SchemaResolutionException(
                 string.Format("Could not join '{0}' and '{1}'", table1.ActualName, table2.ActualName));
@@ -51,7 +51,7 @@ namespace Simple.Data.Ado
         private string MakeJoinText(Table rightTable, ForeignKey foreignKey)
         {
             var builder = new StringBuilder(JoinKeyword);
-            builder.AppendFormat(" JOIN {0} ON (", rightTable.QuotedName);
+            builder.AppendFormat(" JOIN {0} ON (", rightTable.QualifiedName);
             builder.Append(FormatJoinExpression(foreignKey, 0));
 
             for (int i = 1; i < foreignKey.Columns.Length; i++)
@@ -74,11 +74,20 @@ namespace Simple.Data.Ado
             get { return _joinType == JoinType.Inner ? string.Empty : "LEFT"; }
         }
 
-        private static IEnumerable<Tuple<string,string>> GetTablePairs(SimpleExpression expression)
+        private static IEnumerable<Tuple<TableName,TableName>> GetTableNames(SimpleExpression expression, string schema)
         {
             return GetReferencesFromExpression(expression)
-                .SelectMany(dr => dr.GetAllObjectNames().SkipLast().ToTuplePairs())
+                .SelectMany(r => DynamicReferenceToTuplePairs(r, schema))
+                .Select((table1, table2) => Tuple.Create(new TableName(schema, table1), new TableName(schema, table2)))
                 .Distinct();
+        }
+
+        private static IEnumerable<Tuple<string,string>> DynamicReferenceToTuplePairs(DynamicReference reference, string schema)
+        {
+            return reference.GetAllObjectNames()
+                .SkipWhile(s => s.Equals(schema, StringComparison.OrdinalIgnoreCase))
+                .SkipLast()
+                .ToTuplePairs();
         }
 
         private static IEnumerable<DynamicReference> GetReferencesFromExpression(SimpleExpression expression)

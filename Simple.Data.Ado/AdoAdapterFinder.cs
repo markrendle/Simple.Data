@@ -18,13 +18,13 @@ namespace Simple.Data.Ado
 
         public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
-            if (criteria == null) return FindAll(tableName);
+            if (criteria == null) return FindAll(TableName.Parse(tableName));
 
-            var commandBuilder = new FindHelper(_adapter.GetSchema()).GetFindByCommand(tableName, criteria);
+            var commandBuilder = new FindHelper(_adapter.GetSchema()).GetFindByCommand(TableName.Parse(tableName), criteria);
             return ExecuteQuery(commandBuilder);
         }
 
-        private IEnumerable<IDictionary<string, object>> FindAll(string tableName)
+        private IEnumerable<IDictionary<string, object>> FindAll(TableName tableName)
         {
             return ExecuteQuery("select * from " + _adapter.GetSchema().FindTable(tableName).ActualName);
         }

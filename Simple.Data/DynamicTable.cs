@@ -53,7 +53,7 @@ namespace Simple.Data
             var command = CommandFactory.GetCommandFor(binder.Name);
             if (command != null)
             {
-                result = command.Execute(_database, _tableName, binder, args);
+                result = command.Execute(_database, this, binder, args);
                 return true;
             }
             return base.TryInvokeMember(binder, args, out result);

@@ -24,13 +24,13 @@ namespace Simple.Data.Ado
                 data.Keys.Select(s => table.FindColumn(s).QuotedName).Aggregate((agg, next) => agg + "," + next);
             string valueList = data.Keys.Select(s => "?").Aggregate((agg, next) => agg + "," + next);
 
-            string insertSql = "insert into " + table.QuotedName + " (" + columnList + ") values (" + valueList + ")";
+            string insertSql = "insert into " + table.QualifiedName + " (" + columnList + ") values (" + valueList + ")";
 
             var identityColumn = table.Columns.FirstOrDefault(col => col.IsIdentity);
 
             if (identityColumn != null)
             {
-                insertSql += "; select * from " + table.QuotedName + " where " + identityColumn.QuotedName +
+                insertSql += "; select * from " + table.QualifiedName + " where " + identityColumn.QuotedName +
                              " = scope_identity()";
                 return ExecuteSingletonQuery(insertSql, data.Values.ToArray());
             }

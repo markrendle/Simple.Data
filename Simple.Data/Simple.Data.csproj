@@ -68,7 +68,6 @@
     <Compile Include="Database.Obsolete.cs" />
     <Compile Include="DynamicEnumerable.cs" />
     <Compile Include="DynamicSchema.cs" />
-    <Compile Include="DynamicTableOrSchema.cs" />
     <Compile Include="Extensions\BinderExtensions.cs" />
     <Compile Include="Extensions\IDictionaryExtensions.cs" />
     <Compile Include="Extensions\ObjectEx.cs" />

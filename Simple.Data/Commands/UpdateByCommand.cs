@@ -12,20 +12,20 @@ namespace Simple.Data.Commands
             return method.Homogenize().StartsWith("updateby", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public object Execute(Database database, string tableName, InvokeMemberBinder binder, object[] args)
+        public object Execute(Database database, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             if (binder.HasSingleUnnamedArgument())
             {
-                return UpdateCommand.UpdateByKeyFields(tableName, database, args[0],
+                return UpdateCommand.UpdateByKeyFields(table.GetQualifiedName(), database, args[0],
                                                 MethodNameParser.ParseCriteriaNamesFromMethodName(binder.Name));
             }
 
             var criteria = MethodNameParser.ParseFromBinder(binder, args);
-            var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteria);
+            var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), criteria);
             var data = binder.NamedArgumentsToDictionary(args)
                 .Where(kvp => !criteria.ContainsKey(kvp.Key))
                 .ToDictionary();
-            return database.Adapter.Update(tableName, data, criteriaExpression);
+            return database.Adapter.Update(table.GetQualifiedName(), data, criteriaExpression);
         }
     }
 }

@@ -15,16 +15,16 @@ namespace Simple.Data.Commands
             return method.Equals("update", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public object Execute(Database database, string tableName, InvokeMemberBinder binder, object[] args)
+        public object Execute(Database database, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             if (args.Length != 1) throw new ArgumentException("Incorrect number of arguments to Update method.");
-            var keyFieldNames = database.Adapter.GetKeyFieldNames(tableName).ToArray();
+            var keyFieldNames = database.Adapter.GetKeyFieldNames(table.GetQualifiedName()).ToArray();
             if (keyFieldNames.Length == 0)
             {
                 throw new NotSupportedException("Adapter does not support key-based update for this object.");
             }
 
-            return UpdateByKeyFields(tableName, database, args[0], keyFieldNames);
+            return UpdateByKeyFields(table.GetQualifiedName(), database, args[0], keyFieldNames);
         }
 
         internal static object UpdateByKeyFields(string tableName, Database database, object entity, IEnumerable<string> keyFieldNames)

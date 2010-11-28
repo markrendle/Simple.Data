@@ -24,16 +24,16 @@ namespace Simple.Data.Commands
         /// Executes the command.
         /// </summary>
         /// <param name="database">The database.</param>
-        /// <param name="tableName">Name of the table.</param>
+        /// <param name="table"></param>
         /// <param name="binder">The binder from the <see cref="DynamicTable"/> method invocation.</param>
         /// <param name="args">The arguments from the <see cref="DynamicTable"/> method invocation.</param>
         /// <returns></returns>
-        public object Execute(Database database, string tableName, InvokeMemberBinder binder, object[] args)
+        public object Execute(Database database, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             if (args.Length == 1 && args[0] is SimpleExpression)
             {
-                var data = database.Adapter.Find(tableName, (SimpleExpression) args[0]).FirstOrDefault();
-                return data != null ? new DynamicRecord(data, tableName, database) : null;
+                var data = database.Adapter.Find(table.GetQualifiedName(), (SimpleExpression) args[0]).FirstOrDefault();
+                return data != null ? new DynamicRecord(data, table.GetQualifiedName(), database) : null;
             }
 
             return null;

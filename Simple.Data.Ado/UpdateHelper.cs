@@ -32,14 +32,14 @@ namespace Simple.Data.Ado
             return _commandBuilder;
         }
 
-        private string GetUpdateClause(string tableName, IDictionary<string, object> data)
+        private string GetUpdateClause(string tableName, IEnumerable<KeyValuePair<string, object>> data)
         {
             var table = _schema.FindTable(tableName);
             var setClause = string.Join(", ",
                 data.Select(
                     kvp =>
                     string.Format("{0} = {1}", table.FindColumn(kvp.Key).QuotedName, _commandBuilder.AddParameter(kvp.Value))));
-            return string.Format("update {0} set {1}", table.QuotedName, setClause);
+            return string.Format("update {0} set {1}", table.QualifiedName, setClause);
         }
     }
 }

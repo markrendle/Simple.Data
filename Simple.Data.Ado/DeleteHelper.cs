@@ -35,7 +35,7 @@ namespace Simple.Data.Ado
         private string GetDeleteClause(string tableName)
         {
             var table = _schema.FindTable(tableName);
-            return string.Concat("delete from ", table.QuotedName);
+            return string.Concat("delete from ", table.QualifiedName);
         }
     }
 }

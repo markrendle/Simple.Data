@@ -34,7 +34,7 @@ namespace Simple.Data.IntegrationTest
             dynamic database = CreateDatabaseWithSingularNames(mockDatabase);
             var orderDate = new DateTime(2010, 1, 1);
             string expectedSql =
-                "select [Customer].* from [Customer] join [Orders] on ([Customer].[CustomerId] = [Orders].[CustomerId]) where [Orders].[OrderDate] = @p1".ToLowerInvariant();
+                "select [dbo].[Customer].* from [dbo].[Customer] join [dbo].[Orders] on ([dbo].[Customer].[CustomerId] = [dbo].[Orders].[CustomerId]) where [dbo].[Orders].[OrderDate] = @p1".ToLowerInvariant();
 
             // Act
             database.Customer.Find(database.Customers.Orders.OrderDate == orderDate);
@@ -66,8 +66,8 @@ namespace Simple.Data.IntegrationTest
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabaseWithShoutyNames(mockDatabase);
             var orderDate = new DateTime(2010, 1, 1);
-            string expectedSql = "select [CUSTOMER].* from [CUSTOMER] join [ORDER] on ([CUSTOMER].[CUSTOMER_ID] = [ORDER].[CUSTOMER_ID])"
-                                 + " where [ORDER].[ORDER_DATE] = @p1";
+            string expectedSql = "select [dbo].[CUSTOMER].* from [dbo].[CUSTOMER] join [dbo].[ORDER] on ([dbo].[CUSTOMER].[CUSTOMER_ID] = [dbo].[ORDER].[CUSTOMER_ID])"
+                                 + " where [dbo].[ORDER].[ORDER_DATE] = @p1";
 
             // Act
             database.Customer.Find(database.Customers.Orders.OrderDate == orderDate);

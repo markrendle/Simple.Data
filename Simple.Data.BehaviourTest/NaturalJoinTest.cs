@@ -34,7 +34,7 @@ namespace Simple.Data.IntegrationTest
             dynamic database = CreateDatabase(mockDatabase);
             var orderDate = new DateTime(2010, 1, 1);
             const string expectedSql =
-                "select [Customer].* from [Customer] join [Orders] on ([Customer].[CustomerId] = [Orders].[CustomerId]) where [Orders].[OrderDate] = @p1";
+                "select [dbo].[Customer].* from [dbo].[Customer] join [dbo].[Orders] on ([dbo].[Customer].[CustomerId] = [dbo].[Orders].[CustomerId]) where [dbo].[Orders].[OrderDate] = @p1";
 
             // Act
             database.Customer.Find(database.Customer.Orders.OrderDate == orderDate);
