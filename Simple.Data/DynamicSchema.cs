@@ -40,6 +40,11 @@ namespace Simple.Data
             return table;
         }
 
+        internal string GetName()
+        {
+            return _name;
+        }
+
         private bool GetDynamicTable(string name, out object result)
         {
             result = _tables.GetOrAdd(name, CreateDynamicTable);

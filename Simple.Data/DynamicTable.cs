@@ -22,7 +22,7 @@ namespace Simple.Data
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
         /// <param name="database">The database which owns the table.</param>
-        public DynamicTable(string tableName, Database database) : this(tableName, database, null)
+        internal DynamicTable(string tableName, Database database) : this(tableName, database, null)
         {
         }
 
@@ -32,7 +32,7 @@ namespace Simple.Data
         /// <param name="tableName">Name of the table.</param>
         /// <param name="database">The database which owns the table.</param>
         /// <param name="schema">The schema to which the table belongs.</param>
-        public DynamicTable(string tableName, Database database, DynamicSchema schema)
+        internal DynamicTable(string tableName, Database database, DynamicSchema schema)
         {
             _tableName = tableName;
             _schema = schema;
@@ -56,9 +56,7 @@ namespace Simple.Data
                 result = command.Execute(_database, _tableName, binder, args);
                 return true;
             }
-
-            result = null;
-            return false;
+            return base.TryInvokeMember(binder, args, out result);
         }
 
         /// <summary>
@@ -92,6 +90,16 @@ namespace Simple.Data
             {
                 _database.Adapter.Insert(_tableName, dictionary);
             }
+        }
+
+        internal string GetName()
+        {
+            return _tableName;
+        }
+
+        internal string GetQualifiedName()
+        {
+            return _schema != null ? _schema.GetName() + "." + _tableName : _tableName;
         }
 
         private IEnumerable<dynamic> GetAll()
