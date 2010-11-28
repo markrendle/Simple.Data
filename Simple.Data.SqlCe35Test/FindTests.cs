@@ -57,7 +57,7 @@ namespace Simple.Data.SqlCeTest
         public void TestImplicitEnumerableCast()
         {
             var db = Database.OpenFile(DatabasePath);
-            foreach (User user in db.Users.All)
+            foreach (User user in db.Users.All())
             {
                 Assert.IsNotNull(user);
             }

@@ -59,7 +59,7 @@ namespace Simple.Data.SqlTest
         public void TestImplicitEnumerableCast()
         {
             var db = DatabaseHelper.Open();
-            foreach (User user in db.Users.All)
+            foreach (User user in db.Users.All())
             {
                 Assert.IsNotNull(user);
             }

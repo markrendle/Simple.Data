@@ -14,15 +14,23 @@ namespace Simple.Data
     {
         private readonly string _name;
         private readonly DynamicReference _owner;
+        private readonly Database _database;
 
-        internal DynamicReference(string name) : this(name, null)
+        internal DynamicReference(string name)
         {
+            _name = name;
         }
 
         internal DynamicReference(string name, DynamicReference owner)
         {
             _name = name;
             _owner = owner;
+        }
+
+        internal DynamicReference(string name, Database database)
+        {
+            _name = name;
+            _database = database;
         }
 
         /// <summary>
@@ -34,6 +42,11 @@ namespace Simple.Data
             return _owner;
         }
 
+        private Database GetDatabase()
+        {
+            return _database;
+        }
+
         /// <summary>
         /// Gets the name of the referenced object.
         /// </summary>
@@ -41,6 +54,21 @@ namespace Simple.Data
         public string GetName()
         {
             return _name;
+        }
+
+        public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
+        {
+            if (_database != null)
+            {
+                var table = _database.SetMemberAsTable(this);
+                return table.TryInvokeMember(binder, args, out result);
+            }
+            if ((!ReferenceEquals(_owner, null)) && GetOwner().GetDatabase() != null)
+            {
+                var schema = _owner._database.SetMemberAsSchema(_owner);
+                return schema.GetTable(_name).TryInvokeMember(binder, args, out result);
+            }
+            throw new InvalidOperationException();
         }
 
         /// <summary>

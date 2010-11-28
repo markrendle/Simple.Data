@@ -67,6 +67,38 @@ GO
 */
 
 GO
+PRINT N'Dropping FK_OrderItems_Items...';
+
+
+GO
+ALTER TABLE [dbo].[OrderItems] DROP CONSTRAINT [FK_OrderItems_Items];
+
+
+GO
+PRINT N'Dropping FK_OrderItems_Orders...';
+
+
+GO
+ALTER TABLE [dbo].[OrderItems] DROP CONSTRAINT [FK_OrderItems_Orders];
+
+
+GO
+PRINT N'Dropping PK_Items...';
+
+
+GO
+ALTER TABLE [dbo].[Items] DROP CONSTRAINT [PK_Items];
+
+
+GO
+PRINT N'Dropping PK_OrderItems...';
+
+
+GO
+ALTER TABLE [dbo].[OrderItems] DROP CONSTRAINT [PK_OrderItems];
+
+
+GO
 /*
 Post-Deployment Script Template							
 --------------------------------------------------------------------------------------

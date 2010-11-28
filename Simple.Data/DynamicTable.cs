@@ -14,6 +14,7 @@ namespace Simple.Data
     public class DynamicTable : DynamicObject
     {
         private readonly string _tableName;
+        private readonly DynamicSchema _schema;
         private readonly Database _database;
 
         /// <summary>
@@ -21,9 +22,20 @@ namespace Simple.Data
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
         /// <param name="database">The database which owns the table.</param>
-        public DynamicTable(string tableName, Database database)
+        public DynamicTable(string tableName, Database database) : this(tableName, database, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DynamicTable"/> class.
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="database">The database which owns the table.</param>
+        /// <param name="schema">The schema to which the table belongs.</param>
+        public DynamicTable(string tableName, Database database, DynamicSchema schema)
         {
             _tableName = tableName;
+            _schema = schema;
             _database = database;
         }
 

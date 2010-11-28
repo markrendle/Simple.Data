@@ -77,7 +77,7 @@ namespace Simple.Data.Mocking.Test
         [Test]
         public void All_ShouldReturnTwoUsers()
         {
-            IEnumerable<object> users = Database.Default.Users.All;
+            IEnumerable<object> users = Database.Default.Users.All().Cast<object>();
             Assert.AreEqual(_mockAdapter.Data.Element("Users").Elements().Count(), users.Count());
         }
 

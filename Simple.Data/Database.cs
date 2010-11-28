@@ -12,12 +12,18 @@ namespace Simple.Data
     /// The entry class for Simple.Data. Provides static methods for opening databases,
     /// and implements runtime dynamic functionality for resolving database-level objects.
     /// </summary>
-    public class Database : DynamicObject
+    public partial class Database : DynamicObject
     {
-        private static readonly IDatabaseOpener DatabaseOpener = new DatabaseOpener();
-        private static readonly Lazy<dynamic> LazyDefault = new Lazy<dynamic>(Open, LazyThreadSafetyMode.ExecutionAndPublication);
-        private readonly ConcurrentDictionary<string, DynamicTable> _tables = new ConcurrentDictionary<string, DynamicTable>();
+        private static readonly IDatabaseOpener DatabaseOpener;
+        private static readonly Lazy<dynamic> LazyDefault;
+        private readonly ConcurrentDictionary<string, dynamic> _members = new ConcurrentDictionary<string, dynamic>();
         private readonly Adapter _adapter;
+
+        static Database()
+        {
+            DatabaseOpener = new DatabaseOpener();
+            LazyDefault = new Lazy<dynamic>(DatabaseOpener.OpenDefault, LazyThreadSafetyMode.ExecutionAndPublication);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Database"/> class.
@@ -53,38 +59,6 @@ namespace Simple.Data
         }
 
         /// <summary>
-        /// Opens an instance of <see cref="Database"/> which connects to an ADO.NET data source
-        /// specified in the 'Simple.Data.Properties.Settings.ConnectionString' config ConnectionStrings setting.
-        /// </summary>
-        /// <returns>A <see cref="Database"/> object as a dynamic type.</returns>
-        public static dynamic Open()
-        {
-            return DatabaseOpener.OpenDefault();
-        }
-
-        /// <summary>
-        /// Opens an instance of <see cref="Database"/> which connects to an ADO.NET data source
-        /// specified in the connectionString parameter.
-        /// </summary>
-        /// <param name="connectionString">The connection string.</param>
-        /// <returns>A <see cref="Database"/> object as a dynamic type.</returns>
-        public static dynamic OpenConnection(string connectionString)
-        {
-            return DatabaseOpener.OpenConnection(connectionString);
-        }
-
-        /// <summary>
-        /// Opens an instance of <see cref="Database"/> which connects to the SQL CE database
-        /// specified in the filename parameter.
-        /// </summary>
-        /// <param name="filename">The name of the SQL CE database file.</param>
-        /// <returns>A <see cref="Database"/> object as a dynamic type.</returns>
-        public static dynamic OpenFile(string filename)
-        {
-            return DatabaseOpener.OpenFile(filename);
-        }
-
-        /// <summary>
         /// Provides the implementation for operations that get member values. Classes derived from the <see cref="T:System.Dynamic.DynamicObject"/> class can override this method to specify dynamic behavior for operations such as getting a value for a property.
         /// </summary>
         /// <param name="binder">Provides information about the object that called the dynamic operation. The binder.Name property provides the name of the member on which the dynamic operation is performed. For example, for the Console.WriteLine(sampleObject.SampleProperty) statement, where sampleObject is an instance of the class derived from the <see cref="T:System.Dynamic.DynamicObject"/> class, binder.Name returns "SampleProperty". The binder.IgnoreCase property specifies whether the member name is case-sensitive.</param>
@@ -94,18 +68,32 @@ namespace Simple.Data
         /// </returns>
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            return GetDynamicTable(binder, out result);
+            return GetDynamicMember(binder, out result);
         }
 
-        private bool GetDynamicTable(GetMemberBinder binder, out object result)
+        private bool GetDynamicMember(GetMemberBinder binder, out object result)
         {
-            result = _tables.GetOrAdd(binder.Name, CreateDynamicTable);
+            result = _members.GetOrAdd(binder.Name, CreateDynamicReference);
             return true;
         }
 
-        private DynamicTable CreateDynamicTable(string name)
+        private DynamicReference CreateDynamicReference(string name)
         {
-            return new DynamicTable(name, this);
+            return new DynamicReference(name, this);
+        }
+
+        internal DynamicTable SetMemberAsTable(DynamicReference reference)
+        {
+            if (reference == null) throw new ArgumentNullException("reference");
+            _members.TryUpdate(reference.GetName(), new DynamicTable(reference.GetName(), this), reference);
+            return (DynamicTable) _members[reference.GetName()];
+        }
+
+        internal DynamicSchema SetMemberAsSchema(DynamicReference reference)
+        {
+            if (reference == null) throw new ArgumentNullException("reference");
+            _members.TryUpdate(reference.GetName(), new DynamicSchema(reference.GetName(), this), reference);
+            return (DynamicSchema) _members[reference.GetName()];
         }
     }
 }

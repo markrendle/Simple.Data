@@ -245,27 +245,5 @@ namespace Simple.Data.IntegrationTest
             Assert.AreEqual("Phil", mockDatabase.Parameters[0]);
             Assert.AreEqual(42, mockDatabase.Parameters[1]);
         }
-
-
-        [Test]
-        public void TestAllPropertyShouldWriteDeprecatedMessageToTrace()
-        {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            var traceListener = new TestTraceListener();
-            Trace.Listeners.Add(traceListener);
-
-            try
-            {
-                var dummy = database.Users.All;
-            }
-            catch (InvalidOperationException)
-            {
-                // Ignore it
-            }
-            Assert.IsTrue(traceListener.Messages.Contains("deprecated"));
-
-            Trace.Listeners.Remove(traceListener);
-        }
     }
 }
