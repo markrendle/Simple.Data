@@ -15,7 +15,7 @@ namespace Simple.Data.Extensions
         /// <returns>The modified string.</returns>
         public static string Homogenize(this string source)
         {
-            return HomogenizeRegex.Replace(source.ToLowerInvariant(), string.Empty);
+            return source == null ? null : HomogenizeRegex.Replace(source.ToLowerInvariant(), string.Empty);
         }
 
         public static bool IsPlural(this string str)

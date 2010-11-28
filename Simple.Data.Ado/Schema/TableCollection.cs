@@ -77,7 +77,7 @@ namespace Simple.Data.Ado.Schema
         private Table FindTableWithName(string tableName, string schemaName)
         {
             return this
-                .Where(t => t.HomogenizedName.Equals(tableName) && t.Schema.Homogenize().Equals(schemaName))
+                .Where(t => t.HomogenizedName.Equals(tableName) && (t.Schema == null || t.Schema.Homogenize().Equals(schemaName)))
                 .SingleOrDefault();
         }
 

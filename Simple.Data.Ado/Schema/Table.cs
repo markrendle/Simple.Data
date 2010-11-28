@@ -66,7 +66,12 @@ namespace Simple.Data.Ado.Schema
 
         internal string QualifiedName
         {
-            get { return _databaseSchema.QuoteObjectName(_schema) + '.' + _databaseSchema.QuoteObjectName(_actualName); }
+            get
+            {
+                return _schema == null
+                           ? _databaseSchema.QuoteObjectName(_actualName)
+                           : _databaseSchema.QuoteObjectName(_schema) + '.' + _databaseSchema.QuoteObjectName(_actualName);
+            }
         }
 
         internal IEnumerable<Column> Columns
