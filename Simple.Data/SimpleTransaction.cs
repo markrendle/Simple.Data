@@ -14,11 +14,13 @@ namespace Simple.Data
     {
         private readonly Database _database;
 
+        private readonly IAdapterWithTransactions _adapter;
         private readonly IAdapterTransaction _adapterTransaction;
 
-        internal SimpleTransaction(IAdapterTransaction adapterTransaction, Database database)
+        internal SimpleTransaction(IAdapterWithTransactions adapter, IAdapterTransaction adapterTransaction, Database database)
         {
             if (adapterTransaction == null) throw new ArgumentNullException("adapterTransaction");
+            _adapter = adapter;
             _adapterTransaction = adapterTransaction;
             _database = database;
         }
@@ -58,6 +60,26 @@ namespace Simple.Data
             _adapterTransaction.Rollback();
         }
 
+        public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
+        {
+            return _adapter.Find(tableName, criteria, AdapterTransaction);
+        }
+
+        public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
+        {
+            return _adapter.Insert(tableName, data, AdapterTransaction);
+        }
+
+        public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
+        {
+            return _adapter.Update(tableName, data, criteria, AdapterTransaction);
+        }
+
+        public override int Delete(string tableName, SimpleExpression criteria)
+        {
+            return _adapter.Delete(tableName, criteria, AdapterTransaction);
+        }
+
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
@@ -73,9 +95,9 @@ namespace Simple.Data
             }
         }
 
-        internal override Adapter Adapter
+        protected override Adapter GetAdapter()
         {
-            get { return _database.Adapter; }
+            return _adapter as Adapter;
         }
     }
 }

@@ -14,7 +14,9 @@ namespace Simple.Data
     {
         private readonly ConcurrentDictionary<string, dynamic> _members = new ConcurrentDictionary<string, dynamic>();
 
-        internal abstract Adapter Adapter { get; }
+        internal Adapter Adapter { get { return GetAdapter(); } }
+
+        protected abstract Adapter GetAdapter();
 
         /// <summary>
         /// Provides the implementation for operations that get member values. Classes derived from the <see cref="T:System.Dynamic.DynamicObject"/> class can override this method to specify dynamic behavior for operations such as getting a value for a property.
@@ -61,54 +63,21 @@ namespace Simple.Data
         /// <param name="tableName">Name of the table.</param>
         /// <param name="criteria">The criteria. This may be <c>null</c>, in which case all records should be returned.</param>
         /// <returns>The list of records matching the criteria. If no records are found, return an empty list.</returns>
-        public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
-        {
-            var transaction = this as SimpleTransaction;
-            if (transaction != null)
-            {
-                return ((IAdapterWithTransactions)Adapter).Find(tableName, criteria, transaction.AdapterTransaction);
-            }
-            return Adapter.Find(tableName, criteria);
-        }
+        public abstract IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria);
 
         /// <summary>
         ///  Inserts a record into the specified "table".
         ///  </summary><param name="tableName">Name of the table.</param><param name="data">The values to insert.</param><returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
-        public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
-        {
-            var transaction = this as SimpleTransaction;
-            if (transaction != null)
-            {
-                return ((IAdapterWithTransactions)this).Insert(tableName, data, transaction.AdapterTransaction);
-            }
-            return Adapter.Insert(tableName, data);
-        }
+        public abstract IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data);
 
         /// <summary>
         ///  Updates the specified "table" according to specified criteria.
         ///  </summary><param name="tableName">Name of the table.</param><param name="data">The new values.</param><param name="criteria">The expression to use as criteria for the update operation.</param><returns>The number of records affected by the update operation.</returns>
-        public int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
-        {
-            var transaction = this as SimpleTransaction;
-            if (transaction != null)
-            {
-                return ((IAdapterWithTransactions)this).Update(tableName, data, criteria, transaction.AdapterTransaction);
-            }
-            return Adapter.Update(tableName, data, criteria);
-        }
+        public abstract int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria);
 
         /// <summary>
         ///  Deletes from the specified table.
         ///  </summary><param name="tableName">Name of the table.</param><param name="criteria">The expression to use as criteria for the delete operation.</param><returns>The number of records which were deleted.</returns>
-        public int Delete(string tableName, SimpleExpression criteria)
-        {
-            var transaction = this as SimpleTransaction;
-            if (transaction != null)
-            {
-                return ((IAdapterWithTransactions)this).Delete(tableName, criteria, transaction.AdapterTransaction);
-            }
-            return Adapter.Delete(tableName, criteria);
-        }
-
+        public abstract int Delete(string tableName, SimpleExpression criteria);
     }
 }
