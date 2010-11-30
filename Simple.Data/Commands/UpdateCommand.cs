@@ -15,24 +15,24 @@ namespace Simple.Data.Commands
             return method.Equals("update", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public object Execute(Database database, DynamicTable table, InvokeMemberBinder binder, object[] args)
+        public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             if (args.Length != 1) throw new ArgumentException("Incorrect number of arguments to Update method.");
-            var keyFieldNames = database.Adapter.GetKeyFieldNames(table.GetQualifiedName()).ToArray();
+            var keyFieldNames = dataStrategy.Adapter.GetKeyFieldNames(table.GetQualifiedName()).ToArray();
             if (keyFieldNames.Length == 0)
             {
                 throw new NotSupportedException("Adapter does not support key-based update for this object.");
             }
 
-            return UpdateByKeyFields(table.GetQualifiedName(), database, args[0], keyFieldNames);
+            return UpdateByKeyFields(table.GetQualifiedName(), dataStrategy, args[0], keyFieldNames);
         }
 
-        internal static object UpdateByKeyFields(string tableName, Database database, object entity, IEnumerable<string> keyFieldNames)
+        internal static object UpdateByKeyFields(string tableName, DataStrategy dataStrategy, object entity, IEnumerable<string> keyFieldNames)
         {
             var record = ObjectToDictionary(entity);
             var criteria = GetCriteria(keyFieldNames, record);
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteria);
-            return database.Adapter.Update(tableName, record, criteriaExpression);
+            return dataStrategy.Update(tableName, record, criteriaExpression);
         }
 
         private static Dictionary<string, object> GetCriteria(IEnumerable<string> keyFieldNames, IDictionary<string, object> record)

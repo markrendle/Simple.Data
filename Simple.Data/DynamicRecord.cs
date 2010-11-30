@@ -12,7 +12,7 @@ namespace Simple.Data
     {
         private readonly ConcreteObject _concreteObject = new ConcreteObject();
         private readonly HomogenizedKeyDictionary _data;
-        private readonly Database _database;
+        private readonly DataStrategy _database;
         private readonly string _tableName;
 
         public DynamicRecord()
@@ -35,10 +35,10 @@ namespace Simple.Data
         {
         }
 
-        internal DynamicRecord(IEnumerable<KeyValuePair<string, object>> data, string tableName, Database database)
+        internal DynamicRecord(IEnumerable<KeyValuePair<string, object>> data, string tableName, DataStrategy dataStrategy)
         {
             _tableName = tableName;
-            _database = database;
+            _database = dataStrategy;
             _data = new HomogenizedKeyDictionary(data);
         }
 

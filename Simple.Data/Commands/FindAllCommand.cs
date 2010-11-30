@@ -28,10 +28,10 @@ namespace Simple.Data.Commands
         /// <param name="binder">The binder from the <see cref="DynamicTable"/> method invocation.</param>
         /// <param name="args">The arguments from the <see cref="DynamicTable"/> method invocation.</param>
         /// <returns></returns>
-        public object Execute(Database database, DynamicTable table, InvokeMemberBinder binder, object[] args)
+        public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            return new DynamicEnumerable(database.Adapter.Find(table.GetQualifiedName(), null)
-                .Select(dict => new DynamicRecord(dict, table.GetQualifiedName(), database)));
+            return new DynamicEnumerable(dataStrategy.Find(table.GetQualifiedName(), null)
+                .Select(dict => new DynamicRecord(dict, table.GetQualifiedName(), dataStrategy)));
         }
     }
 }

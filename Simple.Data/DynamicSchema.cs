@@ -10,14 +10,14 @@ namespace Simple.Data
     public class DynamicSchema : DynamicObject
     {
         private readonly string _name;
-        private readonly Database _database;
+        private readonly DataStrategy _database;
 
         private readonly ConcurrentDictionary<string, dynamic> _tables = new ConcurrentDictionary<string, dynamic>();
 
-        public DynamicSchema(string name, Database database)
+        public DynamicSchema(string name, DataStrategy dataStrategy)
         {
             _name = name;
-            _database = database;
+            _database = dataStrategy;
         }
 
         /// <summary>

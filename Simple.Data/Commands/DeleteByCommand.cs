@@ -11,15 +11,20 @@ namespace Simple.Data.Commands
             return method.Equals("delete", StringComparison.InvariantCultureIgnoreCase) || method.StartsWith("deleteby", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public object Execute(Database database, DynamicTable table, InvokeMemberBinder binder, object[] args)
+        public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
+        {
+            SimpleExpression criteriaExpression = GetCriteriaExpression(binder, args, table);
+            return dataStrategy.Delete(table.GetQualifiedName(), criteriaExpression);
+        }
+
+        private static SimpleExpression GetCriteriaExpression(InvokeMemberBinder binder, object[] args, DynamicTable table)
         {
             var criteria = binder.Name.Equals("delete", StringComparison.InvariantCultureIgnoreCase) ?
-                binder.NamedArgumentsToDictionary(args)
-                :
-                MethodNameParser.ParseFromBinder(binder, args);
+                                                                                                         binder.NamedArgumentsToDictionary(args)
+                               :
+                                   MethodNameParser.ParseFromBinder(binder, args);
 
-            var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), criteria);
-            return database.Adapter.Delete(table.GetQualifiedName(), criteriaExpression);
+            return ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), criteria);
         }
     }
 }

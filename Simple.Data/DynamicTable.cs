@@ -15,14 +15,15 @@ namespace Simple.Data
     {
         private readonly string _tableName;
         private readonly DynamicSchema _schema;
-        private readonly Database _database;
+        private readonly DataStrategy _dataStrategy;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DynamicTable"/> class.
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
-        /// <param name="database">The database which owns the table.</param>
-        internal DynamicTable(string tableName, Database database) : this(tableName, database, null)
+        /// <param name="dataStrategy">The database which owns the table.</param>
+        internal DynamicTable(string tableName, DataStrategy dataStrategy)
+            : this(tableName, dataStrategy, null)
         {
         }
 
@@ -30,13 +31,13 @@ namespace Simple.Data
         /// Initializes a new instance of the <see cref="DynamicTable"/> class.
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
-        /// <param name="database">The database which owns the table.</param>
+        /// <param name="dataStrategy">The database which owns the table.</param>
         /// <param name="schema">The schema to which the table belongs.</param>
-        internal DynamicTable(string tableName, Database database, DynamicSchema schema)
+        internal DynamicTable(string tableName, DataStrategy dataStrategy, DynamicSchema schema)
         {
             _tableName = tableName;
             _schema = schema;
-            _database = database;
+            _dataStrategy = dataStrategy;
         }
 
         /// <summary>
@@ -53,7 +54,7 @@ namespace Simple.Data
             var command = CommandFactory.GetCommandFor(binder.Name);
             if (command != null)
             {
-                result = command.Execute(_database, this, binder, args);
+                result = command.Execute(_dataStrategy, this, binder, args);
                 return true;
             }
             return base.TryInvokeMember(binder, args, out result);
@@ -88,7 +89,7 @@ namespace Simple.Data
             var dictionary = entity as IDictionary<string, object>;
             if (dictionary != null)
             {
-                _database.Adapter.Insert(_tableName, dictionary);
+                _dataStrategy.Insert(_tableName, dictionary);
             }
         }
 
@@ -104,7 +105,7 @@ namespace Simple.Data
 
         private IEnumerable<dynamic> GetAll()
         {
-            return _database.Adapter.Find(_tableName, null).Select(dict => new DynamicRecord(dict, _tableName, _database));
+            return _dataStrategy.Find(_tableName, null).Select(dict => new DynamicRecord(dict, _tableName, _dataStrategy));
         }
     }
 }

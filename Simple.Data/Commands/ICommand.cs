@@ -24,6 +24,6 @@ namespace Simple.Data.Commands
         /// <param name="binder">The binder from the <see cref="DynamicTable"/> method invocation.</param>
         /// <param name="args">The arguments from the <see cref="DynamicTable"/> method invocation.</param>
         /// <returns></returns>
-        object Execute(Database database, DynamicTable table, InvokeMemberBinder binder, object[] args);
+        object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args);
     }
 }

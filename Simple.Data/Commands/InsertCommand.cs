@@ -14,31 +14,31 @@ namespace Simple.Data.Commands
             return method.Equals("insert", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public object Execute(Database database, DynamicTable table, InvokeMemberBinder binder, object[] args)
+        public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            return DoInsert(binder, args, database, table.GetQualifiedName()).ToDynamicRecord(table.GetQualifiedName(), database);
+            return DoInsert(binder, args, dataStrategy, table.GetQualifiedName()).ToDynamicRecord(table.GetQualifiedName(), dataStrategy);
         }
 
-        private static IDictionary<string, object> DoInsert(InvokeMemberBinder binder, object[] args, Database database, string tableName)
+        private static IDictionary<string, object> DoInsert(InvokeMemberBinder binder, object[] args, DataStrategy dataStrategy, string tableName)
         {
             return binder.HasSingleUnnamedArgument()
                 ?
-                InsertEntity(args[0], database, tableName)
+                InsertEntity(args[0], dataStrategy, tableName)
                 :
-                InsertDictionary(binder, args, database, tableName);
+                InsertDictionary(binder, args, dataStrategy, tableName);
         }
 
-        private static IDictionary<string, object> InsertDictionary(InvokeMemberBinder binder, object[] args, Database database, string tableName)
+        private static IDictionary<string, object> InsertDictionary(InvokeMemberBinder binder, object[] args, DataStrategy dataStrategy, string tableName)
         {
-            return database.Adapter.Insert(tableName, binder.NamedArgumentsToDictionary(args));
+            return dataStrategy.Insert(tableName, binder.NamedArgumentsToDictionary(args));
         }
 
-        private static IDictionary<string,object> InsertEntity(object entity, Database database, string tableName)
+        private static IDictionary<string,object> InsertEntity(object entity, DataStrategy dataStrategy, string tableName)
         {
             var dictionary = entity as IDictionary<string, object>;
             if (dictionary == null)
                 throw new SimpleDataException("Could not discover data in object.");
-            return database.Adapter.Insert(tableName, dictionary);
+            return dataStrategy.Insert(tableName, dictionary);
         }
     }
 }

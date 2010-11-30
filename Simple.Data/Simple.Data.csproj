@@ -90,7 +90,9 @@
     <Compile Include="Commands\InsertCommand.cs" />
     <Compile Include="Commands\DeleteByCommand.cs" />
     <Compile Include="IAdapterFactory.cs" />
+    <Compile Include="IAdapterTransaction.cs" />
     <Compile Include="IAdapterWithRelation.cs" />
+    <Compile Include="IAdapterWithTransactions.cs" />
     <Compile Include="MefHelper.cs" />
     <Compile Include="MethodNameParser.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -104,10 +106,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="DataStrategy.cs" />
     <Compile Include="SimpleDataException.cs" />
     <Compile Include="SimpleExpression.cs" />
     <Compile Include="SimpleExpressionType.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="SimpleTransaction.cs" />
     <Compile Include="UnresolvableObjectException.cs" />
     <Compile Include="Commands\UpdateByCommand.cs" />
   </ItemGroup>

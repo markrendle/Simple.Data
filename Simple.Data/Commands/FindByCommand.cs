@@ -12,11 +12,11 @@ namespace Simple.Data.Commands
             return method.StartsWith("FindBy") || method.StartsWith("find_by_", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public object Execute(Database database, DynamicTable table, InvokeMemberBinder binder, object[] args)
+        public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
-            var data = database.Adapter.Find(table.GetQualifiedName(), criteriaExpression).FirstOrDefault();
-            return data != null ? new DynamicRecord(data, table.GetQualifiedName(), database) : null;
+            var data = dataStrategy.Find(table.GetQualifiedName(), criteriaExpression).FirstOrDefault();
+            return data != null ? new DynamicRecord(data, table.GetQualifiedName(), dataStrategy) : null;
         }
     }
 }

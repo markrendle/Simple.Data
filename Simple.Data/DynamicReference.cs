@@ -14,7 +14,7 @@ namespace Simple.Data
     {
         private readonly string _name;
         private readonly DynamicReference _owner;
-        private readonly Database _database;
+        private readonly DataStrategy _database;
 
         internal DynamicReference(string name)
         {
@@ -27,10 +27,10 @@ namespace Simple.Data
             _owner = owner;
         }
 
-        internal DynamicReference(string name, Database database)
+        internal DynamicReference(string name, DataStrategy dataStrategy)
         {
             _name = name;
-            _database = database;
+            _database = dataStrategy;
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Simple.Data
             return _owner;
         }
 
-        private Database GetDatabase()
+        private DataStrategy GetDatabase()
         {
             return _database;
         }

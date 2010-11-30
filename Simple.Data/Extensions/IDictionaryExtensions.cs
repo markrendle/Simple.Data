@@ -17,9 +17,9 @@ namespace Simple.Data.Extensions
             return dictionary == null ? null : new DynamicRecord(dictionary, tableName);
         }
 
-        public static DynamicRecord ToDynamicRecord(this IDictionary<string, object> dictionary, string tableName, Database database)
+        public static DynamicRecord ToDynamicRecord(this IDictionary<string, object> dictionary, string tableName, DataStrategy dataStrategy)
         {
-            return dictionary == null ? null : new DynamicRecord(dictionary, tableName, database);
+            return dictionary == null ? null : new DynamicRecord(dictionary, tableName, dataStrategy);
         }
     }
 }
