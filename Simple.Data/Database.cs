@@ -88,5 +88,15 @@ namespace Simple.Data
         {
             return _adapter.Delete(tableName, criteria);
         }
+
+        public SimpleTransaction BeginTransaction()
+        {
+            return SimpleTransaction.Begin(this);
+        }
+
+        public SimpleTransaction BeginTransaction(string name)
+        {
+            return SimpleTransaction.Begin(this, name);
+        }
     }
 }

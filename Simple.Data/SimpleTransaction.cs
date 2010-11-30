@@ -15,15 +15,47 @@ namespace Simple.Data
         private readonly Database _database;
 
         private readonly IAdapterWithTransactions _adapter;
-        private readonly IAdapterTransaction _adapterTransaction;
+        private IAdapterTransaction _adapterTransaction;
 
-        internal SimpleTransaction(IAdapterWithTransactions adapter, IAdapterTransaction adapterTransaction, Database database)
+        private SimpleTransaction(IAdapterWithTransactions adapter, Database database)
         {
-            if (adapterTransaction == null) throw new ArgumentNullException("adapterTransaction");
+            if (adapter == null) throw new ArgumentNullException("adapter");
+            if (database == null) throw new ArgumentNullException("database");
             _adapter = adapter;
-            _adapterTransaction = adapterTransaction;
             _database = database;
         }
+
+        private void Begin()
+        {
+            _adapterTransaction = _adapter.BeginTransaction();
+        }
+
+        private void Begin(string name)
+        {
+            _adapterTransaction = _adapter.BeginTransaction(name);
+        }
+
+        internal static SimpleTransaction Begin(Database database)
+        {
+            SimpleTransaction transaction = CreateTransaction(database);
+            transaction.Begin();
+            return transaction;
+        }
+
+        internal static SimpleTransaction Begin(Database database, string name)
+        {
+            SimpleTransaction transaction = CreateTransaction(database);
+            transaction.Begin(name);
+            return transaction;
+        }
+
+        private static SimpleTransaction CreateTransaction(Database database)
+        {
+            var adapterWithTransactions = database.Adapter as IAdapterWithTransactions;
+            if (adapterWithTransactions == null) throw new NotSupportedException();
+            return new SimpleTransaction(adapterWithTransactions, database);
+        }
+
 
         internal Database Database
         {

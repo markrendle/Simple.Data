@@ -13,7 +13,7 @@ namespace Simple.Data.SqlTest
     {
         private static SqlConnection MakeConnection()
         {
-            return new SqlConnection(@"data source=.;initial catalog=SimpleTest;integrated security=true");
+            return new SqlConnection(Properties.Settings.Default.ConnectionString);
         }
 
         private static SqlCommand MakeCommand()
