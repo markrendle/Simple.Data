@@ -15,10 +15,23 @@ namespace Simple.Data.SqlTest
     [TestFixture]
     public class FindTests
     {
-        [Test]
-        public void TestMethod1()
+        [TestFixtureSetUp]
+        public void Setup()
         {
-            var provider = ProviderHelper.GetProviderByConnectionString("data source=.");
+            using (var cn = new SqlConnection(Properties.Settings.Default.ConnectionString))
+            {
+                using (var cmd = new SqlCommand(Properties.Resources.DatabaseReset, cn))
+                {
+                    cn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        [Test]
+        public void TestProviderIsSqlProvider()
+        {
+            var provider = ProviderHelper.GetProviderByConnectionString(Properties.Settings.Default.ConnectionString);
             Assert.IsInstanceOf(typeof(SqlConnectionProvider), provider);
         }
 
@@ -39,11 +52,10 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
-        [Ignore] // This won't work until the database gets reset before every run.
         public void TestAllCount()
         {
             var db = DatabaseHelper.Open();
-            var count = db.Users.All.Count;
+            var count = db.Users.All().ToList().Count;
             Assert.AreEqual(3, count);
         }
 

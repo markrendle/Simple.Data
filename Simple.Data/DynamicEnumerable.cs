@@ -45,6 +45,26 @@ namespace Simple.Data
             }
         }
 
+        public IList<dynamic> ToList()
+        {
+            return _list.ToList();
+        }
+
+        public dynamic[] ToArray()
+        {
+            return _list.ToArray();
+        }
+
+        public IList<T> ToList<T>()
+        {
+            return Cast<T>().ToList();
+        }
+
+        public T[] ToArray<T>()
+        {
+            return Cast<T>().ToArray();
+        }
+
         /// <summary>
         /// Returns an enumerator that iterates through the collection.
         /// </summary>
