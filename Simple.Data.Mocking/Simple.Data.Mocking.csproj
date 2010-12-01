@@ -57,6 +57,7 @@
     <Compile Include="Ado\MockDbConnection.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Ado\MockDbTransaction.cs" />
     <Compile Include="Ado\MockSchemaProvider.cs" />
     <Compile Include="MockHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

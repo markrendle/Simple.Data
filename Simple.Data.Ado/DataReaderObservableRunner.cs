@@ -40,11 +40,18 @@ namespace Simple.Data.Ado
 
         private void RunQuery()
         {
-            using (_command.Connection)
-            using (_command)
+            if (_command.Connection.State == ConnectionState.Open)
             {
-                _command.Connection.Open();
                 RunReader();
+            }
+            else
+            {
+                using (_command.Connection)
+                using (_command)
+                {
+                    _command.Connection.Open();
+                    RunReader();
+                }
             }
         }
 

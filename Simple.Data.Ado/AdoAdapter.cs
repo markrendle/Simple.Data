@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ using Simple.Data.Ado.Schema;
 namespace Simple.Data.Ado
 {
     [Export("Ado", typeof(Adapter))]
-    internal class AdoAdapter : Adapter, IAdapterWithRelation
+    internal class AdoAdapter : Adapter, IAdapterWithRelation, IAdapterWithTransactions
     {
         private IConnectionProvider _connectionProvider;
         private DatabaseSchema _schema;
@@ -145,6 +146,64 @@ namespace Simple.Data.Ado
         public IEnumerable<IDictionary<string, object>> FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName)
         {
             return _relatedFinder.Value.FindRelated(tableName, row, relatedTableName);
+        }
+
+        public IAdapterTransaction BeginTransaction()
+        {
+            var connection = CreateConnection();
+            connection.Open();
+            var transaction = connection.BeginTransaction();
+            return new AdoAdapterTransaction(transaction);
+        }
+
+        public IAdapterTransaction BeginTransaction(IsolationLevel isolationLevel)
+        {
+            var connection = CreateConnection();
+            connection.Open();
+            var transaction = connection.BeginTransaction(isolationLevel);
+            return new AdoAdapterTransaction(transaction);
+        }
+
+        public IAdapterTransaction BeginTransaction(string name)
+        {
+            var connection = CreateConnection();
+            connection.Open();
+            var sqlConnection = connection as SqlConnection;
+            var transaction = sqlConnection != null ? sqlConnection.BeginTransaction(name) : connection.BeginTransaction();
+
+            return new AdoAdapterTransaction(transaction, name);
+        }
+
+        public IAdapterTransaction BeginTransaction(IsolationLevel isolationLevel, string name)
+        {
+            var connection = CreateConnection();
+            connection.Open();
+            var sqlConnection = connection as SqlConnection;
+            var transaction = sqlConnection != null
+                                  ? sqlConnection.BeginTransaction(isolationLevel, name)
+                                  : connection.BeginTransaction(isolationLevel);
+
+            return new AdoAdapterTransaction(transaction, name);
+        }
+
+        public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria, IAdapterTransaction transaction)
+        {
+            return new AdoAdapterFinder(this, ((AdoAdapterTransaction)transaction).Transaction).Find(tableName, criteria);
+        }
+
+        public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, IAdapterTransaction transaction)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria, IAdapterTransaction transaction)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Delete(string tableName, SimpleExpression criteria, IAdapterTransaction transaction)
+        {
+            throw new NotImplementedException();
         }
     }
 }

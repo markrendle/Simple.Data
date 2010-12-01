@@ -30,7 +30,7 @@ namespace Simple.Data.Mocking.Ado
         /// <param name="isolationLevel">Specifies the isolation level for the transaction.</param>
         protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
         {
-            throw new NotImplementedException();
+            return new MockDbTransaction(this, isolationLevel);
         }
 
         public override void Close()

@@ -10,10 +10,20 @@ namespace Simple.Data.Ado
     class AdoAdapterFinder
     {
         private readonly AdoAdapter _adapter;
+        private readonly DbTransaction _transaction;
+        private readonly DbConnection _connection;
 
-        public AdoAdapterFinder(AdoAdapter adapter)
+        public AdoAdapterFinder(AdoAdapter adapter) : this(adapter, null)
         {
+        }
+
+        public AdoAdapterFinder(AdoAdapter adapter, DbTransaction transaction)
+        {
+            if (adapter == null) throw new ArgumentNullException("adapter");
+            if (transaction == null) throw new ArgumentNullException("transaction");
             _adapter = adapter;
+            _transaction = transaction;
+            _connection = transaction.Connection;
         }
 
         public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
@@ -31,19 +41,21 @@ namespace Simple.Data.Ado
 
         private IEnumerable<IDictionary<string, object>> ExecuteQuery(ICommandBuilder commandBuilder)
         {
-            var connection = _adapter.CreateConnection();
+            var connection = _connection ?? _adapter.CreateConnection();
             var command = commandBuilder.GetCommand(connection);
-            return TryExecuteQuery(connection, command);
+            command.Transaction = _transaction;
+            return TryExecuteQuery(command);
         }
 
         private IEnumerable<IDictionary<string, object>> ExecuteQuery(string sql, params object[] values)
         {
-            var connection = _adapter.CreateConnection();
+            var connection = _connection ?? _adapter.CreateConnection();
             var command = CommandHelper.Create(connection, sql, values);
-            return command.ToAsyncEnumerable();
+            command.Transaction = _transaction;
+            return TryExecuteQuery(command);
         }
 
-        private static IEnumerable<IDictionary<string, object>> TryExecuteQuery(DbConnection connection, IDbCommand command)
+        private static IEnumerable<IDictionary<string, object>> TryExecuteQuery(IDbCommand command)
         {
             try
             {

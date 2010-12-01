@@ -48,6 +48,7 @@
     <Compile Include="AdoAdapterFinder.cs" />
     <Compile Include="AdoAdapterInserter.cs" />
     <Compile Include="AdoAdapterRelatedFinder.cs" />
+    <Compile Include="AdoAdapterTransaction.cs" />
     <Compile Include="CommandBuilder.cs" />
     <Compile Include="CommandHelper.cs" />
     <Compile Include="DataReaderExtensions.cs" />
