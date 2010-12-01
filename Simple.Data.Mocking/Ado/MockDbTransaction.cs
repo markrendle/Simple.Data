@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Simple.Data.Mocking.Ado
 {
-    class MockDbTransaction : DbTransaction
+    public class MockDbTransaction : DbTransaction
     {
         public static bool CommitCalled { get; private set; }
         public static bool RollbackCalled { get; private set; }

@@ -10,10 +10,16 @@ namespace Simple.Data.Ado
     class AdoAdapterInserter
     {
         private readonly AdoAdapter _adapter;
+        private readonly DbTransaction _transaction;
 
-        public AdoAdapterInserter(AdoAdapter adapter)
+        public AdoAdapterInserter(AdoAdapter adapter) : this(adapter, null)
+        {
+        }
+
+        public AdoAdapterInserter(AdoAdapter adapter, DbTransaction transaction)
         {
             _adapter = adapter;
+            _transaction = transaction;
         }
 
         public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
@@ -41,26 +47,38 @@ namespace Simple.Data.Ado
 
         internal IDictionary<string, object> ExecuteSingletonQuery(string sql, params object[] values)
         {
+            if (_transaction != null)
+            {
+                var command = CommandHelper.Create(_transaction.Connection, sql, values.ToArray());
+                command.Transaction = _transaction;
+                return TryExecuteSingletonQuery(command);
+            }
+
             using (var connection = _adapter.CreateConnection())
             {
                 using (var command = CommandHelper.Create(connection, sql, values.ToArray()))
                 {
-                    try
+                    connection.Open();
+                    return TryExecuteSingletonQuery(command);
+                }
+            }
+        }
+
+        private static IDictionary<string, object> TryExecuteSingletonQuery(IDbCommand command)
+        {
+            try
+            {
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
                     {
-                        connection.Open();
-                        using (var reader = command.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                return reader.ToDictionary();
-                            }
-                        }
-                    }
-                    catch (DbException ex)
-                    {
-                        throw new AdoAdapterException(ex.Message, command);
+                        return reader.ToDictionary();
                     }
                 }
+            }
+            catch (DbException ex)
+            {
+                throw new AdoAdapterException(ex.Message, command);
             }
 
             return null;
@@ -68,20 +86,26 @@ namespace Simple.Data.Ado
 
         internal int Execute(string sql, params object[] values)
         {
+            if (_transaction != null)
+            {
+                var command = CommandHelper.Create(_transaction.Connection, sql, values.ToArray());
+                command.Transaction = _transaction;
+                return TryExecute(command);
+            }
             using (var connection = _adapter.CreateConnection())
             {
                 using (var command = CommandHelper.Create(connection, sql, values.ToArray()))
                 {
-                    return TryExecute(connection, command);
+                    connection.Open();
+                    return TryExecute(command);
                 }
             }
         }
 
-        private static int TryExecute(DbConnection connection, IDbCommand command)
+        private static int TryExecute(IDbCommand command)
         {
             try
             {
-                connection.Open();
                 return command.ExecuteNonQuery();
             }
             catch (DbException ex)

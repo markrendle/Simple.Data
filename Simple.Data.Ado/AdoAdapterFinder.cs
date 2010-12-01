@@ -20,10 +20,13 @@ namespace Simple.Data.Ado
         public AdoAdapterFinder(AdoAdapter adapter, DbTransaction transaction)
         {
             if (adapter == null) throw new ArgumentNullException("adapter");
-            if (transaction == null) throw new ArgumentNullException("transaction");
             _adapter = adapter;
-            _transaction = transaction;
-            _connection = transaction.Connection;
+
+            if (transaction != null)
+            {
+                _transaction = transaction;
+                _connection = transaction.Connection;
+            }
         }
 
         public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)

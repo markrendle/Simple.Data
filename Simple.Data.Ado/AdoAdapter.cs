@@ -193,7 +193,7 @@ namespace Simple.Data.Ado
 
         public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, IAdapterTransaction transaction)
         {
-            throw new NotImplementedException();
+            return new AdoAdapterInserter(this, ((AdoAdapterTransaction)transaction).Transaction).Insert(tableName, data);
         }
 
         public int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria, IAdapterTransaction transaction)
