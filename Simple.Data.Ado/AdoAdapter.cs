@@ -94,16 +94,24 @@ namespace Simple.Data.Ado
             {
                 using (var command = commandBuilder.GetCommand(connection))
                 {
-                    return TryExecute(connection, command);
+                    connection.Open();
+                    return TryExecute(command);
                 }
             }
         }
 
-        private static int TryExecute(DbConnection connection, IDbCommand command)
+        private int Execute(ICommandBuilder commandBuilder, IAdapterTransaction transaction)
+        {
+            using (var command = commandBuilder.GetCommand(((AdoAdapterTransaction)transaction).Transaction.Connection))
+            {
+                return TryExecute(command);
+            }
+        }
+
+        private static int TryExecute(IDbCommand command)
         {
             try
             {
-                connection.Open();
                 return command.ExecuteNonQuery();
             }
             catch (DbException ex)
@@ -198,12 +206,14 @@ namespace Simple.Data.Ado
 
         public int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria, IAdapterTransaction transaction)
         {
-            throw new NotImplementedException();
+            var commandBuilder = new UpdateHelper(_schema).GetUpdateCommand(tableName, data, criteria);
+            return Execute(commandBuilder, transaction);
         }
 
         public int Delete(string tableName, SimpleExpression criteria, IAdapterTransaction transaction)
         {
-            throw new NotImplementedException();
+            var commandBuilder = new DeleteHelper(_schema).GetDeleteCommand(tableName, criteria);
+            return Execute(commandBuilder, transaction);
         }
     }
 }

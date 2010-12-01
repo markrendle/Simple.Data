@@ -73,11 +73,16 @@ namespace Simple.Data.IntegrationTest
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
-            database.Users.UpdateById(Id: 1, Name: "Steve", Age: 50);
+            using (var transaction = database.BeginTransaction())
+            {
+                transaction.Users.UpdateById(Id: 1, Name: "Steve", Age: 50);
+                transaction.Commit();
+            }
             Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
             Assert.AreEqual(50, mockDatabase.Parameters[1]);
             Assert.AreEqual(1, mockDatabase.Parameters[2]);
+            Assert.IsTrue(MockDbTransaction.CommitCalled);
         }
 
         [Test]
@@ -89,11 +94,16 @@ namespace Simple.Data.IntegrationTest
             record.Id = 1;
             record.Name = "Steve";
             record.Age = 50;
-            database.Users.Update(record);
+            using (var transaction = database.BeginTransaction())
+            {
+                transaction.Users.Update(record);
+                transaction.Commit();
+            }
             Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
             Assert.AreEqual(50, mockDatabase.Parameters[1]);
             Assert.AreEqual(1, mockDatabase.Parameters[2]);
+            Assert.IsTrue(MockDbTransaction.CommitCalled);
         }
 
         [Test]
@@ -105,11 +115,16 @@ namespace Simple.Data.IntegrationTest
             record.Id = 1;
             record.Name = "Steve";
             record.Age = 50;
-            database.Users.UpdateById(record);
+            using (var transaction = database.BeginTransaction())
+            {
+                transaction.Users.UpdateById(record);
+                transaction.Commit();
+            }
             Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
             Assert.AreEqual(50, mockDatabase.Parameters[1]);
             Assert.AreEqual(1, mockDatabase.Parameters[2]);
+            Assert.IsTrue(MockDbTransaction.CommitCalled);
         }
 
         [Test]
@@ -123,11 +138,16 @@ namespace Simple.Data.IntegrationTest
                                Name = "Steve",
                                Age = 50
                            };
-            database.Users.Update(user);
+            using (var transaction = database.BeginTransaction())
+            {
+                transaction.Users.Update(user);
+                transaction.Commit();
+            }
             Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
             Assert.AreEqual(50, mockDatabase.Parameters[1]);
             Assert.AreEqual(1, mockDatabase.Parameters[2]);
+            Assert.IsTrue(MockDbTransaction.CommitCalled);
         }
 
         [Test]
@@ -141,11 +161,16 @@ namespace Simple.Data.IntegrationTest
                                Name = "Steve",
                                Age = 50
                            };
-            database.Users.UpdateById(user);
+            using (var transaction = database.BeginTransaction())
+            {
+                transaction.Users.UpdateById(user);
+                transaction.Commit();
+            }
             Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
             Assert.AreEqual(50, mockDatabase.Parameters[1]);
             Assert.AreEqual(1, mockDatabase.Parameters[2]);
+            Assert.IsTrue(MockDbTransaction.CommitCalled);
         }
 
         [Test]
@@ -153,9 +178,14 @@ namespace Simple.Data.IntegrationTest
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
-            database.Users.Delete(Id: 1);
+            using (var transaction = database.BeginTransaction())
+            {
+                transaction.Users.Delete(Id: 1);
+                transaction.Commit();
+            }
             Assert.AreEqual("delete from [dbo].[Users] where [dbo].[Users].[Id] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual(1, mockDatabase.Parameters[0]);
+            Assert.IsTrue(MockDbTransaction.CommitCalled);
         }
 
         [Test]
@@ -163,23 +193,14 @@ namespace Simple.Data.IntegrationTest
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
-            database.Users.DeleteById(1);
+            using (var transaction = database.BeginTransaction())
+            {
+                transaction.Users.DeleteById(1);
+                transaction.Commit();
+            }
             Assert.AreEqual("delete from [dbo].[Users] where [dbo].[Users].[Id] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual(1, mockDatabase.Parameters[0]);
-        }
-
-        [Test]
-        public void TestInsertOnTable()
-        {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            dynamic person = new ExpandoObject();
-            person.Name = "Phil";
-            person.Age = 42;
-            database.Users.Insert(person);
-            Assert.AreEqual("insert into [dbo].[Users] ([Name],[Age]) values (@p0,@p1)".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual("Phil", mockDatabase.Parameters[0]);
-            Assert.AreEqual(42, mockDatabase.Parameters[1]);
+            Assert.IsTrue(MockDbTransaction.CommitCalled);
         }
     }
 }
