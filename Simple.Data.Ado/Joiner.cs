@@ -14,6 +14,10 @@ namespace Simple.Data.Ado
         private readonly DatabaseSchema _schema;
         private readonly ConcurrentDictionary<TableName, string> _done = new ConcurrentDictionary<TableName, string>();
 
+        public Joiner(DatabaseSchema schema) : this(JoinType.Outer, schema)
+        {
+        }
+
         public Joiner(JoinType joinType, DatabaseSchema schema)
         {
             if (schema == null) throw new ArgumentNullException("schema");

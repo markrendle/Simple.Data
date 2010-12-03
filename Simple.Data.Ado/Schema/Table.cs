@@ -130,17 +130,14 @@ namespace Simple.Data.Ado.Schema
 
         internal TableJoin GetMaster(string name)
         {
-            var master = DatabaseSchema.FindTable(name);
-            if (master != null)
-            {
-                string commonColumnName = GetCommonColumnName(master);
+            var table = _databaseSchema.FindTable(name);
 
-                if (commonColumnName != null)
-                {
-                    return new TableJoin(master, master.FindColumn(commonColumnName), this, FindColumn(commonColumnName));
-                }
-            }
-            return null;
+            var foreignKey =
+                this.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == table.Schema && fk.MasterTable.Table == table.ActualName);
+
+            if (foreignKey == null) return null;
+
+            return new TableJoin(table, table.FindColumn(foreignKey.UniqueColumns[0]), this, this.FindColumn(foreignKey.Columns[0]));
         }
 
         private string GetCommonColumnName(Table other)
@@ -153,13 +150,13 @@ namespace Simple.Data.Ado.Schema
 
         internal TableJoin GetDetail(string name)
         {
-            var detail = DatabaseSchema.FindTable(name);
-            string commonColumnName = GetCommonColumnName(detail);
-            if (detail.Columns.Select(c => c.HomogenizedName).Intersect(Columns.Select(c => c.HomogenizedName)).Count() == 1)
-            {
-                return new TableJoin(this, FindColumn(commonColumnName), detail, detail.FindColumn(commonColumnName));
-            }
-            return null;
+            var table = DatabaseSchema.FindTable(name);
+            var foreignKey =
+                table.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == this.Schema && fk.MasterTable.Table == this.ActualName);
+
+            if (foreignKey == null) return null;
+
+            return new TableJoin(this, this.FindColumn(foreignKey.UniqueColumns[0]), table, table.FindColumn(foreignKey.Columns[0]));
         }
 
         /// <summary>

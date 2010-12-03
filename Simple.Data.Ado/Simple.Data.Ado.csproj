@@ -89,6 +89,7 @@
     <Compile Include="TableName.cs" />
     <Compile Include="TupleExtensions.cs" />
     <Compile Include="UpdateHelper.cs" />
+    <Compile Include="WeakCache.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Simple.Data\Simple.Data.csproj">

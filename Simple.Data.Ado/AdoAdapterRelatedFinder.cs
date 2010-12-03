@@ -32,7 +32,11 @@ namespace Simple.Data.Ado
             var join = TryJoin(tableName, relatedTableName);
             if (join == null) throw new AdoAdapterException("Could not resolve relationship.");
 
-            return join.Master == _adapter.GetSchema().FindTable(tableName) ? GetDetail(row, join) : GetMaster(row, join);
+            if (join.Master == _adapter.GetSchema().FindTable(tableName))
+            {
+                return GetDetail(row, join);
+            }
+            return GetMaster(row, join);
         }
 
         private TableJoin TryJoin(string tableName, string relatedTableName)

@@ -10,7 +10,7 @@ namespace Simple.Data.SqlTest
     [TestFixture]
     public class TransactionTests
     {
-        [TestFixtureSetUp]
+        [SetUp]
         public void Setup()
         {
             using (var cn = new SqlConnection(Properties.Settings.Default.ConnectionString))
@@ -30,9 +30,17 @@ namespace Simple.Data.SqlTest
 
             using (var tx = db.BeginTransaction())
             {
-                var order = tx.Orders.Insert(CustomerId: 1, OrderDate: DateTime.Today);
-                tx.OrderItems.Insert(OrderId: order.OrderId, ItemId: 1, Quantity: 3);
-                tx.Commit();
+                try
+                {
+                    var order = tx.Orders.Insert(CustomerId: 1, OrderDate: DateTime.Today);
+                    tx.OrderItems.Insert(OrderId: order.OrderId, ItemId: 1, Quantity: 3);
+                    tx.Commit();
+                }
+                catch
+                {
+                    tx.Rollback();
+                    throw;
+                }
             }
             Assert.AreEqual(2, db.Orders.All().ToList().Count);
             Assert.AreEqual(2, db.OrderItems.All().ToList().Count);

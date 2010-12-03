@@ -9,23 +9,23 @@ using Microsoft.CSharp.RuntimeBinder;
 
 namespace Simple.Data
 {
-    public class DynamicEnumerable : DynamicObject, IEnumerable
+    public sealed class DynamicEnumerable : DynamicObject, IEnumerable
     {
-        private readonly IEnumerable<dynamic> _list;
+        private readonly IEnumerable<dynamic> _enumerable;
 
-        public DynamicEnumerable(IEnumerable<dynamic> list)
+        public DynamicEnumerable(IEnumerable<dynamic> source)
         {
-            _list = list;
+            _enumerable = source;
         }
 
         public IEnumerable<T> Cast<T>()
         {
-            return _list.Select(item => (T) item);
+            return _enumerable.Select(item => (T) item);
         }
 
         public IEnumerable<T> OfType<T>()
         {
-            foreach (var item in _list)
+            foreach (var item in _enumerable)
             {
                 bool success = true;
                 T cast;
@@ -47,12 +47,12 @@ namespace Simple.Data
 
         public IList<dynamic> ToList()
         {
-            return _list.ToList();
+            return _enumerable.ToList();
         }
 
         public dynamic[] ToArray()
         {
-            return _list.ToArray();
+            return _enumerable.ToArray();
         }
 
         public IList<T> ToList<T>()
@@ -74,7 +74,7 @@ namespace Simple.Data
         /// <filterpriority>1</filterpriority>
         public IEnumerator GetEnumerator()
         {
-            return new DynamicEnumerator(_list);
+            return new DynamicEnumerator(_enumerable);
         }
 
         class DynamicEnumerator : IEnumerator, IDisposable

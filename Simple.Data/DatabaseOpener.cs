@@ -8,9 +8,9 @@ namespace Simple.Data
 {
     public interface IDatabaseOpener
     {
-        Database OpenDefault();
-        Database OpenFile(string filename);
-        Database OpenConnection(string connectionString);
+        dynamic OpenDefault();
+        dynamic OpenFile(string filename);
+        dynamic OpenConnection(string connectionString);
     }
 
     internal class DatabaseOpener : IDatabaseOpener
@@ -20,17 +20,17 @@ namespace Simple.Data
         private static Func<string, Database> _openFile = OpenFileMethod;
         private static Func<string, Database> _openConnection = OpenConnectionMethod;
 
-        public Database OpenDefault()
+        public dynamic OpenDefault()
         {
             return _openDefault();
         }
 
-        public Database OpenFile(string filename)
+        public dynamic OpenFile(string filename)
         {
             return _openFile(filename);
         }
 
-        public Database OpenConnection(string connectionString)
+        public dynamic OpenConnection(string connectionString)
         {
             return _openConnection(connectionString);
         }
