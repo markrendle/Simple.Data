@@ -59,7 +59,7 @@ namespace Simple.Data
                 }
                 else
                 {
-                    result = relatedRows.Select(dict => new DynamicRecord(dict, binder.Name, _database));
+                    result = new DynamicEnumerable(relatedRows.Select(dict => new DynamicRecord(dict, binder.Name, _database)));
                 }
                 return true;
             }
