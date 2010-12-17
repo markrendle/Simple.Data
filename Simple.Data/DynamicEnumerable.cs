@@ -77,6 +77,16 @@ namespace Simple.Data
             return new DynamicEnumerator(_enumerable);
         }
 
+        public override bool TryConvert(ConvertBinder binder, out object result)
+        {
+            if (binder.Type == typeof(IEnumerable<object>))
+            {
+                result = Cast<object>();
+                return true;
+            }
+            return base.TryConvert(binder, out result);
+        }
+
         class DynamicEnumerator : IEnumerator, IDisposable
         {
             private readonly IEnumerator<dynamic> _enumerator;

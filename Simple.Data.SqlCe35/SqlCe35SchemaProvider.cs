@@ -53,9 +53,9 @@ namespace Simple.Data.SqlCe35
 
             foreach (var group in groups)
             {
-                yield return new ForeignKey(new TableName(group.First()["TABLE_SCHEMA"].ToString(), group.First()["TABLE_NAME"].ToString()),
+                yield return new ForeignKey(new TableName("", group.First()["TABLE_NAME"].ToString()),
                     group.Select(row => row["COLUMN_NAME"].ToString()),
-                    new TableName(group.First()["UNIQUE_TABLE_SCHEMA"].ToString(), group.First()["UNIQUE_TABLE_NAME"].ToString()),
+                    new TableName("", group.First()["UNIQUE_TABLE_NAME"].ToString()),
                     group.Select(row => row["UNIQUE_COLUMN_NAME"].ToString()));
             }
         }

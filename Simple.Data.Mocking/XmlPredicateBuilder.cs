@@ -13,7 +13,7 @@ namespace Simple.Data.Mocking
             if (criteria.Type == SimpleExpressionType.And || criteria.Type == SimpleExpressionType.Or)
             {
                 var leftPredicate = GetPredicate((SimpleExpression) criteria.LeftOperand);
-                var rightPredicate = GetPredicate((SimpleExpression)criteria.LeftOperand);
+                var rightPredicate = GetPredicate((SimpleExpression)criteria.RightOperand);
                 return criteria.Type == SimpleExpressionType.And
                            ? (xml => leftPredicate(xml) && rightPredicate(xml))
                            : new Func<XElement, bool>(xml => leftPredicate(xml) || rightPredicate(xml));
