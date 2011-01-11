@@ -62,6 +62,7 @@
     <Compile Include="BinderHelper.cs" />
     <Compile Include="CachingAdapterFactory.cs" />
     <Compile Include="Commands\CommandFactory.cs" />
+    <Compile Include="Commands\ExecuteFunctionCommand.cs" />
     <Compile Include="Commands\UpdateCommand.cs" />
     <Compile Include="ConcreteObject.cs" />
     <Compile Include="ConcreteTypeCreator.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="Extensions\BinderExtensions.cs" />
     <Compile Include="Extensions\IDictionaryExtensions.cs" />
     <Compile Include="Extensions\ObjectEx.cs" />
+    <Compile Include="FunctionReturnType.cs" />
     <Compile Include="HomogenizedKeyDictionary.cs" />
     <Compile Include="ExpressionHelper.cs" />
     <Compile Include="Commands\FindAllCommand.cs" />
@@ -91,6 +93,7 @@
     <Compile Include="Commands\DeleteByCommand.cs" />
     <Compile Include="IAdapterFactory.cs" />
     <Compile Include="IAdapterTransaction.cs" />
+    <Compile Include="IAdapterWithFunctions.cs" />
     <Compile Include="IAdapterWithRelation.cs" />
     <Compile Include="IAdapterWithTransactions.cs" />
     <Compile Include="MefHelper.cs" />

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
+using Simple.Data.Commands;
 
 namespace Simple.Data
 {
@@ -35,6 +36,17 @@ namespace Simple.Data
         {
             result = _members.GetOrAdd(binder.Name, CreateDynamicReference);
             return true;
+        }
+
+        public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
+        {
+            var adapterWithFunctions = Adapter as IAdapterWithFunctions;
+            if (adapterWithFunctions != null && adapterWithFunctions.IsValidFunction(binder.Name))
+            {
+                var command = new ExecuteFunctionCommand(adapterWithFunctions, binder.Name,
+                                                         binder.CallInfo.ArgumentNames, args);
+            }
+            return base.TryInvokeMember(binder, args, out result);
         }
 
         private DynamicReference CreateDynamicReference(string name)
