@@ -59,6 +59,7 @@
     </Compile>
     <Compile Include="AdapterException.cs" />
     <Compile Include="AdapterFactory.cs" />
+    <Compile Include="AdapterWithFunctionsExtensions.cs" />
     <Compile Include="BinderHelper.cs" />
     <Compile Include="CachingAdapterFactory.cs" />
     <Compile Include="Commands\CommandFactory.cs" />
