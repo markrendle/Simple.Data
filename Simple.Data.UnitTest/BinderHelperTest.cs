@@ -12,11 +12,19 @@ namespace Simple.Data.UnitTest
     public class BinderHelperTest
     {
         [Test]
-        public void ArgumentsToDictionaryShouldNameNamelessArgumentsWithOrdinal()
+        public void NamedArgumentsToDictionaryShouldApplyNamesToLastArguments()
         {
             var binder = new TestInvokeMemberBinder("Test", false, new CallInfo(2, "Foo"));
             var actual = binder.NamedArgumentsToDictionary(new object[] {1, 2});
             Assert.AreEqual(2, actual["Foo"]);
+        }
+
+        [Test]
+        public void ArgumentsToDictionaryShouldApplyOrdinalNamesToFirstArguments()
+        {
+            var binder = new TestInvokeMemberBinder("Test", false, new CallInfo(2, "Foo"));
+            var actual = binder.ArgumentsToDictionary(new object[] { 1, 2 });
+            Assert.AreEqual("_0", actual.First().Key);
         }
     }
 

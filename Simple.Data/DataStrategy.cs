@@ -44,7 +44,7 @@ namespace Simple.Data
             if (adapterWithFunctions != null && adapterWithFunctions.IsValidFunction(binder.Name))
             {
                 var command = new ExecuteFunctionCommand(adapterWithFunctions, binder.Name,
-                                                         binder.CallInfo.ArgumentNames, args);
+                                                         binder.ArgumentsToDictionary(args));
             }
             return base.TryInvokeMember(binder, args, out result);
         }

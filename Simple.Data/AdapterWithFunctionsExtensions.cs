@@ -15,12 +15,11 @@ namespace Simple.Data
             return adapterWithFunctions.IsValidFunction(functionName);
         }
 
-        public static bool Execute(this Adapter adapter, string functionName, IEnumerable<string> parameterNames, IEnumerable<object> parameterValues, out object result)
+        public static bool Execute(this Adapter adapter, string functionName, IEnumerable<KeyValuePair<string,object>> parameters, out object result)
         {
             var adapterWithFunctions = adapter as IAdapterWithFunctions;
             if (adapterWithFunctions == null) throw new NotSupportedException("Adapter does not support Function calls.");
-            var command = new ExecuteFunctionCommand(adapterWithFunctions, functionName,
-                                                                     parameterNames, parameterValues);
+            var command = new ExecuteFunctionCommand(adapterWithFunctions, functionName, parameters);
             return command.Execute(out result);
         }
     }

@@ -38,8 +38,10 @@ namespace Simple.Data.Extensions
             return default(T);
         }
 
-        public static Dictionary<TKey,TValue> ToDictionary<TKey,TValue>(this IEnumerable<KeyValuePair<TKey,TValue>> source)
+        public static IDictionary<TKey,TValue> ToDictionary<TKey,TValue>(this IEnumerable<KeyValuePair<TKey,TValue>> source)
         {
+            var dict = source as IDictionary<TKey, TValue>;
+            if (dict != null) return new Dictionary<TKey, TValue>(dict);
             return source.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         }
 
