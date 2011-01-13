@@ -8,7 +8,7 @@ using Simple.Data.Extensions;
 namespace Simple.Data
 {
     /// <summary>
-    /// Stores data internally for <see cref="DynamicRecord"/>.
+    /// Stores data internally for <see cref="SimpleRecord"/>.
     /// </summary>
     internal class HomogenizedKeyDictionary : IDictionary<string,object>
     {

@@ -37,5 +37,15 @@ namespace Simple.Data.Extensions
         {
             return !str.Any(c => char.IsLower(c));
         }
+
+        public static string NullIfWhitespace(this string str)
+        {
+            return string.IsNullOrWhiteSpace(str) ? null : str;
+        }
+
+        public static string OrDefault(this string str, string defaultValue)
+        {
+            return str ?? defaultValue;
+        }
     }
 }

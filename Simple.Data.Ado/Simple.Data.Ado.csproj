@@ -87,7 +87,9 @@
     <Compile Include="Schema\ForeignKeyCollection.cs" />
     <Compile Include="Schema\ISchemaProvider.cs" />
     <Compile Include="Schema\Key.cs" />
+    <Compile Include="Schema\Parameter.cs" />
     <Compile Include="Schema\SchemaSpecificStringExtensions.cs" />
+    <Compile Include="Schema\StoredProcedure.cs" />
     <Compile Include="Schema\Table.cs" />
     <Compile Include="Schema\TableCollection.cs" />
     <Compile Include="Schema\TableJoin.cs" />
@@ -104,6 +106,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdoAdapter.IAdapterWithFunctions.cs" />
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

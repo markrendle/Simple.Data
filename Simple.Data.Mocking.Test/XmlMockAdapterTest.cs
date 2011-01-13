@@ -93,7 +93,7 @@ namespace Simple.Data.Mocking.Test
         [Test]
         public void TestUpdate()
         {
-            dynamic record = new DynamicRecord();
+            dynamic record = new SimpleRecord();
             record.Id = 4;
             record.Email = "quux";
             Database.Default.Users.Update(record);

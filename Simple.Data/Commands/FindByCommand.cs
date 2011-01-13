@@ -16,7 +16,7 @@ namespace Simple.Data.Commands
         {
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
             var data = dataStrategy.Find(table.GetQualifiedName(), criteriaExpression).FirstOrDefault();
-            return data != null ? new DynamicRecord(data, table.GetQualifiedName(), dataStrategy) : null;
+            return data != null ? new SimpleRecord(data, table.GetQualifiedName(), dataStrategy) : null;
         }
     }
 }

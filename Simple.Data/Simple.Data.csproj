@@ -68,7 +68,7 @@
     <Compile Include="ConcreteObject.cs" />
     <Compile Include="ConcreteTypeCreator.cs" />
     <Compile Include="Database.Obsolete.cs" />
-    <Compile Include="DynamicEnumerable.cs" />
+    <Compile Include="SimpleResultSet.cs" />
     <Compile Include="DynamicSchema.cs" />
     <Compile Include="Extensions\BinderExtensions.cs" />
     <Compile Include="Extensions\IDictionaryExtensions.cs" />
@@ -80,7 +80,7 @@
     <Compile Include="Commands\FindCommand.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="DatabaseOpener.cs" />
-    <Compile Include="DynamicRecord.cs" />
+    <Compile Include="SimpleRecord.cs" />
     <Compile Include="Extensions\DynamicStringExtensions.cs" />
     <Compile Include="DynamicTable.cs" />
     <Compile Include="DynamicReference.cs" />

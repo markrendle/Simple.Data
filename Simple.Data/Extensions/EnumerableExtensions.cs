@@ -71,7 +71,19 @@ namespace Simple.Data.Extensions
                 yield return Tuple.Create(buffer, enumerator.Current);
                 buffer = enumerator.Current;
             }
-            
+        }
+
+        public static IEnumerable<T> ExtendInfinite<T>(this IEnumerable<T> source)
+        {
+            foreach (var item in source)
+            {
+                yield return item;
+            }
+
+            while (true)
+            {
+                yield return default(T);
+            }
         }
     }
 }

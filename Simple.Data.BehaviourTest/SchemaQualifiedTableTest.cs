@@ -145,7 +145,7 @@ namespace Simple.Data.IntegrationTest
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
-            dynamic record = new DynamicRecord();
+            dynamic record = new SimpleRecord();
             record.Id = 1;
             record.Name = "Steve";
             record.Age = 50;
@@ -161,7 +161,7 @@ namespace Simple.Data.IntegrationTest
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
-            dynamic record = new DynamicRecord();
+            dynamic record = new SimpleRecord();
             record.Id = 1;
             record.Name = "Steve";
             record.Age = 50;

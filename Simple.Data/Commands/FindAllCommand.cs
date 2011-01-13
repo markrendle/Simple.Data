@@ -30,8 +30,8 @@ namespace Simple.Data.Commands
         /// <returns></returns>
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            return new DynamicEnumerable(dataStrategy.Find(table.GetQualifiedName(), null)
-                .Select(dict => new DynamicRecord(dict, table.GetQualifiedName(), dataStrategy)));
+            return new SimpleResultSet(dataStrategy.Find(table.GetQualifiedName(), null)
+                .Select(dict => new SimpleRecord(dict, table.GetQualifiedName(), dataStrategy)));
         }
     }
 }

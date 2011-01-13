@@ -7,19 +7,19 @@ namespace Simple.Data.Extensions
 {
     internal static class DictionaryExtensions
     {
-        public static DynamicRecord ToDynamicRecord(this IDictionary<string, object> dictionary)
+        public static SimpleRecord ToDynamicRecord(this IDictionary<string, object> dictionary)
         {
-            return dictionary == null ? null : new DynamicRecord(dictionary);
+            return dictionary == null ? null : new SimpleRecord(dictionary);
         }
 
-        public static DynamicRecord ToDynamicRecord(this IDictionary<string, object> dictionary, string tableName)
+        public static SimpleRecord ToDynamicRecord(this IDictionary<string, object> dictionary, string tableName)
         {
-            return dictionary == null ? null : new DynamicRecord(dictionary, tableName);
+            return dictionary == null ? null : new SimpleRecord(dictionary, tableName);
         }
 
-        public static DynamicRecord ToDynamicRecord(this IDictionary<string, object> dictionary, string tableName, DataStrategy dataStrategy)
+        public static SimpleRecord ToDynamicRecord(this IDictionary<string, object> dictionary, string tableName, DataStrategy dataStrategy)
         {
-            return dictionary == null ? null : new DynamicRecord(dictionary, tableName, dataStrategy);
+            return dictionary == null ? null : new SimpleRecord(dictionary, tableName, dataStrategy);
         }
     }
 }

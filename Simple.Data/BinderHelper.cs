@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -8,19 +9,20 @@ namespace Simple.Data
 {
     static class BinderHelper
     {
-        internal static Dictionary<string, object> NamedArgumentsToDictionary(this InvokeMemberBinder binder, IList<object> args)
+        internal static IDictionary<string, object> NamedArgumentsToDictionary(this InvokeMemberBinder binder, IList<object> args)
         {
-            var dict = new Dictionary<string, object>();
+            var dict = new Dictionary<string, object>() as ICollection<KeyValuePair<string,object>>;
 
-            for (int i = 0; i < args.Count; i++)
+            var keyValuePairs = binder.CallInfo.ArgumentNames
+                .Reverse()
+                .Zip(args.Reverse(), (k, v) => new KeyValuePair<string, object>(k, v));
+
+            foreach (var pair in keyValuePairs)
             {
-                if (!string.IsNullOrWhiteSpace(binder.CallInfo.ArgumentNames[i]))
-                {
-                    dict.Add(binder.CallInfo.ArgumentNames[i], args[i]);
-                }
+                dict.Add(pair);
             }
 
-            return dict;
+            return dict as IDictionary<string,object>;
         }
     }
 }

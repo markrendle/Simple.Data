@@ -25,7 +25,7 @@ namespace Simple.Data.UnitTest
                                                        { "Name", "Bob" },
                                                        { "Age", 42 }
                                                    };
-            dynamic target = new DynamicRecord(data);
+            dynamic target = new SimpleRecord(data);
             Assert.AreEqual("Bob", target.Name);
             Assert.AreEqual(42, target.Age);
         }
@@ -36,7 +36,7 @@ namespace Simple.Data.UnitTest
         [Test()]
         public void DynamicRecordSetterTest()
         {
-            dynamic target = new DynamicRecord();
+            dynamic target = new SimpleRecord();
             target.Name = "Bob";
             Assert.AreEqual("Bob", target.Name);
         }
@@ -44,7 +44,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void DynamicCastTest()
         {
-            dynamic target = new DynamicRecord();
+            dynamic target = new SimpleRecord();
             target.Name = "Bob";
             target.Age = 42;
 
@@ -56,7 +56,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void DynamicCastShouldReturnSameObjectOnSubsequentCalls()
         {
-            dynamic target = new DynamicRecord();
+            dynamic target = new SimpleRecord();
             target.Name = "Bob";
             target.Age = 42;
 

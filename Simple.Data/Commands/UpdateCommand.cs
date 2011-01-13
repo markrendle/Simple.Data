@@ -54,7 +54,7 @@ namespace Simple.Data.Commands
 
         private static IDictionary<string,object> ObjectToDictionary(object obj)
         {
-            var dynamicRecord = obj as DynamicRecord;
+            var dynamicRecord = obj as SimpleRecord;
             if (dynamicRecord != null)
             {
                 return new Dictionary<string, object>(dynamicRecord);

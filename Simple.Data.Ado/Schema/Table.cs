@@ -16,10 +16,14 @@ namespace Simple.Data.Ado.Schema
         private readonly Lazy<Key> _lazyPrimaryKey;
         private readonly Lazy<ForeignKeyCollection> _lazyForeignKeys;
 
+        public Table(string name, TableType type) : this(name, null, type)
+        {
+        }
+
         public Table(string name, string schema, TableType type)
         {
             _actualName = name;
-            _schema = schema;
+            _schema = string.IsNullOrWhiteSpace(schema) ? null : schema;
             _type = type;
         }
 

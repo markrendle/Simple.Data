@@ -50,6 +50,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BinderHelperTest.cs" />
     <Compile Include="DataRecordExtensionsTest.cs" />
     <Compile Include="DynamicEnumerableTest.cs" />
     <Compile Include="DynamicRecordTest.cs" />

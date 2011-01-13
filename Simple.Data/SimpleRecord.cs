@@ -8,34 +8,34 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data
 {
-    public partial class DynamicRecord : DynamicObject
+    public partial class SimpleRecord : DynamicObject
     {
         private readonly ConcreteObject _concreteObject = new ConcreteObject();
         private readonly HomogenizedKeyDictionary _data;
         private readonly DataStrategy _database;
         private readonly string _tableName;
 
-        public DynamicRecord()
+        public SimpleRecord()
         {
             _data = new HomogenizedKeyDictionary();
         }
 
-        public DynamicRecord(Database database)
+        public SimpleRecord(Database database)
         {
             _data = new HomogenizedKeyDictionary();
             _database = database;
         }
 
-        internal DynamicRecord(IEnumerable<KeyValuePair<string, object>> data) : this(data, null)
+        internal SimpleRecord(IEnumerable<KeyValuePair<string, object>> data) : this(data, null)
         {
         }
 
-        internal DynamicRecord(IEnumerable<KeyValuePair<string, object>> data, string tableName)
+        internal SimpleRecord(IEnumerable<KeyValuePair<string, object>> data, string tableName)
             : this(data, tableName, null)
         {
         }
 
-        internal DynamicRecord(IEnumerable<KeyValuePair<string, object>> data, string tableName, DataStrategy dataStrategy)
+        internal SimpleRecord(IEnumerable<KeyValuePair<string, object>> data, string tableName, DataStrategy dataStrategy)
         {
             _tableName = tableName;
             _database = dataStrategy;
@@ -55,11 +55,11 @@ namespace Simple.Data
                 var relatedRows = relatedAdapter.FindRelated(_tableName, _data, binder.Name);
                 if (relatedRows.Count() == 1 && !binder.Name.IsPlural())
                 {
-                    result = new DynamicRecord(relatedRows.Single(), binder.Name, _database);
+                    result = new SimpleRecord(relatedRows.Single(), binder.Name, _database);
                 }
                 else
                 {
-                    result = new DynamicEnumerable(relatedRows.Select(dict => new DynamicRecord(dict, binder.Name, _database)));
+                    result = new SimpleResultSet(relatedRows.Select(dict => new SimpleRecord(dict, binder.Name, _database)));
                 }
                 return true;
             }

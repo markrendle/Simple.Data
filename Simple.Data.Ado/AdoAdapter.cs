@@ -12,7 +12,7 @@ using Simple.Data.Ado.Schema;
 namespace Simple.Data.Ado
 {
     [Export("Ado", typeof(Adapter))]
-    internal class AdoAdapter : Adapter, IAdapterWithRelation, IAdapterWithTransactions
+    internal partial class AdoAdapter : Adapter, IAdapterWithRelation, IAdapterWithTransactions
     {
         private IConnectionProvider _connectionProvider;
         private DatabaseSchema _schema;

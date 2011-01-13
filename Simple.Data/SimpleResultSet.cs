@@ -9,23 +9,36 @@ using Microsoft.CSharp.RuntimeBinder;
 
 namespace Simple.Data
 {
-    public sealed class DynamicEnumerable : DynamicObject, IEnumerable
+    public sealed class SimpleResultSet : DynamicObject, IEnumerable
     {
-        private readonly IEnumerable<dynamic> _enumerable;
+        private readonly IEnumerable<IEnumerable<dynamic>> _sources;
+        private readonly IEnumerator<IEnumerable<dynamic>> _sourceEnumerator;
+        private bool _hasCurrent;
 
-        public DynamicEnumerable(IEnumerable<dynamic> source)
+        public SimpleResultSet(params IEnumerable<dynamic>[] sources) : this (sources.AsEnumerable())
         {
-            _enumerable = source;
+        }
+
+        public SimpleResultSet(IEnumerable<IEnumerable<dynamic>> sources)
+        {
+            _sources = sources;
+            _sourceEnumerator = _sources.GetEnumerator();
+            _hasCurrent = _sourceEnumerator.MoveNext();
+        }
+
+        public bool MoveNext()
+        {
+            return _hasCurrent = (_hasCurrent && _sourceEnumerator.MoveNext());
         }
 
         public IEnumerable<T> Cast<T>()
         {
-            return _enumerable.Select(item => (T) item);
+            return _sourceEnumerator.Current.Select(item => (T) item);
         }
 
         public IEnumerable<T> OfType<T>()
         {
-            foreach (var item in _enumerable)
+            foreach (var item in _sourceEnumerator.Current)
             {
                 bool success = true;
                 T cast;
@@ -47,12 +60,12 @@ namespace Simple.Data
 
         public IList<dynamic> ToList()
         {
-            return _enumerable.ToList();
+            return _sourceEnumerator.Current.ToList();
         }
 
         public dynamic[] ToArray()
         {
-            return _enumerable.ToArray();
+            return _sourceEnumerator.Current.ToArray();
         }
 
         public IList<T> ToList<T>()
@@ -74,7 +87,7 @@ namespace Simple.Data
         /// <filterpriority>1</filterpriority>
         public IEnumerator GetEnumerator()
         {
-            return new DynamicEnumerator(_enumerable);
+            return new DynamicEnumerator(_sourceEnumerator.Current);
         }
 
         public override bool TryConvert(ConvertBinder binder, out object result)
@@ -137,6 +150,30 @@ namespace Simple.Data
             {
                 get { return _enumerator.Current; }
             }
+        }
+
+        /// <summary>
+        /// Creates a single-set <see cref="SimpleResultSet"/> from the specified source.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        public static SimpleResultSet Create(IEnumerable<IEnumerable<KeyValuePair<string,object>>> source)
+        {
+            var q = from dict in source
+                    select new SimpleRecord(dict);
+            return new SimpleResultSet(q);
+        }
+
+        /// <summary>
+        /// Creates a multi-set <see cref="SimpleResultSet"/> from the specified sources.
+        /// </summary>
+        /// <param name="sources">The sources.</param>
+        /// <returns></returns>
+        public static SimpleResultSet Create(IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> sources)
+        {
+            var q = from source in sources
+                    select from dict in source
+                    select new SimpleRecord(dict);
+            return new SimpleResultSet(q);
         }
     }
 }

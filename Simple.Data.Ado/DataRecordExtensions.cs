@@ -13,7 +13,7 @@ namespace Simple.Data.Ado
 
         public static dynamic ToDynamicRecord(this IDataRecord dataRecord, string tableName, Database database)
         {
-            return new DynamicRecord(dataRecord.ToDictionary(), tableName, database);
+            return new SimpleRecord(dataRecord.ToDictionary(), tableName, database);
         }
 
         public static Dictionary<string, object> ToDictionary(this IDataRecord dataRecord)

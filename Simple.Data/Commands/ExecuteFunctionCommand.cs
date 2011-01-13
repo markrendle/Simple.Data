@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using Simple.Data.Extensions;
 
 namespace Simple.Data.Commands
 {
@@ -52,28 +53,28 @@ namespace Simple.Data.Commands
             }
         }
 
-        private static IEnumerable<DynamicEnumerable> ToMultipleResultSets(object source)
+        private static IEnumerable<SimpleResultSet> ToMultipleResultSets(object source)
         {
-            if (source == null) return Enumerable.Empty<DynamicEnumerable>();
+            if (source == null) return Enumerable.Empty<SimpleResultSet>();
             var resultSets = source as IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>>;
             if (resultSets == null) throw new InvalidOperationException("Adapter returned incorrect Type.");
 
             return ToMultipleDynamicEnumerables(resultSets);
         }
 
-        private static IEnumerable<DynamicEnumerable> ToMultipleDynamicEnumerables(IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> resultSets)
+        private static IEnumerable<SimpleResultSet> ToMultipleDynamicEnumerables(IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> resultSets)
         {
-            return resultSets.Select(resultSet => new DynamicEnumerable(resultSet.Select(dict => new DynamicRecord(dict))));
+            return resultSets.Select(resultSet => new SimpleResultSet(resultSet.Select(dict => new SimpleRecord(dict))));
         }
 
-        private static DynamicEnumerable ToResultSet(object source)
+        private static SimpleResultSet ToResultSet(object source)
         {
-            if (source == null) return new DynamicEnumerable(Enumerable.Empty<dynamic>());
+            if (source == null) return new SimpleResultSet(Enumerable.Empty<dynamic>());
 
             var dicts = source as IEnumerable<IEnumerable<KeyValuePair<string, object>>>;
             if (dicts == null) throw new InvalidOperationException("Adapter returned incorrect Type.");
 
-            return new DynamicEnumerable(dicts.Select(dict => new DynamicRecord(dict)));
+            return new SimpleResultSet(dicts.Select(dict => new SimpleRecord(dict)));
         }
 
         private Func<string, IEnumerable<KeyValuePair<string, object>>, object> GetFunc(FunctionReturnType resultType)
@@ -97,10 +98,10 @@ namespace Simple.Data.Commands
 
         private IEnumerable<KeyValuePair<string,object>> MakeArguments()
         {
-            var argumentNamesWithDefaults =
-                _argumentNames.Select((s, i) => string.IsNullOrWhiteSpace(s) ? i.ToString() : s);
-            return _arguments.Zip(argumentNamesWithDefaults,
-                (v, k) => new KeyValuePair<string, object>(k, v));
+            return _arguments.Reverse()
+                .Zip(_argumentNames.Reverse().ExtendInfinite(), (v, k) => new KeyValuePair<string, object>(k, v))
+                .Reverse()
+                .Select((kvp, i) => kvp.Key == null ? new KeyValuePair<string, object>(i.ToString(), kvp.Value) : kvp);
         }
     }
 }
