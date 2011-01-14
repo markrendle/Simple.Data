@@ -90,11 +90,12 @@
     <Compile Include="Schema\Parameter.cs" />
     <Compile Include="Schema\SchemaSpecificStringExtensions.cs" />
     <Compile Include="Schema\StoredProcedure.cs" />
+    <Compile Include="Schema\StoredProcedureCollection.cs" />
     <Compile Include="Schema\Table.cs" />
     <Compile Include="Schema\TableCollection.cs" />
     <Compile Include="Schema\TableJoin.cs" />
     <Compile Include="Schema\TableType.cs" />
-    <Compile Include="TableName.cs" />
+    <Compile Include="ObjectName.cs" />
     <Compile Include="TupleExtensions.cs" />
     <Compile Include="UpdateHelper.cs" />
     <Compile Include="WeakCache.cs" />

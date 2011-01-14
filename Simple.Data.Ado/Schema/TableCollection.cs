@@ -103,9 +103,9 @@ namespace Simple.Data.Ado.Schema
             return null;
         }
 
-        public Table Find(TableName tableName)
+        public Table Find(ObjectName tableName)
         {
-            return Find(tableName.Table, tableName.Schema);
+            return Find(tableName.Name, tableName.Schema);
         }
     }
 }

@@ -5,11 +5,11 @@ namespace Simple.Data.Ado.Schema
     public sealed class ForeignKey
     {
         private readonly Key _columns;
-        private readonly TableName _detailTable;
-        private readonly TableName _masterTable;
+        private readonly ObjectName _detailTable;
+        private readonly ObjectName _masterTable;
         private readonly Key _masterColumns;
 
-        public ForeignKey(TableName detailTable, IEnumerable<string> columns, TableName masterTable, IEnumerable<string> masterColumns)
+        public ForeignKey(ObjectName detailTable, IEnumerable<string> columns, ObjectName masterTable, IEnumerable<string> masterColumns)
         {
             _columns = new Key(columns);
             _detailTable = detailTable;
@@ -17,7 +17,7 @@ namespace Simple.Data.Ado.Schema
             _masterColumns = new Key(masterColumns);
         }
 
-        public TableName DetailTable
+        public ObjectName DetailTable
         {
             get { return _detailTable; }
         }
@@ -32,7 +32,7 @@ namespace Simple.Data.Ado.Schema
             get { return _columns; }
         }
 
-        public TableName MasterTable
+        public ObjectName MasterTable
         {
             get { return _masterTable; }
         }

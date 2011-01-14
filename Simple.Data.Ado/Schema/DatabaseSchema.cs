@@ -39,7 +39,7 @@ namespace Simple.Data.Ado.Schema
             return _lazyTables.Value.Find(tableName);
         }
 
-        public Table FindTable(TableName tableName)
+        public Table FindTable(ObjectName tableName)
         {
             return _lazyTables.Value.Find(tableName);
         }
@@ -55,9 +55,9 @@ namespace Simple.Data.Ado.Schema
             return _schemaProvider.QuoteObjectName(unquotedName);
         }
 
-        public string QuoteObjectName(TableName unquotedName)
+        public string QuoteObjectName(ObjectName unquotedName)
         {
-            return _schemaProvider.QuoteObjectName(unquotedName.Schema) + '.' + _schemaProvider.QuoteObjectName(unquotedName.Table);
+            return _schemaProvider.QuoteObjectName(unquotedName.Schema) + '.' + _schemaProvider.QuoteObjectName(unquotedName.Name);
         }
 
         public static DatabaseSchema Get(IConnectionProvider connectionProvider)

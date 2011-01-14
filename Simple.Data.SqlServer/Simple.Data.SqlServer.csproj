@@ -52,6 +52,7 @@
     </Compile>
     <Compile Include="SqlConnectionProvider.cs" />
     <Compile Include="SqlSchemaProvider.cs" />
+    <Compile Include="SqlTypeResolver.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Simple.Data.Ado\Simple.Data.Ado.csproj">

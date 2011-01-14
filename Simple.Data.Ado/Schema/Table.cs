@@ -16,10 +16,6 @@ namespace Simple.Data.Ado.Schema
         private readonly Lazy<Key> _lazyPrimaryKey;
         private readonly Lazy<ForeignKeyCollection> _lazyForeignKeys;
 
-        public Table(string name, TableType type) : this(name, null, type)
-        {
-        }
-
         public Table(string name, string schema, TableType type)
         {
             _actualName = name;
@@ -137,7 +133,7 @@ namespace Simple.Data.Ado.Schema
             var table = _databaseSchema.FindTable(name);
 
             var foreignKey =
-                this.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == table.Schema && fk.MasterTable.Table == table.ActualName);
+                this.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == table.Schema && fk.MasterTable.Name == table.ActualName);
 
             if (foreignKey == null) return null;
 
@@ -156,7 +152,7 @@ namespace Simple.Data.Ado.Schema
         {
             var table = DatabaseSchema.FindTable(name);
             var foreignKey =
-                table.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == this.Schema && fk.MasterTable.Table == this.ActualName);
+                table.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == this.Schema && fk.MasterTable.Name == this.ActualName);
 
             if (foreignKey == null) return null;
 

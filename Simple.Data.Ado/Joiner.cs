@@ -12,7 +12,7 @@ namespace Simple.Data.Ado
     {
         private readonly JoinType _joinType;
         private readonly DatabaseSchema _schema;
-        private readonly ConcurrentDictionary<TableName, string> _done = new ConcurrentDictionary<TableName, string>();
+        private readonly ConcurrentDictionary<ObjectName, string> _done = new ConcurrentDictionary<ObjectName, string>();
 
         public Joiner(DatabaseSchema schema) : this(JoinType.Outer, schema)
         {
@@ -25,7 +25,7 @@ namespace Simple.Data.Ado
             _schema = schema;
         }
 
-        public string GetJoinClauses(TableName mainTableName, SimpleExpression expression)
+        public string GetJoinClauses(ObjectName mainTableName, SimpleExpression expression)
         {
             _done.AddOrUpdate(mainTableName, string.Empty, (s, o) => string.Empty);
             var tablePairs = GetTableNames(expression, mainTableName.Schema);
@@ -36,15 +36,15 @@ namespace Simple.Data.Ado
             return string.Join(" ", tablePairs.Select(tp => _done[tp.Item2]));
         }
 
-        private void AddJoin(TableName table1Name, TableName table2Name)
+        private void AddJoin(ObjectName table1Name, ObjectName table2Name)
         {
             var table1 = _schema.FindTable(table1Name);
             var table2 = _schema.FindTable(table2Name);
 
             var foreignKey =
-                table2.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == table1.Schema && fk.MasterTable.Table == table1.ActualName)
+                table2.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == table1.Schema && fk.MasterTable.Name == table1.ActualName)
                 ??
-                table1.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == table2.Schema && fk.MasterTable.Table == table2.ActualName);
+                table1.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == table2.Schema && fk.MasterTable.Name == table2.ActualName);
 
             if (foreignKey == null) throw new SchemaResolutionException(
                 string.Format("Could not join '{0}' and '{1}'", table1.ActualName, table2.ActualName));
@@ -78,11 +78,11 @@ namespace Simple.Data.Ado
             get { return _joinType == JoinType.Inner ? string.Empty : "LEFT"; }
         }
 
-        private static IEnumerable<Tuple<TableName,TableName>> GetTableNames(SimpleExpression expression, string schema)
+        private static IEnumerable<Tuple<ObjectName,ObjectName>> GetTableNames(SimpleExpression expression, string schema)
         {
             return GetReferencesFromExpression(expression)
                 .SelectMany(r => DynamicReferenceToTuplePairs(r, schema))
-                .Select((table1, table2) => Tuple.Create(new TableName(schema, table1), new TableName(schema, table2)))
+                .Select((table1, table2) => Tuple.Create(new ObjectName(schema, table1), new ObjectName(schema, table2)))
                 .Distinct();
         }
 

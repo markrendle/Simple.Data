@@ -5,31 +5,31 @@ using System.Text;
 
 namespace Simple.Data.Ado
 {
-    public class TableName : IEquatable<TableName>
+    public class ObjectName : IEquatable<ObjectName>
     {
         private readonly string _schema;
-        private readonly string _table;
+        private readonly string _name;
 
-        public TableName(string schema, string table)
+        public ObjectName(string schema, string name)
         {
             if (schema == null) throw new ArgumentNullException("schema");
-            if (table == null) throw new ArgumentNullException("table");
+            if (name == null) throw new ArgumentNullException("table");
             _schema = schema;
-            _table = table;
+            _name = name;
         }
 
-        public static TableName Parse(string text)
+        public static ObjectName Parse(string text)
         {
             if (text == null) throw new ArgumentNullException("text");
-            if (!text.Contains('.')) return new TableName(Properties.Settings.Default.DefaultSchema ?? "dbo", text);
+            if (!text.Contains('.')) return new ObjectName(Properties.Settings.Default.DefaultSchema ?? "dbo", text);
             var schemaDotTable = text.Split('.');
             if (schemaDotTable.Length != 2) throw new InvalidOperationException("Could not parse table name.");
-            return new TableName(schemaDotTable[0], schemaDotTable[1]);
+            return new ObjectName(schemaDotTable[0], schemaDotTable[1]);
         }
 
-        public string Table
+        public string Name
         {
-            get { return _table; }
+            get { return _name; }
         }
 
         public string Schema
@@ -44,11 +44,11 @@ namespace Simple.Data.Ado
         /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
         /// </returns>
         /// <param name="other">An object to compare with this object.</param>
-        public bool Equals(TableName other)
+        public bool Equals(ObjectName other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(other._schema, _schema) && Equals(other._table, _table);
+            return Equals(other._schema, _schema) && Equals(other._name, _name);
         }
 
         /// <summary>
@@ -62,8 +62,8 @@ namespace Simple.Data.Ado
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof (TableName)) return false;
-            return Equals((TableName) obj);
+            if (obj.GetType() != typeof (ObjectName)) return false;
+            return Equals((ObjectName) obj);
         }
 
         /// <summary>
@@ -77,16 +77,16 @@ namespace Simple.Data.Ado
         {
             unchecked
             {
-                return (_schema.GetHashCode()*397) ^ _table.GetHashCode();
+                return (_schema.GetHashCode()*397) ^ _name.GetHashCode();
             }
         }
 
-        public static bool operator ==(TableName left, TableName right)
+        public static bool operator ==(ObjectName left, ObjectName right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(TableName left, TableName right)
+        public static bool operator !=(ObjectName left, ObjectName right)
         {
             return !Equals(left, right);
         }

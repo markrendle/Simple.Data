@@ -18,7 +18,7 @@ namespace Simple.Data.Ado
             _expressionFormatter = new ExpressionFormatter(_commandBuilder, _schema);
         }
 
-        public ICommandBuilder GetFindByCommand(TableName tableName, SimpleExpression criteria)
+        public ICommandBuilder GetFindByCommand(ObjectName tableName, SimpleExpression criteria)
         {
             _commandBuilder.Append(GetSelectClause(tableName));
             _commandBuilder.Append(" ");
@@ -33,7 +33,7 @@ namespace Simple.Data.Ado
             return _commandBuilder;
         }
 
-        private string GetSelectClause(TableName tableName)
+        private string GetSelectClause(ObjectName tableName)
         {
             return string.Format("select {0}.* from {0}", _schema.FindTable(tableName).QualifiedName);
         }

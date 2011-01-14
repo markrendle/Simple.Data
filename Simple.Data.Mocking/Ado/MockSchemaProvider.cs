@@ -72,6 +72,19 @@ namespace Simple.Data.Mocking.Ado
                 .Select(row => new Column(row["COLUMN_NAME"].ToString(), table));
         }
 
+        public IEnumerable<StoredProcedure> GetStoredProcedures()
+        {
+            return _tables["PROCEDURES"].AsEnumerable()
+                .Select(row => new StoredProcedure(row["PROCEDURE_NAME"].ToString(), row["PROCEDURE_NAME"].ToString(), row["PROCEDURE_SCHEMA"].ToString()));
+        }
+
+        public IEnumerable<Parameter> GetParameters(StoredProcedure storedProcedure)
+        {
+            return _tables["PARAMETERS"].AsEnumerable()
+                .Where(row => row["PROCEDURE_SCHEMA"].ToString() == storedProcedure.Schema && row["PROCEDURE_NAME"].ToString() == storedProcedure.Name)
+                .Select(row => new Parameter(row["PARAMETER_NAME"].ToString(), typeof(object), ParameterDirection.Input));
+        }
+
         public Key GetPrimaryKey(Table table)
         {
             return new Key(_tables["PRIMARY_KEYS"].AsEnumerable()
@@ -92,9 +105,9 @@ namespace Simple.Data.Mocking.Ado
 
             foreach (var group in groups)
             {
-                yield return new ForeignKey(new TableName(group.First()["TABLE_SCHEMA"].ToString(), group.First()["TABLE_NAME"].ToString()),
+                yield return new ForeignKey(new ObjectName(group.First()["TABLE_SCHEMA"].ToString(), group.First()["TABLE_NAME"].ToString()),
                     group.Select(row => row["COLUMN_NAME"].ToString()),
-                    new TableName(group.First()["UNIQUE_TABLE_SCHEMA"].ToString(), group.First()["UNIQUE_TABLE_NAME"].ToString()),
+                    new ObjectName(group.First()["UNIQUE_TABLE_SCHEMA"].ToString(), group.First()["UNIQUE_TABLE_NAME"].ToString()),
                     group.Select(row => row["UNIQUE_COLUMN_NAME"].ToString()));
             }
         }

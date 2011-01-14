@@ -25,29 +25,68 @@ namespace Simple.Data.SqlServer
 
         public IEnumerable<Table> GetTables()
         {
-            using (var cn = ConnectionProvider.CreateConnection())
-            {
-                cn.Open();
+            return GetSchema("TABLES").Select(SchemaRowToTable);
+        }
 
-                foreach (var row in cn.GetSchema("TABLES").AsEnumerable())
-                {
-                    yield return new Table(row["TABLE_NAME"].ToString(), row["TABLE_SCHEMA"].ToString(),
+        private static Table SchemaRowToTable(DataRow row)
+        {
+            return new Table(row["TABLE_NAME"].ToString(), row["TABLE_SCHEMA"].ToString(),
                         row["TABLE_TYPE"].ToString() == "BASE TABLE" ? TableType.Table : TableType.View);
-                }
-            }
         }
 
         public IEnumerable<Column> GetColumns(Table table)
         {
             if (table == null) throw new ArgumentNullException("table");
+            return GetColumnsDataTable(table).AsEnumerable().Select(row => SchemaRowToColumn(table, row));
+        }
+
+        private static Column SchemaRowToColumn(Table table, DataRow row)
+        {
+            return new Column(row["name"].ToString(), table, (bool)row["is_identity"]);
+        }
+
+        public IEnumerable<StoredProcedure> GetStoredProcedures()
+        {
+            return GetSchema("Procedures").Select(SchemaRowToStoredProcedure);
+        }
+
+        private IEnumerable<DataRow> GetSchema(string collectionName, params string[] constraints)
+        {
             using (var cn = ConnectionProvider.CreateConnection())
             {
                 cn.Open();
 
-                foreach (var row in GetColumnsDataTable(table).AsEnumerable())
-                {
-                    yield return new Column(row["name"].ToString(), table, (bool)row["is_identity"]);
-                }
+                return cn.GetSchema(collectionName, constraints).AsEnumerable();
+            }
+        }
+
+        private static StoredProcedure SchemaRowToStoredProcedure(DataRow row)
+        {
+            return new StoredProcedure(row["ROUTINE_NAME"].ToString(), row["SPECIFIC_NAME"].ToString(), row["TABLE_SCHEMA"].ToString());
+        }
+
+        public IEnumerable<Parameter> GetParameters(StoredProcedure storedProcedure)
+        {
+            return GetSchema("ProcedureParameters", null, storedProcedure.Schema, storedProcedure.SpecificName)
+                .Select(SchemaRowToProcedureParameter);
+        }
+
+        private static Parameter SchemaRowToProcedureParameter(DataRow row)
+        {
+            return new Parameter(row["parameter_name"].ToString(), SqlTypeResolver.GetClrType(row["data_type"].ToString()),
+                DirectionFromString(row["parameter_mode"].ToString()));
+        }
+
+        private static ParameterDirection DirectionFromString(string mode)
+        {
+            switch (mode)
+            {
+                case "IN":
+                    return ParameterDirection.Input;
+                case "OUT":
+                    return ParameterDirection.Output;
+                default:
+                    return ParameterDirection.InputOutput;
             }
         }
 
@@ -73,9 +112,9 @@ namespace Simple.Data.SqlServer
 
             foreach (var group in groups)
             {
-                yield return new ForeignKey(new TableName(group.First()["TABLE_SCHEMA"].ToString(), group.First()["TABLE_NAME"].ToString()),
+                yield return new ForeignKey(new ObjectName(group.First()["TABLE_SCHEMA"].ToString(), group.First()["TABLE_NAME"].ToString()),
                     group.Select(row => row["COLUMN_NAME"].ToString()),
-                    new TableName(group.First()["UNIQUE_TABLE_SCHEMA"].ToString(), group.First()["UNIQUE_TABLE_NAME"].ToString()),
+                    new ObjectName(group.First()["UNIQUE_TABLE_SCHEMA"].ToString(), group.First()["UNIQUE_TABLE_NAME"].ToString()),
                     group.Select(row => row["UNIQUE_COLUMN_NAME"].ToString()));
             }
         }
@@ -85,6 +124,11 @@ namespace Simple.Data.SqlServer
             if (unquotedName == null) throw new ArgumentNullException("unquotedName");
             if (unquotedName.StartsWith("[")) return unquotedName;
             return string.Concat("[", unquotedName, "]");
+        }
+
+        public Type DataTypeToClrType(string dataType)
+        {
+            return SqlTypeResolver.GetClrType(dataType);
         }
 
         private DataTable GetColumnsDataTable(Table table)
