@@ -13,7 +13,7 @@ namespace Simple.Data.Ado
         public ObjectName(string schema, string name)
         {
             if (schema == null) throw new ArgumentNullException("schema");
-            if (name == null) throw new ArgumentNullException("table");
+            if (name == null) throw new ArgumentNullException("name");
             _schema = schema;
             _name = name;
         }
@@ -89,6 +89,11 @@ namespace Simple.Data.Ado
         public static bool operator !=(ObjectName left, ObjectName right)
         {
             return !Equals(left, right);
+        }
+
+        public override string ToString()
+        {
+            return _schema == null ? _name : _schema + "." + _name;
         }
     }
 }

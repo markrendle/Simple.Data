@@ -36,12 +36,12 @@ namespace Simple.Data.SqlCe35
             }
         }
 
-        public IEnumerable<StoredProcedure> GetStoredProcedures()
+        public IEnumerable<Procedure> GetStoredProcedures()
         {
-            return Enumerable.Empty<StoredProcedure>();
+            return Enumerable.Empty<Procedure>();
         }
 
-        public IEnumerable<Parameter> GetParameters(StoredProcedure storedProcedure)
+        public IEnumerable<Parameter> GetParameters(Procedure storedProcedure)
         {
             return Enumerable.Empty<Parameter>();
         }

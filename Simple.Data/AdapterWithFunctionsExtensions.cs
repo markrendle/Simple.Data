@@ -22,5 +22,24 @@ namespace Simple.Data
             var command = new ExecuteFunctionCommand(adapterWithFunctions, functionName, parameters);
             return command.Execute(out result);
         }
+
+        public static Func<string, IEnumerable<KeyValuePair<string, object>>, object> GetRelevantFunction(this IAdapterWithFunctions adapter, FunctionReturnType resultType)
+        {
+            Func<string, IEnumerable<KeyValuePair<string, object>>, object> func;
+
+            switch (resultType)
+            {
+                case FunctionReturnType.ResultSet:
+                    func = adapter.ExecuteResultSet;
+                    break;
+                case FunctionReturnType.MultipleResultSets:
+                    func = adapter.ExecuteMultipleResultSets;
+                    break;
+                default:
+                    func = adapter.ExecuteScalar;
+                    break;
+            }
+            return func;
+        }
     }
 }

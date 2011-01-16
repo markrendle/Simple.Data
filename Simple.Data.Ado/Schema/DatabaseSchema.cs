@@ -12,10 +12,12 @@ namespace Simple.Data.Ado.Schema
 
         private readonly ISchemaProvider _schemaProvider;
         private readonly Lazy<TableCollection> _lazyTables;
+        private readonly Lazy<ProcedureCollection> _lazyProcedures;
 
         private DatabaseSchema(ISchemaProvider schemaProvider)
         {
             _lazyTables = new Lazy<TableCollection>(CreateTableCollection);
+            _lazyProcedures = new Lazy<ProcedureCollection>(CreateProcedureCollection);
             _schemaProvider = schemaProvider;
         }
 
@@ -44,10 +46,29 @@ namespace Simple.Data.Ado.Schema
             return _lazyTables.Value.Find(tableName);
         }
 
+        public Procedure FindProcedure(string procedureName)
+        {
+            return _lazyProcedures.Value.Find(procedureName);
+        }
+
+        public Procedure FindProcedure(ObjectName procedureName)
+        {
+            return _lazyProcedures.Value.Find(procedureName);
+        }
+
         private TableCollection CreateTableCollection()
         {
             return new TableCollection(_schemaProvider.GetTables()
                 .Select(table => new Table(table.ActualName, table.Schema, table.Type, this)));
+        }
+
+        private ProcedureCollection CreateProcedureCollection()
+        {
+            return new ProcedureCollection(_schemaProvider.GetStoredProcedures()
+                                                     .Select(
+                                                         proc =>
+                                                         new Procedure(proc.Name, proc.SpecificName, proc.Schema,
+                                                                             this)));
         }
 
         public string QuoteObjectName(string unquotedName)

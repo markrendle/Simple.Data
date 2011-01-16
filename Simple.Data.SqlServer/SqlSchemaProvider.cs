@@ -45,7 +45,7 @@ namespace Simple.Data.SqlServer
             return new Column(row["name"].ToString(), table, (bool)row["is_identity"]);
         }
 
-        public IEnumerable<StoredProcedure> GetStoredProcedures()
+        public IEnumerable<Procedure> GetStoredProcedures()
         {
             return GetSchema("Procedures").Select(SchemaRowToStoredProcedure);
         }
@@ -60,12 +60,12 @@ namespace Simple.Data.SqlServer
             }
         }
 
-        private static StoredProcedure SchemaRowToStoredProcedure(DataRow row)
+        private static Procedure SchemaRowToStoredProcedure(DataRow row)
         {
-            return new StoredProcedure(row["ROUTINE_NAME"].ToString(), row["SPECIFIC_NAME"].ToString(), row["TABLE_SCHEMA"].ToString());
+            return new Procedure(row["ROUTINE_NAME"].ToString(), row["SPECIFIC_NAME"].ToString(), row["TABLE_SCHEMA"].ToString());
         }
 
-        public IEnumerable<Parameter> GetParameters(StoredProcedure storedProcedure)
+        public IEnumerable<Parameter> GetParameters(Procedure storedProcedure)
         {
             return GetSchema("ProcedureParameters", null, storedProcedure.Schema, storedProcedure.SpecificName)
                 .Select(SchemaRowToProcedureParameter);

@@ -11,9 +11,16 @@ namespace Simple.Data
 {
     public sealed class SimpleResultSet : DynamicObject, IEnumerable
     {
+        public static readonly SimpleResultSet Empty = new SimpleResultSet();
+
         private readonly IEnumerable<IEnumerable<dynamic>> _sources;
         private readonly IEnumerator<IEnumerable<dynamic>> _sourceEnumerator;
         private bool _hasCurrent;
+
+        private SimpleResultSet() : this(Enumerable.Empty<dynamic>())
+        {
+            
+        }
 
         public SimpleResultSet(params IEnumerable<dynamic>[] sources) : this (sources.AsEnumerable())
         {

@@ -7,8 +7,8 @@ namespace Simple.Data.Ado.Schema
     {
         IEnumerable<Table> GetTables();
         IEnumerable<Column> GetColumns(Table table);
-        IEnumerable<StoredProcedure> GetStoredProcedures();
-        IEnumerable<Parameter> GetParameters(StoredProcedure storedProcedure);
+        IEnumerable<Procedure> GetStoredProcedures();
+        IEnumerable<Parameter> GetParameters(Procedure storedProcedure);
         Key GetPrimaryKey(Table table);
         IEnumerable<ForeignKey> GetForeignKeys(Table table);
         string QuoteObjectName(string unquotedName);

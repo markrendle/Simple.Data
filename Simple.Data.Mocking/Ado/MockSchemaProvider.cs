@@ -72,13 +72,13 @@ namespace Simple.Data.Mocking.Ado
                 .Select(row => new Column(row["COLUMN_NAME"].ToString(), table));
         }
 
-        public IEnumerable<StoredProcedure> GetStoredProcedures()
+        public IEnumerable<Procedure> GetStoredProcedures()
         {
             return _tables["PROCEDURES"].AsEnumerable()
-                .Select(row => new StoredProcedure(row["PROCEDURE_NAME"].ToString(), row["PROCEDURE_NAME"].ToString(), row["PROCEDURE_SCHEMA"].ToString()));
+                .Select(row => new Procedure(row["PROCEDURE_NAME"].ToString(), row["PROCEDURE_NAME"].ToString(), row["PROCEDURE_SCHEMA"].ToString()));
         }
 
-        public IEnumerable<Parameter> GetParameters(StoredProcedure storedProcedure)
+        public IEnumerable<Parameter> GetParameters(Procedure storedProcedure)
         {
             return _tables["PARAMETERS"].AsEnumerable()
                 .Where(row => row["PROCEDURE_SCHEMA"].ToString() == storedProcedure.Schema && row["PROCEDURE_NAME"].ToString() == storedProcedure.Name)

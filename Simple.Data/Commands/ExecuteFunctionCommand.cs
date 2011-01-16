@@ -25,7 +25,7 @@ namespace Simple.Data.Commands
         public bool Execute(out object result)
         {
             var resultType = _adapter.GetReturnType(_functionName);
-            var func = GetFunc(resultType);
+            var func = _adapter.GetRelevantFunction(resultType);
             result = ConvertToSimpleTypes(func(_functionName, _arguments));
             return true;
         }
@@ -51,23 +51,23 @@ namespace Simple.Data.Commands
             }
         }
 
-        private static IEnumerable<SimpleResultSet> ToMultipleResultSets(object source)
+        private static SimpleResultSet ToMultipleResultSets(object source)
         {
-            if (source == null) return Enumerable.Empty<SimpleResultSet>();
+            if (source == null) return SimpleResultSet.Empty;
             var resultSets = source as IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>>;
             if (resultSets == null) throw new InvalidOperationException("Adapter returned incorrect Type.");
 
             return ToMultipleDynamicEnumerables(resultSets);
         }
 
-        private static IEnumerable<SimpleResultSet> ToMultipleDynamicEnumerables(IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> resultSets)
+        private static SimpleResultSet ToMultipleDynamicEnumerables(IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> resultSets)
         {
-            return resultSets.Select(resultSet => new SimpleResultSet(resultSet.Select(dict => new SimpleRecord(dict))));
+            return new SimpleResultSet(resultSets.Select(resultSet => resultSet.Select(dict => new SimpleRecord(dict))));
         }
 
         private static SimpleResultSet ToResultSet(object source)
         {
-            if (source == null) return new SimpleResultSet(Enumerable.Empty<dynamic>());
+            if (source == null) return SimpleResultSet.Empty;
 
             var dicts = source as IEnumerable<IEnumerable<KeyValuePair<string, object>>>;
             if (dicts == null) throw new InvalidOperationException("Adapter returned incorrect Type.");

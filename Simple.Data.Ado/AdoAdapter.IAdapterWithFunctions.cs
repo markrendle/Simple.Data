@@ -9,7 +9,7 @@ namespace Simple.Data.Ado
 	{
 	    public bool IsValidFunction(string functionName)
 	    {
-	        throw new NotImplementedException();
+	        return _schema.FindProcedure(functionName) != null;
 	    }
 
 	    public FunctionReturnType GetReturnType(string functionName)

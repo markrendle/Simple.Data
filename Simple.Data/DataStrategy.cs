@@ -45,6 +45,7 @@ namespace Simple.Data
             {
                 var command = new ExecuteFunctionCommand(adapterWithFunctions, binder.Name,
                                                          binder.ArgumentsToDictionary(args));
+                return command.Execute(out result);
             }
             return base.TryInvokeMember(binder, args, out result);
         }
