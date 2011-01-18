@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using Simple.Data.Extensions;
@@ -19,12 +20,12 @@ namespace Simple.Data.Ado
             _procedureName = procedureName;
         }
 
-        public IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> Execute(IEnumerable<KeyValuePair<string, object>> suppliedParameters)
+        public IEnumerable<IEnumerable<KeyValuePair<string, object>>> Execute(IEnumerable<KeyValuePair<string, object>> suppliedParameters)
         {
             return Execute(suppliedParameters.ToDictionary());
         }
 
-        public IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> Execute(IDictionary<string, object> suppliedParameters)
+        public IEnumerable<IEnumerable<KeyValuePair<string, object>>> Execute(IDictionary<string, object> suppliedParameters)
         {
             var procedure = _adapter.GetSchema().FindProcedure(_procedureName);
             if (procedure == null)
@@ -33,20 +34,35 @@ namespace Simple.Data.Ado
             }
 
             using (var cn = _adapter.CreateConnection())
-            using (var cmd = cn.CreateCommand())
+            using (var command = cn.CreateCommand())
             {
-                cmd.CommandText = procedure.QuotedName;
-                cmd.CommandType = CommandType.StoredProcedure;
-                int i = 0;
-                foreach (var parameter in procedure.Parameters)
+                command.CommandText = procedure.QuotedName;
+                command.CommandType = CommandType.StoredProcedure;
+                SetParameters(procedure, command, suppliedParameters);
+
+                try
                 {
-                    object value = null;
-                    if (!suppliedParameters.TryGetValue(parameter.Name.Replace("@", ""), out value))
-                    {
-                        suppliedParameters.TryGetValue(i.ToString(), out value);
-                    }
-                    value = value ?? DBNull.Value;
+                    return command.ToAsyncEnumerable();
                 }
+                catch (DbException ex)
+                {
+                    throw new AdoAdapterException(ex.Message, command);
+                }
+            }
+        }
+
+        private static void SetParameters(Procedure procedure, DbCommand cmd, IDictionary<string, object> suppliedParameters)
+        {
+            int i = 0;
+            foreach (var parameter in procedure.Parameters)
+            {
+                object value;
+                if (!suppliedParameters.TryGetValue(parameter.Name.Replace("@", ""), out value))
+                {
+                    suppliedParameters.TryGetValue(i.ToString(), out value);
+                }
+                cmd.AddParameter(parameter.Name, value);
+                i++;
             }
         }
     }

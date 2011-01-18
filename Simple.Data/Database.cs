@@ -15,14 +15,12 @@ namespace Simple.Data
     public partial class Database : DataStrategy
     {
         private static readonly IDatabaseOpener DatabaseOpener;
-        private static readonly Lazy<dynamic> LazyDefault;
         private readonly ConcurrentDictionary<string, dynamic> _members = new ConcurrentDictionary<string, dynamic>();
         private readonly Adapter _adapter;
 
         static Database()
         {
             DatabaseOpener = new DatabaseOpener();
-            LazyDefault = new Lazy<dynamic>(DatabaseOpener.OpenDefault, LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
         /// <summary>
@@ -51,7 +49,7 @@ namespace Simple.Data
         /// <value>The default database.</value>
         public static dynamic Default
         {
-            get { return LazyDefault.Value; }
+            get { return DatabaseOpener.OpenDefault(); }
         }
 
         /// <summary>

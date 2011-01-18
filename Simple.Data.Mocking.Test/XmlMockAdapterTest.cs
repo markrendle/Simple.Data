@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 
 namespace Simple.Data.Mocking.Test
@@ -42,6 +43,38 @@ namespace Simple.Data.Mocking.Test
             Assert.AreEqual("foo", user.Email);
             Assert.AreEqual("bar", user.Password);
         }
+
+        /// <summary>
+        ///A test for Find
+        ///</summary>
+        [Test]
+        public void SeparateThreads_Should_SeeDifferentMocks()
+        {
+            int r1 = 0;
+            int r2 = 0;
+
+            var t1 = new Thread(() => r1 = ThreadTestHelper(1));
+            var t2 = new Thread(() => r2 = ThreadTestHelper(2));
+            t1.Start();
+            t2.Start();
+            t1.Join();
+            t2.Join();
+
+            Assert.AreEqual(1, r1);
+            Assert.AreEqual(2, r2);
+        }
+
+        private static int ThreadTestHelper(int userId)
+        {
+            var mockAdapter =
+                new XmlMockAdapter(
+                    @"<Root><Users _keys=""Id"" Id=""System.Int32"" Key=""System.Guid"">
+<User Id=""" + userId + @""" Email=""foo"" Password=""bar""/>
+</Users></Root>");
+            MockHelper.UseMockAdapter(mockAdapter);
+            return Database.Default.Users.FindByEmail("foo").Id;
+        }
+
 
         /// <summary>
         ///A test for Find

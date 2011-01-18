@@ -16,23 +16,41 @@ namespace Simple.Data
     internal class DatabaseOpener : IDatabaseOpener
     {
         private static readonly IAdapterFactory AdapterFactory = new CachingAdapterFactory();
-        private static Func<Database> _openDefault = OpenDefaultMethod;
-        private static Func<string, Database> _openFile = OpenFileMethod;
-        private static Func<string, Database> _openConnection = OpenConnectionMethod;
+        [ThreadStatic]
+        private static Func<Database> _openDefault;
+        [ThreadStatic]
+        private static Func<string, Database> _openFile;
+        [ThreadStatic]
+        private static Func<string, Database> _openConnection;
+
+        private static Func<Database> OpenDefaultImpl
+        {
+            get { return _openDefault ?? OpenDefaultMethod; }
+        }
+
+        private static Func<string,Database> OpenFileImpl
+        {
+            get { return _openFile ?? OpenFileMethod; }
+        }
+
+        private static Func<string, Database> OpenConnectionImpl
+        {
+            get { return _openConnection ?? OpenConnectionMethod; }
+        }
 
         public dynamic OpenDefault()
         {
-            return _openDefault();
+            return OpenDefaultImpl();
         }
 
         public dynamic OpenFile(string filename)
         {
-            return _openFile(filename);
+            return OpenFileImpl(filename);
         }
 
         public dynamic OpenConnection(string connectionString)
         {
-            return _openConnection(connectionString);
+            return OpenConnectionImpl(connectionString);
         }
 
         public static void UseMockDatabase(Database database)

@@ -20,5 +20,14 @@ namespace Simple.Data.Ado
         {
             return new ObservableDataReader(command);
         }
+
+        public static IDbDataParameter AddParameter(this IDbCommand command, string name, object value)
+        {
+            var parameter = command.CreateParameter();
+            parameter.ParameterName = name;
+            parameter.Value = value ?? DBNull.Value;
+            command.Parameters.Add(parameter);
+            return parameter;
+        }
     }
 }
