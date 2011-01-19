@@ -8,16 +8,35 @@ namespace Simple.Data.Ado
     {
         public static IEnumerable<IDictionary<string, object>> ToDictionaries(this IDataReader reader)
         {
-            var list = new List<IDictionary<string, object>>();
             using (reader)
             {
-                while (reader.Read())
-                {
-                    list.Add(reader.ToDictionary());
-                }
+                return ToDictionariesImpl(reader).ToArray().AsEnumerable();
             }
+        }
 
-            return list.AsEnumerable();
+        public static IEnumerable<IEnumerable<IDictionary<string, object>>> ToMultipleDictionaries(this IDataReader reader)
+        {
+            using (reader)
+            {
+                return ToMultipleDictionariesImpl(reader).ToArray().AsEnumerable();
+            }
+        }
+
+        private static IEnumerable<IEnumerable<IDictionary<string,object>>> ToMultipleDictionariesImpl(IDataReader reader)
+        {
+            do
+            {
+                yield return ToDictionariesImpl(reader).ToArray().AsEnumerable();
+            } while (reader.NextResult());
+            
+        }
+
+        private static IEnumerable<IDictionary<string,object>> ToDictionariesImpl(IDataReader reader)
+        {
+            while (reader.Read())
+            {
+                yield return reader.ToDictionary();
+            }
         }
 
         public static IEnumerable<object> ToDynamicList(this IDataReader reader)

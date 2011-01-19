@@ -9,9 +9,6 @@ namespace Simple.Data
     public interface IAdapterWithFunctions
     {
         bool IsValidFunction(string functionName);
-        FunctionReturnType GetReturnType(string functionName);
-        object ExecuteScalar(string functionName, IEnumerable<KeyValuePair<string, object>> parameters);
-        ResultSet ExecuteResultSet(string functionName, IEnumerable<KeyValuePair<string, object>> parameters);
-        IEnumerable<ResultSet> ExecuteMultipleResultSets(string functionName, IEnumerable<KeyValuePair<string, object>> parameters);
+        IEnumerable<ResultSet> Execute(string functionName, IEnumerable<KeyValuePair<string, object>> parameters);
     }
 }

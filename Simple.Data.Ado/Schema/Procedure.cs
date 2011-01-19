@@ -28,6 +28,7 @@ namespace Simple.Data.Ado.Schema
             _name = name;
             _specificName = specificName;
             _schema = schema.NullIfWhitespace();
+            _lazyParameters = new Lazy<ParameterCollection>(() => new ParameterCollection(GetParameters()));
             _databaseSchema = databaseSchema;
         }
 

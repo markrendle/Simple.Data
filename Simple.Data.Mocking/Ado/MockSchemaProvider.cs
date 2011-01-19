@@ -21,7 +21,7 @@ namespace Simple.Data.Mocking.Ado
             _tables.Add("TABLES", table);
         }
 
-        public void SetColumns(params object[][] rows)
+       public void SetColumns(params object[][] rows)
         {
             _tables.Remove("COLUMNS");
             var table = new DataTable("COLUMNS");
@@ -30,6 +30,24 @@ namespace Simple.Data.Mocking.Ado
             _tables.Add("COLUMNS", table);
         }
 
+       public void SetProcedures(params object[][] rows)
+        {
+            _tables.Remove("PROCEDURES");
+            var table = new DataTable("PROCEDURES");
+            table.AddColumns("PROCEDURE_SCHEMA", "PROCEDURE_NAME");
+            table.AddRows(rows);
+            _tables.Add("PROCEDURES", table);
+        }
+
+       public void SetParameters(params object[][] rows)
+       {
+           _tables.Remove("PARAMETERS");
+           var table = new DataTable("PARAMETERS");
+           table.AddColumns("PROCEDURE_SCHEMA", "PROCEDURE_NAME", "PARAMETER_NAME");
+           table.AddRows(rows);
+           _tables.Add("PARAMETERS", table);
+       }
+       
         public void SetPrimaryKeys(params object[][] rows)
         {
             var table = new DataTable("PRIMARY_KEYS");
@@ -123,5 +141,7 @@ namespace Simple.Data.Mocking.Ado
         {
             _tables.Clear();
         }
+
+        
     }
 }

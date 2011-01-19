@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using Simple.Data.Extensions;
 using Simple.Data.Ado.Schema;
+using ResultSet = System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, object>>>;
 
 namespace Simple.Data.Ado
 {
@@ -20,12 +21,12 @@ namespace Simple.Data.Ado
             _procedureName = procedureName;
         }
 
-        public IEnumerable<IEnumerable<KeyValuePair<string, object>>> Execute(IEnumerable<KeyValuePair<string, object>> suppliedParameters)
+        public IEnumerable<ResultSet> Execute(IEnumerable<KeyValuePair<string, object>> suppliedParameters)
         {
             return Execute(suppliedParameters.ToDictionary());
         }
 
-        public IEnumerable<IEnumerable<KeyValuePair<string, object>>> Execute(IDictionary<string, object> suppliedParameters)
+        public IEnumerable<ResultSet> Execute(IDictionary<string, object> suppliedParameters)
         {
             var procedure = _adapter.GetSchema().FindProcedure(_procedureName);
             if (procedure == null)
@@ -42,12 +43,24 @@ namespace Simple.Data.Ado
 
                 try
                 {
-                    return command.ToAsyncEnumerable();
+                    return Execute(command);
                 }
                 catch (DbException ex)
                 {
                     throw new AdoAdapterException(ex.Message, command);
                 }
+            }
+        }
+
+        private static IEnumerable<ResultSet> Execute(DbCommand command)
+        {
+            command.Connection.Open();
+            using (var reader = command.ExecuteReader())
+            {
+                do
+                {
+                    yield return reader.ToDictionaries();
+                } while (reader.NextResult());
             }
         }
 
@@ -59,7 +72,7 @@ namespace Simple.Data.Ado
                 object value;
                 if (!suppliedParameters.TryGetValue(parameter.Name.Replace("@", ""), out value))
                 {
-                    suppliedParameters.TryGetValue(i.ToString(), out value);
+                    suppliedParameters.TryGetValue("_" + i, out value);
                 }
                 cmd.AddParameter(parameter.Name, value);
                 i++;

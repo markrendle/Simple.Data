@@ -11,7 +11,6 @@ namespace Simple.Data.Commands
     {
         private readonly IAdapterWithFunctions _adapter;
         private readonly string _functionName;
-        private readonly FunctionReturnType _returnType;
         private readonly IEnumerable<KeyValuePair<string, object>> _arguments;
 
         public ExecuteFunctionCommand(IAdapterWithFunctions adapter, string functionName, IEnumerable<KeyValuePair<string,object>> arguments)
@@ -19,36 +18,12 @@ namespace Simple.Data.Commands
             _adapter = adapter;
             _functionName = functionName;
             _arguments = arguments;
-            _returnType = _adapter.GetReturnType(_functionName);
         }
 
         public bool Execute(out object result)
         {
-            var resultType = _adapter.GetReturnType(_functionName);
-            var func = _adapter.GetRelevantFunction(resultType);
-            result = ConvertToSimpleTypes(func(_functionName, _arguments));
+            result = ToMultipleResultSets(_adapter.Execute(_functionName, _arguments));
             return true;
-        }
-
-        public FunctionReturnType ReturnType
-        {
-            get
-            {
-                return _returnType;
-            }
-        }
-
-        private object ConvertToSimpleTypes(object source)
-        {
-            switch (_returnType)
-            {
-                case FunctionReturnType.ResultSet:
-                    return ToResultSet(source);
-                case FunctionReturnType.MultipleResultSets:
-                    return ToMultipleResultSets(source);
-                default:
-                    return source;
-            }
         }
 
         private static SimpleResultSet ToMultipleResultSets(object source)
@@ -73,25 +48,6 @@ namespace Simple.Data.Commands
             if (dicts == null) throw new InvalidOperationException("Adapter returned incorrect Type.");
 
             return new SimpleResultSet(dicts.Select(dict => new SimpleRecord(dict)));
-        }
-
-        private Func<string, IEnumerable<KeyValuePair<string, object>>, object> GetFunc(FunctionReturnType resultType)
-        {
-            Func<string, IEnumerable<KeyValuePair<string, object>>, object> func = null;
-
-            switch (resultType)
-            {
-                case FunctionReturnType.ResultSet:
-                    func = _adapter.ExecuteResultSet;
-                    break;
-                case FunctionReturnType.MultipleResultSets:
-                    func = _adapter.ExecuteMultipleResultSets;
-                    break;
-                default:
-                    func = _adapter.ExecuteScalar;
-                    break;
-            }
-            return func;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ResultSet = System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, object>>>;
 
 namespace Simple.Data.Ado
 {
@@ -12,24 +13,10 @@ namespace Simple.Data.Ado
 	        return _schema.FindProcedure(functionName) != null;
 	    }
 
-	    public FunctionReturnType GetReturnType(string functionName)
+	    public IEnumerable<ResultSet> Execute(string functionName, IEnumerable<KeyValuePair<string, object>> parameters)
 	    {
-	        throw new NotImplementedException();
-	    }
-
-	    public object ExecuteScalar(string functionName, IEnumerable<KeyValuePair<string, object>> parameters)
-	    {
-	        throw new NotImplementedException();
-	    }
-
-	    public IEnumerable<IEnumerable<KeyValuePair<string, object>>> ExecuteResultSet(string functionName, IEnumerable<KeyValuePair<string, object>> parameters)
-	    {
-	        throw new NotImplementedException();
-	    }
-
-	    public IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> ExecuteMultipleResultSets(string functionName, IEnumerable<KeyValuePair<string, object>> parameters)
-	    {
-	        throw new NotImplementedException();
+	        var executor = new ProcedureExecutor(this, ObjectName.Parse(functionName));
+	        return executor.Execute(parameters);
 	    }
 	}
 }
