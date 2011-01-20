@@ -22,6 +22,8 @@ namespace Simple.Data.Ado
                       {SimpleExpressionType.Or, LogicalExpressionToWhereClause},
                       {SimpleExpressionType.Equal, EqualExpressionToWhereClause},
                       {SimpleExpressionType.NotEqual, NotEqualExpressionToWhereClause},
+                      {SimpleExpressionType.Like, LikeExpressionToWhereClause},
+                      {SimpleExpressionType.NotLike, NotLikeExpressionToWhereClause},
                       {SimpleExpressionType.GreaterThan, expr => BinaryExpressionToWhereClause(expr, ">")},
                       {SimpleExpressionType.GreaterThanOrEqual, expr => BinaryExpressionToWhereClause(expr, ">=")},
                       {SimpleExpressionType.LessThan, expr => BinaryExpressionToWhereClause(expr, "<")},
@@ -51,15 +53,27 @@ namespace Simple.Data.Ado
 
         private string EqualExpressionToWhereClause(SimpleExpression expression)
         {
-            return string.Format("{0} {1} {2}", FormatObject(expression.LeftOperand),
-                                 expression.RightOperand is string ? "LIKE" : "=",
+            return string.Format("{0} = {1}", FormatObject(expression.LeftOperand),
                                  FormatObject(expression.RightOperand));
         }
 
         private string NotEqualExpressionToWhereClause(SimpleExpression expression)
         {
-            return string.Format("{0} {1} {2}", FormatObject(expression.LeftOperand),
-                                 expression.RightOperand is string ? "NOT LIKE" : "!=",
+            return string.Format("{0} != {1}", FormatObject(expression.LeftOperand),
+                                 FormatObject(expression.RightOperand));
+        }
+
+        private string LikeExpressionToWhereClause(SimpleExpression expression)
+        {
+            if (!(expression.RightOperand is string)) throw new InvalidOperationException("Cannot use Like on non-string type.");
+            return string.Format("{0} LIKE {1}", FormatObject(expression.LeftOperand),
+                                 FormatObject(expression.RightOperand));
+        }
+
+        private string NotLikeExpressionToWhereClause(SimpleExpression expression)
+        {
+            if (!(expression.RightOperand is string)) throw new InvalidOperationException("Cannot use Not Like on non-string type.");
+            return string.Format("{0} NOT LIKE {1}", FormatObject(expression.LeftOperand),
                                  FormatObject(expression.RightOperand));
         }
 

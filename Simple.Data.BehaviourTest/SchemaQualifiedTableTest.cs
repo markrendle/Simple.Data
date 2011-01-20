@@ -91,7 +91,7 @@ namespace Simple.Data.IntegrationTest
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
             database.foo.Users.FindByName("Foo");
-            Assert.AreEqual("select [foo].[Users].* from [foo].[Users] where [foo].[Users].[name] like @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual("select [foo].[Users].* from [foo].[Users] where [foo].[Users].[name] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Foo", mockDatabase.Parameters[0]);
         }
 
@@ -101,7 +101,7 @@ namespace Simple.Data.IntegrationTest
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
             database.foo.Users.FindByNameAndPassword("Foo", "secret");
-            Assert.AreEqual("select [foo].[Users].* from [foo].[Users] where ([foo].[Users].[name] like @p1 and [foo].[Users].[password] like @p2)".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual("select [foo].[Users].* from [foo].[Users] where ([foo].[Users].[name] = @p1 and [foo].[Users].[password] = @p2)".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Foo", mockDatabase.Parameters[0]);
             Assert.AreEqual("secret", mockDatabase.Parameters[1]);
         }
@@ -113,7 +113,7 @@ namespace Simple.Data.IntegrationTest
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
             database.foo.Users.FindAllByName("Foo");
-            Assert.AreEqual("select [foo].[Users].* from [foo].[Users] where [foo].[Users].[name] like @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual("select [foo].[Users].* from [foo].[Users] where [foo].[Users].[name] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Foo", mockDatabase.Parameters[0]);
         }
 

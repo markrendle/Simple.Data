@@ -14,6 +14,8 @@ namespace Simple.Data
         GreaterThan,
         GreaterThanOrEqual,
         And,
-        Or
+        Or,
+        Like,
+        NotLike
     }
 }

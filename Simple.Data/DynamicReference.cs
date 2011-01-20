@@ -172,6 +172,26 @@ namespace Simple.Data
         }
 
         /// <summary>
+        /// Implements the LIKE operator to create a <see cref="SimpleExpression"/> with the type <see cref="SimpleExpressionType.Like"/>.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>The expression.</returns>
+        public SimpleExpression Like(string value)
+        {
+            return new SimpleExpression(this, value, SimpleExpressionType.Like);
+        }
+
+        /// <summary>
+        /// Implements the NOT LIKE operator to create a <see cref="SimpleExpression"/> with the type <see cref="SimpleExpressionType.NotLike"/>.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>The expression.</returns>
+        public SimpleExpression NotLike(string value)
+        {
+            return new SimpleExpression(this, value, SimpleExpressionType.NotLike);
+        }
+
+        /// <summary>
         /// Indicates whether the current object is equal to another object of the same type.
         /// </summary>
         /// <returns>
