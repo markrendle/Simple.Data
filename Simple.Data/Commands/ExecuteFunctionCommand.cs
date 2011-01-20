@@ -11,9 +11,9 @@ namespace Simple.Data.Commands
     {
         private readonly IAdapterWithFunctions _adapter;
         private readonly string _functionName;
-        private readonly IEnumerable<KeyValuePair<string, object>> _arguments;
+        private readonly IDictionary<string, object> _arguments;
 
-        public ExecuteFunctionCommand(IAdapterWithFunctions adapter, string functionName, IEnumerable<KeyValuePair<string,object>> arguments)
+        public ExecuteFunctionCommand(IAdapterWithFunctions adapter, string functionName, IDictionary<string,object> arguments)
         {
             _adapter = adapter;
             _functionName = functionName;
@@ -26,7 +26,7 @@ namespace Simple.Data.Commands
             return true;
         }
 
-        private static SimpleResultSet ToMultipleResultSets(object source)
+        private SimpleResultSet ToMultipleResultSets(object source)
         {
             if (source == null) return SimpleResultSet.Empty;
             var resultSets = source as IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>>;
@@ -35,9 +35,11 @@ namespace Simple.Data.Commands
             return ToMultipleDynamicEnumerables(resultSets);
         }
 
-        private static SimpleResultSet ToMultipleDynamicEnumerables(IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> resultSets)
+        private SimpleResultSet ToMultipleDynamicEnumerables(IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> resultSets)
         {
-            return new SimpleResultSet(resultSets.Select(resultSet => resultSet.Select(dict => new SimpleRecord(dict))));
+            var result = new SimpleResultSet(resultSets.Select(resultSet => resultSet.Select(dict => new SimpleRecord(dict))));
+            result.SetOutputValues(_arguments);
+            return result;
         }
 
         private static SimpleResultSet ToResultSet(object source)

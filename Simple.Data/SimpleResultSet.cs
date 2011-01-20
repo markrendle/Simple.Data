@@ -16,8 +16,10 @@ namespace Simple.Data
         private readonly IEnumerable<IEnumerable<dynamic>> _sources;
         private readonly IEnumerator<IEnumerable<dynamic>> _sourceEnumerator;
         private bool _hasCurrent;
+        private object _returnValue;
+        private IDictionary<string, object> _outputValues;
 
-        private SimpleResultSet() : this(Enumerable.Empty<dynamic>())
+        private SimpleResultSet() : this(Enumerable.Empty<IEnumerable<dynamic>>())
         {
             
         }
@@ -33,7 +35,17 @@ namespace Simple.Data
             _hasCurrent = _sourceEnumerator.MoveNext();
         }
 
-        public bool MoveNext()
+        public IDictionary<string, object> OutputValues
+        {
+            get { return _outputValues; }
+        }
+
+        public object ReturnValue
+        {
+            get { return (_outputValues != null && _outputValues.ContainsKey("__ReturnValue")) ? _outputValues["__ReturnValue"] : 0; }
+        }
+
+        public bool NextResult()
         {
             return _hasCurrent = (_hasCurrent && _sourceEnumerator.MoveNext());
         }
@@ -83,6 +95,66 @@ namespace Simple.Data
         public T[] ToArray<T>()
         {
             return Cast<T>().ToArray();
+        }
+
+        public dynamic First()
+        {
+            return _sourceEnumerator.Current.First();
+        }
+
+        public dynamic FirstOrDefault()
+        {
+            return _sourceEnumerator.Current.FirstOrDefault();
+        }
+
+        public T First<T>()
+        {
+            return Cast<T>().First();
+        }
+
+        public T FirstOrDefault<T>()
+        {
+            return Cast<T>().FirstOrDefault();
+        }
+
+        public T First<T>(Func<T,bool> predicate)
+        {
+            return Cast<T>().First(predicate);
+        }
+
+        public T FirstOrDefault<T>(Func<T,bool> predicate)
+        {
+            return Cast<T>().FirstOrDefault(predicate);
+        }
+
+        public dynamic Single()
+        {
+            return _sourceEnumerator.Current.First();
+        }
+
+        public dynamic SingleOrDefault()
+        {
+            return _sourceEnumerator.Current.FirstOrDefault();
+        }
+
+        public T Single<T>()
+        {
+            return Cast<T>().Single();
+        }
+
+        public T SingleOrDefault<T>()
+        {
+            return Cast<T>().SingleOrDefault();
+        }
+
+        public T Single<T>(Func<T, bool> predicate)
+        {
+            return Cast<T>().Single(predicate);
+        }
+
+        public T SingleOrDefault<T>(Func<T, bool> predicate)
+        {
+            return Cast<T>().SingleOrDefault(predicate);
         }
 
         /// <summary>
@@ -181,6 +253,11 @@ namespace Simple.Data
                     select from dict in source
                     select new SimpleRecord(dict);
             return new SimpleResultSet(q);
+        }
+
+        internal void SetOutputValues(IDictionary<string,object> outputValues)
+        {
+            _outputValues = outputValues;
         }
     }
 }

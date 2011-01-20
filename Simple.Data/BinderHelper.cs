@@ -19,12 +19,13 @@ namespace Simple.Data
                 .ToDictionary();
         }
 
-        public static IEnumerable<KeyValuePair<string, object>> ArgumentsToDictionary(this InvokeMemberBinder binder, IEnumerable<object> args)
+        public static IDictionary<string, object> ArgumentsToDictionary(this InvokeMemberBinder binder, IEnumerable<object> args)
         {
             return args.Reverse()
                 .Zip(binder.CallInfo.ArgumentNames.Reverse().ExtendInfinite(), (v, k) => new KeyValuePair<string, object>(k, v))
                 .Reverse()
-                .Select((kvp, i) => kvp.Key == null ? new KeyValuePair<string, object>("_" + i.ToString(), kvp.Value) : kvp);
+                .Select((kvp, i) => kvp.Key == null ? new KeyValuePair<string, object>("_" + i.ToString(), kvp.Value) : kvp)
+                .ToDictionary();
         }
     }
 }

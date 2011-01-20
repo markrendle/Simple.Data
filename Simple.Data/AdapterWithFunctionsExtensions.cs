@@ -15,7 +15,7 @@ namespace Simple.Data
             return adapterWithFunctions.IsValidFunction(functionName);
         }
 
-        public static bool Execute(this Adapter adapter, string functionName, IEnumerable<KeyValuePair<string,object>> parameters, out object result)
+        public static bool Execute(this Adapter adapter, string functionName, IDictionary<string,object> parameters, out object result)
         {
             var adapterWithFunctions = adapter as IAdapterWithFunctions;
             if (adapterWithFunctions == null) throw new NotSupportedException("Adapter does not support Function calls.");

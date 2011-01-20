@@ -9,6 +9,6 @@ namespace Simple.Data
     public interface IAdapterWithFunctions
     {
         bool IsValidFunction(string functionName);
-        IEnumerable<ResultSet> Execute(string functionName, IEnumerable<KeyValuePair<string, object>> parameters);
+        IEnumerable<ResultSet> Execute(string functionName, IDictionary<string, object> parameters);
     }
 }

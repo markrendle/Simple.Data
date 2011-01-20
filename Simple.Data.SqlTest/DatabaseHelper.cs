@@ -9,7 +9,7 @@ namespace Simple.Data.SqlTest
     {
         public static dynamic Open()
         {
-            return Database.OpenConnection(Properties.Settings.Default.ConnectionString);
+            return Database.Opener.OpenConnection(Properties.Settings.Default.ConnectionString);
         }
     }
 }

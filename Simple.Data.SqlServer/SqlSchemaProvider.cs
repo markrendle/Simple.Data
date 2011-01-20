@@ -62,7 +62,7 @@ namespace Simple.Data.SqlServer
 
         private static Procedure SchemaRowToStoredProcedure(DataRow row)
         {
-            return new Procedure(row["ROUTINE_NAME"].ToString(), row["SPECIFIC_NAME"].ToString(), row["TABLE_SCHEMA"].ToString());
+            return new Procedure(row["ROUTINE_NAME"].ToString(), row["SPECIFIC_NAME"].ToString(), row["ROUTINE_SCHEMA"].ToString());
         }
 
         public IEnumerable<Parameter> GetParameters(Procedure storedProcedure)
