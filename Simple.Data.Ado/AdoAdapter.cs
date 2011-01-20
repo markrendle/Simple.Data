@@ -215,5 +215,15 @@ namespace Simple.Data.Ado
             var commandBuilder = new DeleteHelper(_schema).GetDeleteCommand(tableName, criteria);
             return Execute(commandBuilder, transaction);
         }
+
+        public string GetIdentityFunction()
+        {
+            return _connectionProvider.GetIdentityFunction();
+        }
+
+        public bool ProviderSupportsCompoundStatements
+        {
+            get { return _connectionProvider.SupportsCompoundStatements; }
+        }
     }
 }

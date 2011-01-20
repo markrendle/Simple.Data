@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Data.SqlServerCe;
 using System.Linq;
 using Simple.Data.Ado;
@@ -37,20 +36,12 @@ namespace Simple.Data.SqlCe40
 
         public IEnumerable<Column> GetColumns(Table table)
         {
-            foreach (var row in GetColumnsDataTable(table).AsEnumerable())
-            {
-                yield return new Column(row["COLUMN_NAME"].ToString(), table);
-            }
-        }
-
-        private static Column SchemaRowToColumn(Table table, DataRow row)
-        {
-            return new Column(row["name"].ToString(), table, (bool)row["is_identity"]);
+            return Enumerable.Select(GetColumnsDataTable(table).AsEnumerable(), row => new Column(row["COLUMN_NAME"].ToString(), table, row["AUTOINC_SEED"] != null));
         }
 
         public IEnumerable<Procedure> GetStoredProcedures()
         {
-            return GetSchema("Procedures").Select(SchemaRowToStoredProcedure);
+            return Enumerable.Empty<Procedure>();
         }
 
         private IEnumerable<DataRow> GetSchema(string collectionName, params string[] constraints)
@@ -63,34 +54,9 @@ namespace Simple.Data.SqlCe40
             }
         }
 
-        private static Procedure SchemaRowToStoredProcedure(DataRow row)
-        {
-            return new Procedure(row["ROUTINE_NAME"].ToString(), row["SPECIFIC_NAME"].ToString(), row["ROUTINE_SCHEMA"].ToString());
-        }
-
         public IEnumerable<Parameter> GetParameters(Procedure storedProcedure)
         {
-            return GetSchema("ProcedureParameters", null, storedProcedure.Schema, storedProcedure.SpecificName)
-                .Select(SchemaRowToProcedureParameter);
-        }
-
-        private static Parameter SchemaRowToProcedureParameter(DataRow row)
-        {
-            return new Parameter(row["parameter_name"].ToString(), SqlTypeResolver.GetClrType(row["data_type"].ToString()),
-                DirectionFromString(row["parameter_mode"].ToString()));
-        }
-
-        private static ParameterDirection DirectionFromString(string mode)
-        {
-            switch (mode)
-            {
-                case "IN":
-                    return ParameterDirection.Input;
-                case "OUT":
-                    return ParameterDirection.Output;
-                default:
-                    return ParameterDirection.InputOutput;
-            }
+            return Enumerable.Empty<Parameter>();
         }
 
         public Key GetPrimaryKey(Table table)
@@ -99,7 +65,7 @@ namespace Simple.Data.SqlCe40
             return new Key(GetPrimaryKeys(table.ActualName).AsEnumerable()
                 .Where(
                     row =>
-                    row["TABLE_SCHEMA"].ToString() == table.Schema && row["TABLE_NAME"].ToString() == table.ActualName)
+                    AreEqual(row["TABLE_SCHEMA"], table.Schema) && row["TABLE_NAME"].ToString() == table.ActualName)
                     .OrderBy(row => (int)row["ORDINAL_POSITION"])
                     .Select(row => row["COLUMN_NAME"].ToString()));
         }
@@ -108,18 +74,27 @@ namespace Simple.Data.SqlCe40
         {
             if (table == null) throw new ArgumentNullException("table");
             var groups = GetForeignKeys(table.ActualName)
-                .Where(row =>
-                    row["TABLE_SCHEMA"].ToString() == table.Schema && row["TABLE_NAME"].ToString() == table.ActualName)
+                .Where(row => AreEqual(row["TABLE_SCHEMA"], table.Schema)
+                    && row["TABLE_NAME"].ToString() == table.ActualName)
                 .GroupBy(row => row["CONSTRAINT_NAME"].ToString())
                 .ToList();
 
             foreach (var group in groups)
             {
-                yield return new ForeignKey(new ObjectName(group.First()["TABLE_SCHEMA"].ToString(), group.First()["TABLE_NAME"].ToString()),
+                yield return new ForeignKey(new ObjectName(group.First()["TABLE_SCHEMA"], group.First()["TABLE_NAME"]),
                     group.Select(row => row["COLUMN_NAME"].ToString()),
-                    new ObjectName(group.First()["UNIQUE_TABLE_SCHEMA"].ToString(), group.First()["UNIQUE_TABLE_NAME"].ToString()),
+                    new ObjectName(group.First()["UNIQUE_TABLE_SCHEMA"], group.First()["UNIQUE_TABLE_NAME"]),
                     group.Select(row => row["UNIQUE_COLUMN_NAME"].ToString()));
             }
+        }
+
+        private static bool AreEqual(object string1, object string2)
+        {
+            if (string1 == DBNull.Value) string1 = null;
+            if (string2 == DBNull.Value) string2 = null;
+            if (string1 == null && string2 == null) return true;
+            if (string1 == null || string2 == null) return false;
+            return string1.ToString().Trim().Equals(string2.ToString().Trim());
         }
 
         public string QuoteObjectName(string unquotedName)
@@ -136,7 +111,7 @@ namespace Simple.Data.SqlCe40
 
         private DataTable GetColumnsDataTable(Table table)
         {
-            return SelectToDataTable("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + table.ActualName + "'");
+            return SelectToDataTable("SELECT COLUMN_NAME, AUTOINC_SEED FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + table.ActualName + "'");
         }
 
         private DataTable GetPrimaryKeys()

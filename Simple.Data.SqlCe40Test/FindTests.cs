@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections;
-using System.Diagnostics;
-using System.Reflection;
-using System.Text;
+﻿using System.Reflection;
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using System.IO;
 using Simple.Data.Ado;
 using Simple.Data.SqlCe40;
+using Simple.Data.SqlCeTest;
 
-namespace Simple.Data.SqlCeTest
+namespace Simple.Data.SqlCe40Test
 {
     /// <summary>
     /// Summary description for FindTests
@@ -41,7 +37,7 @@ namespace Simple.Data.SqlCeTest
         public void TestAll()
         {
             var db = Database.OpenFile(DatabasePath);
-            var all = new List<dynamic>(db.Users.All().Cast<dynamic>());
+            var all = new List<object>(db.Users.All().Cast<dynamic>());
             Assert.IsNotEmpty(all);
         }
 
@@ -68,10 +64,11 @@ namespace Simple.Data.SqlCeTest
         {
             var db = Database.OpenFile(DatabasePath);
 
-            db.Users.Insert(Name: "Alice", Password: "foo", Age: 29);
-            User user = db.Users.FindByNameAndPassword("Alice", "foo");
+            var user = db.Users.Insert(Name: "Alice", Password: "foo", Age: 29);
 
             Assert.IsNotNull(user);
+            Assert.AreEqual("Alice", user.Name);
+            Assert.AreEqual("foo", user.Password);
             Assert.AreEqual(29, user.Age);
         }
     }

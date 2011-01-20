@@ -49,5 +49,15 @@ namespace Simple.Data.SqlCe40
         {
             get { return _connectionString; }
         }
+
+        public string GetIdentityFunction()
+        {
+            return "@@IDENTITY";
+        }
+
+        public bool SupportsCompoundStatements
+        {
+            get { return false; }
+        }
     }
 }

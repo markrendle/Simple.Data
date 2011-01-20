@@ -9,8 +9,8 @@
     <ProjectGuid>{E9160373-8BD2-4D69-B88E-1D3B5BC0A6FB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Simple.Data.SqlCeTest</RootNamespace>
-    <AssemblyName>Simple.Data.SqlCeTest</AssemblyName>
+    <RootNamespace>Simple.Data.SqlCe40Test</RootNamespace>
+    <AssemblyName>Simple.Data.SqlCe40Test</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <PublishUrl>publish\</PublishUrl>
@@ -87,7 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="TestDatabase.sdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>

@@ -9,7 +9,6 @@ namespace Simple.Data
         /// specified in the 'Simple.Data.Properties.Settings.ConnectionString' config ConnectionStrings setting.
         /// </summary>
         /// <returns>A <see cref="Database"/> object as a dynamic type.</returns>
-        [Obsolete("Use Database.Opener.Open() instead.")]
         public static dynamic Open()
         {
             return DatabaseOpener.OpenDefault();
@@ -21,7 +20,6 @@ namespace Simple.Data
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
         /// <returns>A <see cref="Database"/> object as a dynamic type.</returns>
-        [Obsolete("Use Database.Opener.OpenConnection(connectionString) instead.")]
         public static dynamic OpenConnection(string connectionString)
         {
             return DatabaseOpener.OpenConnection(connectionString);
@@ -33,7 +31,6 @@ namespace Simple.Data
         /// </summary>
         /// <param name="filename">The name of the SQL CE database file.</param>
         /// <returns>A <see cref="Database"/> object as a dynamic type.</returns>
-        [Obsolete("Use Database.Opener.OpenFile(filename) instead.")]
         public static dynamic OpenFile(string filename)
         {
             return DatabaseOpener.OpenFile(filename);

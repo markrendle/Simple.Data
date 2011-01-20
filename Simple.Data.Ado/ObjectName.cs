@@ -10,9 +10,15 @@ namespace Simple.Data.Ado
         private readonly string _schema;
         private readonly string _name;
 
+        public ObjectName(object schema, object name)
+        {
+            if (name == null) throw new ArgumentNullException("name");
+            _schema = schema != null && schema != DBNull.Value ? (string)schema : null;
+            _name = (string)name;
+        }
+
         public ObjectName(string schema, string name)
         {
-            if (schema == null) throw new ArgumentNullException("schema");
             if (name == null) throw new ArgumentNullException("name");
             _schema = schema;
             _name = name;
@@ -77,7 +83,7 @@ namespace Simple.Data.Ado
         {
             unchecked
             {
-                return (_schema.GetHashCode()*397) ^ _name.GetHashCode();
+                return ((_schema??string.Empty).GetHashCode()*397) ^ _name.GetHashCode();
             }
         }
 

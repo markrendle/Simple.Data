@@ -32,13 +32,25 @@ namespace Simple.Data.Ado
 
             string insertSql = "insert into " + table.QualifiedName + " (" + columnList + ") values (" + valueList + ")";
 
-            var identityColumn = table.Columns.FirstOrDefault(col => col.IsIdentity);
-
-            if (identityColumn != null)
+            var identityFunction = _adapter.GetIdentityFunction();
+            if (!string.IsNullOrWhiteSpace(identityFunction))
             {
-                insertSql += "; select * from " + table.QualifiedName + " where " + identityColumn.QuotedName +
-                             " = scope_identity()";
-                return ExecuteSingletonQuery(insertSql, data.Values.ToArray());
+                var identityColumn = table.Columns.FirstOrDefault(col => col.IsIdentity);
+
+                if (identityColumn != null)
+                {
+                    var selectSql = "select * from " + table.QualifiedName + " where " + identityColumn.QuotedName +
+                                     " = " + identityFunction;
+                    if (_adapter.ProviderSupportsCompoundStatements)
+                    {
+                        insertSql += "; " + selectSql;
+                        return ExecuteSingletonQuery(insertSql, data.Values.ToArray());
+                    }
+                    else
+                    {
+                        return ExecuteSingletonQuery(insertSql, selectSql, data.Values.ToArray());
+                    }
+                }
             }
 
             Execute(insertSql, data.Values.ToArray());
@@ -59,6 +71,31 @@ namespace Simple.Data.Ado
                 using (var command = CommandHelper.Create(connection, sql, values.ToArray()))
                 {
                     connection.Open();
+                    return TryExecuteSingletonQuery(command);
+                }
+            }
+        }
+
+        internal IDictionary<string, object> ExecuteSingletonQuery(string insertSql, string selectSql, params object[] values)
+        {
+            if (_transaction != null)
+            {
+                var command = CommandHelper.Create(_transaction.Connection, insertSql, values.ToArray());
+                command.Transaction = _transaction;
+                TryExecute(command);
+                command.CommandText = selectSql;
+                command.Parameters.Clear();
+                return TryExecuteSingletonQuery(command);
+            }
+
+            using (var connection = _adapter.CreateConnection())
+            {
+                using (var command = CommandHelper.Create(connection, insertSql, values.ToArray()))
+                {
+                    connection.Open();
+                    TryExecute(command);
+                    command.CommandText = selectSql;
+                    command.Parameters.Clear();
                     return TryExecuteSingletonQuery(command);
                 }
             }

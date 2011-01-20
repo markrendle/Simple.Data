@@ -9,5 +9,7 @@ namespace Simple.Data.Ado
         DbConnection CreateConnection();
         ISchemaProvider GetSchemaProvider();
         string ConnectionString { get; }
+        bool SupportsCompoundStatements { get; }
+        string GetIdentityFunction();
     }
 }

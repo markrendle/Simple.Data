@@ -36,5 +36,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: InternalsVisibleTo("Simple.Data.IntegrationTest")]
 [assembly: InternalsVisibleTo("Simple.Data.SqlCeTest")]
+[assembly: InternalsVisibleTo("Simple.Data.SqlCe40Test")]
 [assembly: InternalsVisibleTo("Simple.Data.SqlTest")]
 [assembly: InternalsVisibleTo("Simple.Data.Ado.Test")]

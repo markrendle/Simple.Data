@@ -36,5 +36,15 @@ namespace Simple.Data.Mocking.Ado
         {
             get { return _connection.ConnectionString; }
         }
+
+        public string GetIdentityFunction()
+        {
+            return null;
+        }
+
+        public bool SupportsCompoundStatements
+        {
+            get { return false; }
+        }
     }
 }

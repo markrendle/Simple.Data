@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.Data.Common;
 using System.Data.SqlClient;
 using Simple.Data.Ado;
@@ -39,6 +40,16 @@ namespace Simple.Data.SqlServer
         public string ConnectionString
         {
             get { return _connectionString; }
+        }
+
+        public string GetIdentityFunction()
+        {
+            return "SCOPE_IDENTITY()";
+        }
+
+        public bool SupportsCompoundStatements
+        {
+            get { return true; }
         }
     }
 }

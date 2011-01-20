@@ -67,7 +67,7 @@
     <Compile Include="Commands\UpdateCommand.cs" />
     <Compile Include="ConcreteObject.cs" />
     <Compile Include="ConcreteTypeCreator.cs" />
-    <Compile Include="Database.Obsolete.cs" />
+    <Compile Include="Database.Open.cs" />
     <Compile Include="SimpleResultSet.cs" />
     <Compile Include="DynamicSchema.cs" />
     <Compile Include="Extensions\BinderExtensions.cs" />
@@ -121,7 +121,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <Compile Include="DynamicRecord.Dictionary`2.cs" />
+    <Compile Include="SimpleRecord.Dictionary`2.cs" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

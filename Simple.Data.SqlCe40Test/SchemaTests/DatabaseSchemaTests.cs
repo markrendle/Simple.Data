@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using NUnit.Framework;
 using Simple.Data.Ado;
 using Simple.Data.Ado.Schema;
 
-namespace Simple.Data.SqlCeTest.SchemaTests
+namespace Simple.Data.SqlCe40Test.SchemaTests
 {
     [TestFixture]
     public class DatabaseSchemaTests

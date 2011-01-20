@@ -32,5 +32,15 @@ namespace Simple.Data.SqlCe35
         {
             get { return _connectionString; }
         }
+
+        public string GetIdentityFunction()
+        {
+            return null;
+        }
+
+        public bool SupportsCompoundStatements
+        {
+            get { return false; }
+        }
     }
 }
