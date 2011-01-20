@@ -149,7 +149,8 @@ namespace Simple.Data.Mocking.Ado
         /// <param name="parameterName">The name of the <see cref="T:System.Data.Common.DbParameter"/> in the collection.</param>
         protected override DbParameter GetParameter(string parameterName)
         {
-            throw new NotImplementedException();
+            return
+                _collection.FirstOrDefault(p => p.ParameterName.Equals(parameterName, StringComparison.CurrentCultureIgnoreCase));
         }
 
         /// <summary>

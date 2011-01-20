@@ -45,7 +45,7 @@ namespace Simple.Data.Mocking.Ado
         /// <filterpriority>1</filterpriority>
         public override bool NextResult()
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         /// <summary>
@@ -273,7 +273,7 @@ namespace Simple.Data.Mocking.Ado
         /// <exception cref="T:System.NotSupportedException">There is no current connection to an instance of SQL Server. </exception><filterpriority>1</filterpriority>
         public override int FieldCount
         {
-            get { throw new NotImplementedException(); }
+            get { return 1; }
         }
 
         /// <summary>

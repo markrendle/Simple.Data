@@ -39,7 +39,7 @@ namespace Simple.Data.IntegrationTest
             db.ProcedureWithoutParameters();
             Assert.IsNotNull(mockDatabase.Sql);
             Assert.AreEqual("[ProcedureWithoutParameters]".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual(0, mockDatabase.Parameters.Count());
+            Assert.AreEqual(1, mockDatabase.Parameters.Count());
         }
 
         [Test]
@@ -50,7 +50,7 @@ namespace Simple.Data.IntegrationTest
             db.ProcedureWithParameters(One: 1, Two: 2);
             Assert.AreEqual(1, mockDatabase.CommandTexts.Count);
             Assert.AreEqual("[ProcedureWithParameters]".ToLowerInvariant(), mockDatabase.CommandTexts[0].ToLowerInvariant());
-            Assert.AreEqual(2, mockDatabase.CommandParameters[0].Count);
+            Assert.AreEqual(3, mockDatabase.CommandParameters[0].Count);
             Assert.IsTrue(mockDatabase.CommandParameters[0].ContainsKey("@One"));
             Assert.AreEqual(1, mockDatabase.CommandParameters[0]["@One"]);
             Assert.IsTrue(mockDatabase.CommandParameters[0].ContainsKey("@Two"));
@@ -65,7 +65,7 @@ namespace Simple.Data.IntegrationTest
             db.ProcedureWithParameters(1, 2);
             Assert.AreEqual(1, mockDatabase.CommandTexts.Count);
             Assert.AreEqual("[ProcedureWithParameters]".ToLowerInvariant(), mockDatabase.CommandTexts[0].ToLowerInvariant());
-            Assert.AreEqual(2, mockDatabase.CommandParameters[0].Count);
+            Assert.AreEqual(3, mockDatabase.CommandParameters[0].Count);
             Assert.IsTrue(mockDatabase.CommandParameters[0].ContainsKey("@One"));
             Assert.AreEqual(1, mockDatabase.CommandParameters[0]["@One"]);
             Assert.IsTrue(mockDatabase.CommandParameters[0].ContainsKey("@Two"));
