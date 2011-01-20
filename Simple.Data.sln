@@ -45,6 +45,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.Ado.Test", "Sim
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.BehaviourTest", "Simple.Data.BehaviourTest\Simple.Data.BehaviourTest.csproj", "{70536BA8-AF0D-46F3-B04C-45177F56B320}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.SqlCe40", "Simple.Data.SqlCe40\Simple.Data.SqlCe40.csproj", "{43BA3D2C-10D8-470D-A60B-4F06D2F9D539}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.SqlCe40Test", "Simple.Data.SqlCe40Test\Simple.Data.SqlCe40Test.csproj", "{E9160373-8BD2-4D69-B88E-1D3B5BC0A6FB}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Simple.Data.vsmdi
@@ -102,6 +106,14 @@ Global
 		{70536BA8-AF0D-46F3-B04C-45177F56B320}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{70536BA8-AF0D-46F3-B04C-45177F56B320}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{70536BA8-AF0D-46F3-B04C-45177F56B320}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43BA3D2C-10D8-470D-A60B-4F06D2F9D539}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43BA3D2C-10D8-470D-A60B-4F06D2F9D539}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43BA3D2C-10D8-470D-A60B-4F06D2F9D539}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43BA3D2C-10D8-470D-A60B-4F06D2F9D539}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9160373-8BD2-4D69-B88E-1D3B5BC0A6FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9160373-8BD2-4D69-B88E-1D3B5BC0A6FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9160373-8BD2-4D69-B88E-1D3B5BC0A6FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9160373-8BD2-4D69-B88E-1D3B5BC0A6FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,5 +125,6 @@ Global
 		{29BBCAE1-DF13-40A0-A412-F2F87F4E9351} = {182AEEFE-9B89-4264-BCED-91A00D1EF896}
 		{96C623FD-869E-4DCE-98A1-17075EE384F9} = {182AEEFE-9B89-4264-BCED-91A00D1EF896}
 		{70536BA8-AF0D-46F3-B04C-45177F56B320} = {182AEEFE-9B89-4264-BCED-91A00D1EF896}
+		{E9160373-8BD2-4D69-B88E-1D3B5BC0A6FB} = {182AEEFE-9B89-4264-BCED-91A00D1EF896}
 	EndGlobalSection
 EndGlobal
