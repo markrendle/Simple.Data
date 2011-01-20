@@ -37,8 +37,10 @@ namespace Simple.Data.SqlCe40
 
         public IEnumerable<Column> GetColumns(Table table)
         {
-            if (table == null) throw new ArgumentNullException("table");
-            return GetColumnsDataTable(table).AsEnumerable().Select(row => SchemaRowToColumn(table, row));
+            foreach (var row in GetColumnsDataTable(table).AsEnumerable())
+            {
+                yield return new Column(row["COLUMN_NAME"].ToString(), table);
+            }
         }
 
         private static Column SchemaRowToColumn(Table table, DataRow row)
@@ -134,11 +136,7 @@ namespace Simple.Data.SqlCe40
 
         private DataTable GetColumnsDataTable(Table table)
         {
-            var columnSelect =
-                string.Format(
-                    "SELECT name, is_identity from sys.columns where object_id = object_id('{0}.{1}', 'TABLE')",
-                    table.Schema, table.ActualName);
-            return SelectToDataTable(columnSelect);
+            return SelectToDataTable("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + table.ActualName + "'");
         }
 
         private DataTable GetPrimaryKeys()
