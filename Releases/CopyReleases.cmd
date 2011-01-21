@@ -11,5 +11,7 @@ copy ..\Simple.Data.SqlServer\bin\Release\Simple.Data.SqlServer.dll %reldir%
 copy ..\Simple.Data.SqlServer\bin\Release\Simple.Data.SqlServer.pdb %reldir%
 copy ..\Simple.Data.SqlCe35\bin\Release\Simple.Data.SqlCe35.dll %reldir%
 copy ..\Simple.Data.SqlCe35\bin\Release\Simple.Data.SqlCe35.pdb %reldir%
+copy ..\Simple.Data.SqlCe40\bin\Release\Simple.Data.SqlCe40.dll %reldir%
+copy ..\Simple.Data.SqlCe40\bin\Release\Simple.Data.SqlCe40.pdb %reldir%
 copy ..\Simple.Data.Mocking\bin\Release\Simple.Data.Mocking.dll %reldir%
 copy ..\Simple.Data.Mocking\bin\Release\Simple.Data.Mocking.pdb %reldir%

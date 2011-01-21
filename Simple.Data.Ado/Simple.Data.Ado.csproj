@@ -49,6 +49,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="AdoAdapter.cs" />
     <Compile Include="AdoAdapterException.cs" />
     <Compile Include="AdoAdapterFinder.cs" />

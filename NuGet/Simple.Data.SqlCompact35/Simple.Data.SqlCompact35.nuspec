@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>Simple.Data.SqlCompact35</id>
+    <version>0.4.1</version>
+    <authors>Mark Rendle</authors>
+    <owners>Mark Rendle</owners>
+    <description>SQL Server Compact 3.5 ADO provider for the Simple.Data data access library.</description> 
+    <projectUrl>http://github.com/markrendle/Simple.Data</projectUrl>
+    <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
+    <tags>sqlserver compact sqlce database data ado .net40</tags>
+    <language>en-us</language>
+    <dependencies>
+      <dependency id="Simple.Data.Core" version="0.4.1" />
+    </dependencies>
+  </metadata>
+</package>
