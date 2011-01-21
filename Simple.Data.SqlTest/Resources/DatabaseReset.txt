@@ -84,3 +84,33 @@ ALTER TABLE [dbo].[OrderItems] WITH NOCHECK
 
 ALTER TABLE [dbo].[OrderItems] WITH NOCHECK
     ADD CONSTRAINT [FK_OrderItems_Orders] FOREIGN KEY ([OrderId]) REFERENCES [dbo].[Orders] ([OrderId]) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GetCustomers]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[GetCustomers]
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GetCustomerAndOrders]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[GetCustomerAndOrders]
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GetCustomerCount]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[GetCustomerCount]
+GO
+CREATE PROCEDURE [dbo].[GetCustomers]
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT * FROM Customers
+    ORDER BY CustomerId
+END
+GO
+CREATE PROCEDURE [dbo].[GetCustomerAndOrders] (@CustomerId int)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT * FROM Customers WHERE CustomerId = @CustomerId;
+    SELECT * FROM Orders WHERE CustomerId = @CustomerId;
+END
+GO
+CREATE PROCEDURE [dbo].[GetCustomerCount]
+AS
+BEGIN
+    SET NOCOUNT ON;
+    RETURN 1
+END

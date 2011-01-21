@@ -18,14 +18,7 @@ namespace Simple.Data.SqlTest
         [TestFixtureSetUp]
         public void Setup()
         {
-            using (var cn = new SqlConnection(Properties.Settings.Default.ConnectionString))
-            {
-                using (var cmd = new SqlCommand(Properties.Resources.DatabaseReset, cn))
-                {
-                    cn.Open();
-                    cmd.ExecuteNonQuery();
-                }
-            }
+            DatabaseHelper.Reset();
         }
 
         [Test]
