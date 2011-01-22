@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -53,12 +54,28 @@ namespace Simple.Data.Ado
 
         private string EqualExpressionToWhereClause(SimpleExpression expression)
         {
+            var range = expression.RightOperand as IRange;
+            if (range != null)
+                return string.Format("{0} BETWEEN {1}", FormatObject(expression.LeftOperand), FormatRange(range));
+
+            var list = expression.RightOperand as IEnumerable;
+            if (list != null && expression.RightOperand.GetType() != typeof(string))
+                return string.Format("{0} IN {1}", FormatObject(expression.LeftOperand), FormatList(list));
+
             return string.Format("{0} = {1}", FormatObject(expression.LeftOperand),
                                  FormatObject(expression.RightOperand));
         }
 
         private string NotEqualExpressionToWhereClause(SimpleExpression expression)
         {
+            var range = expression.RightOperand as IRange;
+            if (range != null)
+                return string.Format("{0} NOT BETWEEN {1}", FormatObject(expression.LeftOperand), FormatRange(range));
+
+            var list = expression.RightOperand as IEnumerable;
+            if (list != null && expression.RightOperand.GetType() != typeof(string))
+                return string.Format("{0} NOT IN {1}", FormatObject(expression.LeftOperand), FormatList(list));
+
             return string.Format("{0} != {1}", FormatObject(expression.LeftOperand),
                                  FormatObject(expression.RightOperand));
         }
@@ -94,6 +111,18 @@ namespace Simple.Data.Ado
             }
 
             return _commandBuilder.AddParameter(value);
+        }
+
+        private string FormatRange(IRange range)
+        {
+            return string.Format("({0} AND {1})", _commandBuilder.AddParameter(range.Start),
+                                 _commandBuilder.AddParameter(range.End));
+        }
+
+        private object FormatList(IEnumerable list)
+        {
+            return string.Format("({0})",
+                                 string.Join(",", list.Cast<object>().Select(o => _commandBuilder.AddParameter(o))));
         }
     }
 }
