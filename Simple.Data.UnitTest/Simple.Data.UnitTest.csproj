@@ -63,6 +63,7 @@
     <Compile Include="ListHelper.cs" />
     <Compile Include="MethodNameParserTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RangeTest.cs" />
     <Compile Include="SimpleExpressionTest.cs" />
     <Compile Include="StringExtensionsTest.cs" />
   </ItemGroup>
