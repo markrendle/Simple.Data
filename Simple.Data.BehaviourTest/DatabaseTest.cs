@@ -107,6 +107,16 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestFindAllWithLike()
+        {
+            var mockDatabase = new MockDatabase();
+            dynamic database = CreateDatabase(mockDatabase);
+            database.Users.FindAll(database.Users.Name.Like("Foo")).ToList();
+            Assert.AreEqual("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[name] like @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual("Foo", mockDatabase.Parameters[0]);
+        }
+
+        [Test]
         public void TestFindByDynamicTwoColumns()
         {
             var mockDatabase = new MockDatabase();

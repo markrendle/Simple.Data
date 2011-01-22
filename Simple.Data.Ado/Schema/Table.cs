@@ -82,7 +82,14 @@ namespace Simple.Data.Ado.Schema
         internal Column FindColumn(string columnName)
         {
             var columns = _lazyColumns.Value;
-            return columns.Find(columnName);
+            try
+            {
+                return columns.Find(columnName);
+            }
+            catch (UnresolvableObjectException ex)
+            {
+                throw new UnresolvableObjectException(_actualName + "." + ex.ObjectName, "Column not found", ex);
+            }
         }
 
         internal Key PrimaryKey

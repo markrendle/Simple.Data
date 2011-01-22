@@ -27,8 +27,11 @@ namespace Simple.Data.Ado
             var table = _adapter.GetSchema().FindTable(tableName);
 
             string columnList =
-                data.Keys.Select(s => table.FindColumn(s).QuotedName).Aggregate((agg, next) => agg + "," + next);
-            string valueList = data.Keys.Select(s => "?").Aggregate((agg, next) => agg + "," + next);
+                data.Keys.Select(table.FindColumn)
+                .Where(c => !c.IsIdentity)
+                .Select(c => c.QuotedName)
+                .Aggregate((agg, next) => agg + "," + next);
+            string valueList = columnList.Split(',').Select(s => "?").Aggregate((agg, next) => agg + "," + next);
 
             string insertSql = "insert into " + table.QualifiedName + " (" + columnList + ") values (" + valueList + ")";
 

@@ -25,7 +25,9 @@ namespace Simple.Data.Ado.Schema
         /// <returns>A <see cref="Column"/> if a match is found; otherwise, <c>null</c>.</returns>
         public Column Find(string columnName)
         {
-            return FindColumnWithName(columnName);
+            var column = FindColumnWithName(columnName);
+            if (column == null) throw new UnresolvableObjectException(columnName);
+            return column;
         }
 
         private Column FindColumnWithName(string columnName)

@@ -9,8 +9,9 @@ namespace Simple.Data.Commands
                                                               {
                                                                   new FindCommand(),
                                                                   new FindByCommand(),
-                                                                  new FindAllByCommand(),
                                                                   new FindAllCommand(),
+                                                                  new FindAllByCommand(),
+                                                                  new AllCommand(),
                                                                   new UpdateByCommand(),
                                                                   new UpdateCommand(),
                                                                   new InsertCommand(),

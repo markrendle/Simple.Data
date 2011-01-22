@@ -17,21 +17,28 @@ namespace Simple.Data.Commands
         /// </returns>
         public bool IsCommandFor(string method)
         {
-            return method.Equals("all", StringComparison.InvariantCultureIgnoreCase);
+            return method.Equals("findall", StringComparison.InvariantCultureIgnoreCase);
         }
 
         /// <summary>
         /// Executes the command.
         /// </summary>
-        /// <param name="database">The database.</param>
+        /// <param name="dataStrategy">The database or transaction</param>
         /// <param name="table"></param>
         /// <param name="binder">The binder from the <see cref="DynamicTable"/> method invocation.</param>
         /// <param name="args">The arguments from the <see cref="DynamicTable"/> method invocation.</param>
         /// <returns></returns>
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            return new SimpleResultSet(dataStrategy.Find(table.GetQualifiedName(), null)
-                .Select(dict => new SimpleRecord(dict, table.GetQualifiedName(), dataStrategy)));
+            if (args.Length == 1 && args[0] is SimpleExpression)
+            {
+                var data = dataStrategy.Find(table.GetQualifiedName(), (SimpleExpression)args[0]);
+                return new SimpleResultSet(data != null
+                             ? data.Select(dict => new SimpleRecord(dict, table.GetQualifiedName(), dataStrategy))
+                             : Enumerable.Empty<SimpleRecord>());
+            }
+
+            return null;
         }
     }
 }

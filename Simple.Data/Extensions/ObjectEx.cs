@@ -7,12 +7,13 @@ namespace Simple.Data.Extensions
 {
     class ObjectEx
     {
-        public static IEnumerable<KeyValuePair<string, object>> ObjectToDictionary(object obj)
+        public static IDictionary<string, object> ObjectToDictionary(object obj)
         {
-            return from property in obj.GetType().GetProperties()
+            return (from property in obj.GetType().GetProperties()
                                      select
                                          new KeyValuePair<string, object>(property.Name,
-                                                                          property.GetValue(obj, null));
+                                                                          property.GetValue(obj, null)))
+                                                                          .ToDictionary();
         }
     }
 }

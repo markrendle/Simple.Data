@@ -37,7 +37,11 @@ namespace Simple.Data.Commands
         {
             var dictionary = entity as IDictionary<string, object>;
             if (dictionary == null)
-                throw new SimpleDataException("Could not discover data in object.");
+            {
+                dictionary = ObjectEx.ObjectToDictionary(entity);
+                if (dictionary.Count == 0)
+                    throw new SimpleDataException("Could not discover data in object.");
+            }
             return dataStrategy.Insert(tableName, dictionary);
         }
     }

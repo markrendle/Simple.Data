@@ -43,14 +43,14 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.CoreEx, Version=1.0.2787.104, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="System.CoreEx, Version=1.0.2838.104, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Rx-Core.1.0.2787.0\lib\Net4\System.CoreEx.dll</HintPath>
+      <HintPath>..\packages\Rx-Core.1.0.2838.0\lib\Net4\System.CoreEx.dll</HintPath>
     </Reference>
     <Reference Include="System.Data" />
-    <Reference Include="System.Reactive, Version=1.0.2787.104, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="System.Reactive, Version=1.0.2838.104, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Rx-Main.1.0.2787.0\lib\Net4\System.Reactive.dll</HintPath>
+      <HintPath>..\packages\Rx-Main.1.0.2838.0\lib\Net4\System.Reactive.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -64,6 +64,7 @@
     <Compile Include="CachingAdapterFactory.cs" />
     <Compile Include="Commands\CommandFactory.cs" />
     <Compile Include="Commands\ExecuteFunctionCommand.cs" />
+    <Compile Include="Commands\FindAllCommand.cs" />
     <Compile Include="Commands\UpdateCommand.cs" />
     <Compile Include="ConcreteObject.cs" />
     <Compile Include="ConcreteTypeCreator.cs" />
@@ -76,7 +77,7 @@
     <Compile Include="FunctionReturnType.cs" />
     <Compile Include="HomogenizedKeyDictionary.cs" />
     <Compile Include="ExpressionHelper.cs" />
-    <Compile Include="Commands\FindAllCommand.cs" />
+    <Compile Include="Commands\AllCommand.cs" />
     <Compile Include="Commands\FindCommand.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="DatabaseOpener.cs" />

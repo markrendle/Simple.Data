@@ -45,6 +45,14 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void TestFindAllByPartialName()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<User> users = db.Users.FindAll(db.Users.Name.Like("Bob")).ToList<User>();
+            Assert.AreEqual(1, users.Count());
+        }
+
+        [Test]
         public void TestAllCount()
         {
             var db = DatabaseHelper.Open();
