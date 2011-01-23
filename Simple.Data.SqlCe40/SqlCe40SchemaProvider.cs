@@ -36,7 +36,7 @@ namespace Simple.Data.SqlCe40
 
         public IEnumerable<Column> GetColumns(Table table)
         {
-            return Enumerable.Select(GetColumnsDataTable(table).AsEnumerable(), row => new Column(row["COLUMN_NAME"].ToString(), table, row["AUTOINC_SEED"] != null));
+            return Enumerable.Select(GetColumnsDataTable(table).AsEnumerable(), row => new Column(row["COLUMN_NAME"].ToString(), table, row["AUTOINC_SEED"] != DBNull.Value));
         }
 
         public IEnumerable<Procedure> GetStoredProcedures()
