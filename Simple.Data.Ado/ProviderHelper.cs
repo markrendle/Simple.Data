@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.ComponentModel.Composition.Hosting;
+using System.Data.OleDb;
 using System.Reflection;
 using System.IO;
 
@@ -22,6 +23,13 @@ namespace Simple.Data.Ado
 
         private static IConnectionProvider LoadProviderByConnectionString(string connectionString)
         {
+            var connectionStringBuilder = new OleDbConnectionStringBuilder(connectionString);
+
+            if (connectionStringBuilder.DataSource.EndsWith("sdf", StringComparison.CurrentCultureIgnoreCase) && File.Exists(connectionStringBuilder.DataSource))
+            {
+                return GetProviderByFilename(connectionStringBuilder.DataSource);
+            }
+            
             var provider = ComposeProvider("sql");
 
             provider.SetConnectionString(connectionString);

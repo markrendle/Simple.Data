@@ -19,10 +19,17 @@ namespace Simple.Data.SqlCe40Test
             "TestDatabase.sdf");
 
         [Test]
-        public void TestMethod1()
+        public void TestProviderWithFileName()
         {
             var provider = ProviderHelper.GetProviderByFilename(DatabasePath);
             Assert.IsInstanceOf(typeof (SqlCe40ConnectionProvider), provider);
+        }
+
+        [Test]
+        public void TestProviderWithConnectionString()
+        {
+            var provider = ProviderHelper.GetProviderByConnectionString(string.Format("data source={0}", DatabasePath));
+            Assert.IsInstanceOf(typeof(SqlCe40ConnectionProvider), provider);
         }
 
         [Test]
