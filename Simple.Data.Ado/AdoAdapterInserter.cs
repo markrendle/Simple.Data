@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
+using Simple.Data.Extensions;
 
 namespace Simple.Data.Ado
 {
@@ -26,9 +27,11 @@ namespace Simple.Data.Ado
         {
             var table = _adapter.GetSchema().FindTable(tableName);
 
+            data = data.Where(kvp => !table.FindColumn(kvp.Key).IsIdentity)
+                .ToDictionary();
             string columnList =
                 data.Keys.Select(table.FindColumn)
-                .Where(c => !c.IsIdentity)
+                //.Where(c => !c.IsIdentity)
                 .Select(c => c.QuotedName)
                 .Aggregate((agg, next) => agg + "," + next);
             string valueList = columnList.Split(',').Select(s => "?").Aggregate((agg, next) => agg + "," + next);

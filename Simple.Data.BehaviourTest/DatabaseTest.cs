@@ -18,7 +18,7 @@ namespace Simple.Data.IntegrationTest
         {
             var mockSchemaProvider = new MockSchemaProvider();
             mockSchemaProvider.SetTables(new[] { "dbo", "Users", "BASE TABLE" });
-            mockSchemaProvider.SetColumns(new[] { "dbo", "Users", "Id" },
+            mockSchemaProvider.SetColumns(new object[] { "dbo", "Users", "Id", true },
                                           new[] { "dbo", "Users", "Name" },
                                           new[] { "dbo", "Users", "Password" },
                                           new[] { "dbo", "Users", "Age" });
@@ -147,6 +147,19 @@ namespace Simple.Data.IntegrationTest
             Assert.AreEqual("insert into [dbo].[Users] ([Name],[Age]) values (@p0,@p1)".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
             Assert.AreEqual(50, mockDatabase.Parameters[1]);
+        }
+
+        [Test]
+        public void TestInsertWithStaticTypeObject()
+        {
+            var mockDatabase = new MockDatabase();
+            dynamic database = CreateDatabase(mockDatabase);
+            var user = new User {Name = "Steve", Age = 50};
+            database.Users.Insert(user);
+            Assert.AreEqual("insert into [dbo].[Users] ([Name],[Password],[Age]) values (@p0,@p1,@p2)".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
+            Assert.AreEqual(null, mockDatabase.Parameters[1]);
+            Assert.AreEqual(50, mockDatabase.Parameters[2]);
         }
 
         [Test]
