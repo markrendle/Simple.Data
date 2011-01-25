@@ -29,13 +29,13 @@ namespace Simple.Data.Commands
         private SimpleResultSet ToMultipleResultSets(object source)
         {
             if (source == null) return SimpleResultSet.Empty;
-            var resultSets = source as IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>>;
+            var resultSets = source as IEnumerable<IEnumerable<IDictionary<string, object>>>;
             if (resultSets == null) throw new InvalidOperationException("Adapter returned incorrect Type.");
 
             return ToMultipleDynamicEnumerables(resultSets);
         }
 
-        private SimpleResultSet ToMultipleDynamicEnumerables(IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> resultSets)
+        private SimpleResultSet ToMultipleDynamicEnumerables(IEnumerable<IEnumerable<IDictionary<string, object>>> resultSets)
         {
             var result = new SimpleResultSet(resultSets.Select(resultSet => resultSet.Select(dict => new SimpleRecord(dict))));
             result.SetOutputValues(_arguments);
@@ -46,7 +46,7 @@ namespace Simple.Data.Commands
         {
             if (source == null) return SimpleResultSet.Empty;
 
-            var dicts = source as IEnumerable<IEnumerable<KeyValuePair<string, object>>>;
+            var dicts = source as IEnumerable<IDictionary<string, object>>;
             if (dicts == null) throw new InvalidOperationException("Adapter returned incorrect Type.");
 
             return new SimpleResultSet(dicts.Select(dict => new SimpleRecord(dict)));

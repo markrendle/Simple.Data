@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Simple.Data.Extensions;
 
 namespace Simple.Data
 {
@@ -29,13 +30,13 @@ namespace Simple.Data
             return Cache.GetOrAdd(concreteType, type => new ConcreteTypeCreator(type));
         }
 
-        public bool TryCreate(HomogenizedKeyDictionary data, out object result)
+        public bool TryCreate(IDictionary<string, object> data, out object result)
         {
             bool anyPropertiesSet = false;
             object obj = Activator.CreateInstance(_concreteType);
             foreach (var propertyInfo in _concreteType.GetProperties().Where(pi => CanSetProperty(pi, data)))
             {
-                propertyInfo.SetValue(obj, data[propertyInfo.Name], null);
+                propertyInfo.SetValue(obj, data[propertyInfo.Name.Homogenize()], null);
                 anyPropertiesSet = true;
             }
 
@@ -44,10 +45,10 @@ namespace Simple.Data
             return anyPropertiesSet;
         }
 
-        private static bool CanSetProperty(PropertyInfo propertyInfo, HomogenizedKeyDictionary data)
+        private static bool CanSetProperty(PropertyInfo propertyInfo, IDictionary<string, object> data)
         {
-            return data.ContainsKey(propertyInfo.Name) &&
-                   !(propertyInfo.PropertyType.IsValueType && data[propertyInfo.Name] == null);
+            return data.ContainsKey(propertyInfo.Name.Homogenize()) &&
+                   !(propertyInfo.PropertyType.IsValueType && data[propertyInfo.Name.Homogenize()] == null);
         }
     }
 }

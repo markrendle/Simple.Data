@@ -11,14 +11,29 @@ namespace Simple.Data.Ado
             return ToDynamicRecord(dataRecord, null, null);
         }
 
+        public static dynamic ToDynamicRecord(this IDataRecord dataRecord, OptimizedDictionaryIndex<string> index)
+        {
+            return ToDynamicRecord(dataRecord, index, null, null);
+        }
+
         public static dynamic ToDynamicRecord(this IDataRecord dataRecord, string tableName, Database database)
         {
             return new SimpleRecord(dataRecord.ToDictionary(), tableName, database);
         }
 
+        public static dynamic ToDynamicRecord(this IDataRecord dataRecord, OptimizedDictionaryIndex<string> index, string tableName, Database database)
+        {
+            return new SimpleRecord(dataRecord.ToDictionary(index), tableName, database);
+        }
+
         public static Dictionary<string, object> ToDictionary(this IDataRecord dataRecord)
         {
             return dataRecord.GetFieldNames().ToDictionary(fieldName => fieldName, fieldName => dataRecord[fieldName]);
+        }
+
+        public static IDictionary<string, object> ToDictionary(this IDataRecord dataRecord, OptimizedDictionaryIndex<string> index)
+        {
+            return OptimizedDictionary.Create(index,dataRecord.GetValues());
         }
 
         public static IEnumerable<string> GetFieldNames(this IDataRecord dataRecord)
@@ -27,6 +42,13 @@ namespace Simple.Data.Ado
             {
                 yield return dataRecord.GetName(i);
             }
+        }
+
+        public static IEnumerable<object> GetValues(this IDataRecord dataRecord)
+        {
+            var values = new object[dataRecord.FieldCount];
+            dataRecord.GetValues(values);
+            return values;
         }
     }
 }

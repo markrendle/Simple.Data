@@ -11,35 +11,36 @@ namespace Simple.Data
     public partial class SimpleRecord : DynamicObject
     {
         private readonly ConcreteObject _concreteObject = new ConcreteObject();
-        private readonly HomogenizedKeyDictionary _data;
+        private readonly IDictionary<string, object> _data;
         private readonly DataStrategy _database;
         private readonly string _tableName;
 
         public SimpleRecord()
         {
-            _data = new HomogenizedKeyDictionary();
+            _data = new Dictionary<string, object>();
         }
 
         public SimpleRecord(Database database)
         {
-            _data = new HomogenizedKeyDictionary();
+            _data = new Dictionary<string,object>();
             _database = database;
         }
 
-        internal SimpleRecord(IEnumerable<KeyValuePair<string, object>> data) : this(data, null)
+        internal SimpleRecord(IDictionary<string, object> data)
+            : this(data, null)
         {
         }
 
-        internal SimpleRecord(IEnumerable<KeyValuePair<string, object>> data, string tableName)
+        internal SimpleRecord(IDictionary<string, object> data, string tableName)
             : this(data, tableName, null)
         {
         }
 
-        internal SimpleRecord(IEnumerable<KeyValuePair<string, object>> data, string tableName, DataStrategy dataStrategy)
+        internal SimpleRecord(IDictionary<string, object> data, string tableName, DataStrategy dataStrategy)
         {
             _tableName = tableName;
             _database = dataStrategy;
-            _data = new HomogenizedKeyDictionary(data);
+            _data = data;
         }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)

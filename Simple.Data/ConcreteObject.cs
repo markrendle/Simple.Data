@@ -12,7 +12,7 @@ namespace Simple.Data
         private static readonly object CastFailureObject = new object();
         private WeakReference _concreteObject;
 
-        public object Get(Type type, HomogenizedKeyDictionary data)
+        public object Get(Type type, IDictionary<string,object> data)
         {
             if (_concreteObject == null || !_concreteObject.IsAlive)
             {
@@ -27,7 +27,7 @@ namespace Simple.Data
             return null;
         }
 
-        private object ConvertAndCacheReference(Type type, HomogenizedKeyDictionary data)
+        private object ConvertAndCacheReference(Type type, IDictionary<string, object> data)
         {
             _concreteObject = null;
             object result;

@@ -235,7 +235,7 @@ namespace Simple.Data
         /// Creates a single-set <see cref="SimpleResultSet"/> from the specified source.
         /// </summary>
         /// <param name="source">The source.</param>
-        public static SimpleResultSet Create(IEnumerable<IEnumerable<KeyValuePair<string,object>>> source)
+        public static SimpleResultSet Create(IEnumerable<IDictionary<string,object>> source)
         {
             var q = from dict in source
                     select new SimpleRecord(dict);
@@ -247,7 +247,7 @@ namespace Simple.Data
         /// </summary>
         /// <param name="sources">The sources.</param>
         /// <returns></returns>
-        public static SimpleResultSet Create(IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> sources)
+        public static SimpleResultSet Create(IEnumerable<IEnumerable<IDictionary<string, object>>> sources)
         {
             var q = from source in sources
                     select from dict in source

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Data;
+using Simple.Data.Extensions;
 
 namespace Simple.Data.Ado
 {
@@ -33,9 +34,10 @@ namespace Simple.Data.Ado
 
         private static IEnumerable<IDictionary<string,object>> ToDictionariesImpl(IDataReader reader)
         {
+            var index = OptimizedDictionary.CreateIndex(reader.GetFieldNames().Select(n => n.Homogenize()));
             while (reader.Read())
             {
-                yield return reader.ToDictionary();
+                yield return reader.ToDictionary(index);
             }
         }
 
