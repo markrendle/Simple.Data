@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using NUnit.Framework;
 using Simple.Data.Ado;
+using Simple.Data.Extensions;
 
 namespace Simple.Data.SqlTest
 {
@@ -85,7 +86,7 @@ namespace Simple.Data.SqlTest
             Thread.Sleep(100);
             foreach (var user in users)
             {
-                Console.WriteLine(user["Id"]);
+                Assert.IsTrue(user.ContainsKey("Id".Homogenize()));
             }
 
         }

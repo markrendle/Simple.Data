@@ -69,6 +69,7 @@
     <Compile Include="ConcreteObject.cs" />
     <Compile Include="ConcreteTypeCreator.cs" />
     <Compile Include="Database.Open.cs" />
+    <Compile Include="HomogenizedDictionaryIndex.cs" />
     <Compile Include="IRange.cs" />
     <Compile Include="OptimizedDictionary.cs" />
     <Compile Include="OptimizedDictionaryIndex.cs" />

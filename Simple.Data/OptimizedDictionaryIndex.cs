@@ -11,7 +11,7 @@ namespace Simple.Data
             _index = new Dictionary<T, int>(index);
         }
 
-        public int this[T key]
+        public virtual int this[T key]
         {
             get { return _index[key]; }
         }
@@ -21,12 +21,12 @@ namespace Simple.Data
             return _index.Keys;
         }
 
-        public bool ContainsKey(T key)
+        public virtual bool ContainsKey(T key)
         {
             return _index.ContainsKey(key);
         }
 
-        public bool TryGetIndex(T key, out int index)
+        public virtual bool TryGetIndex(T key, out int index)
         {
             return _index.TryGetValue(key, out index);
         }

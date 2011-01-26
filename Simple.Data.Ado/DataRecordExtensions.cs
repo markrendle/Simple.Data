@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Data;
+using Simple.Data.Extensions;
 
 namespace Simple.Data.Ado
 {
@@ -28,7 +29,7 @@ namespace Simple.Data.Ado
 
         public static Dictionary<string, object> ToDictionary(this IDataRecord dataRecord)
         {
-            return dataRecord.GetFieldNames().ToDictionary(fieldName => fieldName, fieldName => dataRecord[fieldName]);
+            return dataRecord.GetFieldNames().ToDictionary(fieldName => fieldName.Homogenize(), fieldName => dataRecord[fieldName]);
         }
 
         public static IDictionary<string, object> ToDictionary(this IDataRecord dataRecord, OptimizedDictionaryIndex<string> index)
