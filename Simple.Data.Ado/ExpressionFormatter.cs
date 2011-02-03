@@ -115,7 +115,7 @@ namespace Simple.Data.Ado
 
         private string FormatRange(IRange range)
         {
-            return string.Format("({0} AND {1})", _commandBuilder.AddParameter(range.Start),
+            return string.Format("{0} AND {1}", _commandBuilder.AddParameter(range.Start),
                                  _commandBuilder.AddParameter(range.End));
         }
 
