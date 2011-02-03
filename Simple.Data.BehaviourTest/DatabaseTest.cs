@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Simple.Data.Ado;
+using Simple.Data.Mocking;
 using Simple.Data.Mocking.Ado;
 
 namespace Simple.Data.IntegrationTest
@@ -19,11 +20,16 @@ namespace Simple.Data.IntegrationTest
             var mockSchemaProvider = new MockSchemaProvider();
             mockSchemaProvider.SetTables(new[] { "dbo", "Users", "BASE TABLE" });
             mockSchemaProvider.SetColumns(new object[] { "dbo", "Users", "Id", true },
-                                          new[] { "dbo", "Users", "Name" },
-                                          new[] { "dbo", "Users", "Password" },
-                                          new[] { "dbo", "Users", "Age" });
-            mockSchemaProvider.SetPrimaryKeys(new object[] {"dbo", "Users", "Id", 0});
-            return new Database(new AdoAdapter(new MockConnectionProvider(new MockDbConnection(mockDatabase), mockSchemaProvider)));
+                                            new[] { "dbo", "Users", "Name" },
+                                            new[] { "dbo", "Users", "Password" },
+                                            new[] { "dbo", "Users", "Age" });
+            mockSchemaProvider.SetPrimaryKeys(new object[] { "dbo", "Users", "Id", 0 });
+            var adapter =
+                MockHelper.CreateMockAdoAdapter(new MockConnectionProvider(new MockDbConnection(mockDatabase),
+                                                                           mockSchemaProvider));
+            MockHelper.UseMockAdapter(adapter);
+            return Database.Open();
+            //            return new Database(new AdoAdapter(new MockConnectionProvider(new MockDbConnection(mockDatabase), mockSchemaProvider)));
         }
 
         [Test]
@@ -154,7 +160,7 @@ namespace Simple.Data.IntegrationTest
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
-            var user = new User {Name = "Steve", Age = 50};
+            var user = new User { Name = "Steve", Age = 50 };
             database.Users.Insert(user);
             Assert.AreEqual("insert into [dbo].[Users] ([Name],[Password],[Age]) values (@p0,@p1,@p2)".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Steve", mockDatabase.Parameters[0]);

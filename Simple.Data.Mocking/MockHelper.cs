@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Simple.Data.Ado;
 
 namespace Simple.Data.Mocking
 {
@@ -25,6 +26,11 @@ namespace Simple.Data.Mocking
         public static void UseMockAdapter(Func<Adapter> mockAdapterCreator)
         {
             DatabaseOpener.UseMockAdapter(mockAdapterCreator());
+        }
+
+        public static Adapter CreateMockAdoAdapter(IConnectionProvider connectionProvider)
+        {
+            return new AdoAdapter(connectionProvider);
         }
     }
 }
