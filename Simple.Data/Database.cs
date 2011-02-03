@@ -96,5 +96,10 @@ namespace Simple.Data
         {
             return SimpleTransaction.Begin(this, name);
         }
+
+        protected override Database GetDatabase()
+        {
+            return this;
+        }
     }
 }

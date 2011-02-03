@@ -357,7 +357,7 @@ namespace Simple.Data.Mocking.Ado
         /// <param name="ordinal">The zero-based column ordinal.</param><filterpriority>1</filterpriority>
         public override string GetName(int ordinal)
         {
-            throw new NotImplementedException();
+            return ordinal.ToString();
         }
 
         /// <summary>

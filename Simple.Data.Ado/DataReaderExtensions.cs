@@ -34,7 +34,7 @@ namespace Simple.Data.Ado
 
         private static IEnumerable<IDictionary<string,object>> ToDictionariesImpl(IDataReader reader)
         {
-            var index = OptimizedDictionary.CreateIndex(reader.GetFieldNames().Select(n => n.Homogenize()));
+            var index = HomogenizedDictionaryIndex.CreateIndex(reader.GetFieldNames());
             var values = new object[reader.FieldCount];
             while (reader.Read())
             {

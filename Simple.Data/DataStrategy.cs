@@ -43,7 +43,7 @@ namespace Simple.Data
             var adapterWithFunctions = Adapter as IAdapterWithFunctions;
             if (adapterWithFunctions != null && adapterWithFunctions.IsValidFunction(binder.Name))
             {
-                var command = new ExecuteFunctionCommand(adapterWithFunctions, binder.Name,
+                var command = new ExecuteFunctionCommand(GetDatabase(), adapterWithFunctions, binder.Name,
                                                          binder.ArgumentsToDictionary(args));
                 return command.Execute(out result);
             }
@@ -68,6 +68,8 @@ namespace Simple.Data
             _members.TryUpdate(reference.GetName(), new DynamicSchema(reference.GetName(), this), reference);
             return (DynamicSchema)_members[reference.GetName()];
         }
+
+        protected abstract Database GetDatabase();
 
         /// <summary>
         ///  Finds data from the specified "table".

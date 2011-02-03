@@ -131,5 +131,10 @@ namespace Simple.Data
         {
             return _adapter as Adapter;
         }
+
+        protected override Database GetDatabase()
+        {
+            return _database;
+        }
     }
 }

@@ -17,12 +17,12 @@ namespace Simple.Data
 
         public SimpleRecord()
         {
-            _data = new Dictionary<string, object>();
+            _data = new HomogenizedKeyDictionary();
         }
 
         public SimpleRecord(Database database)
         {
-            _data = new Dictionary<string,object>();
+            _data = new HomogenizedKeyDictionary();
             _database = database;
         }
 
@@ -40,7 +40,13 @@ namespace Simple.Data
         {
             _tableName = tableName;
             _database = dataStrategy;
-            _data = data;
+            _data = HomogenizeDataDictionary(data);
+        }
+
+        private static IDictionary<string,object> HomogenizeDataDictionary(IDictionary<string,object> data)
+        {
+            if (data is HomogenizedKeyDictionary || data is OptimizedDictionary<string, object>) return data;
+            return new HomogenizedKeyDictionary(data);
         }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
@@ -49,6 +55,11 @@ namespace Simple.Data
             {
                 result = _data[binder.Name];
                 return true;
+            }
+            if (_tableName == null)
+            {
+                result = null;
+                return false;
             }
             var relatedAdapter = _database.Adapter as IAdapterWithRelation;
             if (relatedAdapter != null && relatedAdapter.IsValidRelation(_tableName, binder.Name))
