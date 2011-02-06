@@ -36,7 +36,7 @@ namespace Simple.Data
             object obj = Activator.CreateInstance(_concreteType);
             foreach (var propertyInfo in _concreteType.GetProperties().Where(pi => CanSetProperty(pi, data)))
             {
-                propertyInfo.SetValue(obj, data[propertyInfo.Name.Homogenize()], null);
+                propertyInfo.SetValue(obj, data[propertyInfo.Name], null);
                 anyPropertiesSet = true;
             }
 
@@ -47,8 +47,8 @@ namespace Simple.Data
 
         private static bool CanSetProperty(PropertyInfo propertyInfo, IDictionary<string, object> data)
         {
-            return data.ContainsKey(propertyInfo.Name.Homogenize()) &&
-                   !(propertyInfo.PropertyType.IsValueType && data[propertyInfo.Name.Homogenize()] == null);
+            return data.ContainsKey(propertyInfo.Name) &&
+                   !(propertyInfo.PropertyType.IsValueType && data[propertyInfo.Name] == null);
         }
     }
 }

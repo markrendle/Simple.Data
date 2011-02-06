@@ -40,7 +40,7 @@ namespace Simple.Data
         {
             _tableName = tableName;
             _database = dataStrategy;
-            _data = HomogenizeDataDictionary(data);
+            _data = data;
         }
 
         private static IDictionary<string,object> HomogenizeDataDictionary(IDictionary<string,object> data)
