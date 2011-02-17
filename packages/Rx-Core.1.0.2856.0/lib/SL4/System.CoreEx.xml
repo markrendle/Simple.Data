@@ -506,11 +506,6 @@
             Indicates whether left and right are not equal.       
             </summary>
         </member>
-        <member name="M:System.Collections.Generic.Notification`1.GetHashCode">
-            <summary>
-            Returns the hash code for this instance.
-            </summary>
-        </member>
         <member name="M:System.Collections.Generic.Notification`1.Accept(System.IObserver{`0})">
             <summary>
             Invokes the observer's method corresponding to the notification.

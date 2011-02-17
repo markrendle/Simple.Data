@@ -18,6 +18,13 @@ namespace Simple.Data.SqlCe40Test
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8)),
             "TestDatabase.sdf");
 
+        [TestFixtureSetUp]
+        public void DeleteAlice()
+        {
+            var db = Database.Opener.OpenFile(DatabasePath);
+            db.Users.DeleteByName("Alice");
+        }
+
         [Test]
         public void TestProviderWithFileName()
         {

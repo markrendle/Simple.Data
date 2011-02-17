@@ -2,7 +2,7 @@
 <package> 
   <metadata> 
     <id>Simple.Data.Core</id> 
-    <version>0.4.6</version> 
+    <version>0.4.7</version> 
     <authors>Mark Rendle</authors> 
     <owners>Mark Rendle</owners>
     <description>A Simple, Dynamic data access library.</description> 
@@ -11,7 +11,7 @@
     <tags>sql database data ado .net40</tags>
     <language>en-US</language> 
     <dependencies>
-      <dependency id="Rx-Main" version="1.0.2838.0" />
+      <dependency id="Rx-Main" version="[1.0.2856.0]" />
     </dependencies>
  </metadata> 
 </package>
