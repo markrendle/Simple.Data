@@ -39,7 +39,7 @@ namespace Simple.Data.Commands
         {
             var criteria = new Dictionary<string, object>();
 
-            foreach (var keyFieldName in keyFieldNames.Select(s => s.Homogenize()))
+            foreach (var keyFieldName in keyFieldNames)
             {
                 if (!record.ContainsKey(keyFieldName))
                 {
@@ -65,7 +65,7 @@ namespace Simple.Data.Commands
 
         private static IDictionary<string, object> RegularObjectToDictionary(object obj)
         {
-            var record = new Dictionary<string, object>();
+            var record = new Dictionary<string, object>(HomogenizedEqualityComparer.DefaultInstance);
             foreach (var property in obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
                 var value = property.GetValue(obj, null);

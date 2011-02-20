@@ -17,12 +17,12 @@ namespace Simple.Data
 
         public SimpleRecord()
         {
-            _data = new HomogenizedKeyDictionary();
+            _data = new Dictionary<string,object>(HomogenizedEqualityComparer.DefaultInstance);
         }
 
-        public SimpleRecord(Database database)
+        public SimpleRecord(DataStrategy database)
         {
-            _data = new HomogenizedKeyDictionary();
+            _data = new Dictionary<string,object>(HomogenizedEqualityComparer.DefaultInstance);
             _database = database;
         }
 
@@ -40,13 +40,7 @@ namespace Simple.Data
         {
             _tableName = tableName;
             _database = dataStrategy;
-            _data = HomogenizeDataDictionary(data);
-        }
-
-        private static IDictionary<string,object> HomogenizeDataDictionary(IDictionary<string,object> data)
-        {
-            if (data is HomogenizedKeyDictionary || data is OptimizedDictionary<string, object>) return data;
-            return new HomogenizedKeyDictionary(data);
+            _data = data;
         }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
@@ -80,7 +74,7 @@ namespace Simple.Data
 
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
-            _data[binder.Name.Homogenize()] = value;
+            _data[binder.Name] = value;
             return true;
         }
 

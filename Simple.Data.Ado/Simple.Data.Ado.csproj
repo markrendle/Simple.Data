@@ -68,12 +68,16 @@
     <Compile Include="DeleteHelper.cs" />
     <Compile Include="ExpressionFormatter.cs" />
     <Compile Include="FindHelper.cs" />
+    <Compile Include="HomogenizedDictionaryIndex.cs" />
     <Compile Include="ICommandBuilder.cs" />
     <Compile Include="IConnectionProvider.cs" />
     <Compile Include="IExpressionFormatter.cs" />
     <Compile Include="Joiner.cs" />
     <Compile Include="JoinType.cs" />
     <Compile Include="ObservableDataReader.cs" />
+    <Compile Include="OptimizedDictionary.cs" />
+    <Compile Include="OptimizedDictionaryIndex.cs" />
+    <Compile Include="OptimizedDictionary`2.cs" />
     <Compile Include="ProcedureExecutor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Simple.Data
+namespace Simple.Data.Ado
 {
     public static class OptimizedDictionary
     {
@@ -12,7 +12,7 @@ namespace Simple.Data
             return new OptimizedDictionaryIndex<T>(index);
         }
 
-        public static OptimizedDictionary<TKey,TValue> Create<TKey,TValue>(OptimizedDictionaryIndex<TKey> index, IEnumerable<TValue> values)
+        public static OptimizedDictionary<TKey,TValue> Create<TKey,TValue>(IDictionary<TKey,int> index, IEnumerable<TValue> values)
         {
             return new OptimizedDictionary<TKey, TValue>(index, values);
         }

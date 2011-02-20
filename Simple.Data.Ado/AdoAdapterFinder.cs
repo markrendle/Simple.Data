@@ -62,7 +62,7 @@ namespace Simple.Data.Ado
         {
             try
             {
-                return command.ToAsyncEnumerable();
+                return command.ToBufferedEnumerable();
             }
             catch (DbException ex)
             {
