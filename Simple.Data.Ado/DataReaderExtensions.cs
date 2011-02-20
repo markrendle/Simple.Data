@@ -7,6 +7,11 @@ namespace Simple.Data.Ado
 {
     internal static class DataReaderExtensions
     {
+        public static IDictionary<string,object> ToDictionary(this IDataReader dataReader)
+        {
+            return dataReader.ToDictionary(dataReader.CreateDictionaryIndex());
+        }
+
         public static IEnumerable<IDictionary<string, object>> ToDictionaries(this IDataReader reader)
         {
             using (reader)
@@ -34,7 +39,7 @@ namespace Simple.Data.Ado
 
         private static IEnumerable<IDictionary<string,object>> ToDictionariesImpl(IDataReader reader)
         {
-            var index = HomogenizedDictionaryIndex.CreateIndex(reader.GetFieldNames());
+            var index = reader.CreateDictionaryIndex();
             var values = new object[reader.FieldCount];
             while (reader.Read())
             {

@@ -5,11 +5,37 @@ using System.Data.Common;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Simple.Data.Extensions;
 
 namespace Simple.Data.Ado
 {
     static class DbCommandExtensions
     {
+        public static IEnumerable<IDictionary<string,object>> ToBufferedEnumerable(this IDbCommand command)
+        {
+            try
+            {
+                command.Connection.Open();
+            }
+            catch (DbException ex)
+            {
+                throw new AdoAdapterException(ex.Message, ex);
+            }
+            var reader = command.ExecuteReaderWithExceptionWrap();
+            var index = reader.CreateDictionaryIndex();
+            return BufferedEnumerable.Create(() => reader.Read()
+                                                       ? Maybe.Some(reader.ToDictionary(index))
+                                                       : Maybe<IDictionary<string, object>>.None,
+                                                       () => { using (command.Connection)using(command)using(reader) {} });
+        }
+
+        public static Dictionary<string, int> CreateDictionaryIndex(this IDataReader reader)
+        {
+            var keys =
+                reader.GetFieldNames().Select((s, i) => new KeyValuePair<string, int>(s.Homogenize(), i)).ToDictionary();
+            return new Dictionary<string, int>(keys, HomogenizedEqualityComparer.DefaultInstance);
+        }
+
         public static IEnumerable<IDictionary<string, object>> ToAsyncEnumerable(this IDbCommand command)
         {
             if (command.Connection == null) throw new InvalidOperationException("Command has no connection.");
@@ -28,6 +54,20 @@ namespace Simple.Data.Ado
             parameter.Value = value ?? DBNull.Value;
             command.Parameters.Add(parameter);
             return parameter;
+        }
+
+        public static IDataReader ExecuteReaderWithExceptionWrap(this IDbCommand command)
+        {
+            try
+            {
+                return command.ExecuteReader();
+            }
+            catch (DbException ex)
+            {
+                throw new AdoAdapterException(ex.Message, command.CommandText,
+                    command.Parameters.Cast<IDbDataParameter>()
+                    .ToDictionary(p => p.ParameterName, p => p.Value));
+            }
         }
     }
 }

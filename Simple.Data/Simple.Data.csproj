@@ -61,6 +61,8 @@
     <Compile Include="AdapterFactory.cs" />
     <Compile Include="AdapterWithFunctionsExtensions.cs" />
     <Compile Include="BinderHelper.cs" />
+    <Compile Include="BufferedEnumerable.cs" />
+    <Compile Include="BufferedEnumerable`1.cs" />
     <Compile Include="CachingAdapterFactory.cs" />
     <Compile Include="Commands\CommandFactory.cs" />
     <Compile Include="Commands\ExecuteFunctionCommand.cs" />
@@ -69,11 +71,11 @@
     <Compile Include="ConcreteObject.cs" />
     <Compile Include="ConcreteTypeCreator.cs" />
     <Compile Include="Database.Open.cs" />
-    <Compile Include="HomogenizedDictionaryIndex.cs" />
+    <Compile Include="EnumerableEx.cs" />
+    <Compile Include="Extensions\HomogenizeEx.cs" />
+    <Compile Include="HomogenizedEqualityComparer.cs" />
     <Compile Include="IRange.cs" />
-    <Compile Include="OptimizedDictionary.cs" />
-    <Compile Include="OptimizedDictionaryIndex.cs" />
-    <Compile Include="OptimizedDictionary`2.cs" />
+    <Compile Include="Maybe`1.cs" />
     <Compile Include="Range.cs" />
     <Compile Include="Range`1.cs" />
     <Compile Include="SimpleResultSet.cs" />
@@ -82,7 +84,6 @@
     <Compile Include="Extensions\IDictionaryExtensions.cs" />
     <Compile Include="Extensions\ObjectEx.cs" />
     <Compile Include="FunctionReturnType.cs" />
-    <Compile Include="HomogenizedKeyDictionary.cs" />
     <Compile Include="ExpressionHelper.cs" />
     <Compile Include="Commands\AllCommand.cs" />
     <Compile Include="Commands\FindCommand.cs" />

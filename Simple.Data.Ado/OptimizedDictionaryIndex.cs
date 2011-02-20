@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Simple.Data
+namespace Simple.Data.Ado
 {
     public class OptimizedDictionaryIndex<T>
     {
