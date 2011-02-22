@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
+using Simple.Data.Commands;
 
 namespace Simple.Data
 {
@@ -65,8 +66,16 @@ namespace Simple.Data
             }
             if ((!ReferenceEquals(_owner, null)) && GetOwner().GetDatabase() != null)
             {
-                var schema = _owner._database.SetMemberAsSchema(_owner);
-                return schema.GetTable(_name).TryInvokeMember(binder, args, out result);
+                var command = CommandFactory.GetCommandFor(binder.Name);
+                if (command != null)
+                {
+                    var schema = _owner._database.SetMemberAsSchema(_owner);
+                    var table = schema.GetTable(_name);
+                    result = command.Execute(_database, table, binder, args);
+                }
+                else
+                    result = new SimpleExpression(this, new SimpleFunction(binder.Name, args), SimpleExpressionType.Function);
+                return true;
             }
             throw new InvalidOperationException();
         }
@@ -169,26 +178,6 @@ namespace Simple.Data
         public static SimpleExpression operator >=(DynamicReference column, object value)
         {
             return new SimpleExpression(column, value, SimpleExpressionType.GreaterThanOrEqual);
-        }
-
-        /// <summary>
-        /// Implements the LIKE operator to create a <see cref="SimpleExpression"/> with the type <see cref="SimpleExpressionType.Like"/>.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns>The expression.</returns>
-        public SimpleExpression Like(string value)
-        {
-            return new SimpleExpression(this, value, SimpleExpressionType.Like);
-        }
-
-        /// <summary>
-        /// Implements the NOT LIKE operator to create a <see cref="SimpleExpression"/> with the type <see cref="SimpleExpressionType.NotLike"/>.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns>The expression.</returns>
-        public SimpleExpression NotLike(string value)
-        {
-            return new SimpleExpression(this, value, SimpleExpressionType.NotLike);
         }
 
         /// <summary>

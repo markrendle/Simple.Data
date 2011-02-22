@@ -68,6 +68,7 @@
     <Compile Include="Commands\ExecuteFunctionCommand.cs" />
     <Compile Include="Commands\FindAllCommand.cs" />
     <Compile Include="Commands\UpdateCommand.cs" />
+    <Compile Include="ConcreteCollectionTypeCreator.cs" />
     <Compile Include="ConcreteObject.cs" />
     <Compile Include="ConcreteTypeCreator.cs" />
     <Compile Include="Database.Open.cs" />
@@ -78,6 +79,8 @@
     <Compile Include="Maybe`1.cs" />
     <Compile Include="Range.cs" />
     <Compile Include="Range`1.cs" />
+    <Compile Include="SimpleFunction.cs" />
+    <Compile Include="SimpleList.cs" />
     <Compile Include="SimpleResultSet.cs" />
     <Compile Include="DynamicSchema.cs" />
     <Compile Include="Extensions\BinderExtensions.cs" />

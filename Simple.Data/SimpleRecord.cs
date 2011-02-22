@@ -48,6 +48,10 @@ namespace Simple.Data
             if (_data.ContainsKey(binder.Name))
             {
                 result = _data[binder.Name];
+                var converted = ConvertResult(result);
+                if (!ReferenceEquals(result, converted))
+                    _data[binder.Name] = result = converted;
+                
                 return true;
             }
             if (_tableName == null)
@@ -87,6 +91,23 @@ namespace Simple.Data
         public override IEnumerable<string> GetDynamicMemberNames()
         {
             return _data.Keys.AsEnumerable();
+        }
+
+        private static object ConvertResult(object result)
+        {
+            var subRecord = result as IDictionary<string, object>;
+            if (subRecord != null)
+                return new SimpleRecord(subRecord);
+
+            var subResultSet = result as IEnumerable<IDictionary<string, object>>;
+            if (subResultSet != null)
+                return new SimpleList(subResultSet.Select(x => new SimpleRecord(x)));
+
+            var list = result as IEnumerable<object>;
+            if (list != null)
+                return new SimpleList(list);
+
+            return result;
         }
     }
 }
