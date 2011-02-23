@@ -16,7 +16,6 @@ namespace Simple.Data
         private readonly IEnumerable<IEnumerable<dynamic>> _sources;
         private readonly IEnumerator<IEnumerable<dynamic>> _sourceEnumerator;
         private bool _hasCurrent;
-        private object _returnValue;
         private IDictionary<string, object> _outputValues;
 
         private SimpleResultSet() : this(Enumerable.Empty<IEnumerable<dynamic>>())
