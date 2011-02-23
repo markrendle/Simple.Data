@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.UnitTest", "Sim
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assemblies", "Assemblies", "{BA656253-3472-4A47-8640-976E89465B6F}"
 	ProjectSection(SolutionItems) = preProject
+		Assemblies\MongoDB.Bson.dll = Assemblies\MongoDB.Bson.dll
+		Assemblies\MongoDB.Driver.dll = Assemblies\MongoDB.Driver.dll
 		Assemblies\sqlceca35.dll = Assemblies\sqlceca35.dll
 		Assemblies\sqlcecompact35.dll = Assemblies\sqlcecompact35.dll
 		Assemblies\sqlceer35EN.dll = Assemblies\sqlceer35EN.dll
