@@ -29,7 +29,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void TestCastWithClass()
         {
-            var dict = new Dictionary<string, object> {{"Name", "Bob"}};
+            var dict = new Dictionary<string, object>(HomogenizedEqualityComparer.DefaultInstance) {{"Name", "Bob"}};
             dynamic test = new SimpleResultSet(new[] {new SimpleRecord(dict)});
             IEnumerable<Foo> foos = test.Cast<Foo>();
             Assert.AreEqual(1, foos.Count());
@@ -38,7 +38,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void TestCastWithForeach()
         {
-            var dict = new Dictionary<string, object> { { "Name", "Bob" } };
+            var dict = new Dictionary<string, object>(HomogenizedEqualityComparer.DefaultInstance) { { "Name", "Bob" } };
             dynamic test = new SimpleResultSet(new[] { new SimpleRecord(dict) });
             foreach (Foo foo in test)
             {

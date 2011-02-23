@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Simple.Data.Extensions;
+using System.Collections;
 
 namespace Simple.Data
 {
@@ -34,9 +35,24 @@ namespace Simple.Data
         {
             bool anyPropertiesSet = false;
             object obj = Activator.CreateInstance(_concreteType);
+            object value;
             foreach (var propertyInfo in _concreteType.GetProperties().Where(pi => CanSetProperty(pi, data)))
             {
-                propertyInfo.SetValue(obj, data[propertyInfo.Name], null);
+                value = data[propertyInfo.Name.Homogenize()];
+
+                if (ConcreteCollectionTypeCreator.IsCollectionType(propertyInfo.PropertyType))
+                {
+                    if (!ConcreteCollectionTypeCreator.TryCreate(propertyInfo.PropertyType, (IEnumerable)value, out value))
+                        continue;
+                }
+                else
+                {
+                    var subData = value as IDictionary<string, object>;
+                    if (subData != null && !ConcreteTypeCreator.Get(propertyInfo.PropertyType).TryCreate(subData, out value))
+                        continue;
+                }
+
+                propertyInfo.SetValue(obj, value, null);
                 anyPropertiesSet = true;
             }
 

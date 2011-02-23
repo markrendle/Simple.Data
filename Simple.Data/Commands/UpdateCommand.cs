@@ -57,7 +57,7 @@ namespace Simple.Data.Commands
             var dynamicRecord = obj as SimpleRecord;
             if (dynamicRecord != null)
             {
-                return new Dictionary<string, object>(dynamicRecord);
+                return new Dictionary<string, object>(dynamicRecord, HomogenizedEqualityComparer.DefaultInstance);
             }
 
             return RegularObjectToDictionary(obj);

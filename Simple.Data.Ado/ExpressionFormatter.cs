@@ -23,8 +23,7 @@ namespace Simple.Data.Ado
                       {SimpleExpressionType.Or, LogicalExpressionToWhereClause},
                       {SimpleExpressionType.Equal, EqualExpressionToWhereClause},
                       {SimpleExpressionType.NotEqual, NotEqualExpressionToWhereClause},
-                      {SimpleExpressionType.Like, LikeExpressionToWhereClause},
-                      {SimpleExpressionType.NotLike, NotLikeExpressionToWhereClause},
+                      {SimpleExpressionType.Function, FunctionExpressionToWhereClause},
                       {SimpleExpressionType.GreaterThan, expr => BinaryExpressionToWhereClause(expr, ">")},
                       {SimpleExpressionType.GreaterThanOrEqual, expr => BinaryExpressionToWhereClause(expr, ">=")},
                       {SimpleExpressionType.LessThan, expr => BinaryExpressionToWhereClause(expr, "<")},
@@ -80,18 +79,24 @@ namespace Simple.Data.Ado
                                  FormatObject(expression.RightOperand));
         }
 
-        private string LikeExpressionToWhereClause(SimpleExpression expression)
+        private string FunctionExpressionToWhereClause(SimpleExpression expression)
         {
-            if (!(expression.RightOperand is string)) throw new InvalidOperationException("Cannot use Like on non-string type.");
-            return string.Format("{0} LIKE {1}", FormatObject(expression.LeftOperand),
-                                 FormatObject(expression.RightOperand));
-        }
+            var function = expression.RightOperand as SimpleFunction;
+            if (function == null) throw new InvalidOperationException("Expected SimpleFunction as the right operand.");
 
-        private string NotLikeExpressionToWhereClause(SimpleExpression expression)
-        {
-            if (!(expression.RightOperand is string)) throw new InvalidOperationException("Cannot use Not Like on non-string type.");
-            return string.Format("{0} NOT LIKE {1}", FormatObject(expression.LeftOperand),
-                                 FormatObject(expression.RightOperand));
+            if (function.Name.Equals("like", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return string.Format("{0} LIKE {1}", FormatObject(expression.LeftOperand),
+                                 FormatObject(function.Args[0]));
+            }
+
+            if (function.Name.Equals("notlike", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return string.Format("{0} NOT LIKE {1}", FormatObject(expression.LeftOperand),
+                                 FormatObject(function.Args[0]));
+            }
+
+            throw new NotSupportedException(string.Format("Unknown function '{0}'.", function.Name));
         }
 
         private string BinaryExpressionToWhereClause(SimpleExpression expression, string comparisonOperator)
