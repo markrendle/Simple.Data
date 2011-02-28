@@ -74,12 +74,12 @@ namespace Simple.Data.Ado.Schema
             }
         }
 
-        internal IEnumerable<Column> Columns
+        public IEnumerable<Column> Columns
         {
             get { return _lazyColumns.Value.AsEnumerable(); }
         }
 
-        internal Column FindColumn(string columnName)
+        public Column FindColumn(string columnName)
         {
             var columns = _lazyColumns.Value;
             try
@@ -92,12 +92,12 @@ namespace Simple.Data.Ado.Schema
             }
         }
 
-        internal Key PrimaryKey
+        public Key PrimaryKey
         {
             get { return _lazyPrimaryKey.Value; }
         }
 
-        internal ForeignKeyCollection ForeignKeys
+        public ForeignKeyCollection ForeignKeys
         {
             get { return _lazyForeignKeys.Value; }
         }

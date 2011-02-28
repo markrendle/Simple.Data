@@ -2,7 +2,7 @@
 
 namespace Simple.Data.Ado.Schema
 {
-    class ForeignKeyCollection : KeyedCollection<ObjectName, ForeignKey>
+    public class ForeignKeyCollection : KeyedCollection<ObjectName, ForeignKey>
     {
         /// <summary>
         /// When implemented in a derived class, extracts the key from the specified element.

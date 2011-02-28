@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Simple.Data.Ado.Schema
 {
-    internal class DatabaseSchema
+    public class DatabaseSchema
     {
         private static readonly ConcurrentDictionary<string, DatabaseSchema> Instances = new ConcurrentDictionary<string, DatabaseSchema>();
 

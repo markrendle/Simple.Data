@@ -33,9 +33,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="nunit.framework, Version=2.5.7.10213, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+    <Reference Include="nunit.framework, Version=2.5.9.10348, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NUnit.2.5.7.10213\lib\nunit.framework.dll</HintPath>
+      <HintPath>..\packages\NUnit.2.5.9.10348\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.mocks, Version=2.5.9.10348, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NUnit.2.5.9.10348\lib\nunit.mocks.dll</HintPath>
+    </Reference>
+    <Reference Include="pnunit.framework">
+      <HintPath>..\packages\NUnit.2.5.9.10348\lib\pnunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -80,6 +87,10 @@
     <ProjectReference Include="..\Simple.Data.SqlServer\Simple.Data.SqlServer.csproj">
       <Project>{E24F1C0F-3DCD-4BE5-9A6E-78EF6CB392A1}</Project>
       <Name>Simple.Data.SqlServer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Simple.Data.TestHelper\Simple.Data.TestHelper.csproj">
+      <Project>{7DAB2F13-0392-435E-A934-4567266714BF}</Project>
+      <Name>Simple.Data.TestHelper</Name>
     </ProjectReference>
     <ProjectReference Include="..\Simple.Data\Simple.Data.csproj">
       <Project>{148CEE80-2E84-4ABD-B5AB-20415B2BBD21}</Project>

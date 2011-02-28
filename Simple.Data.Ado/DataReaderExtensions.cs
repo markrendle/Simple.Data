@@ -5,7 +5,7 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data.Ado
 {
-    internal static class DataReaderExtensions
+    public static class DataReaderExtensions
     {
         public static IDictionary<string,object> ToDictionary(this IDataReader dataReader)
         {

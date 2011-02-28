@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Simple.Data.Ado
 {
-    class ProviderHelper
+    public class ProviderHelper
     {
         private static readonly ConcurrentDictionary<string, IConnectionProvider> Cache = new ConcurrentDictionary<string,IConnectionProvider>();
 
