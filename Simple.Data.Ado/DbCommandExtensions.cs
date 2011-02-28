@@ -32,7 +32,7 @@ namespace Simple.Data.Ado
         public static Dictionary<string, int> CreateDictionaryIndex(this IDataReader reader)
         {
             var keys =
-                reader.GetFieldNames().Select((s, i) => new KeyValuePair<string, int>(s.Homogenize(), i)).ToDictionary();
+                reader.GetFieldNames().Select((s, i) => new KeyValuePair<string, int>(s, i)).ToDictionary();
             return new Dictionary<string, int>(keys, HomogenizedEqualityComparer.DefaultInstance);
         }
 

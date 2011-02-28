@@ -38,7 +38,7 @@ namespace Simple.Data
             object value;
             foreach (var propertyInfo in _concreteType.GetProperties().Where(pi => CanSetProperty(pi, data)))
             {
-                value = data[propertyInfo.Name.Homogenize()];
+                value = data[propertyInfo.Name];
 
                 if (ConcreteCollectionTypeCreator.IsCollectionType(propertyInfo.PropertyType))
                 {
