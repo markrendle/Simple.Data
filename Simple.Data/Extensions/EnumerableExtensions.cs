@@ -87,5 +87,10 @@ namespace Simple.Data.Extensions
                 yield return default(T);
             }
         }
+
+        public static IEnumerable<T> Replace<T>(this IEnumerable<T> source, T toReplace, T replaceWith)
+        {
+            return source.Select(item => Equals(item, toReplace) ? replaceWith : item);
+        }
     }
 }
