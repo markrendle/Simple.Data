@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Data;
 using Simple.Data.Extensions;
@@ -45,7 +44,7 @@ namespace Simple.Data.Ado
             while (reader.Read())
             {
                 reader.GetValues(values);
-                yield return OptimizedDictionary.Create(index, values.Replace(DBNull.Value, null));
+                yield return OptimizedDictionary.Create(index, values);
             }
         }
 

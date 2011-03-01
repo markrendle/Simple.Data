@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Data;
 using Simple.Data.Extensions;
@@ -30,7 +29,7 @@ namespace Simple.Data.Ado
 
         public static Dictionary<string, object> ToDictionary(this IDataRecord dataRecord)
         {
-            return dataRecord.GetFieldNames().ToDictionary(fieldName => fieldName.Homogenize(), fieldName => DBNullToNull(dataRecord[fieldName]));
+            return dataRecord.GetFieldNames().ToDictionary(fieldName => fieldName.Homogenize(), fieldName => dataRecord[fieldName]);
         }
 
         public static IDictionary<string, object> ToDictionary(this IDataRecord dataRecord, IDictionary<string,int> index)
@@ -50,12 +49,7 @@ namespace Simple.Data.Ado
         {
             var values = new object[dataRecord.FieldCount];
             dataRecord.GetValues(values);
-            return values.Replace(DBNull.Value, null);
-        }
-
-        private static object DBNullToNull(object source)
-        {
-            return source == DBNull.Value ? null : source;
+            return values;
         }
     }
 }
