@@ -14,7 +14,7 @@ namespace Simple.Data.Ado
         public FindHelper(DatabaseSchema schema)
         {
             _schema = schema;
-            _commandBuilder = new CommandBuilder();
+            _commandBuilder = new CommandBuilder(schema.SchemaProvider);
             _expressionFormatter = new ExpressionFormatter(_commandBuilder, _schema);
         }
 

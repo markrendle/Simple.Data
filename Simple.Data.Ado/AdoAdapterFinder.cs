@@ -53,7 +53,7 @@ namespace Simple.Data.Ado
         private IEnumerable<IDictionary<string, object>> ExecuteQuery(string sql, params object[] values)
         {
             var connection = _connection ?? _adapter.CreateConnection();
-            var command = CommandHelper.Create(connection, sql, values);
+            var command = new CommandHelper(_adapter.SchemaProvider).Create(connection, sql, values);
             command.Transaction = _transaction;
             return TryExecuteQuery(command);
         }

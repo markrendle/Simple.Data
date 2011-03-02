@@ -104,6 +104,13 @@ namespace Simple.Data.SqlCe40
             return string.Concat("[", unquotedName, "]");
         }
 
+        public string NameParameter(string baseName)
+        {
+            if (baseName == null) throw new ArgumentNullException("baseName");
+            if (baseName.Length == 0) throw new ArgumentException("Base name must be provided");
+            return (baseName.StartsWith("@")) ? baseName : "@" + baseName;
+        }
+
         public Type DataTypeToClrType(string dataType)
         {
             return SqlTypeResolver.GetClrType(dataType);

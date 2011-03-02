@@ -1,12 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using System.Text.RegularExpressions;
+using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
-    internal static class CommandHelper
+    internal class CommandHelper
     {
-        internal static IDbCommand Create(IDbConnection connection, string sql, IList<object> values)
+        private readonly ISchemaProvider _schemaProvider;
+
+        public CommandHelper(ISchemaProvider schemaProvider)
+        {
+            _schemaProvider = schemaProvider;
+        }
+
+        internal IDbCommand Create(IDbConnection connection, string sql, IList<object> values)
         {
             var command = connection.CreateCommand();
 
@@ -15,7 +24,7 @@ namespace Simple.Data.Ado
             return command;
         }
 
-        internal static IDbCommand Create(IDbConnection connection, CommandBuilder commandBuilder)
+        internal IDbCommand Create(IDbConnection connection, CommandBuilder commandBuilder)
         {
             var command = connection.CreateCommand();
             command.CommandText = commandBuilder.Text;
@@ -23,7 +32,7 @@ namespace Simple.Data.Ado
             return command;
         }
 
-        private static string PrepareCommand(IEnumerable<char> sql, IList<object> values, IDbCommand command)
+        private string PrepareCommand(IEnumerable<char> sql, IList<object> values, IDbCommand command)
         {
             int index = 0;
             var sqlBuilder = new StringBuilder();
@@ -32,7 +41,7 @@ namespace Simple.Data.Ado
                 if (c == '?')
                 {
                     var parameter = command.CreateParameter();
-                    parameter.ParameterName = "@p" + index;
+                    parameter.ParameterName = _schemaProvider.NameParameter("p" + index);
                     parameter.Value = values[index];
                     command.Parameters.Add(parameter);
                     

@@ -4,28 +4,32 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
     class CommandBuilder : ICommandBuilder
     {
         private int _number;
+        private readonly ISchemaProvider _schemaProvider;
         private readonly Dictionary<string, object> _parameters = new Dictionary<string, object>();
         private readonly StringBuilder _text;
 
-        public CommandBuilder()
+        public CommandBuilder(ISchemaProvider schemaProvider)
         {
             _text = new StringBuilder();
+            _schemaProvider = schemaProvider;
         }
 
-        public CommandBuilder(string text)
+        public CommandBuilder(string text, ISchemaProvider schemaProvider)
         {
             _text = new StringBuilder(text);
+            _schemaProvider = schemaProvider;
         }
 
         public string AddParameter(object value)
         {
-            string name = "@p" + Interlocked.Increment(ref _number);
+            string name = _schemaProvider.NameParameter("p" + Interlocked.Increment(ref _number));
             _parameters.Add(name, value);
             return name;
         }

@@ -225,5 +225,10 @@ namespace Simple.Data.Ado
         {
             get { return _connectionProvider.SupportsCompoundStatements; }
         }
+
+        public ISchemaProvider SchemaProvider
+        {
+            get { return _connectionProvider.GetSchemaProvider(); }
+        }
     }
 }
