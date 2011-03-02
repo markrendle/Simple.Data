@@ -51,5 +51,15 @@ namespace Simple.Data.SqlServer
         {
             get { return true; }
         }
+
+        public bool SupportsStoredProcedures
+        {
+            get { return true; }
+        }
+
+        public IProcedureExecutor GetProcedureExecutor(AdoAdapter adapter, ObjectName procedureName)
+        {
+            return new ProcedureExecutor(adapter, procedureName);
+        }
     }
 }

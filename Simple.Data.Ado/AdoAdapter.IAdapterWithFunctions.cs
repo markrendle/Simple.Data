@@ -7,18 +7,18 @@ using ResultSet = System.Collections.Generic.IEnumerable<System.Collections.Gene
 
 namespace Simple.Data.Ado
 {
-	internal partial class AdoAdapter : IAdapterWithFunctions
+    public partial class AdoAdapter : IAdapterWithFunctions
 	{
-	    private readonly ConcurrentDictionary<string, ProcedureExecutor> _executors = new ConcurrentDictionary<string, ProcedureExecutor>();
+	    private readonly ConcurrentDictionary<string, IProcedureExecutor> _executors = new ConcurrentDictionary<string, IProcedureExecutor>();
 
 	    public bool IsValidFunction(string functionName)
 	    {
-	        return _schema.FindProcedure(functionName) != null;
+	        return _connectionProvider.SupportsStoredProcedures && _schema.FindProcedure(functionName) != null;
 	    }
 
 	    public IEnumerable<ResultSet> Execute(string functionName, IDictionary<string, object> parameters)
 	    {
-	        var executor = _executors.GetOrAdd(functionName, f => new ProcedureExecutor(this, ObjectName.Parse(f)));
+	        var executor = _executors.GetOrAdd(functionName, f => _connectionProvider.GetProcedureExecutor(this, ObjectName.Parse(f)));
 	        return executor.Execute(parameters);
 	    }
 	}

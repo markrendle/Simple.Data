@@ -11,5 +11,7 @@ namespace Simple.Data.Ado
         string ConnectionString { get; }
         bool SupportsCompoundStatements { get; }
         string GetIdentityFunction();
+        bool SupportsStoredProcedures { get; }
+        IProcedureExecutor GetProcedureExecutor(AdoAdapter adapter, ObjectName procedureName);
     }
 }

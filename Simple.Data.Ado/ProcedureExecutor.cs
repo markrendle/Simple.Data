@@ -12,7 +12,13 @@ using ResultSet = System.Collections.Generic.IEnumerable<System.Collections.Gene
 
 namespace Simple.Data.Ado
 {
-    internal class ProcedureExecutor
+    public interface IProcedureExecutor
+    {
+        IEnumerable<ResultSet> Execute(IDictionary<string, object> suppliedParameters);
+        IEnumerable<ResultSet> ExecuteReader(DbCommand command);
+    }
+
+    public class ProcedureExecutor : IProcedureExecutor
     {
         private const string SimpleReturnParameterName = "@__Simple_ReturnValue";
 
@@ -64,7 +70,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        private IEnumerable<ResultSet> ExecuteReader(DbCommand command)
+        public IEnumerable<ResultSet> ExecuteReader(DbCommand command)
         {
             command.Connection.Open();
             using (var reader = command.ExecuteReader())

@@ -59,5 +59,15 @@ namespace Simple.Data.SqlCe40
         {
             get { return false; }
         }
+
+        public bool SupportsStoredProcedures
+        {
+            get { return false; }
+        }
+
+        public IProcedureExecutor GetProcedureExecutor(AdoAdapter adapter, ObjectName procedureName)
+        {
+            throw new NotSupportedException("SQL Server Compact Edition does not support stored procedures.");
+        }
     }
 }
