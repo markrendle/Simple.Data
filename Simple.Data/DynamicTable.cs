@@ -76,7 +76,7 @@ namespace Simple.Data
                 result = GetAll().ToList();
                 return true;
             }
-            result = new DynamicReference(binder.Name, new DynamicReference(_tableName));
+            result = new DynamicReference(binder.Name, new DynamicReference(_tableName, _dataStrategy));
             return true;
         }
 
