@@ -28,8 +28,7 @@ namespace Simple.Data.Ado.Schema
             if (tableName.Contains('.'))
             {
                 var schemaDotTable = tableName.Split('.');
-                if (schemaDotTable.Length != 2) throw new InvalidOperationException("Could not resolve qualified table name.");
-                return Find(schemaDotTable[1], schemaDotTable[0]);
+                return Find(schemaDotTable[schemaDotTable.Length - 1], schemaDotTable[0]);
             }
             var table = FindTableWithName(tableName.Homogenize())
                    ?? FindTableWithPluralName(tableName.Homogenize())
@@ -55,6 +54,15 @@ namespace Simple.Data.Ado.Schema
             var table = FindTableWithName(tableName.Homogenize(), schemaName.Homogenize())
                    ?? FindTableWithPluralName(tableName.Homogenize(), schemaName.Homogenize())
                    ?? FindTableWithSingularName(tableName.Homogenize(), schemaName.Homogenize());
+
+            if (table == null)
+            {
+                // Try without schemaName, which might not be schemaName
+                table = FindTableWithName(tableName.Homogenize())
+                        ?? FindTableWithPluralName(tableName.Homogenize())
+                        ?? FindTableWithSingularName(tableName.Homogenize());
+
+            }
 
             if (table == null)
             {
