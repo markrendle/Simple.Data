@@ -46,6 +46,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.SqlCe40Test", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.TestHelper", "Simple.Data.TestHelper\Simple.Data.TestHelper.csproj", "{7DAB2F13-0392-435E-A934-4567266714BF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.Mysql40", "Simple.Data.Mysql40\Simple.Data.Mysql40.csproj", "{6BB6D48E-E2AB-4AF7-8FE3-10A3AACE3FC7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.Mysql40Test", "Simple.Data.Mysql40Test\Simple.Data.Mysql40Test.csproj", "{B6507B06-C337-4661-B5D0-E23786CDEE87}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +108,14 @@ Global
 		{7DAB2F13-0392-435E-A934-4567266714BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DAB2F13-0392-435E-A934-4567266714BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7DAB2F13-0392-435E-A934-4567266714BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BB6D48E-E2AB-4AF7-8FE3-10A3AACE3FC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BB6D48E-E2AB-4AF7-8FE3-10A3AACE3FC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BB6D48E-E2AB-4AF7-8FE3-10A3AACE3FC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BB6D48E-E2AB-4AF7-8FE3-10A3AACE3FC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6507B06-C337-4661-B5D0-E23786CDEE87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6507B06-C337-4661-B5D0-E23786CDEE87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6507B06-C337-4661-B5D0-E23786CDEE87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6507B06-C337-4661-B5D0-E23786CDEE87}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -115,5 +127,6 @@ Global
 		{96C623FD-869E-4DCE-98A1-17075EE384F9} = {182AEEFE-9B89-4264-BCED-91A00D1EF896}
 		{70536BA8-AF0D-46F3-B04C-45177F56B320} = {182AEEFE-9B89-4264-BCED-91A00D1EF896}
 		{E9160373-8BD2-4D69-B88E-1D3B5BC0A6FB} = {182AEEFE-9B89-4264-BCED-91A00D1EF896}
+		{B6507B06-C337-4661-B5D0-E23786CDEE87} = {182AEEFE-9B89-4264-BCED-91A00D1EF896}
 	EndGlobalSection
 EndGlobal
