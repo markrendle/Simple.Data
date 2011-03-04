@@ -59,32 +59,5 @@ namespace Simple.Data.Mysql40.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to select rc.CONSTRAINT_NAME, fkcu.TABLE_SCHEMA, fkcu.TABLE_NAME, fkcu.COLUMN_NAME,
-        ///pkcu.TABLE_SCHEMA AS UNIQUE_TABLE_SCHEMA, pkcu.TABLE_NAME AS UNIQUE_TABLE_NAME, pkcu.COLUMN_NAME AS UNIQUE_COLUMN_NAME,
-        ///fkcu.ORDINAL_POSITION
-        ///FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS rc
-        ///JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE fkcu ON rc.CONSTRAINT_NAME = fkcu.CONSTRAINT_NAME
-        ///JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE pkcu ON rc.UNIQUE_CONSTRAINT_NAME = pkcu.CONSTRAINT_NAME
-        ///WHERE fkcu.ORDINAL_POSITION = pkcu.ORDINAL_ [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string ForeignKeysSql {
-            get {
-                return ResourceManager.GetString("ForeignKeysSql", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SELECT        kcu.TABLE_SCHEMA, kcu.TABLE_NAME, kcu.CONSTRAINT_NAME, tc.CONSTRAINT_TYPE, kcu.COLUMN_NAME, kcu.ORDINAL_POSITION
-        ///FROM            INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS tc INNER JOIN
-        ///                         INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS kcu ON kcu.CONSTRAINT_NAME = tc.CONSTRAINT_NAME AND kcu.TABLE_NAME = tc.TABLE_NAME
-        ///WHERE        (tc.CONSTRAINT_TYPE = &apos;PRIMARY KEY&apos;).
-        /// </summary>
-        internal static string PrimaryKeysSql {
-            get {
-                return ResourceManager.GetString("PrimaryKeysSql", resourceCulture);
-            }
-        }
     }
 }
