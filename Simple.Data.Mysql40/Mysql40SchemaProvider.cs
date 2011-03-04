@@ -5,7 +5,6 @@ using System.Linq;
 using MySql.Data.MySqlClient;
 using Simple.Data.Ado;
 using Simple.Data.Ado.Schema;
-using Simple.Data.Mysql40.Properties;
 
 namespace Simple.Data.Mysql40
 {
@@ -69,29 +68,26 @@ namespace Simple.Data.Mysql40
 
         public IEnumerable<ForeignKey> GetForeignKeys(Table table)
         {
-            if (table == null) throw new ArgumentNullException("table");
-            var groups = GetForeignKeys(table.ActualName)
-                .Where(row => AreEqual(row["TABLE_SCHEMA"], table.Schema)
-                    && row["TABLE_NAME"].ToString() == table.ActualName)
-                .GroupBy(row => row["CONSTRAINT_NAME"].ToString())
-                .ToList();
+            //Implicit foreign key support
+            //MyIsam (the most used Mysql db engine) does not support foreign key constraint
+            //Foreign key support is therefor implemented in an implicit way
+            //based on naming conventions
+            //If a column name exisits as a primarykey in one table, then a column with the same name can
+            //be used as a foreign key in another table.
+            var foreignKeys = new List<ForeignKey>();
+            var tables = GetTables();
+            var primaryKeys = tables.Select(t => new Tuple<Table, Key>(t, GetPrimaryKey(t))).ToList();
 
-            foreach (var group in groups)
+            foreach (var column in table.Columns)
             {
-                yield return new ForeignKey(new ObjectName(group.First()["TABLE_SCHEMA"], group.First()["TABLE_NAME"]),
-                    group.Select(row => row["COLUMN_NAME"].ToString()),
-                    new ObjectName(group.First()["UNIQUE_TABLE_SCHEMA"], group.First()["UNIQUE_TABLE_NAME"]),
-                    group.Select(row => row["UNIQUE_COLUMN_NAME"].ToString()));
+                foreignKeys.AddRange(
+                    primaryKeys.Where(key => key.Item2[0].Contains(column.ActualName) && key.Item1.ActualName != table.ActualName).Select(
+                        key =>
+                        new ForeignKey(new ObjectName(null, table.ActualName),
+                                       new List<string> {column.ActualName},new ObjectName(null, key.Item1.ActualName), new List<string> {key.Item2[0]}
+                                       )));
             }
-        }
-
-        private static bool AreEqual(object string1, object string2)
-        {
-            if (string1 == DBNull.Value) string1 = null;
-            if (string2 == DBNull.Value) string2 = null;
-            if (string1 == null && string2 == null) return true;
-            if (string1 == null || string2 == null) return false;
-            return string1.ToString().Trim().Equals(string2.ToString().Trim());
+            return foreignKeys;
         }
 
         public string QuoteObjectName(string unquotedName)
@@ -116,23 +112,6 @@ namespace Simple.Data.Mysql40
         private DataTable GetColumnsDataTable(Table table)
         {
             return SelectToDataTable(string.Format("SHOW COLUMNS FROM {0}",table.ActualName));
-        }
-
-        private DataTable GetPrimaryKeys()
-        {
-            return SelectToDataTable(Resources.PrimaryKeysSql);
-        }
-
-        private DataTable GetForeignKeys()
-        {
-            return SelectToDataTable(Resources.ForeignKeysSql);
-        }
-
-        private EnumerableRowCollection<DataRow> GetForeignKeys(string tableName)
-        {
-            return GetForeignKeys().AsEnumerable()
-                .Where(
-                    row => row["TABLE_NAME"].ToString().Equals(tableName, StringComparison.InvariantCultureIgnoreCase));
         }
 
         private DataTable SelectToDataTable(string sql)
