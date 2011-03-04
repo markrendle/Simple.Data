@@ -223,5 +223,14 @@ namespace Simple.Data
                 return ((_name != null ? _name.GetHashCode() : 0)*397) ^ (!ReferenceEquals(_owner, null) ? _owner.GetHashCode() : 0);
             }
         }
+
+        public override string ToString()
+        {
+            if (!ReferenceEquals(_owner, null))
+            {
+                return _owner + "." + _name;
+            }
+            return _name;
+        }
     }
 }

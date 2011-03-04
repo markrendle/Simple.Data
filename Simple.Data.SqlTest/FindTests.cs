@@ -89,5 +89,15 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual("Pass", dboActual.Description);
             Assert.IsNull(testActual);
         }
+
+        [Test]
+        public void TestFindWithCriteriaAndSchemaQualification()
+        {
+            var db = DatabaseHelper.Open();
+
+            var dboActual = db.dbo.SchemaTable.Find(db.dbo.SchemaTable.Id == 1);
+
+            Assert.AreEqual("Pass", dboActual.Description);
+        }
     }
 }

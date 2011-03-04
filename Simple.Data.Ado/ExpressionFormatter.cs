@@ -111,7 +111,7 @@ namespace Simple.Data.Ado
             var reference = value as DynamicReference;
             if (!ReferenceEquals(reference, null))
             {
-                var table = _schema.FindTable(reference.GetOwner().GetName());
+                var table = _schema.FindTable(reference.GetOwner().ToString());
                 return table.QualifiedName + "." + table.FindColumn(reference.GetName()).QuotedName;
             }
 
