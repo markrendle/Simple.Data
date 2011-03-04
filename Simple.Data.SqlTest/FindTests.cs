@@ -78,5 +78,16 @@ namespace Simple.Data.SqlTest
             }
         }
 
+        [Test]
+        public void TestFindWithSchemaQualification()
+        {
+            var db = DatabaseHelper.Open();
+            
+            var dboActual = db.dbo.SchemaTable.FindById(1);
+            var testActual = db.test.SchemaTable.FindById(1);
+
+            Assert.AreEqual("Pass", dboActual.Description);
+            Assert.IsNull(testActual);
+        }
     }
 }
