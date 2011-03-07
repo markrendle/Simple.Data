@@ -47,7 +47,7 @@ namespace Simple.Data.Mocking
 
         private static Func<XElement, XElement> BuildNestedElementResolver(IList<string> elementNames)
         {
-            Func<XElement, XElement> resolver = xml => xml.Element(elementNames[1]);
+            Func<XElement, XElement> resolver = xml => xml.Element(elementNames[1]).Elements().First();
             for (int i = 2; i < elementNames.Count - 1; i++)
             {
                 var nested = resolver;

@@ -196,6 +196,25 @@ namespace Simple.Data.Mocking.Test
             var customer = db.CustomerData.FindByCustomerNoAndAccountManagerEmail(1, "someEmail");
             Assert.IsNull(customer);
         }
+
+        [Test]
+        public void FindWithJoinInCriteriaSHouldWork()
+        {
+            var adapter = new XmlMockAdapter(@"<root><Users UserKey=""System.Guid"" UserCustomers=""UserCustomers"">
+                        <User Email=""somesiteUser"" Password=""PASSWORD"" UserType=""Customer"" UserKey=""FF47BE0F-A6AE-4B52-B7CC-B2F3CA413838"">
+                            <UserCustomers UserKey=""System.Guid"" CustomerNo=""System.Int32"" SiteNo=""System.Int32"">
+                                <UserCustomer UserKey=""FF47BE0F-A6AE-4B52-B7CC-B2F3CA413838"" CustomerNo=""1000"" SiteNo=""501""/>
+                            </UserCustomers>
+                        </User>
+                    </Users></root>");
+            dynamic db = new Database(adapter);
+
+            var associatedUser =
+                db.Users.Find(db.Users.UserCustomers.CustomerNo == 1000 && db.Users.UserType == "Customer");
+
+            Assert.IsNotNull(associatedUser);
+            Assert.AreEqual(new Guid("FF47BE0F-A6AE-4B52-B7CC-B2F3CA413838"), associatedUser.UserKey);
+        }
     }
 }
 
