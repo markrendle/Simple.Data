@@ -78,7 +78,10 @@ namespace Simple.Data.Ado.Schema
 
         public string QuoteObjectName(ObjectName unquotedName)
         {
-            return _schemaProvider.QuoteObjectName(unquotedName.Schema) + '.' + _schemaProvider.QuoteObjectName(unquotedName.Name);
+            if (!string.IsNullOrWhiteSpace(unquotedName.Schema))
+                return _schemaProvider.QuoteObjectName(unquotedName.Schema) + '.' + _schemaProvider.QuoteObjectName(unquotedName.Name);
+            else
+                return _schemaProvider.QuoteObjectName(unquotedName.Name);
         }
 
         public static DatabaseSchema Get(IConnectionProvider connectionProvider)
