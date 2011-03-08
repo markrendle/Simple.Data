@@ -86,6 +86,7 @@ namespace Simple.Data.SqlTest
             var dboActual = db.dbo.SchemaTable.FindById(1);
             var testActual = db.test.SchemaTable.FindById(1);
 
+            Assert.IsNotNull(dboActual);
             Assert.AreEqual("Pass", dboActual.Description);
             Assert.IsNull(testActual);
         }
@@ -97,6 +98,7 @@ namespace Simple.Data.SqlTest
 
             var dboActual = db.dbo.SchemaTable.Find(db.dbo.SchemaTable.Id == 1);
 
+            Assert.IsNotNull(dboActual);
             Assert.AreEqual("Pass", dboActual.Description);
         }
     }

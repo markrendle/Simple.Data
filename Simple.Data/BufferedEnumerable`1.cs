@@ -7,17 +7,92 @@ namespace Simple.Data
 {
     sealed class BufferedEnumerable<T> : IEnumerable<T>
     {
+        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
         private readonly List<T> _buffer = new List<T>();
         private bool _done;
 
         internal void Iterate(Func<Maybe<T>> iterator)
         {
             Maybe<T> maybe;
-            while (maybe = iterator())
+            while ((maybe = iterator()).HasValue)
             {
-                _buffer.Add(maybe.Value);
+                Add(maybe.Value);
             }
-            _done = true;
+            SetDone();
+        }
+
+        private void SetDone()
+        {
+            _lock.EnterWriteLock();
+            try
+            {
+                _done = true;
+            }
+            finally
+            {
+                _lock.ExitWriteLock();
+            }
+        }
+
+        private void Add(T item)
+        {
+            _lock.EnterWriteLock();
+            try
+            {
+                _buffer.Add(item);
+            }
+            finally
+            {
+                _lock.ExitWriteLock();
+            }
+        }
+
+        private T this[int index]
+        {
+            get
+            {
+                _lock.EnterReadLock();
+                try
+                {
+                    return _buffer[index];
+                }
+                finally
+                {
+                    _lock.ExitReadLock();
+                }
+            }
+        }
+
+        private int Count
+        {
+            get
+            {
+                _lock.EnterReadLock();
+                try
+                {
+                    return _buffer.Count;
+                }
+                finally
+                {
+                    _lock.ExitReadLock();
+                }
+            }
+        }
+
+        private bool Done
+        {
+            get
+            {
+                _lock.EnterReadLock();
+                try
+                {
+                    return _done;
+                }
+                finally
+                {
+                    _lock.ExitReadLock();
+                }
+            }
         }
 
         class BufferedEnumerator : IEnumerator<T>
@@ -53,16 +128,17 @@ namespace Simple.Data
 
                 if (_bufferedEnumerable._done)
                 {
-                    return _current < _bufferedEnumerable._buffer.Count;
+                    return _current < _bufferedEnumerable.Count;
                 }
 
                 WaitForBuffer();
-                return _current < _bufferedEnumerable._buffer.Count;
+                return _current < _bufferedEnumerable.Count;
             }
 
             private void WaitForBuffer()
             {
-                SpinWait.SpinUntil(() => _bufferedEnumerable._done || _bufferedEnumerable._buffer.Count > _current);
+                // Block until next item delivered or iterator is done.
+                SpinWait.SpinUntil(() => _bufferedEnumerable.Done || _bufferedEnumerable.Count > _current);
             }
 
             /// <summary>
@@ -84,8 +160,8 @@ namespace Simple.Data
             {
                 get
                 {
-                    if (_current >= _bufferedEnumerable._buffer.Count) throw new InvalidOperationException();
-                    return _bufferedEnumerable._buffer[_current];
+                    if (_current >= _bufferedEnumerable.Count) throw new InvalidOperationException();
+                    return _bufferedEnumerable[_current];
                 }
             }
 

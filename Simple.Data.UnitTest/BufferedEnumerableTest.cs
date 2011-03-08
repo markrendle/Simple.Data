@@ -35,13 +35,13 @@ namespace Simple.Data.UnitTest
         [Test]
         public void MaybeNoneShouldBeFalse()
         {
-            Assert.False(Maybe<int>.None);
+            Assert.False(Maybe<int>.None.HasValue);
         }
 
         [Test]
         public void MaybeSomeShouldBeTrue()
         {
-            Assert.True(Maybe<int>.Some(1));
+            Assert.True(Maybe<int>.Some(1).HasValue);
         }
 
         [Test]
@@ -50,11 +50,11 @@ namespace Simple.Data.UnitTest
             int n = 0;
             Func<Maybe<int>> iterator = () => ++n < 10 ? n : Maybe<int>.None;
             Maybe<int> maybe;
-            while (maybe = iterator())
+            while ((maybe = iterator()).HasValue)
             {
                 Assert.AreEqual(n, maybe.Value);
             }
-            Assert.False(maybe);
+            Assert.False(maybe.HasValue);
         }
     }
 }

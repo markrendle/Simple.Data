@@ -17,11 +17,18 @@ namespace Simple.Data
             return new SomeClass(value);
         }
 
+        public abstract bool HasValue { get; }
+
         class NoneClass : Maybe<T>
         {
             public override T Value
             {
                 get { return default(T); }
+            }
+
+            public override bool HasValue
+            {
+                get { return false; }
             }
 
             /// <summary>
@@ -80,6 +87,11 @@ namespace Simple.Data
                 get { return _value; }
             }
 
+            public override bool HasValue
+            {
+                get { return true; }
+            }
+
             /// <summary>
             /// Indicates whether the current object is equal to another object of the same type.
             /// </summary>
@@ -89,7 +101,7 @@ namespace Simple.Data
             /// <param name="other">An object to compare with this object.</param>
             public override bool Equals(Maybe<T> other)
             {
-                return other != null && other && Equals(other.Value, _value);
+                return other != null && other.HasValue && Equals(other.Value, _value);
             }
 
             /// <summary>
@@ -127,10 +139,10 @@ namespace Simple.Data
             get;
         }
 
-        public static implicit operator bool(Maybe<T> maybe)
-        {
-            return maybe is SomeClass;
-        }
+        //public static implicit operator bool(Maybe<T> maybe)
+        //{
+        //    return maybe is SomeClass;
+        //}
 
         public static implicit operator Maybe<T>(T value)
         {
