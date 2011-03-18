@@ -78,6 +78,11 @@ namespace Simple.Data.Ado
             return Execute(commandBuilder);
         }
 
+		public override object Max(string tableName, string fieldName)
+		{
+			return new AdoAdapterMaxer(this).Max(tableName, fieldName);
+		}
+
         /// <summary>
         /// Gets the names of the fields which comprise the unique identifier for the specified table.
         /// </summary>
@@ -88,7 +93,7 @@ namespace Simple.Data.Ado
             return _schema.FindTable(tableName).PrimaryKey.AsEnumerable();
         }
 
-        private int Execute(ICommandBuilder commandBuilder)
+    	private int Execute(ICommandBuilder commandBuilder)
         {
             using (var connection = CreateConnection())
             {

@@ -87,7 +87,12 @@ namespace Simple.Data
             return _adapter.Delete(tableName, criteria);
         }
 
-        public SimpleTransaction BeginTransaction()
+    	public override object Max(string tableName, string fieldName)
+    	{
+    		return _adapter.Max(tableName, fieldName);
+    	}
+
+    	public SimpleTransaction BeginTransaction()
         {
             return SimpleTransaction.Begin(this);
         }

@@ -112,7 +112,12 @@ namespace Simple.Data
             return _adapter.Delete(tableName, criteria, AdapterTransaction);
         }
 
-        /// <summary>
+    	public override object Max(string tableName, string fieldName)
+    	{
+    		return _adapter.Max(tableName, fieldName);
+    	}
+
+    	/// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()

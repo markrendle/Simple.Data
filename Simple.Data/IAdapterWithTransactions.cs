@@ -41,5 +41,7 @@ namespace Simple.Data
         /// <param name="transaction">The transaction with which the operation is associated.</param>
         /// <returns>The number of records which were deleted.</returns>
         int Delete(string tableName, SimpleExpression criteria, IAdapterTransaction transaction);
+
+    	object Max(string tableName, string fieldName);
     }
 }

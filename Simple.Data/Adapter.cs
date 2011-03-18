@@ -71,5 +71,7 @@ namespace Simple.Data
         ///  Gets the names of the fields which comprise the unique identifier for the specified table.
         ///  </summary><param name="tableName">Name of the table.</param><returns></returns>
         public abstract IEnumerable<string> GetKeyFieldNames(string tableName);
+
+    	public abstract object Max(string tableName, string fieldName);
     }
 }
