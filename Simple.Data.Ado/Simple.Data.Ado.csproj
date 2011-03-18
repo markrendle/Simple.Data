@@ -56,7 +56,7 @@
     <Compile Include="AdoAdapterException.cs" />
     <Compile Include="AdoAdapterFinder.cs" />
     <Compile Include="AdoAdapterInserter.cs" />
-    <Compile Include="AdoAdapterMaxer.cs" />
+    <Compile Include="AdoAdapterAggregator.cs" />
     <Compile Include="AdoAdapterRelatedFinder.cs" />
     <Compile Include="AdoAdapterTransaction.cs" />
     <Compile Include="CommandBuilder.cs" />
@@ -75,7 +75,7 @@
     <Compile Include="IExpressionFormatter.cs" />
     <Compile Include="Joiner.cs" />
     <Compile Include="JoinType.cs" />
-    <Compile Include="MaxHelper.cs" />
+    <Compile Include="AggregationHelper.cs" />
     <Compile Include="ObservableDataReader.cs" />
     <Compile Include="OptimizedDictionary.cs" />
     <Compile Include="OptimizedDictionaryIndex.cs" />

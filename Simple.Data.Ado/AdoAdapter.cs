@@ -80,12 +80,12 @@ namespace Simple.Data.Ado
 
 		public override object Max(string tableName, string columnName, SimpleExpression criteria)
 		{
-			return new AdoAdapterMaxer(this).Max(tableName, columnName, criteria);
+			return new AdoAdapterAggregator(this).Max(tableName, columnName, criteria);
 		}
 
 		public override object Min(string tableName, string columnName, SimpleExpression criteria)
 		{
-			return new AdoAdapterMaxer(this).Min(tableName, columnName, criteria);
+			return new AdoAdapterAggregator(this).Min(tableName, columnName, criteria);
 		}
 
         /// <summary>
