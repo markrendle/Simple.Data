@@ -13,8 +13,8 @@ namespace Simple.Data.Commands
 		public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
 		{
 //			var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
-			var fieldName = binder.Name.Substring(3);
-			var data = dataStrategy.Max(table.GetQualifiedName(), fieldName);
+			var columName = binder.Name.Substring(3);
+			var data = dataStrategy.Max(table.GetQualifiedName(), columName);
 			return data;
 		}
 	}

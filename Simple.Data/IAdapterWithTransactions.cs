@@ -42,6 +42,6 @@ namespace Simple.Data
         /// <returns>The number of records which were deleted.</returns>
         int Delete(string tableName, SimpleExpression criteria, IAdapterTransaction transaction);
 
-    	object Max(string tableName, string fieldName);
+    	object Max(string tableName, string columnName);
     }
 }

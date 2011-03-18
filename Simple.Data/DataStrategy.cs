@@ -94,6 +94,6 @@ namespace Simple.Data
         ///  </summary><param name="tableName">Name of the table.</param><param name="criteria">The expression to use as criteria for the delete operation.</param><returns>The number of records which were deleted.</returns>
         public abstract int Delete(string tableName, SimpleExpression criteria);
 
-    	public abstract object Max(string tableName, string fieldName);
+    	public abstract object Max(string tableName, string columnName);
     }
 }

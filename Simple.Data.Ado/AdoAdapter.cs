@@ -78,9 +78,9 @@ namespace Simple.Data.Ado
             return Execute(commandBuilder);
         }
 
-		public override object Max(string tableName, string fieldName)
+		public override object Max(string tableName, string columnName)
 		{
-			return new AdoAdapterMaxer(this).Max(tableName, fieldName);
+			return new AdoAdapterMaxer(this).Max(tableName, columnName);
 		}
 
         /// <summary>

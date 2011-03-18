@@ -27,21 +27,21 @@ namespace Simple.Data.Ado
 			}
 		}		
 
-		public object Max(string tableName, string fieldName)
+		public object Max(string tableName, string columnName)
 		{
-			var commandBuilder = new MaxHelper(_adapter.GetSchema()).GetMaxCommand(tableName, fieldName);
-			return ExecuteQuery(commandBuilder);
+			var commandBuilder = new MaxHelper(_adapter.GetSchema()).GetMaxCommand(tableName, columnName);
+			return ExecuteScalar(commandBuilder);
 		}
 
-		private object ExecuteQuery(ICommandBuilder commandBuilder)
+		private object ExecuteScalar(ICommandBuilder commandBuilder)
 		{
 			var connection = _connection ?? _adapter.CreateConnection();
 			var command = commandBuilder.GetCommand(connection);
 			command.Transaction = _transaction;
-			return TryExecuteQuery(command);
+			return TryExecuteScalar(command);
 		}
 
-		private static object TryExecuteQuery(IDbCommand command)
+		private static object TryExecuteScalar(IDbCommand command)
 		{
 			try
 			{

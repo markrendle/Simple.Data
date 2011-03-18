@@ -72,6 +72,6 @@ namespace Simple.Data
         ///  </summary><param name="tableName">Name of the table.</param><returns></returns>
         public abstract IEnumerable<string> GetKeyFieldNames(string tableName);
 
-    	public abstract object Max(string tableName, string fieldName);
+    	public abstract object Max(string tableName, string columnName);
     }
 }

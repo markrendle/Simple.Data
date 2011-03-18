@@ -15,9 +15,9 @@ namespace Simple.Data.Ado
             _expressionFormatter = new ExpressionFormatter(_commandBuilder, _schema);
         }
 
-		public ICommandBuilder GetMaxCommand(string tableName, string fieldName)
+		public ICommandBuilder GetMaxCommand(string tableName, string columnName)
 		{
-			_commandBuilder.Append(GetMaxClause(tableName, fieldName));
+			_commandBuilder.Append(GetMaxClause(tableName, columnName));
 
 //			if (criteria != null)
 //			{
@@ -28,9 +28,9 @@ namespace Simple.Data.Ado
 			return _commandBuilder;
 		}
 
-		private string GetMaxClause(string tableName, string fieldName)
+		private string GetMaxClause(string tableName, string columnName)
 		{
-			return string.Format("select max({0}.{1}) from {0}", _schema.FindTable(tableName).QualifiedName, fieldName);
+			return string.Format("select max({0}.{1}) from {0}", _schema.FindTable(tableName).QualifiedName, columnName);
 		}
 
 	}
