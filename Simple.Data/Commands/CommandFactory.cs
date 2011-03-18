@@ -16,7 +16,8 @@ namespace Simple.Data.Commands
                                                                   new UpdateCommand(),
                                                                   new InsertCommand(),
                                                                   new DeleteByCommand(),
-																  new MaxCommand()
+																  new MaxCommand(),
+																  new MinCommand()
                                                               };
 
         public static ICommand GetCommandFor(string method)

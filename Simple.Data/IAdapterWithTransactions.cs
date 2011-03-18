@@ -43,5 +43,7 @@ namespace Simple.Data
         int Delete(string tableName, SimpleExpression criteria, IAdapterTransaction transaction);
 
     	object Max(string tableName, string columnName, SimpleExpression criteria);
+
+		object Min(string tableName, string columnName, SimpleExpression criteria);
     }
 }

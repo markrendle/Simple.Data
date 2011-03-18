@@ -117,6 +117,11 @@ namespace Simple.Data
     		return _adapter.Max(tableName, columnName, criteria);
     	}
 
+		public override object Min(string tableName, string columnName, SimpleExpression criteria)
+		{
+			return _adapter.Min(tableName, columnName, criteria);
+		}
+
     	/// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>

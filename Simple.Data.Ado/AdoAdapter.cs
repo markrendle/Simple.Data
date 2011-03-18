@@ -83,6 +83,11 @@ namespace Simple.Data.Ado
 			return new AdoAdapterMaxer(this).Max(tableName, columnName, criteria);
 		}
 
+		public override object Min(string tableName, string columnName, SimpleExpression criteria)
+		{
+			return new AdoAdapterMaxer(this).Min(tableName, columnName, criteria);
+		}
+
         /// <summary>
         /// Gets the names of the fields which comprise the unique identifier for the specified table.
         /// </summary>

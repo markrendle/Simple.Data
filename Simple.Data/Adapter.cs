@@ -73,5 +73,7 @@ namespace Simple.Data
         public abstract IEnumerable<string> GetKeyFieldNames(string tableName);
 
     	public abstract object Max(string tableName, string columnName, SimpleExpression criteria);
+
+		public abstract object Min(string tableName, string columnName, SimpleExpression criteria);
     }
 }

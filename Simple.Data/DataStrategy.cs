@@ -95,5 +95,7 @@ namespace Simple.Data
         public abstract int Delete(string tableName, SimpleExpression criteria);
 
     	public abstract object Max(string tableName, string columnName, SimpleExpression criteria);
+
+		public abstract object Min(string tableName, string columnName, SimpleExpression criteria);
     }
 }

@@ -33,6 +33,13 @@ namespace Simple.Data.Ado
 			return ExecuteScalar(commandBuilder);
 		}
 
+		public object Min(string tableName, string columnName, SimpleExpression criteria)
+		{
+			var commandBuilder = new MaxHelper(_adapter.GetSchema()).GetMinCommand(tableName, columnName, criteria);
+			return ExecuteScalar(commandBuilder);
+		}
+
+
 		private object ExecuteScalar(ICommandBuilder commandBuilder)
 		{
 			var connection = _connection ?? _adapter.CreateConnection();

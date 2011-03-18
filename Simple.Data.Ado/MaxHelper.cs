@@ -33,5 +33,22 @@ namespace Simple.Data.Ado
 			return string.Format("select max({0}.{1}) from {0}", _schema.FindTable(tableName).QualifiedName, columnName);
 		}
 
+		public ICommandBuilder GetMinCommand(string tableName, string columnName, SimpleExpression criteria)
+		{
+			_commandBuilder.Append(GetMinClause(tableName, columnName));
+
+			if (criteria != null)
+			{
+				_commandBuilder.Append(" where ");
+				_commandBuilder.Append(_expressionFormatter.Format(criteria));
+			}
+
+			return _commandBuilder;
+		}
+
+		private string GetMinClause(string tableName, string columnName)
+		{
+			return string.Format("select min({0}.{1}) from {0}", _schema.FindTable(tableName).QualifiedName, columnName);
+		}
 	}
 }

@@ -92,7 +92,12 @@ namespace Simple.Data
     		return _adapter.Max(tableName, columnName, criteria);
     	}
 
-    	public SimpleTransaction BeginTransaction()
+		public override object Min(string tableName, string columnName, SimpleExpression criteria)
+		{
+			return _adapter.Min(tableName, columnName, criteria);
+		}
+		
+		public SimpleTransaction BeginTransaction()
         {
             return SimpleTransaction.Begin(this);
         }
