@@ -7,14 +7,19 @@ namespace Simple.Data.Commands
 	{
 		public bool IsCommandFor(string method)
 		{
-			return method.StartsWith("Max") || method.StartsWith("max_", StringComparison.InvariantCultureIgnoreCase);
+			return method.StartsWith("Max");
 		}
 
 		public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
 		{
-//			var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
+			SimpleExpression criteriaExpression = null;
+			if (args.Length == 1 && args[0] is SimpleExpression)
+			{
+				criteriaExpression = args[0] as SimpleExpression;
+			}
+
 			var columName = binder.Name.Substring(3);
-			var data = dataStrategy.Max(table.GetQualifiedName(), columName);
+			var data = dataStrategy.Max(table.GetQualifiedName(), columName, criteriaExpression);
 			return data;
 		}
 	}

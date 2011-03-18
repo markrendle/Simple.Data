@@ -15,15 +15,15 @@ namespace Simple.Data.Ado
             _expressionFormatter = new ExpressionFormatter(_commandBuilder, _schema);
         }
 
-		public ICommandBuilder GetMaxCommand(string tableName, string columnName)
+		public ICommandBuilder GetMaxCommand(string tableName, string columnName, SimpleExpression criteria)
 		{
 			_commandBuilder.Append(GetMaxClause(tableName, columnName));
 
-//			if (criteria != null)
-//			{
-//				_commandBuilder.Append(" where ");
-//				_commandBuilder.Append(_expressionFormatter.Format(criteria));
-//			}
+			if (criteria != null)
+			{
+				_commandBuilder.Append(" where ");
+				_commandBuilder.Append(_expressionFormatter.Format(criteria));
+			}
 
 			return _commandBuilder;
 		}

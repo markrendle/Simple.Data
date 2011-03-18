@@ -25,11 +25,11 @@ namespace Simple.Data.Ado
 				_transaction = transaction;
 				_connection = transaction.Connection;
 			}
-		}		
+		}
 
-		public object Max(string tableName, string columnName)
+		public object Max(string tableName, string columnName, SimpleExpression criteria)
 		{
-			var commandBuilder = new MaxHelper(_adapter.GetSchema()).GetMaxCommand(tableName, columnName);
+			var commandBuilder = new MaxHelper(_adapter.GetSchema()).GetMaxCommand(tableName, columnName, criteria);
 			return ExecuteScalar(commandBuilder);
 		}
 
