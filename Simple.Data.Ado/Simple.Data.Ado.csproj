@@ -65,6 +65,7 @@
     <Compile Include="DataRecordExtensions.cs" />
     <Compile Include="DbCommandExtensions.cs" />
     <Compile Include="DbCommandObservableEx.cs" />
+    <Compile Include="DelegatingConnectionBase`1.cs" />
     <Compile Include="DeleteHelper.cs" />
     <Compile Include="ExpressionFormatter.cs" />
     <Compile Include="FindHelper.cs" />
