@@ -11,13 +11,13 @@ namespace Simple.Data.Ado
     class AdoAdapterInserter
     {
         private readonly AdoAdapter _adapter;
-        private readonly DbTransaction _transaction;
+        private readonly IDbTransaction _transaction;
 
         public AdoAdapterInserter(AdoAdapter adapter) : this(adapter, null)
         {
         }
 
-        public AdoAdapterInserter(AdoAdapter adapter, DbTransaction transaction)
+        public AdoAdapterInserter(AdoAdapter adapter, IDbTransaction transaction)
         {
             _adapter = adapter;
             _transaction = transaction;

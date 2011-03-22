@@ -10,14 +10,14 @@ namespace Simple.Data.Ado
     class AdoAdapterFinder
     {
         private readonly AdoAdapter _adapter;
-        private readonly DbTransaction _transaction;
-        private readonly DbConnection _connection;
+        private readonly IDbTransaction _transaction;
+        private readonly IDbConnection _connection;
 
         public AdoAdapterFinder(AdoAdapter adapter) : this(adapter, null)
         {
         }
 
-        public AdoAdapterFinder(AdoAdapter adapter, DbTransaction transaction)
+        public AdoAdapterFinder(AdoAdapter adapter, IDbTransaction transaction)
         {
             if (adapter == null) throw new ArgumentNullException("adapter");
             _adapter = adapter;

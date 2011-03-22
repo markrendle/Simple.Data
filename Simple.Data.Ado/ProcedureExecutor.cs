@@ -15,7 +15,7 @@ namespace Simple.Data.Ado
     public interface IProcedureExecutor
     {
         IEnumerable<ResultSet> Execute(IDictionary<string, object> suppliedParameters);
-        IEnumerable<ResultSet> ExecuteReader(DbCommand command);
+        IEnumerable<ResultSet> ExecuteReader(IDbCommand command);
     }
 
     public class ProcedureExecutor : IProcedureExecutor
@@ -24,7 +24,7 @@ namespace Simple.Data.Ado
 
         private readonly AdoAdapter _adapter;
         private readonly ObjectName _procedureName;
-        private Func<DbCommand, IEnumerable<ResultSet>> _executeImpl;
+        private Func<IDbCommand, IEnumerable<ResultSet>> _executeImpl;
 
         public ProcedureExecutor(AdoAdapter adapter, ObjectName procedureName)
         {
@@ -50,7 +50,7 @@ namespace Simple.Data.Ado
                 try
                 {
                     var result = _executeImpl(command);
-                    suppliedParameters["__ReturnValue"] = command.Parameters[SimpleReturnParameterName].Value;
+                    suppliedParameters["__ReturnValue"] = command.Parameters.GetValue(SimpleReturnParameterName);
                     RetrieveOutputParameterValues(procedure, command, suppliedParameters);
                     return result;
                 }
@@ -61,16 +61,16 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static void RetrieveOutputParameterValues(Procedure procedure, DbCommand command, IDictionary<string, object> suppliedParameters)
+        private static void RetrieveOutputParameterValues(Procedure procedure, IDbCommand command, IDictionary<string, object> suppliedParameters)
         {
             foreach (var outputParameter in procedure.Parameters.Where(p => p.Direction == ParameterDirection.InputOutput || p.Direction == ParameterDirection.Output))
             {
                 suppliedParameters[outputParameter.Name.Replace("@", "")] =
-                    command.Parameters[outputParameter.Name].Value;
+                    command.Parameters.GetValue(outputParameter.Name);
             }
         }
 
-        public IEnumerable<ResultSet> ExecuteReader(DbCommand command)
+        public IEnumerable<ResultSet> ExecuteReader(IDbCommand command)
         {
             command.Connection.Open();
             using (var reader = command.ExecuteReader())
@@ -86,7 +86,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static IEnumerable<ResultSet> ExecuteNonQuery(DbCommand command)
+        private static IEnumerable<ResultSet> ExecuteNonQuery(IDbCommand command)
         {
             Trace.TraceInformation("ExecuteNonQuery");
             command.Connection.Open();
@@ -94,7 +94,7 @@ namespace Simple.Data.Ado
             return Enumerable.Empty<ResultSet>();
         }
 
-        private static void SetParameters(Procedure procedure, DbCommand cmd, IDictionary<string, object> suppliedParameters)
+        private static void SetParameters(Procedure procedure, IDbCommand cmd, IDictionary<string, object> suppliedParameters)
         {
             AddReturnParameter(cmd);
 
@@ -111,7 +111,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static void AddReturnParameter(DbCommand cmd)
+        private static void AddReturnParameter(IDbCommand cmd)
         {
             var returnParameter = cmd.CreateParameter();
             returnParameter.ParameterName = SimpleReturnParameterName;

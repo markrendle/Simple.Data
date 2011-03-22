@@ -60,6 +60,7 @@
     <Compile Include="AdoAdapterTransaction.cs" />
     <Compile Include="CommandBuilder.cs" />
     <Compile Include="CommandHelper.cs" />
+    <Compile Include="DataParameterCollectionEx.cs" />
     <Compile Include="DataReaderExtensions.cs" />
     <Compile Include="DataReaderObservableRunner.cs" />
     <Compile Include="DataRecordExtensions.cs" />

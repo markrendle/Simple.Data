@@ -120,7 +120,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        internal DbConnection CreateConnection()
+        internal IDbConnection CreateConnection()
         {
             return _connectionProvider.CreateConnection();
         }
