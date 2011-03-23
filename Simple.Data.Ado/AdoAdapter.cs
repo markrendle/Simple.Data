@@ -41,6 +41,10 @@ namespace Simple.Data.Ado
             {
                 _connectionProvider = ProviderHelper.GetProviderByFilename(Settings.Filename);
             }
+            else if (settingsKeys.Contains("ConnectionName"))
+            {
+                _connectionProvider = ProviderHelper.GetProviderByConnectionName(Settings.ConnectionName);
+            }
             _schema = DatabaseSchema.Get(_connectionProvider);
             _relatedFinder = new Lazy<AdoAdapterRelatedFinder>(CreateRelatedFinder);
         }

@@ -12,6 +12,7 @@ namespace Simple.Data
         dynamic OpenFile(string filename);
         dynamic OpenConnection(string connectionString);
         dynamic Open(string adapterName, object settings);
+        dynamic OpenNamedConnection(string connectionName);
     }
 
     internal class DatabaseOpener : IDatabaseOpener
@@ -23,6 +24,8 @@ namespace Simple.Data
         private static Func<string, Database> _openFile;
         [ThreadStatic]
         private static Func<string, Database> _openConnection;
+        [ThreadStatic]
+        private static Func<string, Database> _openNamedConnection;
         [ThreadStatic]
         private static Func<string, object, Database> _open;
 
@@ -39,6 +42,11 @@ namespace Simple.Data
         private static Func<string, Database> OpenConnectionImpl
         {
             get { return _openConnection ?? OpenConnectionMethod; }
+        }
+
+        private static Func<string, Database> OpenNamedConnectionImpl
+        {
+            get { return _openNamedConnection ?? OpenNamedConnectionMethod; }
         }
 
         private static Func<string, object, Database> OpenImpl
@@ -64,6 +72,11 @@ namespace Simple.Data
         public dynamic Open(string adapterName, object settings)
         {
             return OpenImpl(adapterName, settings);
+        }
+
+        public dynamic OpenNamedConnection(string connectionName)
+        {
+            return OpenNamedConnectionImpl(connectionName);
         }
 
         public static void UseMockDatabase(Database database)
@@ -107,6 +120,11 @@ namespace Simple.Data
         private static Database OpenConnectionMethod(string connectionString)
         {
             return new Database(AdapterFactory.Create("Ado", new { ConnectionString = connectionString }));
+        }
+
+        private static Database OpenNamedConnectionMethod(string connectionName)
+        {
+            return new Database(AdapterFactory.Create("Ado", new { ConnectionName = connectionName }));
         }
 
         private static Database OpenMethod(string adapterName, object settings)

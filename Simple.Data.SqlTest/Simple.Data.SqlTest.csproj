@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DatabaseHelper.cs" />
+    <Compile Include="DatabaseOpenerTests.cs" />
     <Compile Include="InsertTests.cs" />
     <Compile Include="NaturalJoinTest.cs" />
     <Compile Include="ObservableDataReaderTest.cs" />

@@ -36,5 +36,9 @@ namespace Simple.Data
             return DatabaseOpener.OpenFile(filename);
         }
         
+        public static dynamic OpenNamedConnection(string connectionName)
+        {
+            return DatabaseOpener.OpenNamedConnection(connectionName);
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.ComponentModel.Composition.Hosting;
+using System.Configuration;
 using System.Data.OleDb;
 using System.Reflection;
 using System.IO;
@@ -57,6 +58,29 @@ namespace Simple.Data.Ado
         private static IConnectionProvider ComposeProvider(string extension)
         {
             return MefHelper.Compose<IConnectionProvider>(extension);
+        }
+
+        public static IConnectionProvider GetProviderByConnectionName(string connectionName)
+        {
+            var connectionSettings = ConfigurationManager.ConnectionStrings[connectionName];
+            if (connectionSettings == null)
+            {
+                throw new ArgumentOutOfRangeException("connectionName");
+            }
+
+            if (connectionSettings.ProviderName == "System.Data.SqlClient")
+            {
+                return GetProviderByConnectionString(connectionSettings.ConnectionString);
+            }
+
+            var provider = ComposeProvider(connectionSettings.ProviderName);
+            if (provider == null)
+            {
+                throw new InvalidOperationException("Provider could not be resolved.");
+            }
+
+            provider.SetConnectionString(connectionSettings.ConnectionString);
+            return provider;
         }
     }
 }
