@@ -2,7 +2,7 @@
 <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>Simple.Data.SqlCompact40</id>
-    <version>0.5.2</version>
+    <version>0.5.4</version>
     <authors>Mark Rendle</authors>
     <owners>Mark Rendle</owners>
     <description>SQL Server Compact 4.0 ADO provider for the Simple.Data data access library.</description> 
@@ -11,7 +11,7 @@
     <tags>sqlserver compact sqlce database data ado .net40</tags>
     <language>en-us</language>
     <dependencies>
-      <dependency id="Simple.Data.Core" version="0.5.2" />
+      <dependency id="Simple.Data.Ado" version="0.5.4" />
     </dependencies>
   </metadata>
 </package>
