@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Data;
 using System.Data.Common;
 using System.Data.SqlServerCe;
 using Simple.Data.Ado;
@@ -18,7 +19,7 @@ namespace Simple.Data.SqlCe40
             _connectionString = connectionString;
         }
 
-        public DbConnection CreateConnection()
+        public IDbConnection CreateConnection()
         {
             if (!_checked) CheckVersion();
             return new SqlCeConnection(_connectionString);

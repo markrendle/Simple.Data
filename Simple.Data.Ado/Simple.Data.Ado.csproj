@@ -66,6 +66,7 @@
     <Compile Include="DataRecordExtensions.cs" />
     <Compile Include="DbCommandExtensions.cs" />
     <Compile Include="DbCommandObservableEx.cs" />
+    <Compile Include="DbConnectionExtensions.cs" />
     <Compile Include="DelegatingConnectionBase`1.cs" />
     <Compile Include="DeleteHelper.cs" />
     <Compile Include="ExpressionFormatter.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="ICommandBuilder.cs" />
     <Compile Include="IConnectionProvider.cs" />
     <Compile Include="IExpressionFormatter.cs" />
+    <Compile Include="ISchemaGetter.cs" />
     <Compile Include="Joiner.cs" />
     <Compile Include="JoinType.cs" />
     <Compile Include="ObservableDataReader.cs" />

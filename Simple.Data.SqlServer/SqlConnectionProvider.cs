@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using Simple.Data.Ado;
@@ -22,7 +23,7 @@ namespace Simple.Data.SqlServer
             _connectionString = connectionString;
         }
 
-        public DbConnection CreateConnection()
+        public IDbConnection CreateConnection()
         {
             return new SqlConnection(_connectionString);
         }

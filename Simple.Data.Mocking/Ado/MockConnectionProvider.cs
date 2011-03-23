@@ -22,7 +22,7 @@ namespace Simple.Data.Mocking.Ado
             throw new NotImplementedException();
         }
 
-        public DbConnection CreateConnection()
+        public IDbConnection CreateConnection()
         {
             return _connection;
         }

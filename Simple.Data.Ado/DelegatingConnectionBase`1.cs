@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Simple.Data.Ado
 {
-    public abstract class DelegatingConnectionBase : IDbConnection
+    public abstract class DelegatingConnectionBase : IDbConnection, ISchemaGetter
     {
         private readonly IDbConnection _target;
 
@@ -134,6 +134,11 @@ namespace Simple.Data.Ado
         protected DelegatingConnectionBase(IDbConnection target)
         {
             _target = target;
+        }
+
+        public virtual DataTable GetSchema(string collectionName, params string[] constraints)
+        {
+            return _target.GetSchema(collectionName, constraints);
         }
     }
 }
