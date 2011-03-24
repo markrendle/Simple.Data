@@ -33,6 +33,11 @@ namespace Simple.Data
             return GetDynamicTable(binder.Name, out result);
         }
 
+        public DynamicTable this[string name]
+        {
+            get { return GetTable(name); }
+        }
+
         internal DynamicTable GetTable(string name)
         {
             dynamic table;

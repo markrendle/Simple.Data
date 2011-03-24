@@ -34,8 +34,13 @@ namespace Simple.Data
 
         protected virtual bool GetDynamicMember(GetMemberBinder binder, out object result)
         {
-            result = _members.GetOrAdd(binder.Name, CreateDynamicReference);
+            result = GetOrAddDynamicReference(binder.Name);
             return true;
+        }
+
+        private dynamic GetOrAddDynamicReference(string name)
+        {
+            return _members.GetOrAdd(name, CreateDynamicReference);
         }
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
@@ -48,6 +53,11 @@ namespace Simple.Data
                 return command.Execute(out result);
             }
             return base.TryInvokeMember(binder, args, out result);
+        }
+
+        public dynamic this[string name]
+        {
+            get { return GetOrAddDynamicReference(name); }
         }
 
         private DynamicReference CreateDynamicReference(string name)

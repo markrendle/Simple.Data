@@ -80,6 +80,11 @@ namespace Simple.Data
             return true;
         }
 
+        public DynamicReference this[string name]
+        {
+            get { return new DynamicReference(name, new DynamicReference(_tableName, _dataStrategy)); }
+        }
+
         /// <summary>
         /// Inserts the specified entity.
         /// </summary>

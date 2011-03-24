@@ -94,6 +94,11 @@ namespace Simple.Data
             return true;
         }
 
+        public dynamic this[string name]
+        {
+            get { return new DynamicReference(name, this); }
+        }
+
         /// <summary>
         /// Gets the names of all objects included in the reference as an array, with the uppermost object first.
         /// </summary>

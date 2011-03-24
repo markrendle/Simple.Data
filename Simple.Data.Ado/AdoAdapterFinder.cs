@@ -39,7 +39,7 @@ namespace Simple.Data.Ado
 
         private IEnumerable<IDictionary<string, object>> FindAll(ObjectName tableName)
         {
-            return ExecuteQuery("select * from " + _adapter.GetSchema().FindTable(tableName).ActualName);
+            return ExecuteQuery("select * from " + _adapter.GetSchema().FindTable(tableName).QualifiedName);
         }
 
         private IEnumerable<IDictionary<string, object>> ExecuteQuery(ICommandBuilder commandBuilder)
