@@ -1,64 +1,61 @@
-# Fix
-An ultra-lightweight web glue for .NET, written in C#.
-## What?
-Fix joins together web servers, request handlers and "infixes", or middleware, in such a way that the implementations of each don't need to know anything about each other, or, indeed, about Fix itself.
-### Example?
-This is a Console application which runs a web server using Fix:
+# Simple.Data
+A lightweight, dynamic data access component for .NET, written in C#.
+## What is it?
+Prompted by the need for an easy-to-use database access component which prevents SQL injection attacks while not requiring lots of boilerplate ADO.NET code or a pre-generated ORM model. Inspired by Ruby's ActiveRecord and DataMapper gems.
 
-    class Program
-    {
-        static void Main()
-        {
-            using (var server = new Server("http://*:81/"))
-            {
-                var fixer = new Fixer(server.Start, server.Stop);
-                fixer.AddHandler(new RequestPrinter().PrintRequest);
-                fixer.Start();
-                Console.Write("Running. Press Enter to stop.");
-                Console.ReadLine();
-                fixer.Stop();
-            }
-        }
-    }
-Fixer, Server and RequestPrinter are all in separate assemblies, with no dependencies between them. The Console application has references to all the assemblies, and uses Fix to hook everything up.
-### More example?
-    class Program
-    {
-        static void Main()
-        {
-            using (var server = new Server("http://*:81/"))
-            {
-                var fixer = new Fixer(server.Start, server.Stop);
-                fixer.AddHandler(new RequestPrinter().PrintRequest);
-                fixer.AddHandler(new InfoPrinter().PrintInfo);
-                fixer.AddInfix(new MethodDownshifter().DownshiftMethod);
-                fixer.Start();
-                Console.Write("Running. Press Enter to stop.");
-                Console.ReadLine();
-                fixer.Stop();
-            }
-        }
-    }
-In this case, we are adding two handlers, either of which could serve the request. We're also adding an Infix, which can modify the request before it is passed to the handlers.
-##Why?
-Partly because it's interesting to boil something like a web application server down to the bare minimum like this.
+Instead of
 
-More importantly, by relying entirely on .NET standard Action and Func delegates, Fix eliminates unnecessary coupling between classes and assemblies, as well as dependencies on itself.
-So you could write your own Fixer class and use that to wire up any servers, handlers or modules that would work with this "reference implementation".
+    public User FindUserByEmail(string email)
+	{
+		User user = null;
+        using (var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["Default"].ConnectionString))
+	    using (var command = new SqlCommand("select id, email, hashed_password, salt from users where email = @email", connection))
+	    {
+	        command.Parameters.Add("@email", SqlDbType.NVarChar, 50).Value = form.Email);
+		    connection.Open();
+		    using (var reader = command.ExecuteReader())
+		    {
+			    if (reader.Read())
+			    {
+				    user = new User {Id = reader.GetInt32(0), Email = reader.GetString(1), Password = reader.GetString(2), salt = reader.GetString(3)};
+				}
+			}
+		}
+		return user;
+	}
 
-Another benefit is that because Fix takes a functional approach to the problem, it is friendlier to functional languages like F# and Clojure.
-And functional languages are ideal for writing web applications, which aren't supposed to maintain any state anyway.
-Ideally, a request will come in and be turned into a response by a series of operations.
+why not just write
 
-###Action and Func, eh?
-Yes, and the actual signatures are hideous. What I've done in this code is to add "using" aliases for them, to make it easier to read:
+	public User FindUserByEmail(string email)
+	{
+		return Database.Open().Users.FindByEmail(email);
+	}
 
-    using RequestHandler = System.Action<string, string, System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>>, byte[], System.Action<int, string, System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>>, byte[]>>;
-    using ResponseHandler = System.Action<int, string, System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>>, byte[]>;
-    using Infix = System.Action<string, string, System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>>, byte[], System.Action<int, string, System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>>, byte[]>, System.Delegate>;
-##Production-ready?
-Good grief, no. There's a lot of discussion going on around this area at the moment (e.g. [the OWIN project](http://owin.github.com/owin))
-and this is my contribution. The delegate signatures used are by no means ideal, particularly the *byte[]* type being used for the request
-and response bodies, which should probably be a *Func of byte[]* or a *Task of byte[]* or something.
+and take the rest of the morning off?
 
-I'd love to hear people's thoughts on this. Best way is to catch me on [Twitter](http://twitter.com/markrendle).
+Simple.Data does this by using the dynamic features of .NET 4 to interpret method and property names at runtime and map them to your underlying data-store with a convention-based approach.
+For the code above, there is no pre-defined type with a Users property, and no FindByEmail method. Within Simple.Data, that single line of code is converted into all the ADO.NET
+boilerplate for you.
+
+## Multiple database and NoSQL store support
+Because Simple.Data provides a sort of dynamic Domain Specific Language to represent queries, inserts, updates and deletes, it is able to support not only a wide range of RDBMS
+engines, but also non-SQL-based data stores such as MongoDB. It has an open and flexible model of Adapters and Providers which make it simple to write plug-ins to map to
+almost any back-end.
+
+Currently, Simple.Data has adapters for:
+
+* ADO-based access to relational databases, with providers for:
+	* SQL Server 2005 and later
+	* SQL Server Compact Edition 4.0
+	* MySQL 4.0 and later
+	* SQLite
+* MongoDB
+
+We are expecting more ADO Providers to support Oracle, PostgreSQL and more, and Adapters for CouchDB, Redis, Azure Table Storage, Amazon SimpleDB...
+
+## Resources
+* Simple.Data can be installed from [NuGet](http://nuget.org/)
+* Find more information in [the wiki](http://github.com/markrendle/Simple.Data/wiki/Getting-started)
+* Ask questions or report issues on [the mailing list](http://groups.google.com/group/simpledata)
+* Follow [@markrendle on Twitter](http://twitter.com/markrendle) for updates
+* Check out [my blog](http://blog.markrendle.net/) for the latest news
