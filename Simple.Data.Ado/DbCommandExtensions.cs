@@ -15,7 +15,8 @@ namespace Simple.Data.Ado
         {
             try
             {
-                command.Connection.Open();
+                if (command.Connection.State == ConnectionState.Closed)
+                    command.Connection.Open();
             }
             catch (DbException ex)
             {
@@ -26,7 +27,7 @@ namespace Simple.Data.Ado
             return BufferedEnumerable.Create(() => reader.Read()
                                                        ? Maybe.Some(reader.ToDictionary(index))
                                                        : Maybe<IDictionary<string, object>>.None,
-                                                       () => { using (command.Connection)using(command)using(reader) {} });
+                                                       () => DisposeCommandAndReader(command, reader));
         }
 
         public static Dictionary<string, int> CreateDictionaryIndex(this IDataReader reader)
@@ -68,6 +69,14 @@ namespace Simple.Data.Ado
                     command.Parameters.Cast<IDbDataParameter>()
                     .ToDictionary(p => p.ParameterName, p => p.Value));
             }
+        }
+
+        private static void DisposeCommandAndReader(IDbCommand command, IDataReader reader)
+        {
+            using (command.Connection)
+            using (command)
+            using (reader)
+            { /* NoOp */ }
         }
     }
 }

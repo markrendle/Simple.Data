@@ -1,14 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 
 namespace Simple.Data.Ado
 {
+    /// <summary>
+    /// Provides a base class for implementing <see cref="IDbConnection"/> which delegates all the interface methods
+    /// to a wrapped instance of <see cref="IDbConnection"/>.
+    /// Also implements the <see cref="DbConnection.GetSchema(string,string[])"/> method which is on <see cref="DbConnection"/> but not <see cref="IDbConnection"/>.
+    /// </summary>
     public abstract class DelegatingConnectionBase : IDbConnection, ISchemaGetter
     {
-        private readonly IDbConnection _target;
+        private readonly IDbConnection _delegatedConnection;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DelegatingConnectionBase"/> class.
+        /// </summary>
+        /// <param name="delegatedConnection">The connection to which method calls are delegated by default.</param>
+        protected DelegatingConnectionBase(IDbConnection delegatedConnection)
+        {
+            _delegatedConnection = delegatedConnection;
+        }
+
+        protected IDbConnection DelegatedConnection
+        {
+            get { return _delegatedConnection; }
+        }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -16,7 +36,7 @@ namespace Simple.Data.Ado
         /// <filterpriority>2</filterpriority>
         public virtual void Dispose()
         {
-            _target.Dispose();
+            _delegatedConnection.Dispose();
         }
 
         /// <summary>
@@ -28,7 +48,7 @@ namespace Simple.Data.Ado
         /// <filterpriority>2</filterpriority>
         public virtual IDbTransaction BeginTransaction()
         {
-            return _target.BeginTransaction();
+            return _delegatedConnection.BeginTransaction();
         }
 
         /// <summary>
@@ -40,7 +60,7 @@ namespace Simple.Data.Ado
         /// <param name="il">One of the <see cref="T:System.Data.IsolationLevel"/> values. </param><filterpriority>2</filterpriority>
         public virtual IDbTransaction BeginTransaction(IsolationLevel il)
         {
-            return _target.BeginTransaction(il);
+            return _delegatedConnection.BeginTransaction(il);
         }
 
         /// <summary>
@@ -49,7 +69,7 @@ namespace Simple.Data.Ado
         /// <filterpriority>2</filterpriority>
         public virtual void Close()
         {
-            _target.Close();
+            _delegatedConnection.Close();
         }
 
         /// <summary>
@@ -58,7 +78,7 @@ namespace Simple.Data.Ado
         /// <param name="databaseName">The name of the database to use in place of the current database. </param><filterpriority>2</filterpriority>
         public virtual void ChangeDatabase(string databaseName)
         {
-            _target.ChangeDatabase(databaseName);
+            _delegatedConnection.ChangeDatabase(databaseName);
         }
 
         /// <summary>
@@ -70,7 +90,7 @@ namespace Simple.Data.Ado
         /// <filterpriority>2</filterpriority>
         public virtual IDbCommand CreateCommand()
         {
-            return _target.CreateCommand();
+            return _delegatedConnection.CreateCommand();
         }
 
         /// <summary>
@@ -79,7 +99,7 @@ namespace Simple.Data.Ado
         /// <filterpriority>2</filterpriority>
         public virtual void Open()
         {
-            _target.Open();
+            _delegatedConnection.Open();
         }
 
         /// <summary>
@@ -91,8 +111,8 @@ namespace Simple.Data.Ado
         /// <filterpriority>2</filterpriority>
         public virtual string ConnectionString
         {
-            get { return _target.ConnectionString; }
-            set { _target.ConnectionString = value; }
+            get { return _delegatedConnection.ConnectionString; }
+            set { _delegatedConnection.ConnectionString = value; }
         }
 
         /// <summary>
@@ -104,7 +124,7 @@ namespace Simple.Data.Ado
         /// <filterpriority>2</filterpriority>
         public virtual int ConnectionTimeout
         {
-            get { return _target.ConnectionTimeout; }
+            get { return _delegatedConnection.ConnectionTimeout; }
         }
 
         /// <summary>
@@ -116,7 +136,7 @@ namespace Simple.Data.Ado
         /// <filterpriority>2</filterpriority>
         public virtual string Database
         {
-            get { return _target.Database; }
+            get { return _delegatedConnection.Database; }
         }
 
         /// <summary>
@@ -128,17 +148,12 @@ namespace Simple.Data.Ado
         /// <filterpriority>2</filterpriority>
         public virtual ConnectionState State
         {
-            get { return _target.State; }
-        }
-
-        protected DelegatingConnectionBase(IDbConnection target)
-        {
-            _target = target;
+            get { return _delegatedConnection.State; }
         }
 
         public virtual DataTable GetSchema(string collectionName, params string[] constraints)
         {
-            return _target.GetSchema(collectionName, constraints);
+            return _delegatedConnection.GetSchema(collectionName, constraints);
         }
     }
 }

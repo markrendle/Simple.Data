@@ -6,6 +6,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{10F43335-5672-4BDA-91BB-5311C2BFA409}"
 	ProjectSection(SolutionItems) = preProject
 		CommonAssemblyInfo.cs = CommonAssemblyInfo.cs
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.UnitTest", "Simple.Data.UnitTest\Simple.Data.UnitTest.csproj", "{1D2908F9-A78B-4EE1-8DAA-D4DBF3937C58}"
