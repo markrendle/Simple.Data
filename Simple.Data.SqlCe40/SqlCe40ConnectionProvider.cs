@@ -9,6 +9,7 @@ using Simple.Data.Ado.Schema;
 namespace Simple.Data.SqlCe40
 {
     [Export("sdf", typeof(IConnectionProvider))]
+    [Export("System.Data.SqlServerCe", typeof(IConnectionProvider))]
     public class SqlCe40ConnectionProvider : IConnectionProvider
     {
         private string _connectionString;
