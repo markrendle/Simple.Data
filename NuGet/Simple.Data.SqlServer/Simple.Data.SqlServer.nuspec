@@ -2,16 +2,17 @@
 <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>Simple.Data.SqlServer</id>
-    <version>0.5.4</version>
+    <version>0.5.5</version>
     <authors>Mark Rendle</authors>
     <owners>Mark Rendle</owners>
     <description>SQL Server ADO provider for the Simple.Data data access library.</description> 
     <projectUrl>http://github.com/markrendle/Simple.Data</projectUrl>
     <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
+    <iconUrl>http://simplefx.org/images/simpledata100x100.png</iconUrl>
     <tags>sqlserver database data ado .net40</tags>
     <language>en-us</language>
     <dependencies>
-      <dependency id="Simple.Data.Ado" version="0.5.4" />
+      <dependency id="Simple.Data.Ado" version="0.5.5" />
     </dependencies>
   </metadata>
 </package>

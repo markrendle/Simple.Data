@@ -2,12 +2,13 @@
 <package> 
   <metadata> 
     <id>Simple.Data.Core</id> 
-    <version>0.5.4</version> 
+    <version>0.5.5</version> 
     <authors>Mark Rendle</authors> 
     <owners>Mark Rendle</owners>
     <description>A Simple, Dynamic data access library.</description> 
     <projectUrl>http://github.com/markrendle/Simple.Data</projectUrl>
     <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
+    <iconUrl>http://simplefx.org/images/simpledata100x100.png</iconUrl>
     <tags>sql database data ado .net40</tags>
     <language>en-US</language> 
  </metadata> 
