@@ -73,7 +73,7 @@ namespace Simple.Data.Ado
 
         private static void DisposeCommandAndReader(IDbConnection connection, IDbCommand command, IDataReader reader)
         {
-            using (command.Connection)
+            using (connection)
             using (command)
             using (reader)
             { /* NoOp */ }
