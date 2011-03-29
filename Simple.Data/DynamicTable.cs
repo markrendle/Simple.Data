@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Dynamic;
 using Simple.Data.Commands;
+using Simple.Data.Extensions;
 
 namespace Simple.Data
 {
@@ -83,19 +84,6 @@ namespace Simple.Data
         public DynamicReference this[string name]
         {
             get { return new DynamicReference(name, new DynamicReference(_tableName, _dataStrategy)); }
-        }
-
-        /// <summary>
-        /// Inserts the specified entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        public void Insert(dynamic entity)
-        {
-            var dictionary = entity as IDictionary<string, object>;
-            if (dictionary != null)
-            {
-                _dataStrategy.Insert(_tableName, dictionary);
-            }
         }
 
         internal string GetName()

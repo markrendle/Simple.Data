@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Simple.Data.Extensions
 {
-    class ObjectEx
+    public static class ObjectEx
     {
-        public static IDictionary<string, object> ObjectToDictionary(object obj)
+        public static IDictionary<string, object> ObjectToDictionary(this object obj)
         {
             return (from property in obj.GetType().GetProperties()
                                      select
