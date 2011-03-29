@@ -21,7 +21,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void StringToDateRangeTest()
         {
-            var range = "01/01/2011".to("31/01/2011");
+            var range = "2011-01-01".to("2011-01-31");
             Assert.AreEqual(new DateTime(2011,1,1), range.Start);
             Assert.AreEqual(new DateTime(2011,1,31), range.End);
         }
