@@ -70,6 +70,7 @@
     <Compile Include="DbConnectionExtensions.cs" />
     <Compile Include="DelegatingConnectionBase`1.cs" />
     <Compile Include="DeleteHelper.cs" />
+    <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="ExpressionFormatter.cs" />
     <Compile Include="FindHelper.cs" />
     <Compile Include="HomogenizedDictionaryIndex.cs" />

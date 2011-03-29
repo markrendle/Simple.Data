@@ -51,7 +51,22 @@ namespace Simple.Data.Ado
         /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.</exception>
         public void Add(KeyValuePair<TKey, TValue> item)
         {
-            throw new NotSupportedException();
+            if (!_index.ContainsKey(item.Key))
+            {
+                AddKeyToIndex(item.Key);
+            }
+            _values[_index[item.Key]] = item.Value;
+        }
+
+        private void AddKeyToIndex(TKey key)
+        {
+            lock (_index.GetLockObject())
+            {
+                if (!_index.ContainsKey(key))
+                {
+                    _index.Add(key, _index.Count);
+                }
+            }
         }
 
         /// <summary>
@@ -199,7 +214,21 @@ namespace Simple.Data.Ado
                     throw new KeyNotFoundException();
                 }
             }
-            set { throw new NotSupportedException(); }
+            set
+            {
+                try
+                {
+                    _values[_index[key]] = value;
+                }
+                catch (ArgumentNullException)
+                {
+                    throw new ArgumentNullException("key");
+                }
+                catch (KeyNotFoundException)
+                {
+                    throw new KeyNotFoundException();
+                }
+            }
         }
 
         /// <summary>

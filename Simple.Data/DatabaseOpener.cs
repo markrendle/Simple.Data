@@ -82,28 +82,28 @@ namespace Simple.Data
         public static void UseMockDatabase(Database database)
         {
             _openDefault = () => database;
-            _openFile = _openConnection = (ignore) => database;
+            _openFile = _openConnection = _openNamedConnection = (ignore) => database;
             _open = (ignore1, ignore2) => database;
         }
 
         public static void UseMockAdapter(Adapter adapter)
         {
             _openDefault = () => new Database(adapter);
-            _openFile = _openConnection = (ignore) => new Database(adapter);
+            _openFile = _openConnection = _openNamedConnection = (ignore) => new Database(adapter);
             _open = (ignore1, ignore2) => new Database(adapter);
         }
 
         public static void UseMockDatabase(Func<Database> databaseCreator)
         {
             _openDefault = () => databaseCreator();
-            _openFile = _openConnection = (ignore) => databaseCreator();
+            _openFile = _openConnection = _openNamedConnection = (ignore) => databaseCreator();
             _open = (ignore1, ignore2) => databaseCreator();
         }
 
         public static void UseMockAdapter(Func<Adapter> adapterCreator)
         {
             _openDefault = () => new Database(adapterCreator());
-            _openFile = _openConnection = (ignore) => new Database(adapterCreator());
+            _openFile = _openConnection = _openNamedConnection = (ignore) => new Database(adapterCreator());
             _open = (ignore1, ignore2) => new Database(adapterCreator());
         }
 

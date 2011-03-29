@@ -11,12 +11,12 @@ namespace Simple.Data.Ado
 {
     static class DbCommandExtensions
     {
-        public static IEnumerable<IDictionary<string,object>> ToBufferedEnumerable(this IDbCommand command)
+        public static IEnumerable<IDictionary<string,object>> ToBufferedEnumerable(this IDbCommand command, IDbConnection connection)
         {
             try
             {
-                if (command.Connection.State == ConnectionState.Closed)
-                    command.Connection.Open();
+                if (connection.State == ConnectionState.Closed)
+                    connection.Open();
             }
             catch (DbException ex)
             {
@@ -27,7 +27,7 @@ namespace Simple.Data.Ado
             return BufferedEnumerable.Create(() => reader.Read()
                                                        ? Maybe.Some(reader.ToDictionary(index))
                                                        : Maybe<IDictionary<string, object>>.None,
-                                                       () => DisposeCommandAndReader(command, reader));
+                                                       () => DisposeCommandAndReader(connection, command, reader));
         }
 
         public static Dictionary<string, int> CreateDictionaryIndex(this IDataReader reader)
@@ -71,7 +71,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static void DisposeCommandAndReader(IDbCommand command, IDataReader reader)
+        private static void DisposeCommandAndReader(IDbConnection connection, IDbCommand command, IDataReader reader)
         {
             using (command.Connection)
             using (command)

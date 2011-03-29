@@ -60,6 +60,12 @@ namespace Simple.Data.Commands
                 return new Dictionary<string, object>(dynamicRecord, HomogenizedEqualityComparer.DefaultInstance);
             }
 
+            var dictionary = obj as IDictionary<string, object>;
+            if (dictionary != null)
+            {
+                return dictionary;
+            }
+
             return RegularObjectToDictionary(obj);
         }
 

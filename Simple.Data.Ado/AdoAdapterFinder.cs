@@ -47,7 +47,7 @@ namespace Simple.Data.Ado
             var connection = _connection ?? _adapter.CreateConnection();
             var command = commandBuilder.GetCommand(connection);
             command.Transaction = _transaction;
-            return TryExecuteQuery(command);
+            return TryExecuteQuery(connection, command);
         }
 
         private IEnumerable<IDictionary<string, object>> ExecuteQuery(string sql, params object[] values)
@@ -55,14 +55,14 @@ namespace Simple.Data.Ado
             var connection = _connection ?? _adapter.CreateConnection();
             var command = new CommandHelper(_adapter.SchemaProvider).Create(connection, sql, values);
             command.Transaction = _transaction;
-            return TryExecuteQuery(command);
+            return TryExecuteQuery(connection, command);
         }
 
-        private static IEnumerable<IDictionary<string, object>> TryExecuteQuery(IDbCommand command)
+        private static IEnumerable<IDictionary<string, object>> TryExecuteQuery(IDbConnection connection, IDbCommand command)
         {
             try
             {
-                return command.ToBufferedEnumerable();
+                return command.ToBufferedEnumerable(connection);
             }
             catch (DbException ex)
             {
