@@ -114,6 +114,7 @@ namespace Simple.Data.Ado
 
         private static int TryExecute(IDbCommand command)
         {
+            command.WriteTrace();
             try
             {
                 return command.ExecuteNonQuery();

@@ -9,6 +9,14 @@ namespace Simple.Data.SqlTest
     public class TestTraceListener : TraceListener
     {
         private readonly StringBuilder _builder = new StringBuilder();
+
+        public override void Write(string message, string category)
+        {
+            if (category.Equals("Simple.Data.SqlTest"))
+            {
+                Write(message);
+            }
+        }
         /// <summary>
         /// When overridden in a derived class, writes the specified message to the listener you create in the derived class.
         /// </summary>

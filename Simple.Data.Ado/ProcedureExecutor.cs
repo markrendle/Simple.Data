@@ -72,6 +72,7 @@ namespace Simple.Data.Ado
 
         public IEnumerable<ResultSet> ExecuteReader(IDbCommand command)
         {
+            command.WriteTrace();
             command.Connection.Open();
             using (var reader = command.ExecuteReader())
             {
@@ -88,7 +89,8 @@ namespace Simple.Data.Ado
 
         private static IEnumerable<ResultSet> ExecuteNonQuery(IDbCommand command)
         {
-            Trace.TraceInformation("ExecuteNonQuery");
+            command.WriteTrace();
+            Trace.TraceInformation("ExecuteNonQuery", "Simple.Data.SqlTest");
             command.Connection.Open();
             command.ExecuteNonQuery();
             return Enumerable.Empty<ResultSet>();

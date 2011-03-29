@@ -37,17 +37,6 @@ namespace Simple.Data.Ado
             return new Dictionary<string, int>(keys, HomogenizedEqualityComparer.DefaultInstance);
         }
 
-        public static IEnumerable<IDictionary<string, object>> ToAsyncEnumerable(this IDbCommand command)
-        {
-            if (command.Connection == null) throw new InvalidOperationException("Command has no connection.");
-            return ToObservable(command).ToEnumerable();
-        }
-
-        public static IObservable<IDictionary<string, object>> ToObservable(this IDbCommand command)
-        {
-            return new ObservableDataReader(command);
-        }
-
         public static IDbDataParameter AddParameter(this IDbCommand command, string name, object value)
         {
             var parameter = command.CreateParameter();
@@ -59,6 +48,7 @@ namespace Simple.Data.Ado
 
         public static IDataReader ExecuteReaderWithExceptionWrap(this IDbCommand command)
         {
+            command.WriteTrace();
             try
             {
                 return command.ExecuteReader();

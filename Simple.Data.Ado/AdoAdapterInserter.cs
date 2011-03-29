@@ -109,6 +109,7 @@ namespace Simple.Data.Ado
 
         private static IDictionary<string, object> TryExecuteSingletonQuery(IDbCommand command)
         {
+            command.WriteTrace();
             try
             {
                 using (var reader = command.ExecuteReader())
@@ -147,6 +148,7 @@ namespace Simple.Data.Ado
 
         private static int TryExecute(IDbCommand command)
         {
+            command.WriteTrace();
             try
             {
                 return command.ExecuteNonQuery();
