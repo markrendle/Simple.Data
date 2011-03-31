@@ -74,11 +74,7 @@ namespace Simple.Data.Commands
             var record = new Dictionary<string, object>(HomogenizedEqualityComparer.DefaultInstance);
             foreach (var property in obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
-                var value = property.GetValue(obj, null);
-                if (value != null)
-                {
-                    record.Add(property.Name, property.GetValue(obj, null));
-                }
+                record.Add(property.Name, property.GetValue(obj, null));
             }
             return record;
         }
