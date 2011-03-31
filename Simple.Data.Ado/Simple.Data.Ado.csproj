@@ -74,6 +74,7 @@
     <Compile Include="HomogenizedDictionaryIndex.cs" />
     <Compile Include="ICommandBuilder.cs" />
     <Compile Include="IConnectionProvider.cs" />
+    <Compile Include="ICustomInserter.cs" />
     <Compile Include="IExpressionFormatter.cs" />
     <Compile Include="ISchemaGetter.cs" />
     <Compile Include="Joiner.cs" />

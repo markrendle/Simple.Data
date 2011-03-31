@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlServerCe;
+using System.Linq;
 using Simple.Data.Ado;
 using Simple.Data.Ado.Schema;
 
@@ -57,6 +58,21 @@ namespace Simple.Data.SqlCe40
             return "@@IDENTITY";
         }
 
+        public bool TryGetNewRowSelect(Table table, out string selectSql)
+        {
+            var identityColumn = table.Columns.FirstOrDefault(col => col.IsIdentity);
+
+            if (identityColumn == null)
+            {
+                selectSql = null;
+                return false;
+            }
+
+            selectSql = "select * from " + table.QualifiedName + " where " + identityColumn.QuotedName +
+                        " = @@IDENTITY";
+            return true;
+        }
+        
         public bool SupportsCompoundStatements
         {
             get { return false; }

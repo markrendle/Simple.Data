@@ -42,6 +42,12 @@ namespace Simple.Data.Mocking.Ado
             return null;
         }
 
+        public bool TryGetNewRowSelect(Table table, out string selectSql)
+        {
+            selectSql = null;
+            return false;
+        }
+
         public bool SupportsStoredProcedures
         {
             get { return true; }

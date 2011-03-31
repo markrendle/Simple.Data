@@ -25,6 +25,12 @@ namespace Simple.Data.Ado
 
         public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
         {
+            var customInserter = _adapter.ProviderHelper.GetCustomProvider<ICustomInserter>(_adapter.ConnectionProvider);
+            if (customInserter != null)
+            {
+                return customInserter.Insert(_adapter, tableName, data);
+            }
+
             var table = _adapter.GetSchema().FindTable(tableName);
 
             data = data.Where(kvp => !table.FindColumn(kvp.Key).IsIdentity)

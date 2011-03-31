@@ -64,7 +64,7 @@ namespace Simple.Data.Ado.Schema
             get { return _databaseSchema.QuoteObjectName(_actualName); }
         }
 
-        internal string QualifiedName
+        public string QualifiedName
         {
             get
             {

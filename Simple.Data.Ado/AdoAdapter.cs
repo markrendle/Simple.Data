@@ -14,7 +14,20 @@ namespace Simple.Data.Ado
     [Export("Ado", typeof(Adapter))]
     public partial class AdoAdapter : Adapter, IAdapterWithRelation, IAdapterWithTransactions
     {
+        private readonly ProviderHelper _providerHelper = new ProviderHelper();
+
+        public ProviderHelper ProviderHelper
+        {
+            get { return _providerHelper; }
+        }
+
         private IConnectionProvider _connectionProvider;
+
+        public IConnectionProvider ConnectionProvider
+        {
+            get { return _connectionProvider; }
+        }
+
         private DatabaseSchema _schema;
         private Lazy<AdoAdapterRelatedFinder> _relatedFinder;
 
@@ -23,7 +36,7 @@ namespace Simple.Data.Ado
             
         }
 
-        internal AdoAdapter(IConnectionProvider connectionProvider)
+        internal AdoAdapter(IConnectionProvider connectionProvider) : this()
         {
             _connectionProvider = connectionProvider;
             _schema = DatabaseSchema.Get(_connectionProvider);
@@ -104,7 +117,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        private int Execute(ICommandBuilder commandBuilder, IAdapterTransaction transaction)
+        private static int Execute(ICommandBuilder commandBuilder, IAdapterTransaction transaction)
         {
             using (var command = commandBuilder.GetCommand(((AdoAdapterTransaction)transaction).Transaction.Connection))
             {

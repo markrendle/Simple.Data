@@ -24,7 +24,7 @@ namespace Simple.Data.SqlTest
         [Test]
         public void TestProviderIsSqlProvider()
         {
-            var provider = ProviderHelper.GetProviderByConnectionString(Properties.Settings.Default.ConnectionString);
+            var provider = new ProviderHelper().GetProviderByConnectionString(Properties.Settings.Default.ConnectionString);
             Assert.IsInstanceOf(typeof(SqlConnectionProvider), provider);
         }
 

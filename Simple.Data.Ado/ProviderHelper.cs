@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Configuration;
 using System.Data.OleDb;
@@ -10,19 +11,20 @@ namespace Simple.Data.Ado
 {
     public class ProviderHelper
     {
-        private static readonly ConcurrentDictionary<string, IConnectionProvider> Cache = new ConcurrentDictionary<string,IConnectionProvider>();
+        private readonly ConcurrentDictionary<string, IConnectionProvider> _connectionProviderCache = new ConcurrentDictionary<string,IConnectionProvider>();
+        private readonly ConcurrentDictionary<Type, object> _customProviderCache = new ConcurrentDictionary<Type, object>();
 
-        public static IConnectionProvider GetProviderByConnectionString(string connectionString)
+        public IConnectionProvider GetProviderByConnectionString(string connectionString)
         {
-            return Cache.GetOrAdd(connectionString, LoadProviderByConnectionString);
+            return _connectionProviderCache.GetOrAdd(connectionString, LoadProviderByConnectionString);
         }
 
-        public static IConnectionProvider GetProviderByFilename(string filename)
+        public IConnectionProvider GetProviderByFilename(string filename)
         {
-            return Cache.GetOrAdd(filename, LoadProviderByFilename);
+            return _connectionProviderCache.GetOrAdd(filename, LoadProviderByFilename);
         }
 
-        private static IConnectionProvider LoadProviderByConnectionString(string connectionString)
+        private IConnectionProvider LoadProviderByConnectionString(string connectionString)
         {
             var connectionStringBuilder = new OleDbConnectionStringBuilder(connectionString);
 
@@ -60,7 +62,7 @@ namespace Simple.Data.Ado
             return MefHelper.Compose<IConnectionProvider>(extension);
         }
 
-        public static IConnectionProvider GetProviderByConnectionName(string connectionName)
+        public IConnectionProvider GetProviderByConnectionName(string connectionName)
         {
             var connectionSettings = ConfigurationManager.ConnectionStrings[connectionName];
             if (connectionSettings == null)
@@ -81,6 +83,22 @@ namespace Simple.Data.Ado
 
             provider.SetConnectionString(connectionSettings.ConnectionString);
             return provider;
+        }
+
+        public T GetCustomProvider<T>(IConnectionProvider connectionProvider)
+        {
+            return (T)_customProviderCache.GetOrAdd(typeof (T), t => GetCustomProviderExport<T>(connectionProvider));
+        }
+
+        private static T GetCustomProviderExport<T>(IConnectionProvider connectionProvider)
+        {
+            using (var assemblyCatalog = new AssemblyCatalog(connectionProvider.GetType().Assembly))
+            {
+                using (var container = new CompositionContainer(assemblyCatalog))
+                {
+                    return container.GetExportedValueOrDefault<T>();
+                }
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Linq;
 using Simple.Data.Ado;
 using Simple.Data.Ado.Schema;
 
@@ -47,6 +48,21 @@ namespace Simple.Data.SqlServer
         public string GetIdentityFunction()
         {
             return "SCOPE_IDENTITY()";
+        }
+
+        public bool TryGetNewRowSelect(Table table, ref string insertSql, out string selectSql)
+        {
+            var identityColumn = table.Columns.FirstOrDefault(col => col.IsIdentity);
+
+            if (identityColumn == null)
+            {
+                selectSql = null;
+                return false;
+            }
+
+            selectSql = "select * from " + table.QualifiedName + " where " + identityColumn.QuotedName +
+                        " = SCOPE_IDENTITY()";
+            return true;
         }
 
         public bool SupportsCompoundStatements

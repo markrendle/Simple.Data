@@ -77,7 +77,7 @@ namespace Simple.Data.Commands
                 var value = property.GetValue(obj, null);
                 if (value != null)
                 {
-                    record.Add(property.Name, value);
+                    record.Add(property.Name, property.GetValue(obj, null));
                 }
             }
             return record;
