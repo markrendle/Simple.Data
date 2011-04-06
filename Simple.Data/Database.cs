@@ -52,6 +52,18 @@ namespace Simple.Data
             get { return DatabaseOpener.OpenDefault(); }
         }
 
+        public override IDictionary<string, object> FindOne(string tableName, SimpleExpression criteria)
+        {
+            try
+            {
+                return _adapter.FindOne(tableName, criteria);
+            }
+            catch (NotImplementedException)
+            {
+                return Find(tableName, criteria).FirstOrDefault();
+            }
+        }
+
         /// <summary>
         ///  Finds data from the specified "table".
         ///  </summary>

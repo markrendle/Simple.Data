@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Simple.Data.Ado
+namespace Simple.Data
 {
     public static class CommonTypes
     {

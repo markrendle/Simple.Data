@@ -11,7 +11,7 @@ namespace Simple.Data.Ado
 {
     static class DbCommandExtensions
     {
-        public static IEnumerable<IDictionary<string,object>> ToBufferedEnumerable(this IDbCommand command, IDbConnection connection)
+        public static IEnumerable<IDictionary<string, object>> ToBufferedEnumerable(this IDbCommand command, IDbConnection connection)
         {
             try
             {

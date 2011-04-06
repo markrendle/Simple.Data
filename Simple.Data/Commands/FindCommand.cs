@@ -32,7 +32,7 @@ namespace Simple.Data.Commands
         {
             if (args.Length == 1 && args[0] is SimpleExpression)
             {
-                var data = dataStrategy.Find(table.GetQualifiedName(), (SimpleExpression)args[0]).FirstOrDefault();
+                var data = dataStrategy.FindOne(table.GetQualifiedName(), (SimpleExpression)args[0]);
                 return data != null ? new SimpleRecord(data, table.GetQualifiedName(), dataStrategy) : null;
             }
 

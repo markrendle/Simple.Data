@@ -57,14 +57,17 @@ namespace Simple.Data
 
         private static IEnumerable<object> GetValues(object operand)
         {
+            if (operand == null) return Yield(null);
+            if (CommonTypes.Contains(operand.GetType())) return Yield(operand);
+
+            if (operand is DynamicReference)
+            {
+                return Enumerable.Empty<object>();
+            }
             var expression = operand as SimpleExpression;
             if (expression != null)
             {
                 return expression.GetValues();
-            }
-            if (operand is DynamicReference)
-            {
-                return Enumerable.Empty<object>();
             }
             var range = operand as IRange;
             if (range != null)

@@ -68,6 +68,11 @@ namespace Simple.Data.Ado
             return new AdoAdapterRelatedFinder(this);
         }
 
+        public override IDictionary<string, object> FindOne(string tableName, SimpleExpression criteria)
+        {
+            return _finder.FindOne(tableName, criteria);
+        }
+
         public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
             return _finder.Find(tableName, criteria);

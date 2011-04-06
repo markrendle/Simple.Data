@@ -32,33 +32,36 @@ namespace Simple.Data.Ado
             }
         }
 
+        public IDictionary<string, object> FindOne(string tableName, SimpleExpression criteria)
+        {
+            if (criteria == null) return FindAll(ObjectName.Parse(tableName)).FirstOrDefault();
+            var commandTemplate = GetCommandTemplate(tableName, criteria);
+            return ExecuteSingletonQuery(commandTemplate, criteria.GetValues());
+        }
+
         public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
             if (criteria == null) return FindAll(ObjectName.Parse(tableName));
+            var commandTemplate = GetCommandTemplate(tableName, criteria);
+            return ExecuteQuery(commandTemplate, criteria.GetValues());
+        }
 
+        private CommandTemplate GetCommandTemplate(string tableName, SimpleExpression criteria)
+        {
             var tableCommandCache = _commandCaches.GetOrAdd(tableName,
-                                                           _ => new ConcurrentDictionary<string, CommandTemplate>());
+                                                            _ => new ConcurrentDictionary<string, CommandTemplate>());
 
             var hash = new ExpressionHasher().Format(criteria);
-            var commandTemplate = tableCommandCache.GetOrAdd(hash,
-                                                            _ =>
-                                                            new FindHelper(_adapter.GetSchema())
-                                                                .GetFindByCommand(ObjectName.Parse(tableName), criteria)
-                                                                .GetCommandTemplate());
-            return ExecuteQuery(commandTemplate, criteria.GetValues());
+            return tableCommandCache.GetOrAdd(hash,
+                                              _ =>
+                                              new FindHelper(_adapter.GetSchema())
+                                                  .GetFindByCommand(ObjectName.Parse(tableName), criteria)
+                                                  .GetCommandTemplate());
         }
 
         private IEnumerable<IDictionary<string, object>> FindAll(ObjectName tableName)
         {
             return ExecuteQuery("select * from " + _adapter.GetSchema().FindTable(tableName).QualifiedName);
-        }
-
-        private IEnumerable<IDictionary<string, object>> ExecuteQuery(ICommandBuilder commandBuilder)
-        {
-            var connection = _connection ?? _adapter.CreateConnection();
-            var command = commandBuilder.GetCommand(connection);
-            command.Transaction = _transaction;
-            return TryExecuteQuery(connection, command);
         }
 
         private IEnumerable<IDictionary<string, object>> ExecuteQuery(CommandTemplate commandTemplate, IEnumerable<object> parameterValues)
@@ -67,6 +70,14 @@ namespace Simple.Data.Ado
             var command = commandTemplate.GetDbCommand(connection, parameterValues);
             command.Transaction = _transaction;
             return TryExecuteQuery(connection, command);
+        }
+
+        private IDictionary<string, object> ExecuteSingletonQuery(CommandTemplate commandTemplate, IEnumerable<object> parameterValues)
+        {
+            var connection = _connection ?? _adapter.CreateConnection();
+            var command = commandTemplate.GetDbCommand(connection, parameterValues);
+            command.Transaction = _transaction;
+            return TryExecuteSingletonQuery(connection, command);
         }
 
         private IEnumerable<IDictionary<string, object>> ExecuteQuery(string sql, params object[] values)
@@ -87,6 +98,32 @@ namespace Simple.Data.Ado
             {
                 throw new AdoAdapterException(ex.Message, command);
             }
+        }
+
+        private static IDictionary<string, object> TryExecuteSingletonQuery(IDbConnection connection, IDbCommand command)
+        {
+            try
+            {
+                using (connection)
+                using (command)
+                {
+                    if (connection.State != ConnectionState.Open)
+                        connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            var index = reader.CreateDictionaryIndex();
+                            return reader.ToDictionary(index);
+                        }
+                    }
+                }
+            }
+            catch (DbException ex)
+            {
+                throw new AdoAdapterException(ex.Message, command);
+            }
+            return null;
         }
     }
 }

@@ -47,6 +47,11 @@ namespace Simple.Data
             
         }
 
+        public virtual IDictionary<string,object> FindOne(string tableName, SimpleExpression criteria)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         ///  Finds data from the specified "table".
         ///  </summary><param name="tableName">Name of the table.</param><param name="criteria">The criteria. This may be <c>null</c>, in which case all records should be returned.</param><returns>The list of records matching the criteria. If no records are found, return an empty list.</returns>
