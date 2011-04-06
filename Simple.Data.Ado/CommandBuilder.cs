@@ -62,6 +62,11 @@ namespace Simple.Data.Ado
             return command;
         }
 
+        public CommandTemplate GetCommandTemplate()
+        {
+            return new CommandTemplate(_text.ToString(), _parameters.Keys.ToArray());
+        }
+
         private void SetParameters(IDbCommand command)
         {
             foreach (var pair in _parameters)
@@ -71,6 +76,39 @@ namespace Simple.Data.Ado
                 parameter.Value = pair.Value;
                 command.Parameters.Add(parameter);
             }
+        }
+    }
+
+    public class CommandTemplate
+    {
+        private readonly string _commandText;
+        private readonly string[] _parameterNames;
+
+        public CommandTemplate(string commandText, string[] parameterNames)
+        {
+            _commandText = commandText;
+            _parameterNames = parameterNames;
+        }
+
+        public IDbCommand GetDbCommand(IDbConnection connection, IEnumerable<object> parameterValues)
+        {
+            var command = connection.CreateCommand();
+            command.CommandText = _commandText;
+            var parameters = parameterValues
+                .Select((v, i) => CreateParameter(command, _parameterNames[i], v));
+            foreach (var parameter in parameters)
+            {
+                command.Parameters.Add(parameter);
+            }
+            return command;
+        }
+
+        private static IDbDataParameter CreateParameter(IDbCommand command, string name, object value)
+        {
+            var parameter = command.CreateParameter();
+            parameter.ParameterName = name;
+            parameter.Value = value;
+            return parameter;
         }
     }
 }

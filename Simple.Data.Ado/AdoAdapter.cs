@@ -14,6 +14,7 @@ namespace Simple.Data.Ado
     [Export("Ado", typeof(Adapter))]
     public partial class AdoAdapter : Adapter, IAdapterWithRelation, IAdapterWithTransactions
     {
+        private readonly AdoAdapterFinder _finder;
         private readonly ProviderHelper _providerHelper = new ProviderHelper();
 
         public ProviderHelper ProviderHelper
@@ -33,7 +34,7 @@ namespace Simple.Data.Ado
 
         public AdoAdapter()
         {
-            
+            _finder = new AdoAdapterFinder(this);
         }
 
         internal AdoAdapter(IConnectionProvider connectionProvider) : this()
@@ -69,7 +70,7 @@ namespace Simple.Data.Ado
 
         public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
-            return new AdoAdapterFinder(this).Find(tableName, criteria);
+            return _finder.Find(tableName, criteria);
         }
 
         public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)

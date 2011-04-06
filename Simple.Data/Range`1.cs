@@ -23,6 +23,12 @@ namespace Simple.Data
             get { return _end; }
         }
 
+        public IEnumerable<object> AsEnumerable()
+        {
+            yield return _start;
+            yield return _end;
+        }
+
         public T Start
         {
             get { return _start; }

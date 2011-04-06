@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -47,6 +48,45 @@ namespace Simple.Data
         public object RightOperand
         {
             get { return _rightOperand; }
+        }
+
+        public IEnumerable<object> GetValues()
+        {
+            return GetValues(_leftOperand).Concat(GetValues(_rightOperand));
+        }
+
+        private static IEnumerable<object> GetValues(object operand)
+        {
+            var expression = operand as SimpleExpression;
+            if (expression != null)
+            {
+                return expression.GetValues();
+            }
+            if (operand is DynamicReference)
+            {
+                return Enumerable.Empty<object>();
+            }
+            var range = operand as IRange;
+            if (range != null)
+            {
+                return range.AsEnumerable();
+            }
+            var list = operand as IEnumerable;
+            if (list != null)
+            {
+                return list.Cast<object>();
+            }
+            var function = operand as SimpleFunction;
+            if (function != null)
+            {
+                return function.Args;
+            }
+            return Yield(operand);
+        }
+
+        private static IEnumerable<object> Yield(object value)
+        {
+            yield return value;
         }
 
         /// <summary>

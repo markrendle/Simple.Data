@@ -61,6 +61,7 @@
     <Compile Include="AdoAdapterTransaction.cs" />
     <Compile Include="CommandBuilder.cs" />
     <Compile Include="CommandHelper.cs" />
+    <Compile Include="CommonTypes.cs" />
     <Compile Include="DataParameterCollectionEx.cs" />
     <Compile Include="DataReaderExtensions.cs" />
     <Compile Include="DataRecordExtensions.cs" />
@@ -70,6 +71,8 @@
     <Compile Include="DeleteHelper.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="ExpressionFormatter.cs" />
+    <Compile Include="ExpressionFormatterBase.cs" />
+    <Compile Include="ExpressionHasher.cs" />
     <Compile Include="FindHelper.cs" />
     <Compile Include="HomogenizedDictionaryIndex.cs" />
     <Compile Include="ICommandBuilder.cs" />

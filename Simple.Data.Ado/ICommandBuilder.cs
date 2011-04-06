@@ -7,5 +7,6 @@ namespace Simple.Data.Ado
         string AddParameter(object value);
         void Append(string text);
         IDbCommand GetCommand(IDbConnection connection);
+        CommandTemplate GetCommandTemplate();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -9,6 +10,8 @@ namespace Simple.Data.Ado
 {
     class AdoAdapterFinder
     {
+        private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, CommandTemplate>> _commandCaches =
+            new ConcurrentDictionary<string, ConcurrentDictionary<string, CommandTemplate>>();
         private readonly AdoAdapter _adapter;
         private readonly IDbTransaction _transaction;
         private readonly IDbConnection _connection;
@@ -33,8 +36,16 @@ namespace Simple.Data.Ado
         {
             if (criteria == null) return FindAll(ObjectName.Parse(tableName));
 
-            var commandBuilder = new FindHelper(_adapter.GetSchema()).GetFindByCommand(ObjectName.Parse(tableName), criteria);
-            return ExecuteQuery(commandBuilder);
+            var tableCommandCache = _commandCaches.GetOrAdd(tableName,
+                                                           _ => new ConcurrentDictionary<string, CommandTemplate>());
+
+            var hash = new ExpressionHasher().Format(criteria);
+            var commandTemplate = tableCommandCache.GetOrAdd(hash,
+                                                            _ =>
+                                                            new FindHelper(_adapter.GetSchema())
+                                                                .GetFindByCommand(ObjectName.Parse(tableName), criteria)
+                                                                .GetCommandTemplate());
+            return ExecuteQuery(commandTemplate, criteria.GetValues());
         }
 
         private IEnumerable<IDictionary<string, object>> FindAll(ObjectName tableName)
@@ -46,6 +57,14 @@ namespace Simple.Data.Ado
         {
             var connection = _connection ?? _adapter.CreateConnection();
             var command = commandBuilder.GetCommand(connection);
+            command.Transaction = _transaction;
+            return TryExecuteQuery(connection, command);
+        }
+
+        private IEnumerable<IDictionary<string, object>> ExecuteQuery(CommandTemplate commandTemplate, IEnumerable<object> parameterValues)
+        {
+            var connection = _connection ?? _adapter.CreateConnection();
+            var command = commandTemplate.GetDbCommand(connection, parameterValues);
             command.Transaction = _transaction;
             return TryExecuteQuery(connection, command);
         }

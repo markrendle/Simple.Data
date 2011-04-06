@@ -184,10 +184,11 @@ namespace Simple.Data.IntegrationTest
                 Age = 50
             };
             database.foo.Users.Update(user);
-            Assert.AreEqual("update [foo].[Users] set [Name] = @p1, [Age] = @p2 where [foo].[Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual("update [foo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [foo].[Users].[Id] = @p4".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
-            Assert.AreEqual(50, mockDatabase.Parameters[1]);
-            Assert.AreEqual(1, mockDatabase.Parameters[2]);
+            Assert.IsNull(mockDatabase.Parameters[1]);
+            Assert.AreEqual(50, mockDatabase.Parameters[2]);
+            Assert.AreEqual(1, mockDatabase.Parameters[3]);
         }
 
         [Test]
@@ -202,10 +203,11 @@ namespace Simple.Data.IntegrationTest
                 Age = 50
             };
             database.foo.Users.UpdateById(user);
-            Assert.AreEqual("update [foo].[Users] set [Name] = @p1, [Age] = @p2 where [foo].[Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual("update [foo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [foo].[Users].[Id] = @p4".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
-            Assert.AreEqual(50, mockDatabase.Parameters[1]);
-            Assert.AreEqual(1, mockDatabase.Parameters[2]);
+            Assert.IsNull(mockDatabase.Parameters[1]);
+            Assert.AreEqual(50, mockDatabase.Parameters[2]);
+            Assert.AreEqual(1, mockDatabase.Parameters[3]);
         }
 
         [Test]

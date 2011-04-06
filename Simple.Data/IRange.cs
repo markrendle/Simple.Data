@@ -9,5 +9,6 @@ namespace Simple.Data
     {
         object Start { get; }
         object End { get; }
+        IEnumerable<object> AsEnumerable();
     }
 }
