@@ -27,6 +27,11 @@ namespace Simple.Data.Commands
             return UpdateByKeyFields(table.GetQualifiedName(), dataStrategy, args[0], keyFieldNames);
         }
 
+        public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
         internal static object UpdateByKeyFields(string tableName, DataStrategy dataStrategy, object entity, IEnumerable<string> keyFieldNames)
         {
             var record = ObjectToDictionary(entity);

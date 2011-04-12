@@ -16,7 +16,7 @@ namespace Simple.Data.Ado
             _schema = schema;
         }
 
-        protected override string FormatObject(object value)
+        protected override string FormatObject(object value, object otherOperand)
         {
             var reference = value as DynamicReference;
             if (!ReferenceEquals(reference, null))
@@ -25,19 +25,29 @@ namespace Simple.Data.Ado
                 return table.QualifiedName + "." + table.FindColumn(reference.GetName()).QuotedName;
             }
 
-            return _commandBuilder.AddParameter(value);
+            return _commandBuilder.AddParameter(value, GetColumn(otherOperand as DynamicReference)).Name;
         }
 
-        protected override string FormatRange(IRange range)
+        protected override string FormatRange(IRange range, object otherOperand)
         {
-            return string.Format("{0} AND {1}", _commandBuilder.AddParameter(range.Start),
-                                 _commandBuilder.AddParameter(range.End));
+            return string.Format("{0} AND {1}", _commandBuilder.AddParameter(range.Start, GetColumn(otherOperand as DynamicReference)),
+                                 _commandBuilder.AddParameter(range.End, GetColumn(otherOperand as DynamicReference)));
         }
 
-        protected override string FormatList(IEnumerable list)
+        protected override string FormatList(IEnumerable list, object otherOperand)
         {
             return string.Format("({0})",
-                                 string.Join(",", list.Cast<object>().Select(o => _commandBuilder.AddParameter(o))));
+                                 string.Join(",", list.Cast<object>().Select(o => _commandBuilder.AddParameter(o, GetColumn(otherOperand as DynamicReference)))));
+        }
+
+        private Column GetColumn(DynamicReference reference)
+        {
+            if (reference == null)
+            {
+                return null;
+            }
+            var table = _schema.FindTable(reference.GetOwner().ToString());
+            return table.FindColumn(reference.GetName());
         }
     }
 }

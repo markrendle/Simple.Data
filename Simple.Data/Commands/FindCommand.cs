@@ -38,5 +38,10 @@ namespace Simple.Data.Commands
 
             return null;
         }
+
+        public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

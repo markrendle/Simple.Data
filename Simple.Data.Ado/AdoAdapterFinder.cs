@@ -39,6 +39,16 @@ namespace Simple.Data.Ado
             return ExecuteSingletonQuery(commandTemplate, criteria.GetValues());
         }
 
+        public Func<object[],IDictionary<string,object>> CreateFindOneDelegate(string tableName, SimpleExpression criteria)
+        {
+            if (criteria == null)
+            {
+                return _ => FindAll(ObjectName.Parse(tableName)).FirstOrDefault();
+            }
+            var commandTemplate = GetCommandTemplate(tableName, criteria);
+            return args => ExecuteSingletonQuery(commandTemplate, args);
+        }
+
         public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
             if (criteria == null) return FindAll(ObjectName.Parse(tableName));

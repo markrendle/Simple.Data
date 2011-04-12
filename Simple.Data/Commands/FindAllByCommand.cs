@@ -19,5 +19,10 @@ namespace Simple.Data.Commands
                          ? data.Where(dict => dict != null).Select(dict => new SimpleRecord(dict, table.GetQualifiedName(), dataStrategy))
                          : Enumerable.Empty<SimpleRecord>());
         }
+
+        public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

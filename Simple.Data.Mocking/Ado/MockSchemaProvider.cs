@@ -25,7 +25,7 @@ namespace Simple.Data.Mocking.Ado
         {
             _tables.Remove("COLUMNS");
             var table = new DataTable("COLUMNS");
-            table.AddColumns("TABLE_SCHEMA", "TABLE_NAME", "COLUMN_NAME", "IS_IDENTITY");
+            table.AddColumns("TABLE_SCHEMA", "TABLE_NAME", "COLUMN_NAME", "IS_IDENTITY", "DATA_TYPE", "CHARACTER_MAXIMUM_LENGTH");
             table.AddRows(AddIdentityDefault(rows));
             _tables.Add("COLUMNS", table);
         }
@@ -92,7 +92,7 @@ namespace Simple.Data.Mocking.Ado
         {
             return _tables["COLUMNS"].AsEnumerable()
                 .Where(row => row["TABLE_SCHEMA"].ToString() == table.Schema && row["TABLE_NAME"].ToString() == table.ActualName)
-                .Select(row => new Column(row["COLUMN_NAME"].ToString(), table, bool.Parse(row["IS_IDENTITY"].ToString())));
+                .Select(row => new Column(row["COLUMN_NAME"].ToString(), table, bool.Parse(row["IS_IDENTITY"].ToString()), DbType.Object, 0));
         }
 
         public IEnumerable<Procedure> GetStoredProcedures()

@@ -76,5 +76,10 @@ namespace Simple.Data
         ///  Gets the names of the fields which comprise the unique identifier for the specified table.
         ///  </summary><param name="tableName">Name of the table.</param><returns></returns>
         public abstract IEnumerable<string> GetKeyFieldNames(string tableName);
+
+        public virtual Func<object[],IDictionary<string,object>> CreateFindOneDelegate(string tableName, SimpleExpression criteria)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

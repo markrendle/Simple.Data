@@ -38,7 +38,7 @@ namespace Simple.Data.Ado
             var setClause = string.Join(", ",
                 data.Select(
                     kvp =>
-                    string.Format("{0} = {1}", table.FindColumn(kvp.Key).QuotedName, _commandBuilder.AddParameter(kvp.Value))));
+                    string.Format("{0} = {1}", table.FindColumn(kvp.Key).QuotedName, _commandBuilder.AddParameter(kvp.Value, table.FindColumn(kvp.Key)).Name)));
             return string.Format("update {0} set {1}", table.QualifiedName, setClause);
         }
     }

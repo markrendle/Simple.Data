@@ -61,7 +61,9 @@ namespace Simple.Data.Ado
             foreach (var pair in commandBuilder.Parameters)
             {
                 var parameter = command.CreateParameter();
-                parameter.ParameterName = pair.Key;
+                parameter.ParameterName = pair.Key.Name;
+                parameter.DbType = pair.Key.DbType;
+                parameter.Size = pair.Key.MaxLength;
                 parameter.Value = pair.Value;
                 command.Parameters.Add(parameter);
             }

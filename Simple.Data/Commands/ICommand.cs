@@ -1,4 +1,5 @@
-﻿using System.Dynamic;
+﻿using System;
+using System.Dynamic;
 
 namespace Simple.Data.Commands
 {
@@ -19,11 +20,14 @@ namespace Simple.Data.Commands
         /// <summary>
         /// Executes the command.
         /// </summary>
-        /// <param name="database">The database.</param>
+        /// <param name="dataStrategy">The database or transaction.</param>
         /// <param name="table">The table.</param>
         /// <param name="binder">The binder from the <see cref="DynamicTable"/> method invocation.</param>
         /// <param name="args">The arguments from the <see cref="DynamicTable"/> method invocation.</param>
         /// <returns></returns>
         object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args);
+
+        Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder,
+                                              object[] args);
     }
 }

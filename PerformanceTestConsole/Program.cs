@@ -29,7 +29,7 @@ namespace PerformanceTestConsole
     class Program
     {
 
-        public static readonly string connectionString = "Data Source=.;Initial Catalog=tempdb;Integrated Security=True";
+        public static readonly string connectionString = "Data Source=SQL2008;Initial Catalog=tempdb;User ID=sa;Password=SAPassword01";
 
         public static SqlConnection GetOpenConnection()
         {
@@ -41,7 +41,7 @@ namespace PerformanceTestConsole
         static void RunPerformanceTests()
         {
             var test = new PerformanceTests();
-            Console.WriteLine("Running 500 itrations that load up a post entity");
+            Console.WriteLine("Running 500 iterations that load up a post entity");
             test.Run(500);
         }
 
@@ -50,8 +50,7 @@ namespace PerformanceTestConsole
 
             EnsureDBSetup();
             RunPerformanceTests();
-            if (Debugger.IsAttached)
-                Console.ReadKey();
+            if (Debugger.IsAttached) Console.ReadKey();
         }
 
         private static void EnsureDBSetup()

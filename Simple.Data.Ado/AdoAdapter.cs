@@ -73,6 +73,11 @@ namespace Simple.Data.Ado
             return _finder.FindOne(tableName, criteria);
         }
 
+        public override Func<object[],IDictionary<string,object>> CreateFindOneDelegate(string tableName, SimpleExpression criteria)
+        {
+            return _finder.CreateFindOneDelegate(tableName, criteria);
+        }
+
         public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
             return _finder.Find(tableName, criteria);

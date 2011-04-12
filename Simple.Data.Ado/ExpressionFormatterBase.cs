@@ -66,15 +66,15 @@ namespace Simple.Data.Ado
 
         private string FormatAsComparison(SimpleExpression expression, string op)
         {
-            return string.Format("{0} {1} {2}", FormatObject(expression.LeftOperand), op,
-                                 FormatObject(expression.RightOperand));
+            return string.Format("{0} {1} {2}", FormatObject(expression.LeftOperand, expression.RightOperand), op,
+                                 FormatObject(expression.RightOperand, expression.LeftOperand));
         }
 
         private string TryFormatAsInList(SimpleExpression expression, IEnumerable list, string op)
         {
             return (list != null)
                        ?
-                           string.Format("{0} {1} {2}", FormatObject(expression.LeftOperand), op, FormatList(list))
+                           string.Format("{0} {1} {2}", FormatObject(expression.LeftOperand, expression.RightOperand), op, FormatList(list, expression.LeftOperand))
                        :
                            null;
         }
@@ -83,7 +83,7 @@ namespace Simple.Data.Ado
         {
             return (range != null)
                        ?
-                           string.Format("{0} {1} {2}", FormatObject(expression.LeftOperand), op, FormatRange(range))
+                           string.Format("{0} {1} {2}", FormatObject(expression.LeftOperand, expression.RightOperand), op, FormatRange(range, expression.LeftOperand))
                        :
                            null;
         }
@@ -95,14 +95,14 @@ namespace Simple.Data.Ado
 
             if (function.Name.Equals("like", StringComparison.InvariantCultureIgnoreCase))
             {
-                return string.Format("{0} LIKE {1}", FormatObject(expression.LeftOperand),
-                                     FormatObject(function.Args[0]));
+                return string.Format("{0} LIKE {1}", FormatObject(expression.LeftOperand, expression.RightOperand),
+                                     FormatObject(function.Args[0], expression.LeftOperand));
             }
 
             if (function.Name.Equals("notlike", StringComparison.InvariantCultureIgnoreCase))
             {
-                return string.Format("{0} NOT LIKE {1}", FormatObject(expression.LeftOperand),
-                                     FormatObject(function.Args[0]));
+                return string.Format("{0} NOT LIKE {1}", FormatObject(expression.LeftOperand, expression.RightOperand),
+                                     FormatObject(function.Args[0], expression.LeftOperand));
             }
 
             throw new NotSupportedException(string.Format("Unknown function '{0}'.", function.Name));
@@ -110,13 +110,13 @@ namespace Simple.Data.Ado
 
         private string BinaryExpressionToWhereClause(SimpleExpression expression, string comparisonOperator)
         {
-            return string.Format("{0} {1} {2}", FormatObject(expression.LeftOperand),
+            return string.Format("{0} {1} {2}", FormatObject(expression.LeftOperand, expression.RightOperand),
                                  comparisonOperator,
-                                 FormatObject(expression.RightOperand));
+                                 FormatObject(expression.RightOperand, expression.LeftOperand));
         }
 
-        protected abstract string FormatObject(object value);
-        protected abstract string FormatRange(IRange range);
-        protected abstract string FormatList(IEnumerable list);
+        protected abstract string FormatObject(object value, object otherOperand);
+        protected abstract string FormatRange(IRange range, object otherOperand);
+        protected abstract string FormatList(IEnumerable list, object otherOperand);
     }
 }

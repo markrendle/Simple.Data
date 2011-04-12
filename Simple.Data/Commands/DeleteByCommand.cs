@@ -17,6 +17,11 @@ namespace Simple.Data.Commands
             return dataStrategy.Delete(table.GetQualifiedName(), criteriaExpression);
         }
 
+        public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
         private static SimpleExpression GetCriteriaExpression(InvokeMemberBinder binder, object[] args, DynamicTable table)
         {
             var criteria = binder.Name.Equals("delete", StringComparison.InvariantCultureIgnoreCase) ?

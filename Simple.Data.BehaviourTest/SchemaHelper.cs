@@ -40,12 +40,12 @@ namespace Simple.Data.IntegrationTest
             columns.Columns.Add("data_type", typeof(string));
             columns.Columns.Add("character_maximum_length", typeof(int));
 
-            columns.Rows.Add("dbo", "Customer", "CustomerId", "NO", "integer", null);
+            columns.Rows.Add("dbo", "Customer", "CustomerId", "NO", "integer", DBNull.Value);
             columns.Rows.Add("dbo", "Customer", "Name", "NO", "varchar", 100);
 
-            columns.Rows.Add("dbo", "Orders", "OrderId", "NO", "integer", null);
-            columns.Rows.Add("dbo", "Orders", "CustomerId", "NO", "integer", null);
-            columns.Rows.Add("dbo", "Orders", "Date", "NO", "datetime", null);
+            columns.Rows.Add("dbo", "Orders", "OrderId", "NO", "integer", DBNull.Value);
+            columns.Rows.Add("dbo", "Orders", "CustomerId", "NO", "integer", DBNull.Value);
+            columns.Rows.Add("dbo", "Orders", "Date", "NO", "datetime", DBNull.Value);
 
             return columns;
         }

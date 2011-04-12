@@ -38,10 +38,9 @@ namespace Simple.Data
 
         internal SimpleRecord(IDictionary<string, object> data, string tableName, DataStrategy dataStrategy)
         {
-            if (data == null) throw new ArgumentNullException("data");
             _tableName = tableName;
             _database = dataStrategy;
-            _data = data;
+            _data = data ?? new Dictionary<string, object>();
         }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)

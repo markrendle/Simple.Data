@@ -10,6 +10,42 @@ namespace Simple.Data.SqlCe40
 {
     class SqlCe40SchemaProvider : ISchemaProvider
     {
+        private static readonly Dictionary<string, DbType> DbTypeLookup = new Dictionary<string, DbType>
+                                                                              {
+                                                                                  {"text", DbType.AnsiString},
+                                                                                  {"uniqueidentifier", DbType.Guid},
+                                                                                  {"date", DbType.DateTime},
+                                                                                  {"time", DbType.DateTime},
+                                                                                  {"datetime2", DbType.DateTime2},
+                                                                                  {
+                                                                                      "datetimeoffset",
+                                                                                      DbType.DateTimeOffset
+                                                                                      },
+                                                                                  {"tinyint", DbType.Byte},
+                                                                                  {"smallint", DbType.Int16},
+                                                                                  {"int", DbType.Int32},
+                                                                                  {"smalldatetime", DbType.DateTime},
+                                                                                  {"real", DbType.Single},
+                                                                                  {"money", DbType.Currency},
+                                                                                  {"datetime", DbType.DateTime},
+                                                                                  {"float", DbType.Double},
+                                                                                  {"sql_variant", DbType.Object},
+                                                                                  {"ntext", DbType.String},
+                                                                                  {"bit", DbType.Boolean},
+                                                                                  {"decimal", DbType.Decimal},
+                                                                                  {"numeric", DbType.VarNumeric},
+                                                                                  {"smallmoney", DbType.Currency},
+                                                                                  {"bigint", DbType.Int64},
+                                                                                  {"varbinary", DbType.Binary},
+                                                                                  {"varchar", DbType.AnsiString},
+                                                                                  {"binary", DbType.Binary},
+                                                                                  {"char", DbType.AnsiStringFixedLength},
+                                                                                  {"timestamp", DbType.Binary},
+                                                                                  {"nvarchar", DbType.String},
+                                                                                  {"nchar", DbType.StringFixedLength},
+                                                                                  {"xml", DbType.Xml},
+                                                                              }; 
+        
         private readonly IConnectionProvider _connectionProvider;
 
         public SqlCe40SchemaProvider(IConnectionProvider connectionProvider)
@@ -36,7 +72,12 @@ namespace Simple.Data.SqlCe40
 
         public IEnumerable<Column> GetColumns(Table table)
         {
-            return Enumerable.Select(GetColumnsDataTable(table).AsEnumerable(), row => new Column(row["COLUMN_NAME"].ToString(), table, row["AUTOINC_SEED"] != DBNull.Value));
+            return Enumerable.Select(GetColumnsDataTable(table).AsEnumerable(),
+                                     row =>
+                                     new Column(row["COLUMN_NAME"].ToString(), table,
+                                                row["AUTOINC_SEED"] != DBNull.Value,
+                                                DbTypeLookup[(string) row["DATA_TYPE"]],
+                                                row["CHARACTER_MAXIMUM_LENGTH"] == DBNull.Value ? 0 : (int)row["CHARACTER_MAXIMUM_LENGTH"]));
         }
 
         public IEnumerable<Procedure> GetStoredProcedures()
@@ -118,7 +159,7 @@ namespace Simple.Data.SqlCe40
 
         private DataTable GetColumnsDataTable(Table table)
         {
-            return SelectToDataTable("SELECT COLUMN_NAME, AUTOINC_SEED FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + table.ActualName + "'");
+            return SelectToDataTable("SELECT COLUMN_NAME, AUTOINC_SEED, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + table.ActualName + "'");
         }
 
         private DataTable GetPrimaryKeys()

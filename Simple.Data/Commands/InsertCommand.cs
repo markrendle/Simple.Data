@@ -19,6 +19,11 @@ namespace Simple.Data.Commands
             return DoInsert(binder, args, dataStrategy, table.GetQualifiedName()).ToDynamicRecord(table.GetQualifiedName(), dataStrategy);
         }
 
+        public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
         private static IDictionary<string, object> DoInsert(InvokeMemberBinder binder, object[] args, DataStrategy dataStrategy, string tableName)
         {
             return binder.HasSingleUnnamedArgument()

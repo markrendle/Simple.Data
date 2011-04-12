@@ -10,16 +10,38 @@ namespace Simple.Data.Ado.Schema
         private readonly string _actualName;
         private readonly Table _table;
         private readonly bool _isIdentity;
+        private readonly DbType _dbType;
+        private readonly int _maxLength;
 
-        public Column(string actualName, Table table) : this(actualName, table, false)
+        public Column(string actualName, Table table) : this(actualName, table, DbType.Object)
         {
         }
 
-        public Column(string actualName, Table table, bool isIdentity)
+        public Column(string actualName, Table table, DbType dbType) : this(actualName, table, false, dbType, 0)
+        {
+        }
+
+        public Column(string actualName, Table table, bool isIdentity) : this(actualName, table, isIdentity, DbType.Object, 0)
+        {
+        }
+
+        public Column(string actualName, Table table, bool isIdentity, DbType dbType, int maxLength)
         {
             _actualName = actualName;
+            _dbType = dbType;
+            _maxLength = maxLength;
             _isIdentity = isIdentity;
             _table = table;
+        }
+
+        public int MaxLength
+        {
+            get { return _maxLength; }
+        }
+
+        public DbType DbType
+        {
+            get { return _dbType; }
         }
 
         public string HomogenizedName

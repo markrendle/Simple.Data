@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -14,6 +15,8 @@ namespace Simple.Data
     /// </summary>
     public class DynamicTable : DynamicObject
     {
+        private readonly ConcurrentDictionary<string, Func<object[], object>> _delegates =
+            new ConcurrentDictionary<string, Func<object[], object>>();
         private readonly string _tableName;
         private readonly DynamicSchema _schema;
         private readonly DataStrategy _dataStrategy;
@@ -52,13 +55,33 @@ namespace Simple.Data
         /// </returns>
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
+            var func = _delegates.GetOrAdd(binder.Name, name => CreateMemberDelegate(name,binder,args));
+            if (func != null)
+            {
+                result = func(args);
+                return true;
+            }
+
             var command = CommandFactory.GetCommandFor(binder.Name);
             if (command != null)
             {
                 result = command.Execute(_dataStrategy, this, binder, args);
                 return true;
             }
+
             return base.TryInvokeMember(binder, args, out result);
+        }
+
+        private Func<object[],object> CreateMemberDelegate(string name, InvokeMemberBinder binder, object[] args)
+        {
+            try
+            {
+                return CommandFactory.GetCommandFor(name).CreateDelegate(_dataStrategy, this, binder, args);
+            }
+            catch (NotImplementedException)
+            {
+                return null;
+            }
         }
 
         /// <summary>
