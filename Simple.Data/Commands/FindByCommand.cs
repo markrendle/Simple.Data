@@ -19,7 +19,7 @@ namespace Simple.Data.Commands
             try
             {
                 var func = dataStrategy.Adapter.CreateFindOneDelegate(table.GetQualifiedName(), criteriaExpression);
-                return a => new SimpleRecord(func(a), table.GetName(), dataStrategy);
+                return a => new SimpleRecord(func(a), table.GetQualifiedName(), dataStrategy);
             }
             catch (NotImplementedException)
             {

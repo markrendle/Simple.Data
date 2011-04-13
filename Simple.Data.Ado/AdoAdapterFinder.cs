@@ -56,6 +56,16 @@ namespace Simple.Data.Ado
             return ExecuteQuery(commandTemplate, criteria.GetValues());
         }
 
+        public Func<object[], IEnumerable<IDictionary<string, object>>> CreateFindDelegate(string tableName, SimpleExpression criteria)
+        {
+            if (criteria == null)
+            {
+                return _ => FindAll(ObjectName.Parse(tableName));
+            }
+            var commandTemplate = GetCommandTemplate(tableName, criteria);
+            return args => ExecuteQuery(commandTemplate, args);
+        }
+
         private CommandTemplate GetCommandTemplate(string tableName, SimpleExpression criteria)
         {
             var tableCommandCache = _commandCaches.GetOrAdd(tableName,

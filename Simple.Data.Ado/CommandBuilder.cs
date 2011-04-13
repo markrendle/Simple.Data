@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -72,110 +72,85 @@ namespace Simple.Data.Ado
 
         private void SetParameters(IDbCommand command)
         {
-            foreach (var pair in _parameters)
+            if (_parameters.Any(kvp => kvp.Value is IRange) || _parameters.Any(kvp => kvp.Value is IEnumerable && !(kvp.Value is string)))
             {
-                var parameter = command.CreateParameter();
-                parameter.ParameterName = pair.Key.Name;
-                parameter.DbType = pair.Key.DbType;
-                parameter.Value = pair.Value;
-                command.Parameters.Add(parameter);
+                foreach (var pair in _parameters)
+                {
+                    foreach (var parameter in CreateParameterComplex(pair.Key, pair.Value, command))
+                    {
+                        command.Parameters.Add(parameter);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var pair in _parameters)
+                {
+                    command.Parameters.Add(CreateSingleParameter(pair.Value, command, pair.Key.Name, pair.Key.DbType));
+                }
             }
         }
-    }
 
-    public class CommandTemplate
-    {
-        private readonly string _commandText;
-        private readonly ParameterTemplate[] _parameters;
-
-        public CommandTemplate(string commandText, ParameterTemplate[] parameterNames)
+        private static IEnumerable<IDbDataParameter> CreateParameterComplex(ParameterTemplate template, object value, IDbCommand command)
         {
-            _commandText = commandText;
-            _parameters = parameterNames;
-        }
-
-        public IDbCommand GetDbCommand(IDbConnection connection, IEnumerable<object> parameterValues)
-        {
-            var command = connection.CreateCommand();
-            command.CommandText = _commandText;
-            var parameters = parameterValues
-                .Select((v, i) => CreateParameter(command, _parameters[i], v));
-            foreach (var parameter in parameters)
+            var range = value as IRange;
+            if (range != null)
             {
-                command.Parameters.Add(parameter);
+                yield return CreateSingleParameter(value, command, template.Name + "_start", template.DbType);
+                yield return CreateSingleParameter(value, command, template.Name + "_end", template.DbType);
+                SetBetweenInCommandText(command, template.Name);
             }
-            return command;
+            else
+            {
+                var list = value as IEnumerable<object>;
+                if (list != null)
+                {
+                    var builder = new StringBuilder();
+                    var array = list.ToArray();
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        builder.AppendFormat(",{0}_{1}", template.Name, i);
+                        yield return CreateSingleParameter(value, command, template.Name + "_" + i, template.DbType);
+                    }
+                    if (command.CommandText.Contains("!= " + template.Name))
+                    {
+                        command.CommandText = command.CommandText.Replace("!= " + template.Name,
+                                                                      "NOT IN (" + builder.ToString().Substring(1) + ")");
+                    }
+                    else
+                    {
+                        command.CommandText = command.CommandText.Replace("= " + template.Name,
+                                                                      "IN (" + builder.ToString().Substring(1) + ")");
+                    }
+                }
+                else
+                {
+                    yield return CreateSingleParameter(value, command, template.Name, template.DbType);
+                }
+            }
         }
 
-        private static IDbDataParameter CreateParameter(IDbCommand command, ParameterTemplate parameterTemplate, object value)
+        public static void SetBetweenInCommandText(IDbCommand command, string name)
+        {
+            if (command.CommandText.Contains("!= " + name))
+            {
+                command.CommandText = command.CommandText.Replace("!= " + name,
+                                                                  string.Format("NOT BETWEEN {0}_start AND {0}_end", name));
+            }
+            else
+            {
+                command.CommandText = command.CommandText.Replace("= " + name,
+                                                                  string.Format("BETWEEN {0}_start AND {0}_end", name));
+            }
+        }
+
+        private static IDbDataParameter CreateSingleParameter(object value, IDbCommand command, string name, DbType dbType)
         {
             var parameter = command.CreateParameter();
-            parameter.ParameterName = parameterTemplate.Name;
-            parameter.DbType = parameterTemplate.DbType;
+            parameter.ParameterName = name;
+            parameter.DbType = dbType;
             parameter.Value = value;
             return parameter;
-        }
-    }
-
-    public class ParameterTemplate : IEquatable<ParameterTemplate>
-    {
-        private readonly string _name;
-        private readonly DbType _dbType;
-        private readonly int _maxLength;
-
-        public ParameterTemplate(string name) : this(name, DbType.Object, 0)
-        {
-        }
-
-        public ParameterTemplate(string name, DbType dbType, int maxLength)
-        {
-            if (name == null) throw new ArgumentNullException("name");
-            _name = name;
-            _dbType = dbType;
-            _maxLength = maxLength;
-        }
-
-        public int MaxLength
-        {
-            get { return _maxLength; }
-        }
-
-        public DbType DbType
-        {
-            get { return _dbType; }
-        }
-
-        public string Name
-        {
-            get { return _name; }
-        }
-
-        public bool Equals(ParameterTemplate other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return Equals(other._name, _name) && Equals(other._dbType, _dbType);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof (ParameterTemplate)) return false;
-            return Equals((ParameterTemplate) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (_name.GetHashCode()*397) ^ _dbType.GetHashCode();
-            }
-        }
-
-        public override string ToString()
-        {
-            return Name;
         }
     }
 }

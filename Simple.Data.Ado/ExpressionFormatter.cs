@@ -30,14 +30,12 @@ namespace Simple.Data.Ado
 
         protected override string FormatRange(IRange range, object otherOperand)
         {
-            return string.Format("{0} AND {1}", _commandBuilder.AddParameter(range.Start, GetColumn(otherOperand as DynamicReference)),
-                                 _commandBuilder.AddParameter(range.End, GetColumn(otherOperand as DynamicReference)));
+            return _commandBuilder.AddParameter(range, GetColumn(otherOperand as DynamicReference)).Name;
         }
 
         protected override string FormatList(IEnumerable list, object otherOperand)
         {
-            return string.Format("({0})",
-                                 string.Join(",", list.Cast<object>().Select(o => _commandBuilder.AddParameter(o, GetColumn(otherOperand as DynamicReference)))));
+            return _commandBuilder.AddParameter(list, GetColumn(otherOperand as DynamicReference)).Name;
         }
 
         private Column GetColumn(DynamicReference reference)

@@ -1,0 +1,90 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+
+namespace Simple.Data.Ado
+{
+    public class CommandTemplate
+    {
+        private readonly string _commandText;
+        private readonly ParameterTemplate[] _parameters;
+
+        public CommandTemplate(string commandText, ParameterTemplate[] parameterNames)
+        {
+            _commandText = commandText;
+            _parameters = parameterNames;
+        }
+
+        public IDbCommand GetDbCommand(IDbConnection connection, IEnumerable<object> parameterValues)
+        {
+            var command = connection.CreateCommand();
+            command.CommandText = _commandText;
+
+            foreach (var parameter in CreateParameters(command, parameterValues))
+            {
+                command.Parameters.Add(parameter);
+            }
+
+            return command;
+        }
+
+        private IEnumerable<IDbDataParameter> CreateParameters(IDbCommand command, IEnumerable<object> parameterValues)
+        {
+            return parameterValues.Any(o => o is IEnumerable && !(o is string)) || parameterValues.Any(o => o is IRange)
+                       ? parameterValues.SelectMany((v,i) => CreateParameters(command, _parameters[i], v))
+                       : parameterValues.Select((v, i) => CreateParameter(command, _parameters[i], v));
+        }
+
+        private static IEnumerable<IDbDataParameter> CreateParameters(IDbCommand command, ParameterTemplate parameterTemplate, object value)
+        {
+            var range = value as IRange;
+            if (range != null)
+            {
+                yield return CreateParameter(command, parameterTemplate, range.Start, "_start");
+                yield return CreateParameter(command, parameterTemplate, range.End, "_end");
+                CommandBuilder.SetBetweenInCommandText(command, parameterTemplate.Name);
+            }
+            else
+            {
+                var list = value as IEnumerable;
+                if (list != null)
+                {
+                    var builder = new StringBuilder();
+                    var array = list.Cast<object>().ToArray();
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        builder.AppendFormat(",{0}_{1}", parameterTemplate.Name, i);
+                        yield return CreateParameter(command, parameterTemplate, array[i], "_" + i);
+                    }
+                    if (command.CommandText.Contains("!= " + parameterTemplate.Name))
+                    {
+                        command.CommandText = command.CommandText.Replace("!= " + parameterTemplate.Name,
+                                                                          "NOT IN (" + builder.ToString().Substring(1) +
+                                                                          ")");
+                    }
+                    else
+                    {
+                        command.CommandText = command.CommandText.Replace("= " + parameterTemplate.Name,
+                                                                          "IN (" + builder.ToString().Substring(1) + ")");
+                    }
+                }
+                else
+                {
+                    yield return CreateParameter(command, parameterTemplate, value);
+                }
+            }
+            
+        }
+
+        private static IDbDataParameter CreateParameter(IDbCommand command, ParameterTemplate parameterTemplate, object value, string suffix = "")
+        {
+            var parameter = command.CreateParameter();
+            parameter.ParameterName = parameterTemplate.Name + suffix;
+            parameter.DbType = parameterTemplate.DbType;
+            parameter.Value = value;
+            return parameter;
+        }
+    }
+}

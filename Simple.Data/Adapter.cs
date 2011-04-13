@@ -81,5 +81,10 @@ namespace Simple.Data
         {
             throw new NotImplementedException();
         }
+
+        public virtual Func<object[], IEnumerable<IDictionary<string, object>>> CreateFindDelegate(string tableName, SimpleExpression criteria)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
