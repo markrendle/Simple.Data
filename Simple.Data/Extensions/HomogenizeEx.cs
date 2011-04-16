@@ -23,9 +23,12 @@ namespace Simple.Data.Extensions
         public static string Homogenize(this string source)
         {
             //we have to inline the call to force the compiler to not optimize for the string,string call.
-            return source == null ? null : Cache.GetOrAdd(source, (notused) => {
-                return string.Intern(HomogenizeRegex.Replace(source.ToLowerInvariant(), string.Empty));
-            });
+            return source == null ? null : Cache.GetOrAdd(source, HomogenizeImpl);
+        }
+
+        private static string HomogenizeImpl(string source)
+        {
+            return string.Intern(HomogenizeRegex.Replace(source.ToLowerInvariant(), string.Empty));
         }
     }
 }
