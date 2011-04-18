@@ -76,7 +76,7 @@ namespace Simple.Data.Ado
                                               _ =>
                                               new FindHelper(_adapter.GetSchema())
                                                   .GetFindByCommand(ObjectName.Parse(tableName), criteria)
-                                                  .GetCommandTemplate());
+                                                  .GetCommandTemplate(_adapter.GetSchema().FindTable(ObjectName.Parse(tableName))));
         }
 
         private IEnumerable<IDictionary<string, object>> FindAll(ObjectName tableName)
@@ -89,7 +89,7 @@ namespace Simple.Data.Ado
             var connection = _connection ?? _adapter.CreateConnection();
             var command = commandTemplate.GetDbCommand(connection, parameterValues);
             command.Transaction = _transaction;
-            return TryExecuteQuery(connection, command);
+            return TryExecuteQuery(connection, command, commandTemplate.Index);
         }
 
         private IDictionary<string, object> ExecuteSingletonQuery(CommandTemplate commandTemplate, IEnumerable<object> parameterValues)
@@ -97,7 +97,7 @@ namespace Simple.Data.Ado
             var connection = _connection ?? _adapter.CreateConnection();
             var command = commandTemplate.GetDbCommand(connection, parameterValues);
             command.Transaction = _transaction;
-            return TryExecuteSingletonQuery(connection, command);
+            return TryExecuteSingletonQuery(connection, command, commandTemplate.Index);
         }
 
         private IEnumerable<IDictionary<string, object>> ExecuteQuery(string sql, params object[] values)
@@ -120,6 +120,18 @@ namespace Simple.Data.Ado
             }
         }
 
+        private static IEnumerable<IDictionary<string, object>> TryExecuteQuery(IDbConnection connection, IDbCommand command, IDictionary<string, int> index)
+        {
+            try
+            {
+                return command.ToBufferedEnumerable(connection, index);
+            }
+            catch (DbException ex)
+            {
+                throw new AdoAdapterException(ex.Message, command);
+            }
+        }
+
         private static IDictionary<string, object> TryExecuteSingletonQuery(IDbConnection connection, IDbCommand command)
         {
             try
@@ -134,6 +146,31 @@ namespace Simple.Data.Ado
                         if (reader.Read())
                         {
                             var index = reader.CreateDictionaryIndex();
+                            return reader.ToDictionary(index);
+                        }
+                    }
+                }
+            }
+            catch (DbException ex)
+            {
+                throw new AdoAdapterException(ex.Message, command);
+            }
+            return null;
+        }
+
+        private static IDictionary<string, object> TryExecuteSingletonQuery(IDbConnection connection, IDbCommand command, IDictionary<string,int> index)
+        {
+            try
+            {
+                using (connection)
+                using (command)
+                {
+                    if (connection.State != ConnectionState.Open)
+                        connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
                             return reader.ToDictionary(index);
                         }
                     }

@@ -8,6 +8,6 @@ namespace Simple.Data.Ado
         ParameterTemplate AddParameter(object value, Column column);
         void Append(string text);
         IDbCommand GetCommand(IDbConnection connection);
-        CommandTemplate GetCommandTemplate();
+        CommandTemplate GetCommandTemplate(Table table);
     }
 }
