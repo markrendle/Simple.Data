@@ -30,6 +30,24 @@ namespace Simple.Data.Ado
                                                        () => DisposeCommandAndReader(connection, command, reader));
         }
 
+        public static IEnumerable<IDictionary<string, object>> ToBufferedEnumerable(this IDbCommand command, IDbConnection connection, IDictionary<string,int> index)
+        {
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                    connection.Open();
+            }
+            catch (DbException ex)
+            {
+                throw new AdoAdapterException(ex.Message, ex);
+            }
+            var reader = command.ExecuteReaderWithExceptionWrap();
+            return BufferedEnumerable.Create(() => reader.Read()
+                                                       ? Maybe.Some(reader.ToDictionary(index))
+                                                       : Maybe<IDictionary<string, object>>.None,
+                                                       () => DisposeCommandAndReader(connection, command, reader));
+        }
+
         public static Dictionary<string, int> CreateDictionaryIndex(this IDataReader reader)
         {
             var keys =

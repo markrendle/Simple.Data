@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
@@ -10,11 +11,18 @@ namespace Simple.Data.Ado
     {
         private readonly string _commandText;
         private readonly ParameterTemplate[] _parameters;
+        private readonly Dictionary<string, int> _index;
 
-        public CommandTemplate(string commandText, ParameterTemplate[] parameterNames)
+        public CommandTemplate(string commandText, ParameterTemplate[] parameterNames, Dictionary<string, int> index)
         {
             _commandText = commandText;
             _parameters = parameterNames;
+            _index = index;
+        }
+
+        public Dictionary<string, int> Index
+        {
+            get { return _index; }
         }
 
         public IDbCommand GetDbCommand(IDbConnection connection, IEnumerable<object> parameterValues)

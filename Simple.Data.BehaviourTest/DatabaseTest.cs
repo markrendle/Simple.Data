@@ -226,7 +226,7 @@ namespace Simple.Data.IntegrationTest
             database.Users.Update(user);
             Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
-            Assert.IsNull(mockDatabase.Parameters[1]);
+            Assert.AreEqual(DBNull.Value, mockDatabase.Parameters[1]);
             Assert.AreEqual(50, mockDatabase.Parameters[2]);
             Assert.AreEqual(1, mockDatabase.Parameters[3]);
         }
@@ -245,9 +245,19 @@ namespace Simple.Data.IntegrationTest
             database.Users.UpdateById(user);
             Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
-            Assert.IsNull(mockDatabase.Parameters[1]);
+            Assert.AreEqual(DBNull.Value, mockDatabase.Parameters[1]);
             Assert.AreEqual(50, mockDatabase.Parameters[2]);
             Assert.AreEqual(1, mockDatabase.Parameters[3]);
+        }
+
+        [Test]
+        public void TestThatUpdateUsesDbNullForNullValues()
+        {
+            var mockDatabase = new MockDatabase();
+            dynamic database = CreateDatabase(mockDatabase);
+            database.Users.UpdateById(Id: 1, Name: null);
+            Assert.AreEqual("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Id] = @p2".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual(DBNull.Value, mockDatabase.Parameters[0]);
         }
 
         [Test]

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -65,9 +66,10 @@ namespace Simple.Data.Ado
             return command;
         }
 
-        public CommandTemplate GetCommandTemplate()
+        public CommandTemplate GetCommandTemplate(Table table)
         {
-            return new CommandTemplate(_text.ToString(), _parameters.Keys.ToArray());
+            var index = table.Columns.Select((c, i) => Tuple.Create(c, i)).ToDictionary(t => t.Item1.ActualName, t => t.Item2);
+            return new CommandTemplate(_text.ToString(), _parameters.Keys.ToArray(), new Dictionary<string, int>(index, HomogenizedEqualityComparer.DefaultInstance));
         }
 
         private void SetParameters(IDbCommand command)
@@ -149,8 +151,13 @@ namespace Simple.Data.Ado
             var parameter = command.CreateParameter();
             parameter.ParameterName = name;
             parameter.DbType = dbType;
-            parameter.Value = value;
+            parameter.Value = GetTheDataParameterValue(value);
             return parameter;
+        }
+
+        private static object GetTheDataParameterValue(object value)
+        {
+            return value ?? DBNull.Value;
         }
     }
 }
