@@ -186,7 +186,7 @@ namespace Simple.Data.IntegrationTest
             database.foo.Users.Update(user);
             Assert.AreEqual("update [foo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [foo].[Users].[Id] = @p4".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
-            Assert.IsNull(mockDatabase.Parameters[1]);
+            Assert.AreEqual(DBNull.Value, mockDatabase.Parameters[1]);
             Assert.AreEqual(50, mockDatabase.Parameters[2]);
             Assert.AreEqual(1, mockDatabase.Parameters[3]);
         }
@@ -205,7 +205,7 @@ namespace Simple.Data.IntegrationTest
             database.foo.Users.UpdateById(user);
             Assert.AreEqual("update [foo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [foo].[Users].[Id] = @p4".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
-            Assert.IsNull(mockDatabase.Parameters[1]);
+            Assert.AreEqual(DBNull.Value, mockDatabase.Parameters[1]);
             Assert.AreEqual(50, mockDatabase.Parameters[2]);
             Assert.AreEqual(1, mockDatabase.Parameters[3]);
         }
