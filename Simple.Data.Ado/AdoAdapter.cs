@@ -88,6 +88,11 @@ namespace Simple.Data.Ado
             return _finder.Find(tableName, criteria);
         }
 
+        public override IEnumerable<IDictionary<string, object>> Query(SimpleQuery query)
+        {
+            return new AdoAdapterQueryRunner(this).Run(query);
+        }
+
         public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
         {
             return new AdoAdapterInserter(this).Insert(tableName, data);
@@ -263,6 +268,21 @@ namespace Simple.Data.Ado
         public ISchemaProvider SchemaProvider
         {
             get { return _connectionProvider.GetSchemaProvider(); }
+        }
+    }
+
+    public class AdoAdapterQueryRunner
+    {
+        private readonly AdoAdapter _adoAdapter;
+
+        public AdoAdapterQueryRunner(AdoAdapter adoAdapter)
+        {
+            _adoAdapter = adoAdapter;
+        }
+
+        public IEnumerable<IDictionary<string, object>> Run(SimpleQuery query)
+        {
+            throw new NotImplementedException();
         }
     }
 }

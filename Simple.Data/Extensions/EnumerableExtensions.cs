@@ -92,5 +92,14 @@ namespace Simple.Data.Extensions
         {
             return source.Select(item => Equals(item, toReplace) ? replaceWith : item);
         }
+
+        public static IEnumerable<T> Append<T>(this IEnumerable<T> source, T newItem)
+        {
+            foreach (var item in source)
+            {
+                yield return item;
+            }
+            yield return newItem;
+        }
     }
 }

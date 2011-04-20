@@ -32,6 +32,11 @@ namespace Simple.Data.Mocking
                 .Select(e => e.AttributesToDictionary());
         }
 
+        public override IEnumerable<IDictionary<string, object>> Query(SimpleQuery query)
+        {
+            throw new NotImplementedException();
+        }
+
         public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
         {
             var tableElement = GetTableElement(tableName);

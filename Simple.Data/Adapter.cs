@@ -57,6 +57,8 @@ namespace Simple.Data
         ///  </summary><param name="tableName">Name of the table.</param><param name="criteria">The criteria. This may be <c>null</c>, in which case all records should be returned.</param><returns>The list of records matching the criteria. If no records are found, return an empty list.</returns>
         public abstract IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria);
 
+        public abstract IEnumerable<IDictionary<string, object>> Query(SimpleQuery query);
+
         /// <summary>
         ///  Inserts a record into the specified "table".
         ///  </summary><param name="tableName">Name of the table.</param><param name="data">The values to insert.</param><returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
