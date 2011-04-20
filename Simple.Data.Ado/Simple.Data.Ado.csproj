@@ -79,6 +79,7 @@
     <Compile Include="IConnectionProvider.cs" />
     <Compile Include="ICustomInserter.cs" />
     <Compile Include="IExpressionFormatter.cs" />
+    <Compile Include="IQueryPager.cs" />
     <Compile Include="ISchemaGetter.cs" />
     <Compile Include="Joiner.cs" />
     <Compile Include="JoinType.cs" />
@@ -94,6 +95,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="ProviderHelper.cs" />
+    <Compile Include="QueryBuilder.cs" />
     <Compile Include="SchemaResolutionException.cs" />
     <Compile Include="Schema\AmbiguousObjectNameException.cs" />
     <Compile Include="Schema\Column.cs" />

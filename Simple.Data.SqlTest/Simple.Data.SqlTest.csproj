@@ -75,6 +75,7 @@
     <Compile Include="FindTests.cs" />
     <Compile Include="OrderDetailTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SqlQueryPagerTest.cs" />
     <Compile Include="TestTraceListener.cs" />
     <Compile Include="TransactionTests.cs" />
     <Compile Include="UpdateTests.cs" />

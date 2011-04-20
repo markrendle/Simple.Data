@@ -90,7 +90,8 @@ namespace Simple.Data.Ado
 
         public override IEnumerable<IDictionary<string, object>> Query(SimpleQuery query)
         {
-            return new AdoAdapterQueryRunner(this).Run(query);
+            throw new NotImplementedException();
+//            return new QueryBuilder(this).Build(query);
         }
 
         public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
@@ -268,21 +269,6 @@ namespace Simple.Data.Ado
         public ISchemaProvider SchemaProvider
         {
             get { return _connectionProvider.GetSchemaProvider(); }
-        }
-    }
-
-    public class AdoAdapterQueryRunner
-    {
-        private readonly AdoAdapter _adoAdapter;
-
-        public AdoAdapterQueryRunner(AdoAdapter adoAdapter)
-        {
-            _adoAdapter = adoAdapter;
-        }
-
-        public IEnumerable<IDictionary<string, object>> Run(SimpleQuery query)
-        {
-            throw new NotImplementedException();
         }
     }
 }

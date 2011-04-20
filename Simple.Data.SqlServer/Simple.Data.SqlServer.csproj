@@ -51,6 +51,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SqlConnectionProvider.cs" />
+    <Compile Include="SqlQueryPager.cs" />
     <Compile Include="SqlSchemaProvider.cs" />
     <Compile Include="SqlTypeResolver.cs" />
   </ItemGroup>
