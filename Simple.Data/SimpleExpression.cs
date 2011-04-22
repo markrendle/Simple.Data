@@ -69,16 +69,16 @@ namespace Simple.Data
             {
                 return expression.GetValues();
             }
-            var range = operand as IRange;
-            if (range != null)
-            {
-                return range.AsEnumerable();
-            }
-            var list = operand as IEnumerable;
-            if (list != null)
-            {
-                return list.Cast<object>();
-            }
+            //var range = operand as IRange;
+            //if (range != null)
+            //{
+            //    return range.AsEnumerable();
+            //}
+            //var list = operand as IEnumerable;
+            //if (list != null)
+            //{
+            //    return list.Cast<object>();
+            //}
             var function = operand as SimpleFunction;
             if (function != null)
             {

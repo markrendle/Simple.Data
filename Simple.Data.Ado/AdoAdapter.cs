@@ -88,10 +88,12 @@ namespace Simple.Data.Ado
             return _finder.Find(tableName, criteria);
         }
 
-        public override IEnumerable<IDictionary<string, object>> Query(SimpleQuery query)
+        public override IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query)
         {
-            throw new NotImplementedException();
-//            return new QueryBuilder(this).Build(query);
+            var connection = _connectionProvider.CreateConnection();
+            return new QueryBuilder(this).Build(query)
+                .GetCommand(connection)
+                .ToBufferedEnumerable(connection);
         }
 
         public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)

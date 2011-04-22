@@ -12,7 +12,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void WhereShouldSetCriteria()
         {
-            var query = new SimpleQuery("foo");
+            var query = new SimpleQuery(null, "foo");
             var criteria = new SimpleExpression(1, 1, SimpleExpressionType.Equal);
             query = query.Where(criteria);
             Assert.AreSame(criteria, query.Criteria);
@@ -21,7 +21,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void SkipShouldSetSkipCount()
         {
-            var query = new SimpleQuery("foo");
+            var query = new SimpleQuery(null, "foo");
             query = query.Skip(42);
             Assert.AreEqual(42, query.SkipCount);
         }
@@ -29,7 +29,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void TakeShouldSetTakeCount()
         {
-            var query = new SimpleQuery("foo");
+            var query = new SimpleQuery(null, "foo");
             query = query.Take(42);
             Assert.AreEqual(42, query.TakeCount);
         }
@@ -37,7 +37,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void OrderByShouldSetOrderAscending()
         {
-            var query = new SimpleQuery("foo");
+            var query = new SimpleQuery(null, "foo");
             query = query.OrderBy(new DynamicReference("bar"));
             Assert.AreEqual("bar", query.Order.Single().Reference.GetName());
             Assert.AreEqual(OrderByDirection.Ascending, query.Order.Single().Direction);
@@ -46,7 +46,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void ThenByShouldModifyOrderAscending()
         {
-            var query = new SimpleQuery("foo");
+            var query = new SimpleQuery(null, "foo");
             query = query.OrderBy(new DynamicReference("bar")).ThenBy(new DynamicReference("quux"));
             var actual = query.Order.ToArray();
             Assert.AreEqual(2, actual.Length);
@@ -59,7 +59,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void OrderByDescendingShouldSetOrderDescending()
         {
-            var query = new SimpleQuery("foo");
+            var query = new SimpleQuery(null, "foo");
             query = query.OrderByDescending(new DynamicReference("bar"));
             Assert.AreEqual("bar", query.Order.Single().Reference.GetName());
             Assert.AreEqual(OrderByDirection.Descending, query.Order.Single().Direction);
@@ -68,7 +68,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void ThenByDescendingShouldModifyOrderAscending()
         {
-            var query = new SimpleQuery("foo");
+            var query = new SimpleQuery(null, "foo");
             query = query.OrderBy(new DynamicReference("bar")).ThenByDescending(new DynamicReference("quux"));
             var actual = query.Order.ToArray();
             Assert.AreEqual(2, actual.Length);
@@ -82,14 +82,14 @@ namespace Simple.Data.UnitTest
         [ExpectedException(typeof(InvalidOperationException))]
         public void ThenByWithoutOrderByShouldThrow()
         {
-            new SimpleQuery("foo").ThenBy(new DynamicReference("bar"));
+            new SimpleQuery(null, "foo").ThenBy(new DynamicReference("bar"));
         }
 
         [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void ThenByDescendingWithoutOrderByShouldThrow()
         {
-            new SimpleQuery("foo").ThenByDescending(new DynamicReference("bar"));
+            new SimpleQuery(null, "foo").ThenByDescending(new DynamicReference("bar"));
         }
     }
 }

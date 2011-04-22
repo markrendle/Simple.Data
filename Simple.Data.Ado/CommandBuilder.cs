@@ -38,8 +38,22 @@ namespace Simple.Data.Ado
             return parameterTemplate;
         }
 
+        public ParameterTemplate AddParameter(string name, DbType dbType, object value)
+        {
+            name = _schemaProvider.NameParameter(name);
+            var parameterTemplate = new ParameterTemplate(name, dbType, 0);
+            _parameters.Add(parameterTemplate, value);
+            return parameterTemplate;
+        }
+
         public void Append(string text)
         {
+            _text.Append(text);
+        }
+
+        public void SetText(string text)
+        {
+            _text.Clear();
             _text.Append(text);
         }
 
@@ -98,8 +112,8 @@ namespace Simple.Data.Ado
             var range = value as IRange;
             if (range != null)
             {
-                yield return CreateSingleParameter(value, command, template.Name + "_start", template.DbType);
-                yield return CreateSingleParameter(value, command, template.Name + "_end", template.DbType);
+                yield return CreateSingleParameter(range.Start, command, template.Name + "_start", template.DbType);
+                yield return CreateSingleParameter(range.End, command, template.Name + "_end", template.DbType);
                 SetBetweenInCommandText(command, template.Name);
             }
             else
@@ -112,7 +126,7 @@ namespace Simple.Data.Ado
                     for (int i = 0; i < array.Length; i++)
                     {
                         builder.AppendFormat(",{0}_{1}", template.Name, i);
-                        yield return CreateSingleParameter(value, command, template.Name + "_" + i, template.DbType);
+                        yield return CreateSingleParameter(array[i], command, template.Name + "_" + i, template.DbType);
                     }
                     if (command.CommandText.Contains("!= " + template.Name))
                     {

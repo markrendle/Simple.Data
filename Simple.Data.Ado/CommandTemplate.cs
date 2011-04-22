@@ -34,7 +34,6 @@ namespace Simple.Data.Ado
             {
                 command.Parameters.Add(parameter);
             }
-
             return command;
         }
 

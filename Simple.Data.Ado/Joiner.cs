@@ -82,7 +82,7 @@ namespace Simple.Data.Ado
         {
             return GetReferencesFromExpression(expression)
                 .SelectMany(r => DynamicReferenceToTuplePairs(r, schema))
-                .Select((table1, table2) => Tuple.Create(new ObjectName(schema, table1), new ObjectName(schema, table2)))
+                .TupleSelect((table1, table2) => Tuple.Create(new ObjectName(schema, table1), new ObjectName(schema, table2)))
                 .Distinct();
         }
 

@@ -1,21 +1,28 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using Simple.Data.Extensions;
 
 namespace Simple.Data
 {
-    public class SimpleQuery
+    public class SimpleQuery : DynamicObject, IEnumerable
     {
+        private readonly Adapter _adapter;
         private readonly string _tableName;
         private readonly SimpleExpression _criteria;
         private readonly IEnumerable<SimpleOrderByItem> _order;
         private readonly int? _skipCount;
         private readonly int? _takeCount;
 
-        public SimpleQuery(string tableName)
+        private readonly object _sync = new object();
+        private IEnumerable<dynamic> _records;
+
+        public SimpleQuery(Adapter adapter, string tableName)
         {
+            _adapter = adapter;
             _tableName = tableName;
         }
 
@@ -26,6 +33,7 @@ namespace Simple.Data
             int? skipCount = null,
             int? takeCount = null)
         {
+            _adapter = source._adapter;
             _tableName = tableName ?? source.TableName;
             _criteria = criteria ?? source.Criteria;
             _order = order ?? source.Order;
@@ -101,6 +109,22 @@ namespace Simple.Data
         public SimpleQuery Take(int take)
         {
             return new SimpleQuery(this, takeCount: take);
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            if (_records == null)
+            {
+                lock (_sync)
+                {
+                    if (_records == null)
+                    {
+                        _records = _adapter.RunQuery(this).Select(d => new SimpleRecord(d, _tableName));
+                    }
+                }
+            }
+
+            return _records.GetEnumerator();
         }
     }
 }

@@ -71,6 +71,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="QueryTest.cs" />
     <Compile Include="SchemaTests\DatabaseSchemaTests.cs" />
     <Compile Include="FindTests.cs" />
     <Compile Include="OrderDetailTests.cs" />

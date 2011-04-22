@@ -32,7 +32,7 @@ namespace Simple.Data.Mocking
                 .Select(e => e.AttributesToDictionary());
         }
 
-        public override IEnumerable<IDictionary<string, object>> Query(SimpleQuery query)
+        public override IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query)
         {
             throw new NotImplementedException();
         }
