@@ -13,7 +13,7 @@ namespace Simple.Data.SqlTest
         public void ShouldSelectFromOneToTen()
         {
             var db = DatabaseHelper.Open();
-            var query = db.PagingTest.QueryById(1.to(100)).Skip(0).Take(10);
+            var query = db.PagingTest.QueryById(1.to(100)).Take(10);
             int index = 1;
             foreach (var row in query)
             {

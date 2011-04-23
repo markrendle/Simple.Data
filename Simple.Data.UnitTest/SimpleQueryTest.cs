@@ -44,6 +44,26 @@ namespace Simple.Data.UnitTest
         }
 
         [Test]
+        public void OrderByBarShouldSetOrderAscending()
+        {
+            dynamic query = new SimpleQuery(null, "foo");
+            SimpleQuery actual = query.OrderByBar();
+            Assert.AreEqual("bar", actual.Order.Single().Reference.GetName().ToLowerInvariant());
+            Assert.AreEqual(OrderByDirection.Ascending, actual.Order.Single().Direction);
+        }
+
+        [Test]
+        public void OrderByBarThenByQuuxShouldSetOrderAscending()
+        {
+            dynamic query = new SimpleQuery(null, "foo");
+            SimpleQuery actual = query.OrderByBar().ThenByQuux();
+            Assert.AreEqual("bar", actual.Order.First().Reference.GetName().ToLowerInvariant());
+            Assert.AreEqual("quux", actual.Order.Skip(1).First().Reference.GetName().ToLowerInvariant());
+            Assert.AreEqual(OrderByDirection.Ascending, actual.Order.First().Direction);
+            Assert.AreEqual(OrderByDirection.Ascending, actual.Order.Skip(1).First().Direction);
+        }
+        
+        [Test]
         public void ThenByShouldModifyOrderAscending()
         {
             var query = new SimpleQuery(null, "foo");
@@ -63,6 +83,15 @@ namespace Simple.Data.UnitTest
             query = query.OrderByDescending(new DynamicReference("bar"));
             Assert.AreEqual("bar", query.Order.Single().Reference.GetName());
             Assert.AreEqual(OrderByDirection.Descending, query.Order.Single().Direction);
+        }
+
+        [Test]
+        public void OrderByBarDescendingShouldSetOrderDescending()
+        {
+            dynamic query = new SimpleQuery(null, "foo");
+            SimpleQuery actual = query.OrderByBarDescending();
+            Assert.AreEqual("bar", actual.Order.Single().Reference.GetName().ToLowerInvariant());
+            Assert.AreEqual(OrderByDirection.Descending, actual.Order.Single().Direction);
         }
 
         [Test]

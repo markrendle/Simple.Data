@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Simple.Data.Extensions;
 
 namespace Simple.Data
@@ -125,6 +126,43 @@ namespace Simple.Data
             }
 
             return _records.GetEnumerator();
+        }
+
+        public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
+        {
+            if (binder.Name.StartsWith("order", StringComparison.OrdinalIgnoreCase))
+            {
+                result = ParseOrderBy(binder.Name);
+                return true;
+            }
+            if (binder.Name.StartsWith("then", StringComparison.OrdinalIgnoreCase))
+            {
+                result = ParseThenBy(binder.Name);
+                return true;
+            }
+            return base.TryInvokeMember(binder, args, out result);
+        }
+
+        private SimpleQuery ParseOrderBy(string methodName)
+        {
+            methodName = Regex.Replace(methodName, "^order_?by_?", "", RegexOptions.IgnoreCase);
+            if (methodName.EndsWith("descending", StringComparison.OrdinalIgnoreCase))
+            {
+                methodName = Regex.Replace(methodName, "_?descending$", "", RegexOptions.IgnoreCase);
+                return OrderByDescending(DynamicReference.FromString(_tableName + "." + methodName));
+            }
+            return OrderBy(DynamicReference.FromString(_tableName + "." + methodName));
+        }
+
+        private SimpleQuery ParseThenBy(string methodName)
+        {
+            methodName = Regex.Replace(methodName, "^then_?by_?", "", RegexOptions.IgnoreCase);
+            if (methodName.EndsWith("descending", StringComparison.OrdinalIgnoreCase))
+            {
+                methodName = Regex.Replace(methodName, "_?descending$", "", RegexOptions.IgnoreCase);
+                return ThenByDescending(DynamicReference.FromString(_tableName + "." + methodName));
+            }
+            return ThenBy(DynamicReference.FromString(_tableName + "." + methodName));
         }
     }
 }
