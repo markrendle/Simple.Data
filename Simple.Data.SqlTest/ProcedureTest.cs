@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+﻿using System.Diagnostics;
 using NUnit.Framework;
 
 namespace Simple.Data.SqlTest
@@ -67,6 +63,14 @@ namespace Simple.Data.SqlTest
             var order = results.FirstOrDefault();
             Assert.IsNotNull(order);
             Assert.AreEqual(1, order.OrderId);
+        }
+
+        [Test]
+        public void ScalarFunctionIsCalledCorrectly()
+        {
+            var db = DatabaseHelper.Open();
+            var results = db.VarcharAndReturnInt("The answer to everything");
+            Assert.AreEqual(42, results.ReturnValue);
         }
     }
 }
