@@ -1,30 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using NUnit.Framework;
 
 namespace Simple.Data.SqlTest
 {
-    internal static class DatabaseHelper
+    [SetUpFixture]
+    public class SetupFixture
     {
-        public static dynamic Open()
-        {
-            return Database.Opener.OpenConnection(Properties.Settings.Default.ConnectionString);
-        }
-
-        public static void Reset()
+        [SetUp]
+        public void CreateStoredProcedures()
         {
             using (var cn = new SqlConnection(Properties.Settings.Default.ConnectionString))
             {
                 cn.Open();
                 using (var cmd = cn.CreateCommand())
                 {
-                    cmd.CommandText = "TestReset";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.ExecuteNonQuery();
+                    foreach (var sql in Regex.Split(Properties.Resources.DatabaseReset, @"^\s*GO\s*$", RegexOptions.Multiline))
+                    {
+                        cmd.CommandText = sql;
+                        cmd.ExecuteNonQuery();
+                    }
                 }
             }
         }
