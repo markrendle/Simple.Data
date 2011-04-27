@@ -16,6 +16,7 @@ namespace Simple.Data.Commands
                                                                   new UpdateCommand(),
                                                                   new InsertCommand(),
                                                                   new DeleteByCommand(),
+                                                                  new DeleteAllCommand(),
                                                                   new QueryByCommand(),
                                                               };
 
