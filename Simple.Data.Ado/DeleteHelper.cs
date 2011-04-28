@@ -25,8 +25,9 @@ namespace Simple.Data.Ado
 
             if (criteria != null)
             {
-                _commandBuilder.Append(" where ");
-                _commandBuilder.Append(_expressionFormatter.Format(criteria));
+                var whereCondition = _expressionFormatter.Format(criteria);
+                if (!string.IsNullOrEmpty(whereCondition))
+                    _commandBuilder.Append(" where " + whereCondition);
             }
 
             return _commandBuilder;

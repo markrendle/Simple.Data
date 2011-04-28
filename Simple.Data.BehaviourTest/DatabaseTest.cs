@@ -1,297 +1,269 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
+﻿using System.Dynamic;
 using NUnit.Framework;
-using Simple.Data.Ado;
-using Simple.Data.Mocking;
 using Simple.Data.Mocking.Ado;
 
 namespace Simple.Data.IntegrationTest
 {
     [TestFixture]
-    public class DatabaseTest
+    public class DatabaseTest : DatabaseIntegrationContext
     {
-        static Database CreateDatabase(MockDatabase mockDatabase)
+        private dynamic _db;
+
+        protected override void SetSchema(MockSchemaProvider schemaProvider)
         {
-            var mockSchemaProvider = new MockSchemaProvider();
-            mockSchemaProvider.SetTables(new[] { "dbo", "Users", "BASE TABLE" });
-            mockSchemaProvider.SetColumns(new object[] { "dbo", "Users", "Id", true },
+            schemaProvider.SetTables(new[] { "dbo", "Users", "BASE TABLE" });
+            schemaProvider.SetColumns(new object[] { "dbo", "Users", "Id", true },
                                             new[] { "dbo", "Users", "Name" },
                                             new[] { "dbo", "Users", "Password" },
                                             new[] { "dbo", "Users", "Age" });
-            mockSchemaProvider.SetPrimaryKeys(new object[] { "dbo", "Users", "Id", 0 });
-            var adapter =
-                MockHelper.CreateMockAdoAdapter(new MockConnectionProvider(new MockDbConnection(mockDatabase),
-                                                                           mockSchemaProvider));
-            MockHelper.UseMockAdapter(adapter);
-            return Database.Open();
-            //            return new Database(new AdoAdapter(new MockConnectionProvider(new MockDbConnection(mockDatabase), mockSchemaProvider)));
+            schemaProvider.SetPrimaryKeys(new object[] { "dbo", "Users", "Id", 0 });
+        }
+
+        [SetUp]
+        public void Setup()
+        {
+            _db = GetOpenDataBase();
         }
 
         [Test]
         public void TestFindEqualWithInt32()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            database.Users.Find(database.Users.Id == 1);
-            Assert.AreEqual("select [dbo].[users].* from [dbo].[users] where [dbo].[users].[id] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual(1, mockDatabase.Parameters[0]);
+            _db.Users.Find(_db.Users.Id == 1);
+            GeneratedSqlIs("select [dbo].[users].* from [dbo].[users] where [dbo].[users].[id] = @p1");
+            Parameter(0).Is(1);
         }
 
         [Test]
         public void TestFindNotEqualWithInt32()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            database.Users.Find(database.Users.Id != 1);
-            Assert.AreEqual("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] != @p1".ToLowerInvariant().ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual(1, mockDatabase.Parameters[0]);
+            _db.Users.Find(_db.Users.Id != 1);
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] != @p1");
+            Parameter(0).Is(1);
         }
 
         [Test]
         public void TestFindGreaterThanWithInt32()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            database.Users.Find(database.Users.Id > 1);
-            Assert.AreEqual("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] > @p1".ToLowerInvariant().ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual(1, mockDatabase.Parameters[0]);
+            _db.Users.Find(_db.Users.Id > 1);
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] > @p1");
+            Parameter(0).Is(1);
         }
 
         [Test]
         public void TestFindGreaterThanOrEqualWithInt32()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            database.Users.Find(database.Users.Id >= 1);
-            Assert.AreEqual("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] >= @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual(1, mockDatabase.Parameters[0]);
+            _db.Users.Find(_db.Users.Id >= 1);
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] >= @p1");
+            Parameter(0).Is(1);
         }
 
         [Test]
         public void TestFindLessThanWithInt32()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            database.Users.Find(database.Users.Id < 1);
-            Assert.AreEqual("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] < @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual(1, mockDatabase.Parameters[0]);
+            _db.Users.Find(_db.Users.Id < 1);
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] < @p1");
+            Parameter(0).Is(1);
         }
 
         [Test]
         public void TestFindLessThanOrEqualWithInt32()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            database.Users.Find(database.Users.Id <= 1);
-            Assert.AreEqual("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] <= @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual(1, mockDatabase.Parameters[0]);
+            _db.Users.Find(_db.Users.Id <= 1);
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] <= @p1");
+            Parameter(0).Is(1);
         }
 
         [Test]
         public void TestFindByDynamicSingleColumn()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            database.Users.FindByName("Foo");
-            Assert.AreEqual("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[name] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual("Foo", mockDatabase.Parameters[0]);
+            _db.Users.FindByName("Foo");
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[name] = @p1");
+            Parameter(0).Is("Foo");
         }
 
         [Test]
         public void TestFindWithLike()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            database.Users.Find(database.Users.Name.Like("Foo"));
-            Assert.AreEqual("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[name] like @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual("Foo", mockDatabase.Parameters[0]);
+            _db.Users.Find(_db.Users.Name.Like("Foo"));
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[name] like @p1");
+            Parameter(0).Is("Foo");
         }
 
         [Test]
         public void TestFindAllWithLike()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            database.Users.FindAll(database.Users.Name.Like("Foo")).ToList();
-            Assert.AreEqual("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[name] like @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual("Foo", mockDatabase.Parameters[0]);
+            _db.Users.FindAll(_db.Users.Name.Like("Foo")).ToList();
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[name] like @p1");
+            Parameter(0).Is("Foo");
         }
 
         [Test]
         public void TestFindByDynamicTwoColumns()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            database.Users.FindByNameAndPassword("Foo", "secret");
-            Assert.AreEqual("select [dbo].[Users].* from [dbo].[Users] where ([dbo].[Users].[name] = @p1 and [dbo].[Users].[password] = @p2)".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual("Foo", mockDatabase.Parameters[0]);
-            Assert.AreEqual("secret", mockDatabase.Parameters[1]);
+            _db.Users.FindByNameAndPassword("Foo", "secret");
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where ([dbo].[Users].[name] = @p1 and [dbo].[Users].[password] = @p2)");
+            Parameter(0).Is("Foo");
+            Parameter(1).Is("secret");
         }
 
         [Test]
-        [Ignore]
         public void TestFindAllByDynamic()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            database.Users.FindAllByName("Foo");
-            Assert.AreEqual("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[name] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual("Foo", mockDatabase.Parameters[0]);
+            _db.Users.FindAllByName("Foo");
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[name] = @p1");
+            Parameter(0).Is("Foo");
         }
 
         [Test]
         public void TestInsertWithNamedArguments()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            database.Users.Insert(Name: "Steve", Age: 50);
-            Assert.AreEqual("insert into [dbo].[Users] ([Name],[Age]) values (@p0,@p1)".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
-            Assert.AreEqual(50, mockDatabase.Parameters[1]);
+            _db.Users.Insert(Name: "Steve", Age: 50);
+            GeneratedSqlIs("insert into [dbo].[Users] ([Name],[Age]) values (@p0,@p1)");
+            Parameter(0).Is("Steve");
+            Parameter(1).Is(50);
         }
 
         [Test]
         public void TestInsertWithStaticTypeObject()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
             var user = new User { Name = "Steve", Age = 50 };
-            database.Users.Insert(user);
-            Assert.AreEqual("insert into [dbo].[Users] ([Name],[Password],[Age]) values (@p0,@p1,@p2)".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
-            Assert.AreEqual(null, mockDatabase.Parameters[1]);
-            Assert.AreEqual(50, mockDatabase.Parameters[2]);
+            _db.Users.Insert(user);
+            GeneratedSqlIs("insert into [dbo].[Users] ([Name],[Password],[Age]) values (@p0,@p1,@p2)");
+            Parameter(0).Is("Steve");
+            Parameter(1).Is(null);
+            Parameter(2).Is(50);
         }
 
         [Test]
         public void TestUpdateWithNamedArguments()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            database.Users.UpdateById(Id: 1, Name: "Steve", Age: 50);
-            Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
-            Assert.AreEqual(50, mockDatabase.Parameters[1]);
-            Assert.AreEqual(1, mockDatabase.Parameters[2]);
+            _db.Users.UpdateById(Id: 1, Name: "Steve", Age: 50);
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
+            Parameter(0).Is("Steve");
+            Parameter(1).Is(50);
+            Parameter(2).Is(1);
         }
 
         [Test]
         public void TestUpdateWithDynamicObject()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
             dynamic record = new SimpleRecord();
             record.Id = 1;
             record.Name = "Steve";
             record.Age = 50;
-            database.Users.Update(record);
-            Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
-            Assert.AreEqual(50, mockDatabase.Parameters[1]);
-            Assert.AreEqual(1, mockDatabase.Parameters[2]);
+            _db.Users.Update(record);
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
+            Parameter(0).Is("Steve");
+            Parameter(1).Is(50);
+            Parameter(2).Is(1);
         }
 
         [Test]
         public void TestUpdateByWithDynamicObject()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
             dynamic record = new SimpleRecord();
             record.Id = 1;
             record.Name = "Steve";
             record.Age = 50;
-            database.Users.UpdateById(record);
-            Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
-            Assert.AreEqual(50, mockDatabase.Parameters[1]);
-            Assert.AreEqual(1, mockDatabase.Parameters[2]);
+            _db.Users.UpdateById(record);
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
+            Parameter(0).Is("Steve");
+            Parameter(1).Is(50);
+            Parameter(2).Is(1);
         }
 
         [Test]
         public void TestUpdateWithStaticObject()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
             var user = new User
                            {
                                Id = 1,
                                Name = "Steve",
                                Age = 50
                            };
-            database.Users.Update(user);
-            Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
-            Assert.AreEqual(DBNull.Value, mockDatabase.Parameters[1]);
-            Assert.AreEqual(50, mockDatabase.Parameters[2]);
-            Assert.AreEqual(1, mockDatabase.Parameters[3]);
+            _db.Users.Update(user);
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4");
+            Parameter(0).Is("Steve");
+            Parameter(1).IsDBNull();
+            Parameter(2).Is(50);
+            Parameter(3).Is(1);
         }
 
         [Test]
         public void TestUpdateByWithStaticObject()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
             var user = new User
                            {
                                Id = 1,
                                Name = "Steve",
                                Age = 50
                            };
-            database.Users.UpdateById(user);
-            Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
-            Assert.AreEqual(DBNull.Value, mockDatabase.Parameters[1]);
-            Assert.AreEqual(50, mockDatabase.Parameters[2]);
-            Assert.AreEqual(1, mockDatabase.Parameters[3]);
+            _db.Users.UpdateById(user);
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4");
+            Parameter(0).Is("Steve");
+            Parameter(1).IsDBNull();
+            Parameter(2).Is(50);
+            Parameter(3).Is(1);
         }
 
         [Test]
         public void TestThatUpdateUsesDbNullForNullValues()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            database.Users.UpdateById(Id: 1, Name: null);
-            Assert.AreEqual("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Id] = @p2".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual(DBNull.Value, mockDatabase.Parameters[0]);
+            _db.Users.UpdateById(Id: 1, Name: null);
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Id] = @p2");
+            Parameter(0).IsDBNull();
         }
 
         [Test]
         public void TestDeleteWithNamedArguments()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            database.Users.Delete(Id: 1);
-            Assert.AreEqual("delete from [dbo].[Users] where [dbo].[Users].[Id] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual(1, mockDatabase.Parameters[0]);
+            _db.Users.Delete(Id: 1);
+            GeneratedSqlIs("delete from [dbo].[Users] where [dbo].[Users].[Id] = @p1");
+            Parameter(0).Is(1);
         }
 
         [Test]
         public void TestDeleteBy()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            database.Users.DeleteById(1);
-            Assert.AreEqual("delete from [dbo].[Users] where [dbo].[Users].[Id] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual(1, mockDatabase.Parameters[0]);
+            _db.Users.DeleteById(1);
+            GeneratedSqlIs("delete from [dbo].[Users] where [dbo].[Users].[Id] = @p1");
+            Parameter(0).Is(1);
+        }
+
+        [Test]
+        public void TestDeleteAllWithNoCriteria()
+        {
+            _db.Users.DeleteAll();
+            GeneratedSqlIs("delete from [dbo].[Users]");
+        }
+
+        [Test]
+        public void TestDeleteAllWithSimpleCriteria()
+        {
+            _db.Users.DeleteAll(_db.Users.Age > 42);
+            GeneratedSqlIs("delete from [dbo].[Users] where [dbo].[Users].[Age] > @p1");
+            Parameter(0).Is(42);
+        }
+
+        [Test]
+        public void TestDeleteAllMoreComplexCriteria()
+        {
+            _db.Users.DeleteAll(_db.Users.Age > 42 && _db.Users.Name.Like("J%"));
+            GeneratedSqlIs("delete from [dbo].[Users] where ([dbo].[Users].[Age] > @p1 AND [dbo].[Users].[Name] LIKE @p2)");
+            Parameter(0).Is(42);
+            Parameter(1).Is("J%");
         }
 
         [Test]
         public void TestInsertOnTable()
         {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
             dynamic person = new ExpandoObject();
             person.Name = "Phil";
             person.Age = 42;
-            database.Users.Insert(person);
-            Assert.AreEqual("insert into [dbo].[Users] ([Name],[Age]) values (@p0,@p1)".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual("Phil", mockDatabase.Parameters[0]);
-            Assert.AreEqual(42, mockDatabase.Parameters[1]);
+            _db.Users.Insert(person);
+            GeneratedSqlIs("insert into [dbo].[Users] ([Name],[Age]) values (@p0,@p1)");
+            Parameter(0).Is("Phil");
+            Parameter(1).Is(42);
         }
     }
 }

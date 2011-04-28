@@ -57,6 +57,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DatabaseIntegrationContext.cs" />
     <Compile Include="ProcedureTest.cs" />
     <Compile Include="RangeAndArrayFindTest.cs" />
     <Compile Include="TransactionTest.cs" />
