@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.CSharp.RuntimeBinder;
 using Simple.Data.Extensions;
 
 namespace Simple.Data
@@ -112,20 +113,27 @@ namespace Simple.Data
             return new SimpleQuery(this, takeCount: take);
         }
 
-        public IEnumerator GetEnumerator()
+        protected IEnumerable<dynamic> Records
         {
-            if (_records == null)
+            get
             {
-                lock (_sync)
+                if (_records == null)
                 {
-                    if (_records == null)
+                    lock (_sync)
                     {
-                        _records = _adapter.RunQuery(this).Select(d => new SimpleRecord(d, _tableName));
+                        if (_records == null)
+                        {
+                            _records = _adapter.RunQuery(this).Select(d => new SimpleRecord(d, _tableName));
+                        }
                     }
                 }
+                return _records;
             }
+        }
 
-            return _records.GetEnumerator();
+        public IEnumerator GetEnumerator()
+        {
+            return Records.GetEnumerator();
         }
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
@@ -163,6 +171,113 @@ namespace Simple.Data
                 return ThenByDescending(DynamicReference.FromString(_tableName + "." + methodName));
             }
             return ThenBy(DynamicReference.FromString(_tableName + "." + methodName));
+        }
+
+        public IEnumerable<T> Cast<T>()
+        {
+            return Records.Select(item => (T)item);
+        }
+
+        public IEnumerable<T> OfType<T>()
+        {
+            foreach (var item in Records)
+            {
+                bool success = true;
+                T cast;
+                try
+                {
+                    cast = (T)item;
+                }
+                catch (RuntimeBinderException)
+                {
+                    cast = default(T);
+                    success = false;
+                }
+                if (success)
+                {
+                    yield return cast;
+                }
+            }
+        }
+
+        public IList<dynamic> ToList()
+        {
+            return Records.ToList();
+        }
+
+        public dynamic[] ToArray()
+        {
+            return Records.ToArray();
+        }
+
+        public IList<T> ToList<T>()
+        {
+            return Cast<T>().ToList();
+        }
+
+        public T[] ToArray<T>()
+        {
+            return Cast<T>().ToArray();
+        }
+
+        public dynamic First()
+        {
+            return Records.First();
+        }
+
+        public dynamic FirstOrDefault()
+        {
+            return Records.FirstOrDefault();
+        }
+
+        public T First<T>()
+        {
+            return Cast<T>().First();
+        }
+
+        public T FirstOrDefault<T>()
+        {
+            return Cast<T>().FirstOrDefault();
+        }
+
+        public T First<T>(Func<T, bool> predicate)
+        {
+            return Cast<T>().First(predicate);
+        }
+
+        public T FirstOrDefault<T>(Func<T, bool> predicate)
+        {
+            return Cast<T>().FirstOrDefault(predicate);
+        }
+
+        public dynamic Single()
+        {
+            return Records.First();
+        }
+
+        public dynamic SingleOrDefault()
+        {
+            return Records.FirstOrDefault();
+        }
+
+        public T Single<T>()
+        {
+            return Cast<T>().Single();
+        }
+
+        public T SingleOrDefault<T>()
+        {
+            return Cast<T>().SingleOrDefault();
+        }
+
+        public T Single<T>(Func<T, bool> predicate)
+        {
+            return Cast<T>().Single(predicate);
+        }
+
+        public T SingleOrDefault<T>(Func<T, bool> predicate)
+        {
+            return Cast<T>().SingleOrDefault(predicate);
         }
     }
 }

@@ -67,6 +67,7 @@
     <Compile Include="Commands\CommandFactory.cs" />
     <Compile Include="Commands\ExecuteFunctionCommand.cs" />
     <Compile Include="Commands\FindAllCommand.cs" />
+    <Compile Include="Commands\QueryByCommand.cs" />
     <Compile Include="Commands\UpdateCommand.cs" />
     <Compile Include="CommonTypes.cs" />
     <Compile Include="ConcreteCollectionTypeCreator.cs" />
