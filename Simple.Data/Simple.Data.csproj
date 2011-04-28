@@ -82,6 +82,7 @@
     <Compile Include="OrderByDirection.cs" />
     <Compile Include="Range.cs" />
     <Compile Include="Range`1.cs" />
+    <Compile Include="SimpleEmptyExpression.cs" />
     <Compile Include="SimpleFunction.cs" />
     <Compile Include="SimpleList.cs" />
     <Compile Include="SimpleOrderByItem.cs" />

@@ -231,7 +231,14 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
-        public void TestDeleteAll()
+        public void TestDeleteAllWithNoCriteria()
+        {
+            _db.Users.DeleteAll();
+            GeneratedSqlIs("delete from [dbo].[Users]");
+        }
+
+        [Test]
+        public void TestDeleteAllWithSimpleCriteria()
         {
             _db.Users.DeleteAll(_db.Users.Age > 42);
             GeneratedSqlIs("delete from [dbo].[Users] where [dbo].[Users].[Age] > @p1");

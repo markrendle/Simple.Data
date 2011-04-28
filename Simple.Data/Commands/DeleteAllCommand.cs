@@ -14,15 +14,19 @@ namespace Simple.Data.Commands
 
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            if (args.Length == 1 && args[0] is SimpleExpression)
+            var deletedCount = 0;
+
+            if (args.Length == 0)
             {
-                var deletedCount = dataStrategy.Delete(table.GetQualifiedName(), (SimpleExpression)args[0]);
-                var simpleResultSet = new SimpleResultSet(Enumerable.Empty<SimpleRecord>());
-                simpleResultSet.SetOutputValues(new Dictionary<string, object> { { "__ReturnValue", deletedCount } });
-                return simpleResultSet;
+                deletedCount = dataStrategy.Delete(table.GetQualifiedName(), new SimpleEmptyExpression());
             }
 
-            return null;
+            if (args.Length == 1 && args[0] is SimpleExpression)
+            {
+                deletedCount = dataStrategy.Delete(table.GetQualifiedName(), (SimpleExpression)args[0]);
+            }
+
+            return ConstructResultSet(deletedCount);
         }
 
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
@@ -30,14 +34,11 @@ namespace Simple.Data.Commands
             throw new NotImplementedException();
         }
 
-        private static SimpleExpression GetCriteriaExpression(InvokeMemberBinder binder, object[] args, DynamicTable table)
+        private static object ConstructResultSet(int deletedCount)
         {
-            var criteria = binder.Name.Equals("delete", StringComparison.InvariantCultureIgnoreCase) ?
-                                                                                                         binder.NamedArgumentsToDictionary(args)
-                               :
-                                   MethodNameParser.ParseFromBinder(binder, args);
-
-            return ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), criteria);
+            var simpleResultSet = new SimpleResultSet(Enumerable.Empty<SimpleRecord>());
+            simpleResultSet.SetOutputValues(new Dictionary<string, object> { { "__ReturnValue", deletedCount } });
+            return simpleResultSet;
         }
     }
 }
