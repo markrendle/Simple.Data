@@ -32,10 +32,7 @@ namespace Simple.Data.Commands
         {
             if (args.Length == 1 && args[0] is SimpleExpression)
             {
-                var data = dataStrategy.Find(table.GetQualifiedName(), (SimpleExpression)args[0]);
-                return new SimpleResultSet(data != null
-                             ? data.Select(dict => new SimpleRecord(dict, table.GetQualifiedName(), dataStrategy))
-                             : Enumerable.Empty<SimpleRecord>());
+                return new SimpleQuery(dataStrategy.Adapter, table.GetQualifiedName()).Where((SimpleExpression) args[0]);
             }
 
             return null;
