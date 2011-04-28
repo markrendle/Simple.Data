@@ -6,6 +6,7 @@ using NUnit.Framework;
 using System.IO;
 using Simple.Data.Ado;
 using Simple.Data.SqlServer;
+using Simple.Data.TestHelper;
 
 namespace Simple.Data.SqlTest
 {
@@ -26,6 +27,14 @@ namespace Simple.Data.SqlTest
         {
             var provider = new ProviderHelper().GetProviderByConnectionString(Properties.Settings.Default.ConnectionString);
             Assert.IsInstanceOf(typeof(SqlConnectionProvider), provider);
+        }
+
+        [Test]
+        public void TestProviderIsSqlProviderFromOpen()
+        {
+            Database db = DatabaseHelper.Open();
+            Assert.IsInstanceOf(typeof(AdoAdapter), db.GetAdapter());
+            Assert.IsInstanceOf(typeof(SqlConnectionProvider), ((AdoAdapter)db.GetAdapter()).ConnectionProvider);
         }
 
         [Test]

@@ -17,7 +17,7 @@ namespace Simple.Data
 
         internal Adapter Adapter { get { return GetAdapter(); } }
 
-        protected abstract Adapter GetAdapter();
+        protected internal abstract Adapter GetAdapter();
 
         /// <summary>
         /// Provides the implementation for operations that get member values. Classes derived from the <see cref="T:System.Dynamic.DynamicObject"/> class can override this method to specify dynamic behavior for operations such as getting a value for a property.

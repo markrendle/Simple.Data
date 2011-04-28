@@ -132,7 +132,7 @@ namespace Simple.Data
             }
         }
 
-        protected override Adapter GetAdapter()
+        protected internal override Adapter GetAdapter()
         {
             return _adapter as Adapter;
         }
