@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Simple.Data
+﻿namespace Simple.Data
 {
     public enum SimpleExpressionType
     {
@@ -15,6 +10,7 @@ namespace Simple.Data
         GreaterThanOrEqual,
         And,
         Or,
-        Function
+        Function,
+        Empty
     }
 }

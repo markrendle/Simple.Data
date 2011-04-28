@@ -65,6 +65,7 @@
     <Compile Include="BufferedEnumerable`1.cs" />
     <Compile Include="CachingAdapterFactory.cs" />
     <Compile Include="Commands\CommandFactory.cs" />
+    <Compile Include="Commands\DeleteAllCommand.cs" />
     <Compile Include="Commands\ExecuteFunctionCommand.cs" />
     <Compile Include="Commands\FindAllCommand.cs" />
     <Compile Include="Commands\QueryByCommand.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="OrderByDirection.cs" />
     <Compile Include="Range.cs" />
     <Compile Include="Range`1.cs" />
+    <Compile Include="SimpleEmptyExpression.cs" />
     <Compile Include="SimpleFunction.cs" />
     <Compile Include="SimpleList.cs" />
     <Compile Include="SimpleOrderByItem.cs" />

@@ -21,6 +21,7 @@ namespace Simple.Data.Ado
                                             {SimpleExpressionType.GreaterThanOrEqual, expr => BinaryExpressionToWhereClause(expr, ">=")},
                                             {SimpleExpressionType.LessThan, expr => BinaryExpressionToWhereClause(expr, "<")},
                                             {SimpleExpressionType.LessThanOrEqual, expr => BinaryExpressionToWhereClause(expr, "<=")},
+                                            {SimpleExpressionType.Empty, expr => string.Empty },
                                         };
         }
 
