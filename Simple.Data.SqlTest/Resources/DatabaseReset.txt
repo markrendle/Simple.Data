@@ -6,6 +6,8 @@ IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GetCu
 DROP PROCEDURE [dbo].[GetCustomerAndOrders]
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GetCustomerCount]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[GetCustomerCount]
+IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[VwCustomers]'))
+DROP VIEW [dbo].[VwCustomers];
 GO
 
 CREATE PROCEDURE TestReset 
@@ -113,6 +115,14 @@ BEGIN
 	ALTER TABLE [dbo].[OrderItems] WITH NOCHECK
 		ADD CONSTRAINT [FK_OrderItems_Orders] FOREIGN KEY ([OrderId]) REFERENCES [dbo].[Orders] ([OrderId]) ON DELETE NO ACTION ON UPDATE NO ACTION;
 END
+GO
+
+CREATE VIEW [dbo].[VwCustomers]
+    AS
+        SELECT     Name, Address, CustomerId
+        FROM         dbo.Customers
+        WHERE     (Name LIKE '%A%')
+    
 GO
 
 CREATE PROCEDURE [dbo].[GetCustomers]

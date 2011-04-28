@@ -178,7 +178,7 @@ namespace Simple.Data.SqlServer
         {
             var columnSelect =
                 string.Format(
-                    "SELECT name, is_identity, type_name(system_type_id) as type_name, max_length from sys.columns where object_id = object_id('{0}.{1}', 'TABLE') order by column_id",
+                    "SELECT name, is_identity, type_name(system_type_id) as type_name, max_length from sys.columns where object_id = object_id('{0}.{1}', 'TABLE') or object_id = object_id('{0}.{1}', 'VIEW') order by column_id",
                     table.Schema, table.ActualName);
             return SelectToDataTable(columnSelect);
         }
