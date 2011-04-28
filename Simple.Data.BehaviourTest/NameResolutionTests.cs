@@ -61,10 +61,10 @@ namespace Simple.Data.IntegrationTest
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabaseWithPluralNames(mockDatabase);
             string expectedSql =
-                "select * from [dbo].[Customers]".ToLowerInvariant();
+                "select [CustomerId] from [dbo].[Customers]".ToLowerInvariant();
 
             // Act
-            database["Customer"].All();
+            database["Customer"].All().ToList();
 
             // Assert
             Assert.AreEqual(expectedSql, mockDatabase.Sql.ToLowerInvariant());
@@ -77,10 +77,10 @@ namespace Simple.Data.IntegrationTest
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabaseWithShoutyNames(mockDatabase);
             string expectedSql =
-                "select * from [dbo].[CUSTOMER]".ToLowerInvariant();
+                "select [CUSTOMER_ID] from [dbo].[CUSTOMER]".ToLowerInvariant();
 
             // Act
-            database["Customer"].All();
+            database["Customer"].All().ToList();
 
             // Assert
             Assert.AreEqual(expectedSql, mockDatabase.Sql.ToLowerInvariant());
@@ -93,10 +93,10 @@ namespace Simple.Data.IntegrationTest
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabaseWithShoutyNames(mockDatabase);
             string expectedSql =
-                "select * from [dbo].[CUSTOMER]".ToLowerInvariant();
+                "select [CUSTOMER_ID] from [dbo].[CUSTOMER]".ToLowerInvariant();
 
             // Act
-            database["dbo"]["Customer"].All();
+            database["dbo"]["Customer"].All().ToList();
 
             // Assert
             Assert.AreEqual(expectedSql, mockDatabase.Sql.ToLowerInvariant());
@@ -109,10 +109,10 @@ namespace Simple.Data.IntegrationTest
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabaseWithPluralNames(mockDatabase);
             string expectedSql =
-                "select * from [dbo].[Customers]".ToLowerInvariant();
+                "select [CustomerId] from [dbo].[Customers]".ToLowerInvariant();
 
             // Act
-            database["dbo"]["Customer"].All();
+            database["dbo"]["Customer"].All().ToList();
 
             // Assert
             Assert.AreEqual(expectedSql, mockDatabase.Sql.ToLowerInvariant());

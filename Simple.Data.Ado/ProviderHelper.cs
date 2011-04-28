@@ -90,15 +90,15 @@ namespace Simple.Data.Ado
             return (T)_customProviderCache.GetOrAdd(typeof (T), t => GetCustomProviderExport<T>(connectionProvider));
         }
 
-private static T GetCustomProviderExport<T>(IConnectionProvider connectionProvider)
-{
-    using (var assemblyCatalog = new AssemblyCatalog(connectionProvider.GetType().Assembly))
-    {
-        using (var container = new CompositionContainer(assemblyCatalog))
+        private static T GetCustomProviderExport<T>(IConnectionProvider connectionProvider)
         {
-            return container.GetExportedValueOrDefault<T>();
+            using (var assemblyCatalog = new AssemblyCatalog(connectionProvider.GetType().Assembly))
+            {
+                using (var container = new CompositionContainer(assemblyCatalog))
+                {
+                    return container.GetExportedValueOrDefault<T>();
+                }
+            }
         }
-    }
-}
     }
 }

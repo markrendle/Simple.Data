@@ -34,7 +34,7 @@ namespace Simple.Data.Mocking
 
         public override IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query)
         {
-            throw new NotImplementedException();
+            return Find(query.TableName, query.Criteria);
         }
 
         public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)

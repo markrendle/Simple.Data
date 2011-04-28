@@ -46,43 +46,52 @@ namespace Simple.Data.Ado
 
         private static IEnumerable<IDbDataParameter> CreateParameters(IDbCommand command, ParameterTemplate parameterTemplate, object value)
         {
-            var range = value as IRange;
-            if (range != null)
+            var str = value as string;
+            if (str != null)
             {
-                yield return CreateParameter(command, parameterTemplate, range.Start, "_start");
-                yield return CreateParameter(command, parameterTemplate, range.End, "_end");
-                CommandBuilder.SetBetweenInCommandText(command, parameterTemplate.Name);
+                yield return CreateParameter(command, parameterTemplate, value);
             }
             else
             {
-                var list = value as IEnumerable;
-                if (list != null)
+                var range = value as IRange;
+                if (range != null)
                 {
-                    var builder = new StringBuilder();
-                    var array = list.Cast<object>().ToArray();
-                    for (int i = 0; i < array.Length; i++)
-                    {
-                        builder.AppendFormat(",{0}_{1}", parameterTemplate.Name, i);
-                        yield return CreateParameter(command, parameterTemplate, array[i], "_" + i);
-                    }
-                    if (command.CommandText.Contains("!= " + parameterTemplate.Name))
-                    {
-                        command.CommandText = command.CommandText.Replace("!= " + parameterTemplate.Name,
-                                                                          "NOT IN (" + builder.ToString().Substring(1) +
-                                                                          ")");
-                    }
-                    else
-                    {
-                        command.CommandText = command.CommandText.Replace("= " + parameterTemplate.Name,
-                                                                          "IN (" + builder.ToString().Substring(1) + ")");
-                    }
+                    yield return CreateParameter(command, parameterTemplate, range.Start, "_start");
+                    yield return CreateParameter(command, parameterTemplate, range.End, "_end");
+                    CommandBuilder.SetBetweenInCommandText(command, parameterTemplate.Name);
                 }
                 else
                 {
-                    yield return CreateParameter(command, parameterTemplate, value);
+                    var list = value as IEnumerable;
+                    if (list != null)
+                    {
+                        var builder = new StringBuilder();
+                        var array = list.Cast<object>().ToArray();
+                        for (int i = 0; i < array.Length; i++)
+                        {
+                            builder.AppendFormat(",{0}_{1}", parameterTemplate.Name, i);
+                            yield return CreateParameter(command, parameterTemplate, array[i], "_" + i);
+                        }
+                        if (command.CommandText.Contains("!= " + parameterTemplate.Name))
+                        {
+                            command.CommandText = command.CommandText.Replace("!= " + parameterTemplate.Name,
+                                                                              "NOT IN (" +
+                                                                              builder.ToString().Substring(1) +
+                                                                              ")");
+                        }
+                        else
+                        {
+                            command.CommandText = command.CommandText.Replace("= " + parameterTemplate.Name,
+                                                                              "IN (" + builder.ToString().Substring(1) +
+                                                                              ")");
+                        }
+                    }
+                    else
+                    {
+                        yield return CreateParameter(command, parameterTemplate, value);
+                    }
                 }
             }
-            
         }
 
         private static IDbDataParameter CreateParameter(IDbCommand command, ParameterTemplate parameterTemplate, object value, string suffix = "")
