@@ -109,5 +109,13 @@ namespace Simple.Data.SqlTest
             Assert.IsNotNull(dboActual);
             Assert.AreEqual("Pass", dboActual.Description);
         }
+
+        [Test]
+        public void TestFindOnAView()
+        {
+            var db = DatabaseHelper.Open();
+            var u = db.VwCustomers.FindByCustomerId(1);
+            Assert.IsNotNull(u);
+        }
     }
 }
