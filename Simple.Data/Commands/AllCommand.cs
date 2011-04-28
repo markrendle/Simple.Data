@@ -30,8 +30,9 @@ namespace Simple.Data.Commands
         /// <returns></returns>
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            return new SimpleResultSet(dataStrategy.Find(table.GetQualifiedName(), null)
-                .Select(dict => new SimpleRecord(dict, table.GetQualifiedName(), dataStrategy)));
+            return new SimpleQuery(dataStrategy.Adapter, table.GetQualifiedName());
+            //return new SimpleResultSet(dataStrategy.Find(table.GetQualifiedName(), null)
+            //    .Select(dict => new SimpleRecord(dict, table.GetQualifiedName(), dataStrategy)));
         }
 
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)

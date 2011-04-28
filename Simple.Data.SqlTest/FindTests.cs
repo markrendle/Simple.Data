@@ -61,6 +61,14 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void TestAllWithSkipCount()
+        {
+            var db = DatabaseHelper.Open();
+            var count = db.Users.All().Skip(1).ToList().Count;
+            Assert.AreEqual(2, count);
+        }
+
+        [Test]
         public void TestImplicitCast()
         {
             var db = DatabaseHelper.Open();

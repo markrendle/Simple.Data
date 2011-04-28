@@ -41,7 +41,7 @@ namespace Simple.Data.Ado
                 }
 
                 var skipTemplate = commandBuilder.AddParameter("skip", DbType.Int32, query.SkipCount ?? 0);
-                var takeTemplate = commandBuilder.AddParameter("take", DbType.Int32, query.TakeCount ?? int.MaxValue);
+                var takeTemplate = commandBuilder.AddParameter("take", DbType.Int32, query.TakeCount ?? int.MaxValue - (query.SkipCount ?? 0));
                 commandBuilder.SetText(queryPager.ApplyPaging(commandBuilder.Text, skipTemplate.Name, takeTemplate.Name));
             }
 
