@@ -6,6 +6,8 @@ IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GetCu
 DROP PROCEDURE [dbo].[GetCustomerAndOrders]
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GetCustomerCount]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[GetCustomerCount]
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[VarcharAndReturnInt]'))
+DROP FUNCTION [dbo].[VarcharAndReturnInt]
 GO
 
 CREATE PROCEDURE TestReset 
@@ -136,4 +138,12 @@ AS
 BEGIN
     SET NOCOUNT ON;
     RETURN 1
+END
+GO
+CREATE FUNCTION [dbo].[VarcharAndReturnInt] (@AValue varchar(50)) RETURNS INT AS BEGIN
+  IF ISNUMERIC(@AValue) = 1
+  BEGIN
+    RETURN cast (@AValue  as int)
+  END
+  RETURN 42
 END
