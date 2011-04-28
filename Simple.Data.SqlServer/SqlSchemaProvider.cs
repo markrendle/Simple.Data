@@ -103,26 +103,21 @@ namespace Simple.Data.SqlServer
 
         public IEnumerable<Parameter> GetParameters(Procedure storedProcedure)
         {
-            return GetSchema("ProcedureParameters", null, storedProcedure.Schema, storedProcedure.SpecificName)
-                .Select(SchemaRowToProcedureParameter);
-        }
-
-        private static Parameter SchemaRowToProcedureParameter(DataRow row)
-        {
-            return new Parameter(row["parameter_name"].ToString(), SqlTypeResolver.GetClrType(row["data_type"].ToString()),
-                DirectionFromString(row["parameter_mode"].ToString()));
-        }
-
-        private static ParameterDirection DirectionFromString(string mode)
-        {
-            switch (mode)
+            // GetSchema does not return the return value of e.g. a stored proc correctly,
+            // i.e. there isn't sufficient information to correctly set up a stored proc.
+            using (var connection = (SqlConnection)ConnectionProvider.CreateConnection())
             {
-                case "IN":
-                    return ParameterDirection.Input;
-                case "OUT":
-                    return ParameterDirection.Output;
-                default:
-                    return ParameterDirection.InputOutput;
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = storedProcedure.SpecificName;
+
+                    connection.Open();
+                    SqlCommandBuilder.DeriveParameters(command);
+
+                    foreach (SqlParameter p in command.Parameters)
+                        yield return new Parameter(p.ParameterName, SqlTypeResolver.GetClrType(p.DbType.ToString()), p.Direction);
+                }
             }
         }
 

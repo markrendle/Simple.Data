@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using Simple.Data.Extensions;
 using Simple.Data.Ado.Schema;
 using ResultSet = System.Collections.Generic.IEnumerable<System.Collections.Generic.IDictionary<string, object>>;
 
@@ -50,7 +47,8 @@ namespace Simple.Data.Ado
                 try
                 {
                     var result = _executeImpl(command);
-                    suppliedParameters["__ReturnValue"] = command.Parameters.GetValue(SimpleReturnParameterName);
+                    if (command.Parameters.Contains(SimpleReturnParameterName))
+                      suppliedParameters["__ReturnValue"] = command.Parameters.GetValue(SimpleReturnParameterName);
                     RetrieveOutputParameterValues(procedure, command, suppliedParameters);
                     return result;
                 }
@@ -98,10 +96,11 @@ namespace Simple.Data.Ado
 
         private static void SetParameters(Procedure procedure, IDbCommand cmd, IDictionary<string, object> suppliedParameters)
         {
-            AddReturnParameter(cmd);
+            if (procedure.Parameters.Any(p=>p.Direction == ParameterDirection.ReturnValue))
+              AddReturnParameter(cmd);
 
             int i = 0;
-            foreach (var parameter in procedure.Parameters)
+            foreach (var parameter in procedure.Parameters.Where(p=>p.Direction != ParameterDirection.ReturnValue))
             {
                 object value;
                 if (!suppliedParameters.TryGetValue(parameter.Name.Replace("@", ""), out value))
