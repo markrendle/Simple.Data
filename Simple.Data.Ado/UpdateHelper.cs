@@ -23,10 +23,11 @@ namespace Simple.Data.Ado
         {
             _commandBuilder.Append(GetUpdateClause(tableName, data));
 
-            if (criteria != null)
+            if (criteria != null )
             {
-                _commandBuilder.Append(" where ");
-                _commandBuilder.Append(_expressionFormatter.Format(criteria));
+                var whereStatement = _expressionFormatter.Format(criteria);
+                if (!string.IsNullOrEmpty(whereStatement))
+                  _commandBuilder.Append(" where " + whereStatement);
             }
 
             return _commandBuilder;

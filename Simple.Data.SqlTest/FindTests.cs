@@ -46,6 +46,22 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void TestFindByIdWithCast()
+        {
+            var db = DatabaseHelper.Open();
+            var user = (User)db.Users.FindById(1);
+            Assert.AreEqual(1, user.Id);
+        }
+
+        [Test]
+        public void TestFindByReturnsOne()
+        {
+            var db = DatabaseHelper.Open();
+            var user = (User)db.Users.FindByName("Bob");
+            Assert.AreEqual(1, user.Id);
+        }
+
+        [Test]
         public void TestFindAllByName()
         {
             var db = DatabaseHelper.Open();
