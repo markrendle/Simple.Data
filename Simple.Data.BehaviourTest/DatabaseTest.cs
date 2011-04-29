@@ -90,6 +90,15 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestFindByDynamicTwoColumns()
+        {
+            _db.Users.FindByNameAndPassword("Foo", "secret");
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where ([dbo].[Users].[name] = @p1 and [dbo].[Users].[password] = @p2)");
+            Parameter(0).Is("Foo");
+            Parameter(1).Is("secret");
+        }
+
+        [Test]
         public void TestFindAllByDynamic()
         {
             _db.Users.FindAllByName("Foo").ToList();
