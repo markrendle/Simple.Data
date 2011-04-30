@@ -77,6 +77,8 @@
     <Compile Include="NorthwindTests.cs" />
     <Compile Include="OrderDetailTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryTest.cs" />
+    <Compile Include="SqlCe40QueryPagerTest.cs" />
     <Compile Include="SchemaTests\DatabaseSchemaTests.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>
