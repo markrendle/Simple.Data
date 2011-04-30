@@ -7,8 +7,6 @@ namespace Simple.Data.IntegrationTest
     [TestFixture]
     public class DatabaseTest : DatabaseIntegrationContext
     {
-        private dynamic _db;
-
         protected override void SetSchema(MockSchemaProvider schemaProvider)
         {
             schemaProvider.SetTables(new[] { "dbo", "Users", "BASE TABLE" });
@@ -17,12 +15,6 @@ namespace Simple.Data.IntegrationTest
                                             new[] { "dbo", "Users", "Password" },
                                             new[] { "dbo", "Users", "Age" });
             schemaProvider.SetPrimaryKeys(new object[] { "dbo", "Users", "Id", 0 });
-        }
-
-        [SetUp]
-        public void Setup()
-        {
-            _db = GetOpenDataBase();
         }
 
         [Test]
@@ -212,6 +204,32 @@ namespace Simple.Data.IntegrationTest
             _db.Users.UpdateById(Id: 1, Name: null);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Id] = @p2");
             Parameter(0).IsDBNull();
+        }
+
+        [Test]
+        public void TestUpdateAll()
+        {
+            _db.Users.UpdateAll(Name: "Steve");
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1");
+            Parameter(0).Is("Steve");
+        }
+
+        [Test]
+        public void TestUpdateWithCriteria()
+        {
+            _db.Users.UpdateAll(_db.Users.Age > 30, Name: "Steve");
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Age] > @p2");
+            Parameter(0).Is("Steve");
+            Parameter(1).Is(30);
+        }
+
+        [Test]
+        public void TestUpdateWithCriteriaAsNamedArg()
+        {
+            _db.Users.UpdateAll(Name: "Steve", Condition: _db.Users.Age > 30);
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Age] > @p2");
+            Parameter(0).Is("Steve");
+            Parameter(1).Is(30);
         }
 
         [Test]

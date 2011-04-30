@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq;
+using Simple.Data.Extensions;
 
 namespace Simple.Data.Commands
 {
@@ -26,19 +25,12 @@ namespace Simple.Data.Commands
                 deletedCount = dataStrategy.Delete(table.GetQualifiedName(), (SimpleExpression)args[0]);
             }
 
-            return ConstructResultSet(deletedCount);
+            return deletedCount.ResultSetFromModifiedRowCount();
         }
 
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             throw new NotImplementedException();
-        }
-
-        private static object ConstructResultSet(int deletedCount)
-        {
-            var simpleResultSet = new SimpleResultSet(Enumerable.Empty<SimpleRecord>());
-            simpleResultSet.SetOutputValues(new Dictionary<string, object> { { "__ReturnValue", deletedCount } });
-            return simpleResultSet;
         }
     }
 }
