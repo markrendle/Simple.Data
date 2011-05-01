@@ -15,7 +15,7 @@ namespace Simple.Data
     {
         private readonly ConcurrentDictionary<string, dynamic> _members = new ConcurrentDictionary<string, dynamic>();
 
-        internal Adapter Adapter { get { return GetAdapter(); } }
+        public Adapter Adapter { get { return GetAdapter(); } }
 
         protected internal abstract Adapter GetAdapter();
 
