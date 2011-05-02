@@ -4,6 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Simple.Data.SqlTest.Resources;
 
 namespace Simple.Data.SqlTest
 {
@@ -60,6 +61,23 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual("Marvin", actual.Name);
             Assert.AreEqual("diodes", actual.Password);
             Assert.AreEqual(42000000, actual.Age);
+        }
+
+        [Test]
+        public void TestWithImageColumn()
+        {
+            var db = DatabaseHelper.Open();
+            try
+            {
+                var image = GetImage.Image;
+                db.Images.Insert(Id: 1, TheImage: image);
+                var img = (DbImage)db.Images.FindById(1);
+                Assert.IsTrue(image.SequenceEqual(img.TheImage));
+            }
+            finally
+            {
+                db.Images.DeleteById(1);
+            }
         }
     }
 }

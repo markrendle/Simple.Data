@@ -17,10 +17,7 @@ namespace Simple.Data.SqlServer
                                                                                   {"date", DbType.DateTime},
                                                                                   {"time", DbType.DateTime},
                                                                                   {"datetime2", DbType.DateTime2},
-                                                                                  {
-                                                                                      "datetimeoffset",
-                                                                                      DbType.DateTimeOffset
-                                                                                      },
+                                                                                  {"datetimeoffset", DbType.DateTimeOffset},
                                                                                   {"tinyint", DbType.Byte},
                                                                                   {"smallint", DbType.Int16},
                                                                                   {"int", DbType.Int32},
@@ -41,6 +38,7 @@ namespace Simple.Data.SqlServer
                                                                                   {"binary", DbType.Binary},
                                                                                   {"char", DbType.AnsiStringFixedLength},
                                                                                   {"timestamp", DbType.Binary},
+                                                                                  {"image", DbType.Binary},
                                                                                   {"nvarchar", DbType.String},
                                                                                   {"nchar", DbType.StringFixedLength},
                                                                                   {"xml", DbType.Xml},
