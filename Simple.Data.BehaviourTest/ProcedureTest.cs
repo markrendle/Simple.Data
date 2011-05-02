@@ -27,8 +27,8 @@ namespace Simple.Data.IntegrationTest
         public void CheckMockWorking()
         {
             var mockDatabase = new MockDatabase();
-            CreateDatabase(mockDatabase);
-            Assert.Pass();
+            var db = CreateDatabase(mockDatabase);
+            Assert.NotNull(db);
         }
 
         [Test]

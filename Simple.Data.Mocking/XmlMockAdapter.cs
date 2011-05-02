@@ -90,7 +90,6 @@ namespace Simple.Data.Mocking
         /// <returns>The number of records which were deleted.</returns>
         public override int Delete(string tableName, SimpleExpression criteria)
         {
-            var tableElement = GetTableElement(tableName);
             var elementsToDelete = GetTableElement(tableName).Elements()
                 .Where(XmlPredicateBuilder.GetPredicate(criteria))
                 .ToList();

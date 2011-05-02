@@ -6,11 +6,12 @@ using System.Configuration;
 using System.Data.OleDb;
 using System.Reflection;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Simple.Data.Ado
 {
     public class ProviderHelper
-    {
+	{
         private readonly ConcurrentDictionary<string, IConnectionProvider> _connectionProviderCache = new ConcurrentDictionary<string,IConnectionProvider>();
         private readonly ConcurrentDictionary<Type, object> _customProviderCache = new ConcurrentDictionary<Type, object>();
 
@@ -26,11 +27,10 @@ namespace Simple.Data.Ado
 
         private IConnectionProvider LoadProviderByConnectionString(string connectionString)
         {
-            var connectionStringBuilder = new OleDbConnectionStringBuilder(connectionString);
-
-            if (connectionStringBuilder.DataSource.EndsWith("sdf", StringComparison.CurrentCultureIgnoreCase) && File.Exists(connectionStringBuilder.DataSource))
+			var dataSource = GetDataSourceName(connectionString);
+            if (dataSource.EndsWith("sdf", StringComparison.CurrentCultureIgnoreCase) && File.Exists(dataSource))
             {
-                return GetProviderByFilename(connectionStringBuilder.DataSource);
+                return GetProviderByFilename(dataSource);
             }
             
             var provider = ComposeProvider("sql");
@@ -38,6 +38,16 @@ namespace Simple.Data.Ado
             provider.SetConnectionString(connectionString);
             return provider;
         }
+			
+		internal static string GetDataSourceName(string connectionString)
+		{
+			var match = Regex.Match(connectionString, "data source=(.*?);");
+			if (match != null)
+			{
+				return match.Groups[1].Value;
+			}
+			return string.Empty;
+		}
 
         private static IConnectionProvider LoadProviderByFilename(string filename)
         {

@@ -186,7 +186,7 @@ namespace Simple.Data
                 T cast;
                 try
                 {
-                    cast = (T)item;
+                    cast = (T)(object)item;
                 }
                 catch (RuntimeBinderException)
                 {
