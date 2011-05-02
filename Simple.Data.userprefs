@@ -1,0 +1,63 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Simple.Data.UnitTest/DynamicEnumerableTest.cs">
+    <Files>
+      <File FileName="Simple.Data/SimpleQuery.cs" Line="189" Column="38" />
+      <File FileName="Simple.Data/Commands/FindAllByCommand.cs" Line="37" Column="17" />
+      <File FileName="Simple.Data/SimpleResultSet.cs" Line="59" Column="60" />
+      <File FileName="Simple.Data.Ado/ProviderHelper.cs" Line="31" Column="103" />
+      <File FileName="Simple.Data.Ado/Properties/AssemblyInfo.cs" Line="1" Column="1" />
+      <File FileName="Simple.Data.Ado.Test/ProviderTest.cs" Line="29" Column="27" />
+      <File FileName="Simple.Data.Mocking/XmlMockAdapter.cs" Line="93" Column="1" />
+      <File FileName="Simple.Data.BehaviourTest/ProcedureTest.cs" Line="30" Column="51" />
+      <File FileName="Simple.Data.Mocking.Test/XmlMockAdapterTest.cs" Line="179" Column="1" />
+      <File FileName="Simple.Data.UnitTest/DynamicEnumerableTest.cs" Line="17" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Tests" expanded="True">
+            <Node name="Simple.Data.Ado.Test" expanded="True" />
+            <Node name="Simple.Data.BehaviourTest" expanded="True" />
+            <Node name="Simple.Data.Mocking.Test" expanded="True" />
+            <Node name="Simple.Data.UnitTest" expanded="True">
+              <Node name="DynamicEnumerableTest.cs" selected="True" />
+            </Node>
+          </Node>
+          <Node name="Simple.Data.Ado" expanded="True">
+            <Node name="Properties" expanded="True" />
+          </Node>
+          <Node name="Simple.Data.Mocking" expanded="True" />
+          <Node name="Simple.Data.SqlServer" expanded="True">
+            <Node name="References" expanded="True" />
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+      <Pad Id="MonoDevelop.NUnit.TestPad">
+        <State expanded="True">
+          <Node name="Tests" expanded="True">
+            <Node name="Simple.Data.Ado.Test" expanded="True">
+              <Node name="Simple" expanded="True">
+                <Node name="Data" expanded="True">
+                  <Node name="Ado" expanded="True">
+                    <Node name="Test" expanded="True">
+                      <Node name="ProviderTest" expanded="True" />
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node name="Simple.Data.UnitTest" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

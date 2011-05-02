@@ -13,3 +13,5 @@ deploy
 TestResults/*
 *.dbmdl
 Releases/2*
+*.pidb
+test-results
