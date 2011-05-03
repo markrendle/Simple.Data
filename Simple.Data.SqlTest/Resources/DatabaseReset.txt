@@ -29,6 +29,8 @@ BEGIN
 	DROP TABLE [dbo].[Customers];
 	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[PagingTest]') AND type in (N'U'))
 	DROP TABLE [dbo].[PagingTest];
+    IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Images]') AND type in (N'U'))
+	DROP TABLE [dbo].[Images];
 
 	CREATE TABLE [dbo].[Users] (
 		[Id]       INT            IDENTITY (1, 1) NOT NULL,
@@ -59,6 +61,14 @@ BEGIN
 
 	ALTER TABLE [dbo].[OrderItems]
 		ADD CONSTRAINT [PK_OrderItems] PRIMARY KEY CLUSTERED ([OrderItemId] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
+
+    CREATE TABLE [dbo].[Images](
+	    [Id] [int] NOT NULL,
+	    [TheImage] [image] NOT NULL
+    );
+
+    ALTER TABLE [dbo].[Images]
+		ADD CONSTRAINT [PK_Images] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
 
 	CREATE TABLE [dbo].[Items] (
 		[ItemId] INT            IDENTITY (1, 1) NOT NULL,
