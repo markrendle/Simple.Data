@@ -53,5 +53,19 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, db.Orders.All().ToList().Count);
             Assert.AreEqual(1, db.OrderItems.All().ToList().Count);
         }
+
+        [Test]
+        public void QueryInsideTransaction()
+        {
+            var db = DatabaseHelper.Open();
+
+            using (var tx = db.BeginTransaction())
+            {
+                tx.Users.Insert(Id: 10, Name: "Arthur", Age: 42, Password: "Ladida");
+                var u2 = (User)tx.Users.FindById(10);
+                Assert.IsNotNull(u2);
+                Assert.AreEqual("Arthur", u2.Name);
+            }
+        } 
     }
 }

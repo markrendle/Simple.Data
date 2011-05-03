@@ -42,7 +42,7 @@ namespace Simple.Data.IntegrationTest
         {
             var orderDate = new DateTime(2010, 1, 1);
             const string expectedSql =
-                "select [dbo].[Customer].* from [dbo].[Customer] join [dbo].[Orders] on ([dbo].[Customer].[CustomerId] = [dbo].[Orders].[CustomerId]) where [dbo].[Orders].[OrderDate] = @p1";
+                "select [dbo].[Customer].[CustomerId] from [dbo].[Customer] join [dbo].[Orders] on ([dbo].[Customer].[CustomerId] = [dbo].[Orders].[CustomerId]) where [dbo].[Orders].[OrderDate] = @p1";
 
             _db.Customer.FindAll(_db.Customer.Orders.OrderDate == orderDate).ToList<dynamic>();
             GeneratedSqlIs(expectedSql);

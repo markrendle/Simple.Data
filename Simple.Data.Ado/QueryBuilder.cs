@@ -19,10 +19,16 @@ namespace Simple.Data.Ado
 
         public ICommandBuilder Build(SimpleQuery query)
         {
-            var commandBuilder = new CommandBuilder(GetSelectClause(ObjectName.Parse(query.TableName)), _schema.SchemaProvider);
+            var tableName = ObjectName.Parse(query.TableName);
+            var commandBuilder = new CommandBuilder(GetSelectClause(tableName), _schema.SchemaProvider);
 
             if (query.Criteria != null)
             {
+                var joins = new Joiner(JoinType.Inner, _schema).GetJoinClauses(tableName, query.Criteria);
+                if (!string.IsNullOrWhiteSpace(joins))
+                {
+                    commandBuilder.Append(" " + joins);
+                }
                 commandBuilder.Append(" WHERE " + new ExpressionFormatter(commandBuilder, _schema).Format(query.Criteria));
             }
 
@@ -52,7 +58,7 @@ namespace Simple.Data.Ado
         {
             var table = _schema.FindTable(tableName);
             return string.Format("select {0} from {1}",
-                string.Join(",", table.Columns.Select(c => c.QuotedName)),
+                string.Join(",", table.Columns.Select(c => string.Format("{0}.{1}", table.QualifiedName, c.QuotedName))),
                 table.QualifiedName);
         }
     }
