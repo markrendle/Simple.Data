@@ -64,6 +64,11 @@ namespace Simple.Data
                 {
                     cast = (T)(object)item;
                 }
+                catch (InvalidCastException)
+                {
+                    cast = default(T);
+                    success = false;
+                }
                 catch (RuntimeBinderException)
                 {
                     cast = default(T);

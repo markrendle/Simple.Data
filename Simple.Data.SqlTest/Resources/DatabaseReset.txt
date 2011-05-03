@@ -133,7 +133,7 @@ CREATE VIEW [dbo].[VwCustomers]
     AS
         SELECT     Name, Address, CustomerId
         FROM         dbo.Customers
-        WHERE     (Name LIKE '%A%')
+        WHERE     (Name LIKE '%e%')
     
 GO
 

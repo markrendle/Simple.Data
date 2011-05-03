@@ -15,11 +15,19 @@ namespace Simple.Data.Commands
 
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
+            if (dataStrategy is SimpleTransaction) return null;
+
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
             try
             {
                 var func = dataStrategy.Adapter.CreateFindOneDelegate(table.GetQualifiedName(), criteriaExpression);
-                return a => new SimpleRecord(func(a), table.GetQualifiedName(), dataStrategy);
+                return a =>
+                           {
+                               var data = func(a);
+                               return (data != null && data.Count > 0)
+                                          ? new SimpleRecord(func(a), table.GetQualifiedName(), dataStrategy)
+                                          : null;
+                           };
             }
             catch (NotImplementedException)
             {

@@ -61,8 +61,8 @@ namespace Simple.Data.SqlTest
 
             using (var tx = db.BeginTransaction())
             {
-                tx.Users.Insert(Id: 10, Name: "Arthur", Age: 42, Password: "Ladida");
-                var u2 = (User)tx.Users.FindById(10);
+                tx.Users.Insert(Name: "Arthur", Age: 42, Password: "Ladida");
+                User u2 = tx.Users.FindByName("Arthur");
                 Assert.IsNotNull(u2);
                 Assert.AreEqual("Arthur", u2.Name);
             }

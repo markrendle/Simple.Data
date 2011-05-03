@@ -51,14 +51,14 @@ namespace Simple.Data.IntegrationTest
         public void IndexerMethodWorksWithPluralFromSingular()
         {
             _db["Customer"].All().ToList();
-            GeneratedSqlIs("select [CustomerId] from [dbo].[Customers]");
+            GeneratedSqlIs("select [dbo].[Customers].[CustomerId] from [dbo].[Customers]");
         }
 
         [Test]
         public void IndexerMethodWorksWithSchemaAndPluralFromSingular()
         {
             _db["dbo"]["Customer"].All().ToList();
-            GeneratedSqlIs("select [CustomerId] from [dbo].[Customers]");
+            GeneratedSqlIs("select [dbo].[Customers].[CustomerId] from [dbo].[Customers]");
         }
     }
 
@@ -81,14 +81,14 @@ namespace Simple.Data.IntegrationTest
         public void IndexerMethodWorksWithShoutyFromSingular()
         {
             _db["Customer"].All().ToList();
-            GeneratedSqlIs("select [CUSTOMER_ID] from [dbo].[CUSTOMER]");
+            GeneratedSqlIs("select [dbo].[CUSTOMER].[CUSTOMER_ID] from [dbo].[CUSTOMER]");
         }
 
         [Test]
         public void IndexerMethodWorksWithSchemaAndShoutyFromSingular()
         {
             _db["dbo"]["Customer"].All().ToList();
-            GeneratedSqlIs("select [CUSTOMER_ID] from [dbo].[CUSTOMER]");
+            GeneratedSqlIs("select [dbo].[CUSTOMER].[CUSTOMER_ID] from [dbo].[CUSTOMER]");
         }
 
 

@@ -41,7 +41,7 @@ namespace Simple.Data.Ado
 			
 		internal static string GetDataSourceName(string connectionString)
 		{
-			var match = Regex.Match(connectionString, "data source=(.*?);");
+			var match = Regex.Match(connectionString, @"data source=(.*?)(;|\z)");
 			if (match != null)
 			{
 				return match.Groups[1].Value;

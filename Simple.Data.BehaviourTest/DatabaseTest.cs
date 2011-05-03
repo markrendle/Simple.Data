@@ -85,7 +85,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindAllWithLike()
         {
             _db.Users.FindAll(_db.Users.Name.Like("Foo")).ToList();
-            GeneratedSqlIs("select [id],[name],[password],[age] from [dbo].[Users] where [dbo].[Users].[name] like @p1");
+            GeneratedSqlIs("select [dbo].[Users].[id],[dbo].[Users].[name],[dbo].[Users].[password],[dbo].[Users].[age] from [dbo].[Users] where [dbo].[Users].[name] like @p1");
             Parameter(0).Is("Foo");
         }
 
@@ -102,7 +102,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindAllByDynamic()
         {
             _db.Users.FindAllByName("Foo").ToList();
-            GeneratedSqlIs("select [id],[name],[password],[age] from [dbo].[Users] where [dbo].[Users].[name] = @p1");
+            GeneratedSqlIs("select [dbo].[Users].[id],[dbo].[Users].[name],[dbo].[Users].[password],[dbo].[Users].[age] from [dbo].[Users] where [dbo].[Users].[name] = @p1");
             Parameter(0).Is("Foo");
         }
 

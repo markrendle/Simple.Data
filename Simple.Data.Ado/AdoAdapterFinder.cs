@@ -160,6 +160,7 @@ namespace Simple.Data.Ado
 
         private static IDictionary<string, object> TryExecuteSingletonQuery(IDbConnection connection, IDbCommand command, IDictionary<string,int> index)
         {
+            command.WriteTrace();
             try
             {
                 using (connection)

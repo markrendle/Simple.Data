@@ -29,10 +29,17 @@ namespace Simple.Data.SqlServer
             builder.AppendLine();
             builder.Append(fromEtc);
             builder.AppendLine(")");
-            builder.AppendFormat("SELECT {0} FROM __Data WHERE [_#_] BETWEEN {1} + 1 AND {1} + {2}", columns,
+            builder.AppendFormat("SELECT {0} FROM __Data WHERE [_#_] BETWEEN {1} + 1 AND {1} + {2}", DequalifyColumns(columns),
                                  skipParameterName, takeParameterName);
 
             return builder.ToString();
+        }
+
+        private static string DequalifyColumns(string original)
+        {
+            var q = from part in original.Split(',')
+                    select part.Substring(part.LastIndexOf('.') + 1);
+            return string.Join(",", q);
         }
 
         private static string ExtractOrderBy(string columns, ref string fromEtc)

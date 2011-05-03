@@ -14,7 +14,15 @@ namespace Simple.Data.Ado.Test
 			var actual = Simple.Data.Ado.ProviderHelper.GetDataSourceName(connectionString);
 			Assert.AreEqual(expected, actual);
 		}
-		[Test()]
+        [Test()]
+        public void DataSourceShouldExtractProperlyWithoutSemicolon()
+        {
+            var connectionString = "data source=foo";
+            var expected = "foo";
+            var actual = Simple.Data.Ado.ProviderHelper.GetDataSourceName(connectionString);
+            Assert.AreEqual(expected, actual);
+        }
+        [Test()]
 		public void DataSourceShouldExtractProperlyWithSomethingBefore ()
 		{
 			var connectionString = "provider=SqlClient;data source=foo;initial catalog=bar;";
