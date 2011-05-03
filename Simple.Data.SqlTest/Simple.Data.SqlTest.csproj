@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="DatabaseHelper.cs" />
     <Compile Include="DatabaseOpenerTests.cs" />
+    <Compile Include="DbImage.cs" />
     <Compile Include="InsertTests.cs" />
     <Compile Include="NaturalJoinTest.cs" />
     <Compile Include="ProcedureTest.cs" />
@@ -72,6 +73,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="QueryTest.cs" />
+    <Compile Include="Resources\GetImage.cs" />
     <Compile Include="SchemaTests\DatabaseSchemaTests.cs" />
     <Compile Include="FindTests.cs" />
     <Compile Include="OrderDetailTests.cs" />
@@ -119,6 +121,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\DatabaseReset.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\test.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

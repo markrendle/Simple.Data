@@ -10,39 +10,44 @@ using Simple.Data.Mocking.Ado;
 namespace Simple.Data.IntegrationTest
 {
     [TestFixture]
-    public class NaturalJoinTest
+    public class NaturalJoinTest : DatabaseIntegrationContext
     {
-        static Database CreateDatabase(MockDatabase mockDatabase)
+        protected override void SetSchema(MockSchemaProvider schemaProvider)
         {
-            var mockSchemaProvider = new MockSchemaProvider();
-            mockSchemaProvider.SetTables(new[] {"dbo", "Customer", "BASE TABLE"},
-                                         new[] {"dbo", "Orders", "BASE TABLE"});
-            mockSchemaProvider.SetColumns(new[] {"dbo", "Customer", "CustomerId"},
+            schemaProvider.SetTables(new[] { "dbo", "Customer", "BASE TABLE" },
+                                         new[] { "dbo", "Orders", "BASE TABLE" });
+            schemaProvider.SetColumns(new[] { "dbo", "Customer", "CustomerId" },
                                           new[] { "dbo", "Orders", "OrderId" },
                                           new[] { "dbo", "Orders", "CustomerId" },
-                                          new[] {"dbo", "Orders", "OrderDate"});
-            mockSchemaProvider.SetPrimaryKeys(new object[] {"dbo", "Customer", "CustomerId", 0});
-            mockSchemaProvider.SetForeignKeys(new object[] {"FK_Orders_Customer", "dbo", "Orders", "CustomerId", "dbo", "Customer", "CustomerId", 0});
-            return new Database(new AdoAdapter(new MockConnectionProvider(new MockDbConnection(mockDatabase), mockSchemaProvider)));
+                                          new[] { "dbo", "Orders", "OrderDate" });
+            schemaProvider.SetPrimaryKeys(new object[] { "dbo", "Customer", "CustomerId", 0 });
+            schemaProvider.SetForeignKeys(new object[] { "FK_Orders_Customer", "dbo", "Orders", "CustomerId", "dbo", "Customer", "CustomerId", 0 });
         }
 
         [Test]
         public void NaturalJoinCreatesCorrectCommand()
         {
-            // Arrange
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
             var orderDate = new DateTime(2010, 1, 1);
             const string expectedSql =
                 "select [dbo].[Customer].* from [dbo].[Customer] join [dbo].[Orders] on ([dbo].[Customer].[CustomerId] = [dbo].[Orders].[CustomerId]) where [dbo].[Orders].[OrderDate] = @p1";
 
-            // Act
-            database.Customer.Find(database.Customer.Orders.OrderDate == orderDate);
-            var actualSql = Regex.Replace(mockDatabase.Sql, @"\s+", " ").ToLowerInvariant();
+            _db.Customer.Find(_db.Customer.Orders.OrderDate == orderDate);
+            GeneratedSqlIs(expectedSql);
 
-            // Assert
-            Assert.AreEqual(expectedSql.ToLowerInvariant(), actualSql);
-            Assert.AreEqual(orderDate, mockDatabase.Parameters[0]);
+            Parameter(0).Is(orderDate);
+        }
+
+        [Test]
+        public void NaturalJoinViaFindAllCreatesCorrectCommand()
+        {
+            var orderDate = new DateTime(2010, 1, 1);
+            const string expectedSql =
+                "select [dbo].[Customer].* from [dbo].[Customer] join [dbo].[Orders] on ([dbo].[Customer].[CustomerId] = [dbo].[Orders].[CustomerId]) where [dbo].[Orders].[OrderDate] = @p1";
+
+            _db.Customer.FindAll(_db.Customer.Orders.OrderDate == orderDate).ToList<dynamic>();
+            GeneratedSqlIs(expectedSql);
+
+            Parameter(0).Is(orderDate);
         }
     }
 }
