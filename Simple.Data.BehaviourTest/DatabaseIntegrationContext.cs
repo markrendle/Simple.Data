@@ -27,6 +27,8 @@ namespace Simple.Data.IntegrationTest
 
         protected void GeneratedSqlIs(string sql)
         {
+            if (_mockDatabase.Sql == null)
+                Assert.Fail("No SQL was generated");
             Assert.AreEqual(sql.ToLowerInvariant(), _mockDatabase.Sql.ToLowerInvariant());
         }
 
