@@ -36,5 +36,13 @@ namespace Simple.Data.IntegrationTest
             GeneratedSqlIs("select [dbo].[customers].[customerid],[dbo].[customers].[customer_name] from [dbo].[customers] where [dbo].[customers].[customer_name] = @p1 order by [customer_name]");
             Parameter(0).Is("Arthur");
         }
+
+        [Test]
+        public void DotNetNamingIsCorrectlyResolvedInOrderByExpression()
+        {
+            _db.Customers.FindAll(_db.Customers.CustomerName == "Arthur").OrderBy(_db.Customers.CustomerName).ToList<dynamic>();
+            GeneratedSqlIs("select [dbo].[customers].[customerid],[dbo].[customers].[customer_name] from [dbo].[customers] where [dbo].[customers].[customer_name] = @p1 order by [customer_name]");
+            Parameter(0).Is("Arthur");
+        }
     }
 }
