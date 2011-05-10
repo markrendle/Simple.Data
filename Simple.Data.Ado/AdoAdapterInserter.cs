@@ -28,7 +28,7 @@ namespace Simple.Data.Ado
             var customInserter = _adapter.ProviderHelper.GetCustomProvider<ICustomInserter>(_adapter.ConnectionProvider);
             if (customInserter != null)
             {
-                return customInserter.Insert(_adapter, tableName, data);
+                return customInserter.Insert(_adapter, tableName, data, _transaction);
             }
 
             var table = _adapter.GetSchema().FindTable(tableName);

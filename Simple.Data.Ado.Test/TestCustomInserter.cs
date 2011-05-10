@@ -68,7 +68,7 @@ namespace Simple.Data.Ado.Test
     [Export(typeof(ICustomInserter))]
     public class StubCustomInserter : ICustomInserter
     {
-        public IDictionary<string, object> Insert(AdoAdapter adapter, string tableName, IDictionary<string, object> data)
+        public IDictionary<string, object> Insert(AdoAdapter adapter, string tableName, IDictionary<string, object> data, IDbTransaction transaction = null)
         {
             throw new NotImplementedException();
         }
