@@ -28,9 +28,10 @@ namespace Simple.Data.Ado
             return new SimpleRecord(dataRecord.ToDictionary(index), tableName, database);
         }
 
-        public static Dictionary<string, object> ToDictionary(this IDataRecord dataRecord)
+        public static IDictionary<string, object> ToDictionary(this IDataRecord dataRecord)
         {
-            return dataRecord.GetFieldNames().ToDictionary(fieldName => fieldName.Homogenize(), fieldName => DBNullToClrNull(dataRecord[fieldName]));
+            return dataRecord.ToDictionary(dataRecord.CreateDictionaryIndex());
+//            return dataRecord.GetFieldNames().ToDictionary(fieldName => fieldName.Homogenize(), fieldName => DBNullToClrNull(dataRecord[fieldName]));
         }
 
         public static IDictionary<string, object> ToDictionary(this IDataRecord dataRecord, IDictionary<string,int> index)
@@ -38,6 +39,13 @@ namespace Simple.Data.Ado
             return OptimizedDictionary.Create(index,dataRecord.GetValues());
         }
 
+        public static Dictionary<string, int> CreateDictionaryIndex(this IDataRecord reader)
+        {
+            var keys =
+                reader.GetFieldNames().Select((s, i) => new KeyValuePair<string, int>(s, i)).ToDictionary();
+            return new Dictionary<string, int>(keys, HomogenizedEqualityComparer.DefaultInstance);
+        }
+        
         public static IEnumerable<string> GetFieldNames(this IDataRecord dataRecord)
         {
             for (int i = 0; i < dataRecord.FieldCount; i++)

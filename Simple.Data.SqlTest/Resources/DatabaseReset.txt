@@ -10,6 +10,13 @@ IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Varch
 DROP FUNCTION [dbo].[VarcharAndReturnInt]
 IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[VwCustomers]'))
 DROP VIEW [dbo].[VwCustomers];
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SchemaTable]') AND type in (N'U'))
+DROP TABLE [dbo].[SchemaTable]
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[test].[SchemaTable]') AND type in (N'U'))
+DROP TABLE [test].[SchemaTable]
+GO
+IF EXISTS (SELECT * FROM sys.schemas WHERE name = N'test')
+DROP SCHEMA [test]
 GO
 
 CREATE PROCEDURE TestReset 
@@ -129,12 +136,26 @@ BEGIN
 END
 GO
 
+EXEC [dbo].[TestReset]
+GO
+
 CREATE VIEW [dbo].[VwCustomers]
     AS
         SELECT     Name, Address, CustomerId
         FROM         dbo.Customers
         WHERE     (Name LIKE '%e%')
     
+GO
+
+CREATE TABLE [dbo].[SchemaTable] ([Id] int not null, [Description] nvarchar(100) not null);
+GO
+INSERT INTO [dbo].[SchemaTable] VALUES (1, 'Pass')
+GO
+
+CREATE SCHEMA [test] AUTHORIZATION [dbo]
+GO
+
+CREATE TABLE [test].[SchemaTable] ([Id] int not null, [Description] nvarchar(100) not null);
 GO
 
 CREATE PROCEDURE [dbo].[GetCustomers]

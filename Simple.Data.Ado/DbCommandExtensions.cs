@@ -48,13 +48,6 @@ namespace Simple.Data.Ado
                                                        () => DisposeCommandAndReader(connection, command, reader));
         }
 
-        public static Dictionary<string, int> CreateDictionaryIndex(this IDataReader reader)
-        {
-            var keys =
-                reader.GetFieldNames().Select((s, i) => new KeyValuePair<string, int>(s, i)).ToDictionary();
-            return new Dictionary<string, int>(keys, HomogenizedEqualityComparer.DefaultInstance);
-        }
-
         public static IDbDataParameter AddParameter(this IDbCommand command, string name, object value)
         {
             var parameter = command.CreateParameter();

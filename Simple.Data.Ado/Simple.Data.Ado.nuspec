@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-     <id>Simple.Data.Ado</id>
+    <id>Simple.Data.Ado</id>
     <version>0.6.2</version>
     <authors>Mark Rendle</authors>
     <owners>Mark Rendle</owners>
