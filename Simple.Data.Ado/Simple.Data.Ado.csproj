@@ -67,7 +67,7 @@
     <Compile Include="DataRecordExtensions.cs" />
     <Compile Include="DbCommandExtensions.cs" />
     <Compile Include="DbConnectionExtensions.cs" />
-    <Compile Include="DelegatingConnectionBase`1.cs" />
+    <Compile Include="DelegatingConnectionBase1.cs" />
     <Compile Include="DeleteHelper.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="ExpressionFormatter.cs" />
@@ -85,7 +85,7 @@
     <Compile Include="JoinType.cs" />
     <Compile Include="OptimizedDictionary.cs" />
     <Compile Include="OptimizedDictionaryIndex.cs" />
-    <Compile Include="OptimizedDictionary`2.cs" />
+    <Compile Include="OptimizedDictionary2.cs" />
     <Compile Include="ParameterTemplate.cs" />
     <Compile Include="ProcedureExecutor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

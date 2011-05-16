@@ -109,49 +109,58 @@ namespace Simple.Data.Ado
 
         private static IEnumerable<IDbDataParameter> CreateParameterComplex(ParameterTemplate template, object value, IDbCommand command)
         {
-            var str = value as string;
-            if (str != null)
+            if (template.DbType == DbType.Binary)
             {
                 yield return CreateSingleParameter(value, command, template.Name, template.DbType);
             }
             else
             {
-                var range = value as IRange;
-                if (range != null)
+                var str = value as string;
+                if (str != null)
                 {
-                    yield return CreateSingleParameter(range.Start, command, template.Name + "_start", template.DbType);
-                    yield return CreateSingleParameter(range.End, command, template.Name + "_end", template.DbType);
-                    SetBetweenInCommandText(command, template.Name);
+                    yield return CreateSingleParameter(value, command, template.Name, template.DbType);
                 }
                 else
                 {
-                    var list = value as IEnumerable;
-                    if (list != null)
+                    var range = value as IRange;
+                    if (range != null)
                     {
-                        var builder = new StringBuilder();
-                        var array = list.Cast<object>().ToArray();
-                        for (int i = 0; i < array.Length; i++)
-                        {
-                            builder.AppendFormat(",{0}_{1}", template.Name, i);
-                            yield return
-                                CreateSingleParameter(array[i], command, template.Name + "_" + i, template.DbType);
-                        }
-                        if (command.CommandText.Contains("!= " + template.Name))
-                        {
-                            command.CommandText = command.CommandText.Replace("!= " + template.Name,
-                                                                              "NOT IN (" +
-                                                                              builder.ToString().Substring(1) + ")");
-                        }
-                        else
-                        {
-                            command.CommandText = command.CommandText.Replace("= " + template.Name,
-                                                                              "IN (" + builder.ToString().Substring(1) +
-                                                                              ")");
-                        }
+                        yield return
+                            CreateSingleParameter(range.Start, command, template.Name + "_start", template.DbType);
+                        yield return CreateSingleParameter(range.End, command, template.Name + "_end", template.DbType);
+                        SetBetweenInCommandText(command, template.Name);
                     }
                     else
                     {
-                        yield return CreateSingleParameter(value, command, template.Name, template.DbType);
+                        var list = value as IEnumerable;
+                        if (list != null)
+                        {
+                            var builder = new StringBuilder();
+                            var array = list.Cast<object>().ToArray();
+                            for (int i = 0; i < array.Length; i++)
+                            {
+                                builder.AppendFormat(",{0}_{1}", template.Name, i);
+                                yield return
+                                    CreateSingleParameter(array[i], command, template.Name + "_" + i, template.DbType);
+                            }
+                            if (command.CommandText.Contains("!= " + template.Name))
+                            {
+                                command.CommandText = command.CommandText.Replace("!= " + template.Name,
+                                                                                  "NOT IN (" +
+                                                                                  builder.ToString().Substring(1) + ")");
+                            }
+                            else
+                            {
+                                command.CommandText = command.CommandText.Replace("= " + template.Name,
+                                                                                  "IN (" +
+                                                                                  builder.ToString().Substring(1) +
+                                                                                  ")");
+                            }
+                        }
+                        else
+                        {
+                            yield return CreateSingleParameter(value, command, template.Name, template.DbType);
+                        }
                     }
                 }
             }

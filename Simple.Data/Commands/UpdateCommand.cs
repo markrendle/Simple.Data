@@ -18,7 +18,7 @@ namespace Simple.Data.Commands
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             if (args.Length != 1) throw new ArgumentException("Incorrect number of arguments to Update method.");
-            var keyFieldNames = dataStrategy.Adapter.GetKeyFieldNames(table.GetQualifiedName()).ToArray();
+            var keyFieldNames = dataStrategy.GetAdapter().GetKeyFieldNames(table.GetQualifiedName()).ToArray();
             if (keyFieldNames.Length == 0)
             {
                 throw new NotSupportedException("Adapter does not support key-based update for this object.");

@@ -20,7 +20,7 @@ namespace Simple.Data.Commands
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
             try
             {
-                var func = dataStrategy.Adapter.CreateFindOneDelegate(table.GetQualifiedName(), criteriaExpression);
+                var func = dataStrategy.GetAdapter().CreateFindOneDelegate(table.GetQualifiedName(), criteriaExpression);
                 return a =>
                            {
                                var data = func(a);

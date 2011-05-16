@@ -23,7 +23,7 @@ namespace Simple.Data.Commands
         private static object CreateSimpleQuery(DynamicTable table, InvokeMemberBinder binder, object[] args, DataStrategy dataStrategy)
         {
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
-            return new SimpleQuery(dataStrategy.Adapter, table.GetQualifiedName()).Where(criteriaExpression);
+            return new SimpleQuery(dataStrategy.GetAdapter(), table.GetQualifiedName()).Where(criteriaExpression);
         }
     }
 }

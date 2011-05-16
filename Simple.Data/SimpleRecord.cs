@@ -60,7 +60,7 @@ namespace Simple.Data
                 result = null;
                 return false;
             }
-            var relatedAdapter = _database.Adapter as IAdapterWithRelation;
+            var relatedAdapter = _database.GetAdapter() as IAdapterWithRelation;
             if (relatedAdapter != null && relatedAdapter.IsValidRelation(_tableName, binder.Name))
             {
                 var relatedRows = relatedAdapter.FindRelated(_tableName, _data, binder.Name);

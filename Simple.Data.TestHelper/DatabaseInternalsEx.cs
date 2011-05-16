@@ -9,7 +9,7 @@ namespace Simple.Data.TestHelper
     {
         public static Adapter GetAdapter(this Database database)
         {
-            return database.Adapter;
+            return database.GetAdapter();
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System.Dynamic;
+using System.Linq;
 using NUnit.Framework;
+using Simple.Data.SqlTest.Resources;
 
 namespace Simple.Data.SqlTest
 {
@@ -61,6 +63,26 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual("Marvin", actual.Name);
             Assert.AreEqual("diodes", actual.Password);
             Assert.AreEqual(42000000, actual.Age);
+        }
+
+        [Test]
+        public void TestUpdateWithVarBinaryMaxColumn()
+        {
+            var db = DatabaseHelper.Open();
+            var blob = new Blob
+                           {
+                               Id = 1,
+                               Data = new byte[] {9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
+                           };
+            db.Blobs.Insert(blob);
+
+            var newData = blob.Data = new byte[] {0,1,2,3,4,5,6,7,8,9};
+
+            db.Blobs.Update(blob);
+
+            blob = db.Blobs.FindById(1);
+            
+            Assert.IsTrue(newData.SequenceEqual(blob.Data));
         }
     }
 }

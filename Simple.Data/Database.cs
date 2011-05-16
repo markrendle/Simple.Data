@@ -32,7 +32,7 @@ namespace Simple.Data
             _adapter = adapter;
         }
 
-        protected internal override Adapter GetAdapter()
+        public override Adapter GetAdapter()
         {
             return _adapter;
         }

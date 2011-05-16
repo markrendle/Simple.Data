@@ -51,7 +51,7 @@ namespace Simple.Data
 
         private static SimpleTransaction CreateTransaction(Database database)
         {
-            var adapterWithTransactions = database.Adapter as IAdapterWithTransactions;
+            var adapterWithTransactions = database.GetAdapter() as IAdapterWithTransactions;
             if (adapterWithTransactions == null) throw new NotSupportedException();
             return new SimpleTransaction(adapterWithTransactions, database);
         }
@@ -132,7 +132,7 @@ namespace Simple.Data
             }
         }
 
-        protected internal override Adapter GetAdapter()
+        public override Adapter GetAdapter()
         {
             return _adapter as Adapter;
         }

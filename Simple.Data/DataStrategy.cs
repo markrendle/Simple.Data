@@ -15,9 +15,7 @@ namespace Simple.Data
     {
         private readonly ConcurrentDictionary<string, dynamic> _members = new ConcurrentDictionary<string, dynamic>();
 
-        public Adapter Adapter { get { return GetAdapter(); } }
-
-        protected internal abstract Adapter GetAdapter();
+        public abstract Adapter GetAdapter();
 
         /// <summary>
         /// Provides the implementation for operations that get member values. Classes derived from the <see cref="T:System.Dynamic.DynamicObject"/> class can override this method to specify dynamic behavior for operations such as getting a value for a property.
@@ -45,7 +43,7 @@ namespace Simple.Data
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
-            var adapterWithFunctions = Adapter as IAdapterWithFunctions;
+            var adapterWithFunctions = GetAdapter() as IAdapterWithFunctions;
             if (adapterWithFunctions != null && adapterWithFunctions.IsValidFunction(binder.Name))
             {
                 var command = new ExecuteFunctionCommand(GetDatabase(), adapterWithFunctions, binder.Name,

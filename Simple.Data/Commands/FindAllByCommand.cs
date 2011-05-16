@@ -15,7 +15,7 @@ namespace Simple.Data.Commands
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
-            return new SimpleQuery(dataStrategy.Adapter, table.GetQualifiedName()).Where(criteria);
+            return new SimpleQuery(dataStrategy.GetAdapter(), table.GetQualifiedName()).Where(criteria);
             //var data = dataStrategy.Find(table.GetQualifiedName(), criteria);
             //return CreateSimpleResultSet(table, dataStrategy, data);
         }
@@ -33,7 +33,7 @@ namespace Simple.Data.Commands
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
             try
             {
-                var func = dataStrategy.Adapter.CreateFindDelegate(table.GetQualifiedName(), criteriaExpression);
+                var func = dataStrategy.GetAdapter().CreateFindDelegate(table.GetQualifiedName(), criteriaExpression);
                 return a => CreateSimpleResultSet(table, dataStrategy, func(a));
             }
             catch (NotImplementedException)

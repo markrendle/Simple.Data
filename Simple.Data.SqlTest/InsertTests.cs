@@ -79,5 +79,20 @@ namespace Simple.Data.SqlTest
                 db.Images.DeleteById(1);
             }
         }
+
+        [Test]
+        public void TestInsertWithVarBinaryMaxColumn()
+        {
+            var db = DatabaseHelper.Open();
+            var image = GetImage.Image;
+            var blob = new Blob
+                            {
+                                Id = 1,
+                                Data = image
+                            };
+            db.Blobs.Insert(blob);
+            blob = db.Blobs.FindById(1);
+            Assert.IsTrue(image.SequenceEqual(blob.Data));
+        }
     }
 }

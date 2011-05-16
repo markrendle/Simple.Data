@@ -38,6 +38,8 @@ BEGIN
 	DROP TABLE [dbo].[PagingTest];
     IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Images]') AND type in (N'U'))
 	DROP TABLE [dbo].[Images];
+	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Blobs]') AND type in (N'U'))
+	DROP TABLE [dbo].[Blobs]
 
 	CREATE TABLE [dbo].[Users] (
 		[Id]       INT            IDENTITY (1, 1) NOT NULL,
@@ -96,7 +98,15 @@ BEGIN
 		ADD CONSTRAINT [PK_Customers] PRIMARY KEY CLUSTERED ([CustomerId] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
 	    
 	CREATE TABLE [dbo].[PagingTest] ([Id] int not null);
-	
+
+	CREATE TABLE [dbo].[Blobs](
+		[Id] [int] NOT NULL,
+		[Data] [varbinary](max) NULL
+	)
+
+	ALTER TABLE [dbo].[Blobs]
+		ADD CONSTRAINT [PK_Blobs] PRIMARY KEY CLUSTERED ([Id] ASC)	
+
 	BEGIN TRANSACTION
 	SET IDENTITY_INSERT [dbo].[Customers] ON
 	INSERT INTO [dbo].[Customers] ([CustomerId], [Name], [Address]) VALUES (1, N'Test', N'100 Road')

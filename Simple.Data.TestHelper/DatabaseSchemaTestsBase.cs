@@ -15,7 +15,7 @@ namespace Simple.Data.TestHelper
 
         private DatabaseSchema GetSchema()
         {
-            var adapter = GetDatabase().Adapter as AdoAdapter;
+            var adapter = GetDatabase().GetAdapter() as AdoAdapter;
             if (adapter == null) Assert.Fail("Expected an ADO-based database adapter.");
             return adapter.GetSchema();
         }

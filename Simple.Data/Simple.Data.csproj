@@ -62,7 +62,7 @@
     <Compile Include="AdapterWithFunctionsExtensions.cs" />
     <Compile Include="BinderHelper.cs" />
     <Compile Include="BufferedEnumerable.cs" />
-    <Compile Include="BufferedEnumerable`1.cs" />
+    <Compile Include="BufferedEnumerable1.cs" />
     <Compile Include="CachingAdapterFactory.cs" />
     <Compile Include="Commands\CommandFactory.cs" />
     <Compile Include="Commands\UpdateAllCommand.cs" />
@@ -81,10 +81,10 @@
     <Compile Include="Extensions\ResultSetExtensions.cs" />
     <Compile Include="HomogenizedEqualityComparer.cs" />
     <Compile Include="IRange.cs" />
-    <Compile Include="Maybe`1.cs" />
+    <Compile Include="Maybe.cs" />
     <Compile Include="OrderByDirection.cs" />
     <Compile Include="Range.cs" />
-    <Compile Include="Range`1.cs" />
+    <Compile Include="Range1.cs" />
     <Compile Include="SimpleEmptyExpression.cs" />
     <Compile Include="SimpleFunction.cs" />
     <Compile Include="SimpleList.cs" />
@@ -142,7 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <Compile Include="SimpleRecord.Dictionary`2.cs" />
+    <Compile Include="SimpleRecord.Dictionary2.cs" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
