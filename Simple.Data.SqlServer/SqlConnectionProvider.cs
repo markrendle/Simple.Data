@@ -9,7 +9,7 @@ using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.SqlServer
 {
-    [Export("sql", typeof(IConnectionProvider))]
+//    [Export("sql", typeof(IConnectionProvider))]
     [Export("System.Data.SqlClient", typeof(IConnectionProvider))]
     public class SqlConnectionProvider : IConnectionProvider
     {

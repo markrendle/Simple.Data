@@ -10,12 +10,12 @@ namespace Simple.Data
     {
         public Adapter Create(object settings)
         {
-            return Create(ObjectEx.ObjectToDictionary(settings));
+            return Create(settings.ObjectToDictionary());
         }
 
         public Adapter Create(string adapterName, object settings)
         {
-            return Create(adapterName, ObjectEx.ObjectToDictionary(settings));
+            return Create(adapterName, settings.ObjectToDictionary());
         }
 
         public Adapter Create(IEnumerable<KeyValuePair<string,object>> settings)

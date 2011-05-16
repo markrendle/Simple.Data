@@ -12,6 +12,7 @@ namespace Simple.Data
         dynamic OpenDefault();
         dynamic OpenFile(string filename);
         dynamic OpenConnection(string connectionString);
+        dynamic OpenConnection(string connectionString, string providerName);
         dynamic Open(string adapterName, object settings);
         dynamic OpenNamedConnection(string connectionName);
     }
@@ -25,6 +26,8 @@ namespace Simple.Data
         private static Func<string, Database> _openFile;
         [ThreadStatic]
         private static Func<string, Database> _openConnection;
+        [ThreadStatic]
+        private static Func<string, string, Database> _openConnectionWithProvider;
         [ThreadStatic]
         private static Func<string, Database> _openNamedConnection;
         [ThreadStatic]
@@ -43,6 +46,11 @@ namespace Simple.Data
         private static Func<string, Database> OpenConnectionImpl
         {
             get { return _openConnection ?? OpenConnectionMethod; }
+        }
+
+        private static Func<string,string,Database> OpenConnectionWithProviderImpl
+        {
+            get { return _openConnectionWithProvider ?? OpenConnectionMethod; }
         }
 
         private static Func<string, Database> OpenNamedConnectionImpl
@@ -70,6 +78,11 @@ namespace Simple.Data
             return OpenConnectionImpl(connectionString);
         }
 
+        public dynamic OpenConnection(string connectionString, string providerName)
+        {
+            return OpenConnectionWithProviderImpl(connectionString, providerName);
+        }
+
         public dynamic Open(string adapterName, object settings)
         {
             return OpenImpl(adapterName, settings);
@@ -85,6 +98,7 @@ namespace Simple.Data
             _openDefault = () => database;
             _openFile = _openConnection = _openNamedConnection = (ignore) => database;
             _open = (ignore1, ignore2) => database;
+            _openConnectionWithProvider = (ignore1, ignore2) => database;
         }
 
         public static void UseMockAdapter(Adapter adapter)
@@ -92,6 +106,7 @@ namespace Simple.Data
             _openDefault = () => new Database(adapter);
             _openFile = _openConnection = _openNamedConnection = (ignore) => new Database(adapter);
             _open = (ignore1, ignore2) => new Database(adapter);
+            _openConnectionWithProvider = (ignore1, ignore2) => new Database(adapter);
         }
 
         public static void UseMockDatabase(Func<Database> databaseCreator)
@@ -99,6 +114,7 @@ namespace Simple.Data
             _openDefault = () => databaseCreator();
             _openFile = _openConnection = _openNamedConnection = (ignore) => databaseCreator();
             _open = (ignore1, ignore2) => databaseCreator();
+            _openConnectionWithProvider = (ignore1, ignore2) => databaseCreator();
         }
 
         public static void UseMockAdapter(Func<Adapter> adapterCreator)
@@ -106,11 +122,12 @@ namespace Simple.Data
             _openDefault = () => new Database(adapterCreator());
             _openFile = _openConnection = _openNamedConnection = (ignore) => new Database(adapterCreator());
             _open = (ignore1, ignore2) => new Database(adapterCreator());
+            _openConnectionWithProvider = (ignore1, ignore2) => new Database(adapterCreator());
         }
 
         private static Database OpenDefaultMethod()
         {
-            return OpenConnectionMethod(DefaultConnectionString);
+            return new Database(AdapterFactory.Create("Ado", new { ConnectionName = "Simple.Data.Properties.Settings.DefaultConnectionString" }));
         }
 
         private static Database OpenFileMethod(string filename)
@@ -120,7 +137,12 @@ namespace Simple.Data
 
         private static Database OpenConnectionMethod(string connectionString)
         {
-            return new Database(AdapterFactory.Create("Ado", new { ConnectionString = connectionString }));
+            return new Database(AdapterFactory.Create("Ado", new { ConnectionString = connectionString, ProviderName = "System.Data.SqlClient" }));
+        }
+
+        private static Database OpenConnectionMethod(string connectionString, string providerName)
+        {
+            return new Database(AdapterFactory.Create("Ado", new { ConnectionString = connectionString, ProviderName = providerName }));
         }
 
         private static Database OpenNamedConnectionMethod(string connectionName)

@@ -49,7 +49,15 @@ namespace Simple.Data.Ado
             var settingsKeys = ((IDictionary<string, object>) Settings).Keys;
             if (settingsKeys.Contains("ConnectionString"))
             {
-                _connectionProvider = ProviderHelper.GetProviderByConnectionString(Settings.ConnectionString);
+                if (settingsKeys.Contains("ProviderName"))
+                {
+                    _connectionProvider = ProviderHelper.GetProviderByConnectionString(Settings.ConnectionString,
+                                                                                       Settings.ProviderName);
+                }
+                else
+                {
+                    _connectionProvider = ProviderHelper.GetProviderByConnectionString(Settings.ConnectionString);
+                }
             }
             else if (settingsKeys.Contains("Filename"))
             {
