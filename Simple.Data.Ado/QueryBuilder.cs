@@ -11,6 +11,11 @@ namespace Simple.Data.Ado
         private readonly AdoAdapter _adoAdapter;
         private readonly DatabaseSchema _schema;
 
+        private ObjectName _tableName;
+        private Table _table;
+        private SimpleQuery _query;
+        private CommandBuilder _commandBuilder;
+
         public QueryBuilder(AdoAdapter adoAdapter)
         {
             _adoAdapter = adoAdapter;
@@ -19,26 +24,46 @@ namespace Simple.Data.Ado
 
         public ICommandBuilder Build(SimpleQuery query)
         {
-            var tableName = ObjectName.Parse(query.TableName);
-            var commandBuilder = new CommandBuilder(GetSelectClause(tableName), _schema.SchemaProvider);
+            SetQueryContext(query);
 
-            if (query.Criteria != null)
+            HandleQueryCriteria();
+            HandleOrderBy();
+            HandlePaging();
+
+            return _commandBuilder;
+        }
+
+        private void SetQueryContext(SimpleQuery query)
+        {
+            _query = query;
+            _tableName = ObjectName.Parse(query.TableName);
+            _table = _schema.FindTable(_tableName);
+            _commandBuilder = new CommandBuilder(GetSelectClause(_tableName), _schema.SchemaProvider);
+        }
+
+        private void HandleQueryCriteria()
+        {
+            if (_query.Criteria == null) return;
+
+            var joins = new Joiner(JoinType.Inner, _schema).GetJoinClauses(_tableName, _query.Criteria);
+            if (!string.IsNullOrWhiteSpace(joins))
             {
-                var joins = new Joiner(JoinType.Inner, _schema).GetJoinClauses(tableName, query.Criteria);
-                if (!string.IsNullOrWhiteSpace(joins))
-                {
-                    commandBuilder.Append(" " + joins);
-                }
-                commandBuilder.Append(" WHERE " + new ExpressionFormatter(commandBuilder, _schema).Format(query.Criteria));
+                _commandBuilder.Append(" " + joins);
             }
+            _commandBuilder.Append(" WHERE " + new ExpressionFormatter(_commandBuilder, _schema).Format(_query.Criteria));
+        }
 
-            if (query.Order != null)
-            {
-                var orderNames = query.Order.Select(q => q.Reference.GetName() + (q.Direction == OrderByDirection.Descending ? " DESC" : string.Empty));
-                commandBuilder.Append(" ORDER BY " + string.Join(", ", orderNames));
-            }
+        private void HandleOrderBy()
+        {
+            if (_query.Order == null) return;
 
-            if (query.SkipCount != null || query.TakeCount != null)
+            var orderNames = _query.Order.Select(ToOrderByDirective);
+            _commandBuilder.Append(" ORDER BY " + string.Join(", ", orderNames));
+        }
+
+        private void HandlePaging()
+        {
+            if (_query.SkipCount != null || _query.TakeCount != null)
             {
                 var queryPager = _adoAdapter.ProviderHelper.GetCustomProvider<IQueryPager>(_adoAdapter.ConnectionProvider);
                 if (queryPager == null)
@@ -46,12 +71,18 @@ namespace Simple.Data.Ado
                     throw new NotSupportedException("Paging is not supported by the current ADO provider.");
                 }
 
-                var skipTemplate = commandBuilder.AddParameter("skip", DbType.Int32, query.SkipCount ?? 0);
-                var takeTemplate = commandBuilder.AddParameter("take", DbType.Int32, query.TakeCount ?? int.MaxValue - (query.SkipCount ?? 0));
-                commandBuilder.SetText(queryPager.ApplyPaging(commandBuilder.Text, skipTemplate.Name, takeTemplate.Name));
+                var skipTemplate = _commandBuilder.AddParameter("skip", DbType.Int32, _query.SkipCount ?? 0);
+                var takeTemplate = _commandBuilder.AddParameter("take", DbType.Int32, _query.TakeCount ?? int.MaxValue - _query.SkipCount);
+                _commandBuilder.SetText(queryPager.ApplyPaging(_commandBuilder.Text, skipTemplate.Name, takeTemplate.Name));
             }
+        }
 
-            return commandBuilder;
+        private string ToOrderByDirective(SimpleOrderByItem item)
+        {
+            var col = _table.FindColumn(item.Reference.GetName());
+            var direction = item.Direction == OrderByDirection.Descending ? " DESC" : string.Empty;
+            return col.QuotedName + direction;
+
         }
 
         private string GetSelectClause(ObjectName tableName)
