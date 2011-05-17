@@ -82,7 +82,6 @@ namespace Simple.Data.Ado
             var col = _table.FindColumn(item.Reference.GetName());
             var direction = item.Direction == OrderByDirection.Descending ? " DESC" : string.Empty;
             return col.QuotedName + direction;
-
         }
 
         private string GetSelectClause(ObjectName tableName)
