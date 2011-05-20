@@ -10,11 +10,16 @@ namespace Simple.Data.SqlServer
 {
     class SqlSchemaProvider : ISchemaProvider
     {
+        // More info : http://msdn.microsoft.com/en-us/library/ms131092.aspx
         private static readonly Dictionary<string, DbType> DbTypeLookup = new Dictionary<string, DbType>
                                                                               {
+                                                                                  {"bigint", DbType.Int64},
+                                                                                  {"binary", DbType.Binary},
+                                                                                  {"bit", DbType.Boolean},
+                                                                                  {"char", DbType.AnsiStringFixedLength},
+                                                                                  {"date", DbType.DateTime},
                                                                                   {"text", DbType.AnsiString},
                                                                                   {"uniqueidentifier", DbType.Guid},
-                                                                                  {"date", DbType.DateTime},
                                                                                   {"time", DbType.DateTime},
                                                                                   {"datetime2", DbType.DateTime2},
                                                                                   {"datetimeoffset", DbType.DateTimeOffset},
@@ -28,15 +33,11 @@ namespace Simple.Data.SqlServer
                                                                                   {"float", DbType.Double},
                                                                                   {"sql_variant", DbType.Object},
                                                                                   {"ntext", DbType.String},
-                                                                                  {"bit", DbType.Boolean},
                                                                                   {"decimal", DbType.Decimal},
-                                                                                  {"numeric", DbType.VarNumeric},
+                                                                                  {"numeric", DbType.Decimal},
                                                                                   {"smallmoney", DbType.Currency},
-                                                                                  {"bigint", DbType.Int64},
                                                                                   {"varbinary", DbType.Binary},
                                                                                   {"varchar", DbType.AnsiString},
-                                                                                  {"binary", DbType.Binary},
-                                                                                  {"char", DbType.AnsiStringFixedLength},
                                                                                   {"timestamp", DbType.Binary},
                                                                                   {"image", DbType.Binary},
                                                                                   {"nvarchar", DbType.String},
@@ -70,7 +71,8 @@ namespace Simple.Data.SqlServer
         public IEnumerable<Column> GetColumns(Table table)
         {
             if (table == null) throw new ArgumentNullException("table");
-            return GetColumnsDataTable(table).AsEnumerable().Select(row => SchemaRowToColumn(table, row));
+            var cols = GetColumnsDataTable(table);
+            return cols.AsEnumerable().Select(row => SchemaRowToColumn(table, row));
         }
 
         private static Column SchemaRowToColumn(Table table, DataRow row)
