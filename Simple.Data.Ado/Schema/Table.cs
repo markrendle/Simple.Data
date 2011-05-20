@@ -92,6 +92,11 @@ namespace Simple.Data.Ado.Schema
             }
         }
 
+        public bool HasColumn(string columnName)
+        {
+            return _lazyColumns.Value.Contains(columnName);
+        }
+
         public Key PrimaryKey
         {
             get { return _lazyPrimaryKey.Value; }

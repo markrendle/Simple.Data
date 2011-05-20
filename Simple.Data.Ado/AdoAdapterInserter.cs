@@ -23,21 +23,26 @@ namespace Simple.Data.Ado
             _transaction = transaction;
         }
 
-        public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
+        public IDictionary<string, object> Insert(string tableName, IEnumerable<KeyValuePair<string, object>> data)
         {
+            var table = _adapter.GetSchema().FindTable(tableName);
+            data = data.Where(kvp => table.HasColumn(kvp.Key));
+
+            if (data.Count() == 0)
+            {
+                throw new SimpleDataException("No properties were found which could be mapped to the database.");
+            }
+
             var customInserter = _adapter.ProviderHelper.GetCustomProvider<ICustomInserter>(_adapter.ConnectionProvider);
             if (customInserter != null)
             {
-                return customInserter.Insert(_adapter, tableName, data, _transaction);
+                return customInserter.Insert(_adapter, tableName, data.ToDictionary(), _transaction);
             }
 
-            var table = _adapter.GetSchema().FindTable(tableName);
+            var dataDictionary = data.Where(kvp => !table.FindColumn(kvp.Key).IsIdentity).ToDictionary();
 
-            data = data.Where(kvp => !table.FindColumn(kvp.Key).IsIdentity)
-                .ToDictionary();
             string columnList =
-                data.Keys.Select(table.FindColumn)
-                //.Where(c => !c.IsIdentity)
+                dataDictionary.Keys.Select(table.FindColumn)
                 .Select(c => c.QuotedName)
                 .Aggregate((agg, next) => agg + "," + next);
             string valueList = columnList.Split(',').Select(s => "?").Aggregate((agg, next) => agg + "," + next);
@@ -56,16 +61,16 @@ namespace Simple.Data.Ado
                     if (_adapter.ProviderSupportsCompoundStatements)
                     {
                         insertSql += "; " + selectSql;
-                        return ExecuteSingletonQuery(insertSql, data.Values.ToArray());
+                        return ExecuteSingletonQuery(insertSql, dataDictionary.Values.ToArray());
                     }
                     else
                     {
-                        return ExecuteSingletonQuery(insertSql, selectSql, data.Values.ToArray());
+                        return ExecuteSingletonQuery(insertSql, selectSql, dataDictionary.Values.ToArray());
                     }
                 }
             }
 
-            Execute(insertSql, data.Values.ToArray());
+            Execute(insertSql, dataDictionary.Values.ToArray());
             return null;
         }
 
