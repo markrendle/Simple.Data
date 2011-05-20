@@ -10,6 +10,17 @@ namespace Simple.Data
 {
     class MefHelper
     {
+        public static T Compose<T>()
+        {
+            using (var container = CreateContainer())
+            {
+                var exports = container.GetExports<T>().ToList();
+                if (exports.Count == 0) throw new SimpleDataException("No ADO Provider found.");
+                if (exports.Count > 1) throw new SimpleDataException("Multiple ADO Providers found; specify provider name or remove unwanted assemblies.");
+                return exports.Single().Value;
+            }
+        }
+
         public static T Compose<T>(string contractName)
         {
             using (var container = CreateContainer())

@@ -17,7 +17,7 @@ namespace Simple.Data.Ado
 
         public IConnectionProvider GetProviderByConnectionString(string connectionString)
         {
-            var token = new ConnectionToken(connectionString, "System.Data.SqlClient");
+            var token = new ConnectionToken(connectionString, string.Empty);
             return _connectionProviderCache.GetOrAdd(token, LoadProviderByConnectionString);
         }
 
@@ -35,8 +35,7 @@ namespace Simple.Data.Ado
                 return GetProviderByFilename(dataSource);
             }
             
-            var provider = ComposeProvider("System.Data.SqlClient");
-
+            var provider = ComposeProvider();
             provider.SetConnectionString(token.ConnectionString);
             return provider;
         }
@@ -67,6 +66,11 @@ namespace Simple.Data.Ado
 
             if (extension == null) throw new ArgumentException("Unrecognised file.");
             return extension.TrimStart('.').ToLower();
+        }
+
+        private static IConnectionProvider ComposeProvider()
+        {
+            return MefHelper.Compose<IConnectionProvider>();
         }
 
         private static IConnectionProvider ComposeProvider(string extension)

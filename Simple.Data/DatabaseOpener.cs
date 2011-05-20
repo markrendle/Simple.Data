@@ -137,7 +137,7 @@ namespace Simple.Data
 
         private static Database OpenConnectionMethod(string connectionString)
         {
-            return new Database(AdapterFactory.Create("Ado", new { ConnectionString = connectionString, ProviderName = "System.Data.SqlClient" }));
+            return new Database(AdapterFactory.Create("Ado", new { ConnectionString = connectionString }));
         }
 
         private static Database OpenConnectionMethod(string connectionString, string providerName)
