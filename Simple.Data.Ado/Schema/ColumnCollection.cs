@@ -30,6 +30,11 @@ namespace Simple.Data.Ado.Schema
             return column;
         }
 
+        public bool Contains(string columnName)
+        {
+            return FindColumnWithName(columnName) != null;
+        }
+
         private Column FindColumnWithName(string columnName)
         {
             columnName = columnName.Homogenize();
