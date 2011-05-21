@@ -129,7 +129,23 @@ namespace Simple.Data.UnitTest
             try
             {
                 var query = new SimpleQuery(null, "foo") as dynamic;
-                (query as dynamic).Count().ShouldEqual(0);
+                (query as dynamic).Count();
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
+            Assert.IsNotInstanceOf(typeof(RuntimeBinderException), exception);
+        }
+
+        [Test]
+        public void RespondsToAnyAsDynamic()
+        {
+            Exception exception = null;
+            try
+            {
+                var query = new SimpleQuery(null, "foo") as dynamic;
+                (query as dynamic).Any();
             }
             catch (Exception ex)
             {

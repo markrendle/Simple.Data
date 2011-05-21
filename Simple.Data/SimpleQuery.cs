@@ -284,5 +284,10 @@ namespace Simple.Data
         {
             return Records.Count();
         }
+
+        public bool Any()
+        {
+            return Records.Any();
+        }
     }
 }
