@@ -279,5 +279,15 @@ namespace Simple.Data
         {
             return Cast<T>().SingleOrDefault(predicate);
         }
+
+        public int Count()
+        {
+            return Records.Count();
+        }
+
+        public bool Any()
+        {
+            return Records.Any();
+        }
     }
 }
