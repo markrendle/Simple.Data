@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.CSharp.RuntimeBinder;
 using NUnit.Framework;
 
 namespace Simple.Data.UnitTest
@@ -119,6 +120,22 @@ namespace Simple.Data.UnitTest
         public void ThenByDescendingWithoutOrderByShouldThrow()
         {
             new SimpleQuery(null, "foo").ThenByDescending(new DynamicReference("bar"));
+        }
+
+        [Test]
+        public void RespondsToCountAsADynamic()
+        {
+            Exception exception = null;
+            try
+            {
+                var query = new SimpleQuery(null, "foo") as dynamic;
+                (query as dynamic).Count().ShouldEqual(0);
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
+            Assert.IsNotInstanceOf(typeof(RuntimeBinderException), exception);
         }
     }
 }
