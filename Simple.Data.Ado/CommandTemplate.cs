@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -107,7 +108,7 @@ namespace Simple.Data.Ado
             var parameter = command.CreateParameter();
             parameter.ParameterName = parameterTemplate.Name + suffix;
             parameter.DbType = parameterTemplate.DbType;
-            parameter.Value = value;
+            parameter.Value = value ?? DBNull.Value;
             return parameter;
         }
     }
