@@ -1,4 +1,5 @@
-﻿using System.Dynamic;
+﻿using System;
+using System.Dynamic;
 using NUnit.Framework;
 using Simple.Data.Mocking.Ado;
 
@@ -282,6 +283,15 @@ namespace Simple.Data.IntegrationTest
             GeneratedSqlIs("insert into [dbo].[Users] ([Name],[Age]) values (@p0,@p1)");
             Parameter(0).Is("Phil");
             Parameter(1).Is(42);
+        }
+
+        [Test]
+        public void TestThatInsertUsesDBNull()
+        {
+            dynamic person = new ExpandoObject();
+            person.Name = null;
+            _db.Users.Insert(person);
+            Parameter(0).Is(DBNull.Value);
         }
     }
 }
