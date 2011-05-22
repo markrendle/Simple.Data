@@ -10,6 +10,20 @@ namespace Simple.Data.SqlTest
     public class QueryTest
     {
         [Test]
+        public void CountWithNoCriteriaShouldSelectThree()
+        {
+            var db = DatabaseHelper.Open();
+            Assert.AreEqual(3, db.Users.Count());
+        }
+
+        [Test]
+        public void CountWithCriteriaShouldSelectTwo()
+        {
+            var db = DatabaseHelper.Open();
+            Assert.AreEqual(2, db.Users.Count(db.Users.Age > 30));
+        }
+
+        [Test]
         public void ShouldSelectFromOneToTen()
         {
             var db = DatabaseHelper.Open();

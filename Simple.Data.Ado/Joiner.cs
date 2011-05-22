@@ -36,6 +36,17 @@ namespace Simple.Data.Ado
             return string.Join(" ", tablePairs.Select(tp => _done[tp.Item2]));
         }
 
+        public string GetJoinClauses(ObjectName mainTableName, SimpleExpression expression, IEnumerable<DynamicReference> references)
+        {
+            _done.AddOrUpdate(mainTableName, string.Empty, (s, o) => string.Empty);
+            var tablePairs = GetTableNames(expression, mainTableName.Schema).Concat(GetTableNames(references, mainTableName.Schema)).Distinct();
+            foreach (var tablePair in tablePairs)
+            {
+                AddJoin(tablePair.Item1, tablePair.Item2);
+            }
+            return string.Join(" ", tablePairs.Select(tp => _done[tp.Item2]));
+        }
+
         private void AddJoin(ObjectName table1Name, ObjectName table2Name)
         {
             var table1 = _schema.FindTable(table1Name);
@@ -78,12 +89,16 @@ namespace Simple.Data.Ado
             get { return _joinType == JoinType.Inner ? string.Empty : "LEFT"; }
         }
 
-        private static IEnumerable<Tuple<ObjectName,ObjectName>> GetTableNames(SimpleExpression expression, string schema)
+        private static IEnumerable<Tuple<ObjectName,ObjectName>> GetTableNames(IEnumerable<DynamicReference> references, string schema)
         {
-            return GetReferencesFromExpression(expression)
-                .SelectMany(r => DynamicReferenceToTuplePairs(r, schema))
+            return references.SelectMany(r => DynamicReferenceToTuplePairs(r, schema))
                 .TupleSelect((table1, table2) => Tuple.Create(new ObjectName(schema, table1), new ObjectName(schema, table2)))
                 .Distinct();
+        }
+        
+        private static IEnumerable<Tuple<ObjectName,ObjectName>> GetTableNames(SimpleExpression expression, string schema)
+        {
+            return expression == null ? Enumerable.Empty<Tuple<ObjectName, ObjectName>>() : GetTableNames(GetReferencesFromExpression(expression), schema);
         }
 
         private static IEnumerable<Tuple<string,string>> DynamicReferenceToTuplePairs(DynamicReference reference, string schema)

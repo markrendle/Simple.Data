@@ -61,6 +61,7 @@
     <Compile Include="ExceptionsTesting.cs" />
     <Compile Include="NaturalNamingTest.cs" />
     <Compile Include="ProcedureTest.cs" />
+    <Compile Include="QueryTest.cs" />
     <Compile Include="RangeAndArrayFindTest.cs" />
     <Compile Include="TransactionTest.cs" />
     <Compile Include="DatabaseTest.cs" />

@@ -14,6 +14,7 @@ namespace Simple.Data
     {
         private readonly Adapter _adapter;
         private readonly string _tableName;
+        private readonly IEnumerable<DynamicReference> _columns;
         private readonly SimpleExpression _criteria;
         private readonly IEnumerable<SimpleOrderByItem> _order;
         private readonly int? _skipCount;
@@ -30,6 +31,7 @@ namespace Simple.Data
 
         private SimpleQuery(SimpleQuery source,
             string tableName = null,
+            IEnumerable<DynamicReference> columns = null,
             SimpleExpression criteria = null,
             IEnumerable<SimpleOrderByItem> order = null,
             int? skipCount = null,
@@ -37,10 +39,16 @@ namespace Simple.Data
         {
             _adapter = source._adapter;
             _tableName = tableName ?? source.TableName;
+            _columns = columns ?? source.Columns ?? Enumerable.Empty<DynamicReference>();
             _criteria = criteria ?? source.Criteria;
             _order = order ?? source.Order;
             _skipCount = skipCount ?? source.SkipCount;
             _takeCount = takeCount ?? source.TakeCount;
+        }
+
+        public IEnumerable<DynamicReference> Columns
+        {
+            get { return _columns; }
         }
 
         public int? TakeCount
@@ -66,6 +74,26 @@ namespace Simple.Data
         public string TableName
         {
             get { return _tableName; }
+        }
+
+        /// <summary>
+        /// Selects only the specified columns.
+        /// </summary>
+        /// <param name="columns">The columns.</param>
+        /// <returns>A new <see cref="SimpleQuery"/> which will select only the specified columns.</returns>
+        public SimpleQuery Select(params DynamicReference[] columns)
+        {
+            return new SimpleQuery(this, columns: columns);
+        }
+
+        /// <summary>
+        /// Selects only the specified columns.
+        /// </summary>
+        /// <param name="columns">The columns.</param>
+        /// <returns>A new <see cref="SimpleQuery"/> which will select only the specified columns.</returns>
+        public SimpleQuery Select(IEnumerable<DynamicReference> columns)
+        {
+            return new SimpleQuery(this, columns: columns);
         }
 
         public SimpleQuery Where(SimpleExpression criteria)
@@ -117,17 +145,7 @@ namespace Simple.Data
         {
             get
             {
-                if (_records == null)
-                {
-                    lock (_sync)
-                    {
-                        if (_records == null)
-                        {
-                            _records = _adapter.RunQuery(this).Select(d => new SimpleRecord(d, _tableName));
-                        }
-                    }
-                }
-                return _records;
+                return _adapter.RunQuery(this).Select(d => new SimpleRecord(d, _tableName));
             }
         }
 
@@ -278,6 +296,30 @@ namespace Simple.Data
         public T SingleOrDefault<T>(Func<T, bool> predicate)
         {
             return Cast<T>().SingleOrDefault(predicate);
+        }
+
+        public int Count()
+        {
+            return (int)_adapter.RunQuery(this.Select(new CountSpecialReference())).Single().Single().Value;
+        }
+
+        /// <summary>
+        /// Checks whether the query matches any records without running the full query.
+        /// </summary>
+        /// <returns><c>true</c> if the query matches any record; otherwise, <c>false</c>.</returns>
+        public bool Exists()
+        {
+            return (int)_adapter.RunQuery(this.Select(new CountSpecialReference())).Single().Single().Value > 0;
+        }
+
+        /// <summary>
+        /// Checks whether the query matches any records without running the full query.
+        /// </summary>
+        /// <returns><c>true</c> if the query matches any record; otherwise, <c>false</c>.</returns>
+        /// <remarks>This method is an alias for <see cref="Exists"/>.</remarks>
+        public bool Any()
+        {
+            return Exists();
         }
     }
 }

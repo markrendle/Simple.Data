@@ -26,6 +26,7 @@ namespace Simple.Data.Ado
         {
             SetQueryContext(query);
 
+            HandleJoins();
             HandleQueryCriteria();
             HandleOrderBy();
             HandlePaging();
@@ -41,15 +42,21 @@ namespace Simple.Data.Ado
             _commandBuilder = new CommandBuilder(GetSelectClause(_tableName), _schema.SchemaProvider);
         }
 
-        private void HandleQueryCriteria()
+        private void HandleJoins()
         {
-            if (_query.Criteria == null) return;
+            if (_query.Criteria == null
+                && (_query.Columns.Where(r => !(r is CountSpecialReference)).Count() == 0)) return;
 
-            var joins = new Joiner(JoinType.Inner, _schema).GetJoinClauses(_tableName, _query.Criteria);
+            var joins = new Joiner(JoinType.Inner, _schema).GetJoinClauses(_tableName, _query.Criteria, _query.Columns.Where(r => !(r is CountSpecialReference)));
             if (!string.IsNullOrWhiteSpace(joins))
             {
                 _commandBuilder.Append(" " + joins);
             }
+        }
+
+        private void HandleQueryCriteria()
+        {
+            if (_query.Criteria == null) return;
             _commandBuilder.Append(" WHERE " + new ExpressionFormatter(_commandBuilder, _schema).Format(_query.Criteria));
         }
 
@@ -88,8 +95,31 @@ namespace Simple.Data.Ado
         {
             var table = _schema.FindTable(tableName);
             return string.Format("select {0} from {1}",
-                string.Join(",", table.Columns.Select(c => string.Format("{0}.{1}", table.QualifiedName, c.QuotedName))),
+                GetColumnsClause(table),
                 table.QualifiedName);
+        }
+
+        private string GetColumnsClause(Table table)
+        {
+            return _query.Columns.Count() == 1 && _query.Columns.Single() is CountSpecialReference
+                ?
+                "COUNT(*)"
+                :
+                string.Join(",", GetColumnsToSelect(table).Select(c => string.Format("{0}.{1}", c.Item1.QualifiedName, c.Item2.QuotedName)));
+        }
+
+        private IEnumerable<Tuple<Table,Column>> GetColumnsToSelect(Table table)
+        {
+            if (_query.Columns.Any())
+            {
+                return from c in _query.Columns
+                       let t = _schema.FindTable(c.GetOwner().GetName())
+                       select Tuple.Create(t, t.FindColumn(c.GetName()));
+            }
+            else
+            {
+                return table.Columns.Select(c => Tuple.Create(table, c));
+            }
         }
     }
 }

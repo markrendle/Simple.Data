@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Simple.Data.Commands
@@ -19,11 +20,14 @@ namespace Simple.Data.Commands
                                                                   new DeleteByCommand(),
                                                                   new DeleteAllCommand(),
                                                                   new QueryByCommand(),
+                                                                  new CountCommand(),
                                                               };
+
+        private static readonly ConcurrentDictionary<string, ICommand> Cache = new ConcurrentDictionary<string, ICommand>();
 
         public static ICommand GetCommandFor(string method)
         {
-            return Commands.SingleOrDefault(command => command.IsCommandFor(method));
+            return Cache.GetOrAdd(method, m => Commands.SingleOrDefault(command => command.IsCommandFor(method)));
         }
     }
 }

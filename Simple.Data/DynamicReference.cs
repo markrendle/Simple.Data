@@ -15,7 +15,7 @@ namespace Simple.Data
     {
         private readonly string _name;
         private readonly DynamicReference _owner;
-        private readonly DataStrategy _database;
+        private readonly DataStrategy _dataStrategy;
 
         internal DynamicReference(string name)
         {
@@ -31,7 +31,7 @@ namespace Simple.Data
         internal DynamicReference(string name, DataStrategy dataStrategy)
         {
             _name = name;
-            _database = dataStrategy;
+            _dataStrategy = dataStrategy;
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Simple.Data
 
         private DataStrategy GetDatabase()
         {
-            return _database;
+            return _dataStrategy;
         }
 
         /// <summary>
@@ -59,9 +59,9 @@ namespace Simple.Data
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
-            if (_database != null)
+            if (_dataStrategy != null)
             {
-                var table = _database.SetMemberAsTable(this);
+                var table = _dataStrategy.SetMemberAsTable(this);
                 return table.TryInvokeMember(binder, args, out result);
             }
             if ((!ReferenceEquals(_owner, null)) && GetOwner().GetDatabase() != null)
@@ -69,9 +69,9 @@ namespace Simple.Data
                 var command = CommandFactory.GetCommandFor(binder.Name);
                 if (command != null)
                 {
-                    var schema = _owner._database.SetMemberAsSchema(_owner);
+                    var schema = _owner._dataStrategy.SetMemberAsSchema(_owner);
                     var table = schema.GetTable(_name);
-                    result = command.Execute(_database ?? _owner._database, table, binder, args);
+                    result = command.Execute(_dataStrategy ?? _owner._dataStrategy, table, binder, args);
                 }
                 else
                     result = new SimpleExpression(this, new SimpleFunction(binder.Name, args), SimpleExpressionType.Function);
