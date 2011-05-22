@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -42,7 +43,7 @@ namespace Simple.Data.Ado
                 {
                     var parameter = command.CreateParameter();
                     parameter.ParameterName = _schemaProvider.NameParameter("p" + index);
-                    parameter.Value = values[index];
+                    parameter.Value = values[index] ?? DBNull.Value;
                     command.Parameters.Add(parameter);
                     
                     sqlBuilder.Append(parameter.ParameterName);
