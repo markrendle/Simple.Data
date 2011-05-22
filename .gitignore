@@ -16,3 +16,4 @@ Releases/2*
 *.pidb
 Simple.Data.sln.docstates
 test-results
+apply_config.bat
