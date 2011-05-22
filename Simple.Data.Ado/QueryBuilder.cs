@@ -105,21 +105,32 @@ namespace Simple.Data.Ado
                 ?
                 "COUNT(*)"
                 :
-                string.Join(",", GetColumnsToSelect(table).Select(c => string.Format("{0}.{1}", c.Item1.QualifiedName, c.Item2.QuotedName)));
+                string.Join(",", GetColumnsToSelect(table)
+                .Select(c => FormatColumnClause(c.Item1, c.Item2, c.Item3)));
         }
 
-        private IEnumerable<Tuple<Table,Column>> GetColumnsToSelect(Table table)
+        private IEnumerable<Tuple<Table,Column,string>> GetColumnsToSelect(Table table)
         {
             if (_query.Columns.Any())
             {
                 return from c in _query.Columns
                        let t = _schema.FindTable(c.GetOwner().GetName())
-                       select Tuple.Create(t, t.FindColumn(c.GetName()));
+                       select Tuple.Create(t, t.FindColumn(c.GetName()), c.Alias);
             }
             else
             {
-                return table.Columns.Select(c => Tuple.Create(table, c));
+                const string nullString = null;
+                return table.Columns.Select(c => Tuple.Create(table, c, nullString));
             }
+        }
+
+        private string FormatColumnClause(Table table, Column column, string alias)
+        {
+            if (alias == null)
+                return string.Format("{0}.{1}", table.QualifiedName, column.QuotedName);
+            else
+                return string.Format("{0}.{1} AS {2}", table.QualifiedName, column.QuotedName,
+                                     _schema.QuoteObjectName(alias));
         }
     }
 }

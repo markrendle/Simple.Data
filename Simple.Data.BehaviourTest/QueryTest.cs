@@ -36,6 +36,15 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void SpecifyingColumnWithAliasShouldAddAsClause()
+        {
+            _db.Users.All()
+                .Select(_db.Users.Name, _db.Users.Password.As("SuperSecretPassword"))
+                .ToList();
+            GeneratedSqlIs("select [dbo].[users].[name],[dbo].[users].[password] as [supersecretpassword] from [dbo].[users]");
+        }
+
+        [Test]
         public void SpecifyingColumnsFromOtherTablesShouldAddJoin()
         {
             _db.Users.All()

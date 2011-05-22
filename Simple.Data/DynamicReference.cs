@@ -16,22 +16,35 @@ namespace Simple.Data
         private readonly string _name;
         private readonly DynamicReference _owner;
         private readonly DataStrategy _dataStrategy;
+        private readonly string _alias;
 
-        internal DynamicReference(string name)
+        internal DynamicReference(string name) : this(name, null, null, null)
         {
-            _name = name;
         }
 
-        internal DynamicReference(string name, DynamicReference owner)
+        internal DynamicReference(string name, DynamicReference owner) : this(name, owner, null, null)
+        {
+        }
+
+        internal DynamicReference(string name, DataStrategy dataStrategy) : this(name, null, dataStrategy, null)
+        {
+        }
+
+        internal DynamicReference(string name, DynamicReference owner, DataStrategy dataStrategy) : this(name, owner, dataStrategy, null)
+        {
+        }
+
+        internal DynamicReference(string name, DynamicReference owner, DataStrategy dataStrategy, string alias)
         {
             _name = name;
             _owner = owner;
+            _dataStrategy = dataStrategy;
+            _alias = alias;
         }
 
-        internal DynamicReference(string name, DataStrategy dataStrategy)
+        public string Alias
         {
-            _name = name;
-            _dataStrategy = dataStrategy;
+            get { return _alias; }
         }
 
         /// <summary>
@@ -55,6 +68,11 @@ namespace Simple.Data
         public string GetName()
         {
             return _name;
+        }
+
+        public DynamicReference As(string alias)
+        {
+            return new DynamicReference(_name, _owner, _dataStrategy, alias);
         }
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)

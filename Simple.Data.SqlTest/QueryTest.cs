@@ -66,6 +66,14 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void ColumnAliasShouldChangeDynamicPropertyName()
+        {
+            var db = DatabaseHelper.Open();
+            var actual = db.Users.QueryById(1).Select(db.Users.Name.As("Alias")).First();
+            Assert.AreEqual("Bob", actual.Alias);
+        }
+
+        [Test]
         public void ShouldSelectFromOneToTen()
         {
             var db = DatabaseHelper.Open();

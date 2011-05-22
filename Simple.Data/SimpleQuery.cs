@@ -48,7 +48,7 @@ namespace Simple.Data
 
         public IEnumerable<DynamicReference> Columns
         {
-            get { return _columns; }
+            get { return _columns ?? Enumerable.Empty<DynamicReference>(); }
         }
 
         public int? TakeCount
