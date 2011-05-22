@@ -24,6 +24,48 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void CountByShouldSelectOne()
+        {
+            var db = DatabaseHelper.Open();
+            Assert.AreEqual(1, db.Users.CountByName("Bob"));
+        }
+
+        [Test]
+        public void ExistsWithNoCriteriaShouldReturnTrue()
+        {
+            var db = DatabaseHelper.Open();
+            Assert.AreEqual(true, db.Users.Exists());
+        }
+
+        [Test]
+        public void ExistsWithValidCriteriaShouldReturnTrue()
+        {
+            var db = DatabaseHelper.Open();
+            Assert.AreEqual(true, db.Users.Exists(db.Users.Age > 30));
+        }
+
+        [Test]
+        public void ExistsWithInvalidCriteriaShouldReturnTrue()
+        {
+            var db = DatabaseHelper.Open();
+            Assert.AreEqual(false, db.Users.Exists(db.Users.Age == -1));
+        }
+
+        [Test]
+        public void ExistsByValidValueShouldReturnTrue()
+        {
+            var db = DatabaseHelper.Open();
+            Assert.AreEqual(true, db.Users.ExistsByName("Bob"));
+        }
+
+        [Test]
+        public void ExistsByInvalidValueShouldReturnTrue()
+        {
+            var db = DatabaseHelper.Open();
+            Assert.AreEqual(false, db.Users.ExistsByName("Peter Kay"));
+        }
+
+        [Test]
         public void ShouldSelectFromOneToTen()
         {
             var db = DatabaseHelper.Open();

@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq;
-using System.Text;
 
 namespace Simple.Data.Commands
 {
-    class CountCommand : ICommand
+    class CountByCommand : ICommand
     {
         /// <summary>
         /// Determines whether the instance is able to handle the specified method.
@@ -17,7 +14,7 @@ namespace Simple.Data.Commands
         /// </returns>
         public bool IsCommandFor(string method)
         {
-            return method.Equals("count", StringComparison.InvariantCultureIgnoreCase);
+            return method.StartsWith("countby", StringComparison.InvariantCultureIgnoreCase) || method.StartsWith("count_by", StringComparison.InvariantCultureIgnoreCase);
         }
 
         /// <summary>
@@ -30,14 +27,8 @@ namespace Simple.Data.Commands
         /// <returns></returns>
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            var query = new SimpleQuery(dataStrategy.GetAdapter(), table.GetQualifiedName());
-
-            if (args.Length == 1 && args[0] is SimpleExpression)
-            {
-                query = query.Where((SimpleExpression)args[0]);
-            }
-
-            return query.Count();
+            var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
+            return new SimpleQuery(dataStrategy.GetAdapter(), table.GetQualifiedName()).Where(criteria).Count();
         }
 
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)

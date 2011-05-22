@@ -21,6 +21,9 @@ namespace Simple.Data.Commands
                                                                   new DeleteAllCommand(),
                                                                   new QueryByCommand(),
                                                                   new CountCommand(),
+                                                                  new CountByCommand(),
+                                                                  new ExistsCommand(),
+                                                                  new ExistsByCommand(),
                                                               };
 
         private static readonly ConcurrentDictionary<string, ICommand> Cache = new ConcurrentDictionary<string, ICommand>();

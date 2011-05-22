@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq;
-using System.Text;
 
 namespace Simple.Data.Commands
 {
-    class CountCommand : ICommand
+    class ExistsCommand : ICommand
     {
         /// <summary>
         /// Determines whether the instance is able to handle the specified method.
@@ -17,7 +14,7 @@ namespace Simple.Data.Commands
         /// </returns>
         public bool IsCommandFor(string method)
         {
-            return method.Equals("count", StringComparison.InvariantCultureIgnoreCase);
+            return method.Equals("exists", StringComparison.InvariantCultureIgnoreCase) || method.Equals("any", StringComparison.InvariantCultureIgnoreCase);
         }
 
         /// <summary>
@@ -37,7 +34,7 @@ namespace Simple.Data.Commands
                 query = query.Where((SimpleExpression)args[0]);
             }
 
-            return query.Count();
+            return query.Exists();
         }
 
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
