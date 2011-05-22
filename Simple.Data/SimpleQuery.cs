@@ -309,7 +309,7 @@ namespace Simple.Data
         /// <returns><c>true</c> if the query matches any record; otherwise, <c>false</c>.</returns>
         public bool Exists()
         {
-            return (int)_adapter.RunQuery(this.Select(new CountSpecialReference())).Single().Single().Value > 0;
+            return _adapter.RunQuery(this.Select(new ExistsSpecialReference())).Count() == 1;
         }
 
         /// <summary>

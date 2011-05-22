@@ -82,6 +82,7 @@
     <Compile Include="CountSpecialReference.cs" />
     <Compile Include="Database.Open.cs" />
     <Compile Include="EnumerableEx.cs" />
+    <Compile Include="ExistsSpecialReference.cs" />
     <Compile Include="Extensions\HomogenizeEx.cs" />
     <Compile Include="Extensions\ResultSetExtensions.cs" />
     <Compile Include="HomogenizedEqualityComparer.cs" />

@@ -101,12 +101,19 @@ namespace Simple.Data.Ado
 
         private string GetColumnsClause(Table table)
         {
-            return _query.Columns.Count() == 1 && _query.Columns.Single() is CountSpecialReference
+            return _query.Columns.Count() == 1 && _query.Columns.Single() is SpecialReference
                 ?
-                "COUNT(*)"
+                FormatSpecialReference((SpecialReference)_query.Columns.Single())
                 :
                 string.Join(",", GetColumnsToSelect(table)
                 .Select(c => FormatColumnClause(c.Item1, c.Item2, c.Item3)));
+        }
+
+        private static string FormatSpecialReference(SpecialReference reference)
+        {
+            if (reference.GetType() == typeof(CountSpecialReference)) return "COUNT(*)";
+            if (reference.GetType() == typeof(ExistsSpecialReference)) return "DISTINCT 1";
+            throw new InvalidOperationException("SpecialReference type not recognised.");
         }
 
         private IEnumerable<Tuple<Table,Column,string>> GetColumnsToSelect(Table table)

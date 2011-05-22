@@ -123,7 +123,7 @@ namespace Simple.Data.IntegrationTest
             _db.Users.Insert(user);
             GeneratedSqlIs("insert into [dbo].[Users] ([Name],[Password],[Age]) values (@p0,@p1,@p2)");
             Parameter(0).Is("Steve");
-            Parameter(1).Is(null);
+            Parameter(1).Is(DBNull.Value);
             Parameter(2).Is(50);
         }
 

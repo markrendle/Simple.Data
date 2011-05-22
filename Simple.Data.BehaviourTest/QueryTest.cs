@@ -71,7 +71,7 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
-        public void SpecifyingExistsShouldSelectCount()
+        public void SpecifyingExistsShouldSelectDistinct1()
         {
             try
             {
@@ -82,11 +82,11 @@ namespace Simple.Data.IntegrationTest
                 // This won't work on Mock provider, but the SQL should be generated OK
             }
 
-            GeneratedSqlIs("select count(*) from [dbo].[users]");
+            GeneratedSqlIs("select distinct 1 from [dbo].[users]");
         }
 
         [Test]
-        public void SpecifyingAnyShouldSelectCount()
+        public void SpecifyingAnyShouldSelectDistinct1()
         {
             try
             {
@@ -97,7 +97,7 @@ namespace Simple.Data.IntegrationTest
                 // This won't work on Mock provider, but the SQL should be generated OK
             }
 
-            GeneratedSqlIs("select count(*) from [dbo].[users]");
+            GeneratedSqlIs("select distinct 1 from [dbo].[users]");
         }
     }
 }

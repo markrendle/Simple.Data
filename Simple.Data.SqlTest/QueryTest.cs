@@ -45,7 +45,7 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
-        public void ExistsWithInvalidCriteriaShouldReturnTrue()
+        public void ExistsWithInvalidCriteriaShouldReturnFalse()
         {
             var db = DatabaseHelper.Open();
             Assert.AreEqual(false, db.Users.Exists(db.Users.Age == -1));
@@ -59,7 +59,7 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
-        public void ExistsByInvalidValueShouldReturnTrue()
+        public void ExistsByInvalidValueShouldReturnFalse()
         {
             var db = DatabaseHelper.Open();
             Assert.AreEqual(false, db.Users.ExistsByName("Peter Kay"));

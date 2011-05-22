@@ -5,7 +5,13 @@ using System.Text;
 
 namespace Simple.Data
 {
-    public class CountSpecialReference : DynamicReference
+    public abstract class SpecialReference : DynamicReference
+    {
+        protected SpecialReference(string name) : base(name)
+        {
+        }
+    }
+    public class CountSpecialReference : SpecialReference
     {
         public CountSpecialReference() : base("COUNT")
         {
