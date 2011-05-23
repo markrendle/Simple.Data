@@ -65,7 +65,7 @@ namespace Simple.Data.Ado
                 parameter.ParameterName = pair.Key.Name;
                 parameter.DbType = pair.Key.DbType;
                 parameter.Size = pair.Key.MaxLength;
-                parameter.Value = pair.Value;
+                parameter.Value = pair.Value ?? DBNull.Value;
                 command.Parameters.Add(parameter);
             }
         }
