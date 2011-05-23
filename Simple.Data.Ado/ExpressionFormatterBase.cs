@@ -47,7 +47,7 @@ namespace Simple.Data.Ado
 
         private string EqualExpressionToWhereClause(SimpleExpression expression)
         {
-            if (expression.RightOperand == null) return string.Format("{0} IS NULL", expression.LeftOperand);
+            if (expression.RightOperand == null) return string.Format("{0} IS NULL", FormatObject(expression.LeftOperand, null));
             if (CommonTypes.Contains(expression.RightOperand.GetType())) return FormatAsComparison(expression, "=");
 
             return FormatAsComparison(expression, "=");
@@ -55,7 +55,7 @@ namespace Simple.Data.Ado
 
         private string NotEqualExpressionToWhereClause(SimpleExpression expression)
         {
-            if (expression.RightOperand == null) return string.Format("{0} IS NOT NULL", expression.LeftOperand);
+            if (expression.RightOperand == null) return string.Format("{0} IS NOT NULL", FormatObject(expression.LeftOperand, null));
             if (CommonTypes.Contains(expression.RightOperand.GetType())) return FormatAsComparison(expression, "!=");
 
             return FormatAsComparison(expression, "!=");

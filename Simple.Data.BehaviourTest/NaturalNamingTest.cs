@@ -10,13 +10,13 @@ namespace Simple.Data.IntegrationTest
         {
             schemaProvider.SetTables(
                 new[] { "dbo", "Customers", "BASE TABLE" },
-                new[] { "dbo", "Orders", "BASE TABLE" });
+                new[] { "dbo", "Customer_Orders", "BASE TABLE" });
             schemaProvider.SetColumns(
                 new[] { "dbo", "Customers", "CustomerId" },
                 new[] { "dbo", "Customers", "Customer_Name" },
-                new[] { "dbo", "Orders", "OrderId" },
-                new[] { "dbo", "Orders", "CustomerId" },
-                new[] { "dbo", "Orders", "OrderDate" });
+                new[] { "dbo", "Customer_Orders", "ORDER_ID" },
+                new[] { "dbo", "Customer_Orders", "CUSTOMER_ID" },
+                new[] { "dbo", "Customer_Orders", "ORDER_DATE" });
             schemaProvider.SetPrimaryKeys(new object[] { "dbo", "Customers", "CustomerId", 0 });
             schemaProvider.SetForeignKeys(new object[] { "FK_Orders_Customers", "dbo", "Orders", "CustomerId", "dbo", "Customers", "CustomerId", 0 });
         }
@@ -43,6 +43,14 @@ namespace Simple.Data.IntegrationTest
             _db.Customers.FindAll(_db.Customers.CustomerName == "Arthur").OrderBy(_db.Customers.CustomerName).ToList<dynamic>();
             GeneratedSqlIs("select [dbo].[customers].[customerid],[dbo].[customers].[customer_name] from [dbo].[customers] where [dbo].[customers].[customer_name] = @p1 order by [customer_name]");
             Parameter(0).Is("Arthur");
+        }
+
+        [Test]
+        public void DotNetNamingInComplexQuery()
+        {
+            _db.CustomerOrders.FindAll(_db.CustomerOrders.CustomerId.Like("123%") || (_db.CustomerOrders.CustomerId == null)).ToList<dynamic>();
+            GeneratedSqlIs("select [dbo].[Customer_Orders].[ORDER_ID],[dbo].[Customer_Orders].[CUSTOMER_ID],[dbo].[Customer_Orders].[ORDER_DATE] from [dbo].[Customer_Orders] where ([dbo].[Customer_Orders].[CUSTOMER_ID] like @p1 OR [dbo].[Customer_Orders].[CUSTOMER_ID] IS NULL)");
+            Parameter(0).Is("123%");
         }
     }
 }
