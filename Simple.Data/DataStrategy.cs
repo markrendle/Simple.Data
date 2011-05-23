@@ -58,19 +58,19 @@ namespace Simple.Data
             get { return GetOrAddDynamicReference(name); }
         }
 
-        private DynamicReference CreateDynamicReference(string name)
+        private ObjectReference CreateDynamicReference(string name)
         {
-            return new DynamicReference(name, this);
+            return new ObjectReference(name, this);
         }
 
-        internal DynamicTable SetMemberAsTable(DynamicReference reference)
+        internal DynamicTable SetMemberAsTable(ObjectReference reference)
         {
             if (reference == null) throw new ArgumentNullException("reference");
             _members.TryUpdate(reference.GetName(), new DynamicTable(reference.GetName(), this), reference);
             return (DynamicTable)_members[reference.GetName()];
         }
 
-        internal DynamicSchema SetMemberAsSchema(DynamicReference reference)
+        internal DynamicSchema SetMemberAsSchema(ObjectReference reference)
         {
             if (reference == null) throw new ArgumentNullException("reference");
             _members.TryUpdate(reference.GetName(), new DynamicSchema(reference.GetName(), this), reference);

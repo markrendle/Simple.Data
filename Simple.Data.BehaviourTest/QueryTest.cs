@@ -99,5 +99,54 @@ namespace Simple.Data.IntegrationTest
 
             GeneratedSqlIs("select distinct 1 from [dbo].[users]");
         }
+
+        [Test]
+        public void SpecifyingMinShouldSelectFunction()
+        {
+            try
+            {
+                _db.Users.All().Select(_db.Users.Age.Min()).ToScalar();
+            }
+            catch (InvalidOperationException)
+            {
+                // This won't work on Mock provider, but the SQL should be generated OK
+            }
+            catch (SimpleDataException)
+            {
+                // This won't work on Mock provider, but the SQL should be generated OK
+            }
+
+            GeneratedSqlIs("select min([dbo].[users].[age]) from [dbo].[users]");
+        }
+
+        [Test]
+        public void SpecifyingNonAggregatedColumnAndMinShouldAddGroupBy()
+        {
+            try
+            {
+                _db.Users.All().Select(_db.Users.Name, _db.Users.Age.Min().As("Youngest")).ToList();
+            }
+            catch (InvalidOperationException)
+            {
+                // This won't work on Mock provider, but the SQL should be generated OK
+            }
+
+            GeneratedSqlIs("select [dbo].[users].[name],min([dbo].[users].[age]) as [youngest] from [dbo].[users] group by [dbo].[users].[name]");
+        }
+
+        [Test]
+        public void SpecifyingNonAggregateFunctionAndMinShouldAddGroupBy()
+        {
+            try
+            {
+                _db.Users.All().Select(_db.Users.Name.Length(), _db.Users.Age.Min().As("Youngest")).ToList();
+            }
+            catch (InvalidOperationException)
+            {
+                // This won't work on Mock provider, but the SQL should be generated OK
+            }
+
+            GeneratedSqlIs("select length([dbo].[users].[name]),min([dbo].[users].[age]) as [youngest] from [dbo].[users] group by [dbo].[users].[name]");
+        }
     }
 }

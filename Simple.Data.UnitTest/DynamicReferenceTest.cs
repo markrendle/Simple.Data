@@ -17,10 +17,10 @@ namespace Simple.Data.UnitTest
         public void GetDynamicPropertyReturnsNewDynamicReferenceWithTableAndColumn()
         {
             // Arrange
-            dynamic table = new DynamicReference("Table");
+            dynamic table = new ObjectReference("Table");
 
             // Act
-            DynamicReference column = table.Column;
+            ObjectReference column = table.Column;
 
             // Assert
             Assert.AreEqual("Column", column.GetName());
@@ -31,10 +31,10 @@ namespace Simple.Data.UnitTest
         public void GetDynamicPropertyDotPropertyReturnsNewDynamicReferenceWithTwoOwners()
         {
             // Arrange
-            dynamic table = new DynamicReference("Table1");
+            dynamic table = new ObjectReference("Table1");
 
             // Act
-            DynamicReference column = table.Table2.Column;
+            ObjectReference column = table.Table2.Column;
 
             // Assert
             Assert.AreEqual("Column", column.GetName());
@@ -65,7 +65,7 @@ namespace Simple.Data.UnitTest
         public void FromStringTest()
         {
             // Act
-            var actual = DynamicReference.FromString("One.Two.Three");
+            var actual = ObjectReference.FromString("One.Two.Three");
 
             // Assert
             Assert.AreEqual("Three", actual.GetName());
@@ -74,7 +74,7 @@ namespace Simple.Data.UnitTest
             Assert.IsNull(actual.GetOwner().GetOwner().GetOwner());
         }
 
-        private static void DoAsserts<T>(SimpleExpression expression, DynamicReference column, T rightOperand, SimpleExpressionType expressionType)
+        private static void DoAsserts<T>(SimpleExpression expression, ObjectReference column, T rightOperand, SimpleExpressionType expressionType)
         {
             Assert.AreEqual(column, expression.LeftOperand);
             Assert.AreEqual(rightOperand, expression.RightOperand);
@@ -85,7 +85,7 @@ namespace Simple.Data.UnitTest
         public void EqualOperatorReturnsSimpleExpressionWithEqualType()
         {
             // Arrange
-            var column = DynamicReference.FromStrings("foo", "bar");
+            var column = ObjectReference.FromStrings("foo", "bar");
 
             // Act
             var expression = column == 1;
@@ -98,7 +98,7 @@ namespace Simple.Data.UnitTest
         public void EqualOperatorReturnsSimpleExpressionWithEqualTypeWhenUsedAsDynamic()
         {
             // Arrange
-            dynamic column = DynamicReference.FromStrings("foo", "bar");
+            dynamic column = ObjectReference.FromStrings("foo", "bar");
 
             // Act
             var expression = column == 1;
@@ -111,7 +111,7 @@ namespace Simple.Data.UnitTest
         public void NotEqualOperatorReturnsSimpleExpressionWithNotEqualType()
         {
             // Arrange
-            var column = DynamicReference.FromStrings("foo", "bar");
+            var column = ObjectReference.FromStrings("foo", "bar");
 
             // Act
             var expression = column != 1;
@@ -124,7 +124,7 @@ namespace Simple.Data.UnitTest
         public void LessThanOperatorReturnsSimpleExpressionWithLessThanType()
         {
             // Arrange
-            var column = DynamicReference.FromStrings("foo", "bar");
+            var column = ObjectReference.FromStrings("foo", "bar");
 
             // Act
             var expression = column < 1;
@@ -137,7 +137,7 @@ namespace Simple.Data.UnitTest
         public void LessThanOrEqualOperatorReturnsSimpleExpressionWithLessThanOrEqualType()
         {
             // Arrange
-            var column = DynamicReference.FromStrings("foo", "bar");
+            var column = ObjectReference.FromStrings("foo", "bar");
 
             // Act
             var expression = column <= 1;
@@ -150,7 +150,7 @@ namespace Simple.Data.UnitTest
         public void GreaterThanOperatorReturnsSimpleExpressionWithGreaterThanType()
         {
             // Arrange
-            var column = DynamicReference.FromStrings("foo", "bar");
+            var column = ObjectReference.FromStrings("foo", "bar");
 
             // Act
             var expression = column > 1;
@@ -163,7 +163,7 @@ namespace Simple.Data.UnitTest
         public void GreaterThanOrEqualOperatorReturnsSimpleExpressionWithGreaterThanOrEqualType()
         {
             // Arrange
-            var column = DynamicReference.FromStrings("foo", "bar");
+            var column = ObjectReference.FromStrings("foo", "bar");
 
             // Act
             var expression = column >= 1;

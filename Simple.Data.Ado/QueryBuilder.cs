@@ -28,6 +28,7 @@ namespace Simple.Data.Ado
 
             HandleJoins();
             HandleQueryCriteria();
+            HandleGrouping();
             HandleOrderBy();
             HandlePaging();
 
@@ -47,7 +48,7 @@ namespace Simple.Data.Ado
             if (_query.Criteria == null
                 && (_query.Columns.Where(r => !(r is CountSpecialReference)).Count() == 0)) return;
 
-            var joins = new Joiner(JoinType.Inner, _schema).GetJoinClauses(_tableName, _query.Criteria, _query.Columns.Where(r => !(r is CountSpecialReference)));
+            var joins = new Joiner(JoinType.Inner, _schema).GetJoinClauses(_tableName, _query.Criteria, _query.Columns.OfType<ObjectReference>());
             if (!string.IsNullOrWhiteSpace(joins))
             {
                 _commandBuilder.Append(" " + joins);
@@ -58,6 +59,16 @@ namespace Simple.Data.Ado
         {
             if (_query.Criteria == null) return;
             _commandBuilder.Append(" WHERE " + new ExpressionFormatter(_commandBuilder, _schema).Format(_query.Criteria));
+        }
+
+        private void HandleGrouping()
+        {
+            var groupColumns =
+                _query.Columns.Where(c => (!(c is FunctionReference)) || !((FunctionReference) c).IsAggregate);
+
+            if (!groupColumns.Any()) return;
+
+            _commandBuilder.Append(" GROUP BY " + string.Join(",", groupColumns.Select(FormatGroupByColumnClause)));
         }
 
         private void HandleOrderBy()
@@ -105,8 +116,7 @@ namespace Simple.Data.Ado
                 ?
                 FormatSpecialReference((SpecialReference)_query.Columns.Single())
                 :
-                string.Join(",", GetColumnsToSelect(table)
-                .Select(c => FormatColumnClause(c.Item1, c.Item2, c.Item3)));
+                string.Join(",", GetColumnsToSelect(table).Select(FormatColumnClause));
         }
 
         private static string FormatSpecialReference(SpecialReference reference)
@@ -116,28 +126,64 @@ namespace Simple.Data.Ado
             throw new InvalidOperationException("SpecialReference type not recognised.");
         }
 
-        private IEnumerable<Tuple<Table,Column,string>> GetColumnsToSelect(Table table)
+        private IEnumerable<SimpleReference> GetColumnsToSelect(Table table)
         {
             if (_query.Columns.Any())
             {
-                return from c in _query.Columns
-                       let t = _schema.FindTable(c.GetOwner().GetName())
-                       select Tuple.Create(t, t.FindColumn(c.GetName()), c.Alias);
+                return _query.Columns;
             }
             else
             {
                 const string nullString = null;
-                return table.Columns.Select(c => Tuple.Create(table, c, nullString));
+                return table.Columns.Select(c => ObjectReference.FromStrings(table.ActualName, c.ActualName));
             }
         }
 
-        private string FormatColumnClause(Table table, Column column, string alias)
+        private string FormatColumnClause(SimpleReference reference)
         {
-            if (alias == null)
+            var objectReference = reference as ObjectReference;
+            if (!ReferenceEquals(objectReference, null))
+            {
+                var table = _schema.FindTable(objectReference.GetOwner().GetName());
+                var column = table.FindColumn(objectReference.GetName());
+                if (objectReference.Alias == null)
+                    return string.Format("{0}.{1}", table.QualifiedName, column.QuotedName);
+                else
+                    return string.Format("{0}.{1} AS {2}", table.QualifiedName, column.QuotedName,
+                                         _schema.QuoteObjectName(objectReference.Alias));
+            }
+
+            var functionReference = reference as FunctionReference;
+            if (!ReferenceEquals(functionReference, null))
+            {
+                return functionReference.Alias == null
+                           ? string.Format("{0}({1})", functionReference.Name,
+                                           FormatColumnClause(functionReference.Argument))
+                           : string.Format("{0}({1}) AS {2}", functionReference.Name,
+                                           FormatColumnClause(functionReference.Argument),
+                                           _schema.QuoteObjectName(functionReference.Alias));
+            }
+
+            throw new InvalidOperationException("SimpleReference type not supported.");
+        }
+
+        private string FormatGroupByColumnClause(SimpleReference reference)
+        {
+            var objectReference = reference as ObjectReference;
+            if (!ReferenceEquals(objectReference, null))
+            {
+                var table = _schema.FindTable(objectReference.GetOwner().GetName());
+                var column = table.FindColumn(objectReference.GetName());
                 return string.Format("{0}.{1}", table.QualifiedName, column.QuotedName);
-            else
-                return string.Format("{0}.{1} AS {2}", table.QualifiedName, column.QuotedName,
-                                     _schema.QuoteObjectName(alias));
+            }
+
+            var functionReference = reference as FunctionReference;
+            if (!ReferenceEquals(functionReference, null))
+            {
+                return FormatGroupByColumnClause(functionReference.Argument);
+            }
+
+            throw new InvalidOperationException("SimpleReference type not supported.");
         }
     }
 }

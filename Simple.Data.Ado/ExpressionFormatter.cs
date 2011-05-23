@@ -18,27 +18,27 @@ namespace Simple.Data.Ado
 
         protected override string FormatObject(object value, object otherOperand)
         {
-            var reference = value as DynamicReference;
+            var reference = value as ObjectReference;
             if (!ReferenceEquals(reference, null))
             {
                 var table = _schema.FindTable(reference.GetOwner().ToString());
                 return table.QualifiedName + "." + table.FindColumn(reference.GetName()).QuotedName;
             }
 
-            return _commandBuilder.AddParameter(value, GetColumn(otherOperand as DynamicReference)).Name;
+            return _commandBuilder.AddParameter(value, GetColumn(otherOperand as ObjectReference)).Name;
         }
 
         protected override string FormatRange(IRange range, object otherOperand)
         {
-            return _commandBuilder.AddParameter(range, GetColumn(otherOperand as DynamicReference)).Name;
+            return _commandBuilder.AddParameter(range, GetColumn(otherOperand as ObjectReference)).Name;
         }
 
         protected override string FormatList(IEnumerable list, object otherOperand)
         {
-            return _commandBuilder.AddParameter(list, GetColumn(otherOperand as DynamicReference)).Name;
+            return _commandBuilder.AddParameter(list, GetColumn(otherOperand as ObjectReference)).Name;
         }
 
-        private Column GetColumn(DynamicReference reference)
+        private Column GetColumn(ObjectReference reference)
         {
             if (reference == null)
             {

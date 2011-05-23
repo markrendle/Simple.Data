@@ -100,13 +100,13 @@ namespace Simple.Data
                 result = GetAll().ToList();
                 return true;
             }
-            result = new DynamicReference(binder.Name, new DynamicReference(_tableName, _dataStrategy));
+            result = new ObjectReference(binder.Name, new ObjectReference(_tableName, _dataStrategy));
             return true;
         }
 
-        public DynamicReference this[string name]
+        public ObjectReference this[string name]
         {
-            get { return new DynamicReference(name, new DynamicReference(_tableName, _dataStrategy)); }
+            get { return new ObjectReference(name, new ObjectReference(_tableName, _dataStrategy)); }
         }
 
         internal string GetName()

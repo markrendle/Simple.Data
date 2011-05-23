@@ -24,7 +24,7 @@ namespace Simple.Data
         }
 
         /// <summary>
-        /// Gets the left operand. This may be a <see cref="DynamicReference"/>, a primitive value, or a nested <see cref="SimpleExpression"/>.
+        /// Gets the left operand. This may be a <see cref="ObjectReference"/>, a primitive value, or a nested <see cref="SimpleExpression"/>.
         /// </summary>
         /// <value>The left operand.</value>
         public object LeftOperand
@@ -42,7 +42,7 @@ namespace Simple.Data
         }
 
         /// <summary>
-        /// Gets the right operand. This may be a <see cref="DynamicReference"/>, a primitive value, or a nested <see cref="SimpleExpression"/>.
+        /// Gets the right operand. This may be a <see cref="ObjectReference"/>, a primitive value, or a nested <see cref="SimpleExpression"/>.
         /// </summary>
         /// <value>The right operand.</value>
         public object RightOperand
@@ -60,7 +60,7 @@ namespace Simple.Data
             if (operand == null) return Yield(null);
             if (CommonTypes.Contains(operand.GetType())) return Yield(operand);
 
-            if (operand is DynamicReference)
+            if (operand is ObjectReference)
             {
                 return Enumerable.Empty<object>();
             }

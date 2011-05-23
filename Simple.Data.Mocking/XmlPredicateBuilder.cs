@@ -18,23 +18,23 @@ namespace Simple.Data.Mocking
                            ? (xml => leftPredicate(xml) && rightPredicate(xml))
                            : new Func<XElement, bool>(xml => leftPredicate(xml) || rightPredicate(xml));
             }
-            if (criteria.LeftOperand is DynamicReference)
+            if (criteria.LeftOperand is ObjectReference)
             {
-                var resolver = BuildReferenceResolver((DynamicReference)criteria.LeftOperand);
+                var resolver = BuildReferenceResolver((ObjectReference)criteria.LeftOperand);
                 return xml => Equals(resolver(xml), criteria.RightOperand);
             }
 
             return xml => true;
         }
 
-        private static Func<XElement, object> BuildReferenceResolver(DynamicReference reference)
+        private static Func<XElement, object> BuildReferenceResolver(ObjectReference reference)
         {
             var resolver = BuildElementResolver(reference);
 
             return xml => resolver(xml).TryGetAttribute(reference.GetName()).ConvertValue();
         }
 
-        private static Func<XElement, XElement> BuildElementResolver(DynamicReference reference)
+        private static Func<XElement, XElement> BuildElementResolver(ObjectReference reference)
         {
             var elementNames = reference.GetAllObjectNames();
             if (elementNames.Length == 2)

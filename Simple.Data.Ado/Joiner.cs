@@ -36,7 +36,7 @@ namespace Simple.Data.Ado
             return string.Join(" ", tablePairs.Select(tp => _done[tp.Item2]));
         }
 
-        public string GetJoinClauses(ObjectName mainTableName, SimpleExpression expression, IEnumerable<DynamicReference> references)
+        public string GetJoinClauses(ObjectName mainTableName, SimpleExpression expression, IEnumerable<ObjectReference> references)
         {
             _done.AddOrUpdate(mainTableName, string.Empty, (s, o) => string.Empty);
             var tablePairs = GetTableNames(expression, mainTableName.Schema).Concat(GetTableNames(references, mainTableName.Schema)).Distinct();
@@ -89,7 +89,7 @@ namespace Simple.Data.Ado
             get { return _joinType == JoinType.Inner ? string.Empty : "LEFT"; }
         }
 
-        private static IEnumerable<Tuple<ObjectName,ObjectName>> GetTableNames(IEnumerable<DynamicReference> references, string schema)
+        private static IEnumerable<Tuple<ObjectName,ObjectName>> GetTableNames(IEnumerable<ObjectReference> references, string schema)
         {
             return references.SelectMany(r => DynamicReferenceToTuplePairs(r, schema))
                 .TupleSelect((table1, table2) => Tuple.Create(new ObjectName(schema, table1), new ObjectName(schema, table2)))
@@ -101,7 +101,7 @@ namespace Simple.Data.Ado
             return expression == null ? Enumerable.Empty<Tuple<ObjectName, ObjectName>>() : GetTableNames(GetReferencesFromExpression(expression), schema);
         }
 
-        private static IEnumerable<Tuple<string,string>> DynamicReferenceToTuplePairs(DynamicReference reference, string schema)
+        private static IEnumerable<Tuple<string,string>> DynamicReferenceToTuplePairs(ObjectReference reference, string schema)
         {
             return reference.GetAllObjectNames()
                 .SkipWhile(s => s.Equals(schema, StringComparison.OrdinalIgnoreCase))
@@ -109,7 +109,7 @@ namespace Simple.Data.Ado
                 .ToTuplePairs();
         }
 
-        private static IEnumerable<DynamicReference> GetReferencesFromExpression(SimpleExpression expression)
+        private static IEnumerable<ObjectReference> GetReferencesFromExpression(SimpleExpression expression)
         {
             if (expression.Type == SimpleExpressionType.And || expression.Type == SimpleExpressionType.Or)
             {
@@ -117,15 +117,15 @@ namespace Simple.Data.Ado
                     .Concat(GetReferencesFromExpression((SimpleExpression) expression.LeftOperand));
             }
 
-            var result = Enumerable.Empty<DynamicReference>();
+            var result = Enumerable.Empty<ObjectReference>();
 
-            if (expression.LeftOperand is DynamicReference)
+            if (expression.LeftOperand is ObjectReference)
             {
-                result = result.Concat(new[] {(DynamicReference) expression.LeftOperand});
+                result = result.Concat(new[] {(ObjectReference) expression.LeftOperand});
             }
-            if (expression.RightOperand is DynamicReference)
+            if (expression.RightOperand is ObjectReference)
             {
-                result = result.Concat(new[] { (DynamicReference)expression.RightOperand });
+                result = result.Concat(new[] { (ObjectReference)expression.RightOperand });
             }
 
             return result;

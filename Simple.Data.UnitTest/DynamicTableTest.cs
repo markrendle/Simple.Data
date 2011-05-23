@@ -16,7 +16,7 @@ namespace Simple.Data.UnitTest
             dynamic table = new DynamicTable("Test", null);
 
             // Act
-            DynamicReference column = table.TestColumn;
+            ObjectReference column = table.TestColumn;
 
             // Assert
             Assert.AreEqual("Test", column.GetOwner().GetName());

@@ -19,7 +19,7 @@ namespace Simple.Data
 
         private static SimpleExpression CriteriaPairToExpression(string tableName, KeyValuePair<string, object> pair)
         {
-            return new SimpleExpression(new DynamicReference(pair.Key, new DynamicReference(tableName)), pair.Value, SimpleExpressionType.Equal);
+            return new SimpleExpression(new ObjectReference(pair.Key, new ObjectReference(tableName)), pair.Value, SimpleExpressionType.Equal);
         }
     }
 }

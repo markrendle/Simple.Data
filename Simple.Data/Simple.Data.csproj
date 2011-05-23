@@ -85,6 +85,7 @@
     <Compile Include="ExistsSpecialReference.cs" />
     <Compile Include="Extensions\HomogenizeEx.cs" />
     <Compile Include="Extensions\ResultSetExtensions.cs" />
+    <Compile Include="FunctionReference.cs" />
     <Compile Include="HomogenizedEqualityComparer.cs" />
     <Compile Include="IRange.cs" />
     <Compile Include="Maybe.cs" />
@@ -110,7 +111,7 @@
     <Compile Include="SimpleRecord.cs" />
     <Compile Include="Extensions\DynamicStringExtensions.cs" />
     <Compile Include="DynamicTable.cs" />
-    <Compile Include="DynamicReference.cs" />
+    <Compile Include="ObjectReference.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Commands\FindAllByCommand.cs" />
     <Compile Include="Commands\FindByCommand.cs" />
@@ -143,6 +144,7 @@
     <Compile Include="SimpleExpressionType.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="SimpleTransaction.cs" />
+    <Compile Include="SpecialReference.cs" />
     <Compile Include="UnresolvableObjectException.cs" />
     <Compile Include="Commands\UpdateByCommand.cs" />
   </ItemGroup>

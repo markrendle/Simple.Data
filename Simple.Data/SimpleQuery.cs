@@ -14,7 +14,7 @@ namespace Simple.Data
     {
         private readonly Adapter _adapter;
         private readonly string _tableName;
-        private readonly IEnumerable<DynamicReference> _columns;
+        private readonly IEnumerable<SimpleReference> _columns;
         private readonly SimpleExpression _criteria;
         private readonly IEnumerable<SimpleOrderByItem> _order;
         private readonly int? _skipCount;
@@ -31,7 +31,7 @@ namespace Simple.Data
 
         private SimpleQuery(SimpleQuery source,
             string tableName = null,
-            IEnumerable<DynamicReference> columns = null,
+            IEnumerable<SimpleReference> columns = null,
             SimpleExpression criteria = null,
             IEnumerable<SimpleOrderByItem> order = null,
             int? skipCount = null,
@@ -39,16 +39,16 @@ namespace Simple.Data
         {
             _adapter = source._adapter;
             _tableName = tableName ?? source.TableName;
-            _columns = columns ?? source.Columns ?? Enumerable.Empty<DynamicReference>();
+            _columns = columns ?? source.Columns ?? Enumerable.Empty<SimpleReference>();
             _criteria = criteria ?? source.Criteria;
             _order = order ?? source.Order;
             _skipCount = skipCount ?? source.SkipCount;
             _takeCount = takeCount ?? source.TakeCount;
         }
 
-        public IEnumerable<DynamicReference> Columns
+        public IEnumerable<SimpleReference> Columns
         {
-            get { return _columns ?? Enumerable.Empty<DynamicReference>(); }
+            get { return _columns ?? Enumerable.Empty<SimpleReference>(); }
         }
 
         public int? TakeCount
@@ -81,7 +81,7 @@ namespace Simple.Data
         /// </summary>
         /// <param name="columns">The columns.</param>
         /// <returns>A new <see cref="SimpleQuery"/> which will select only the specified columns.</returns>
-        public SimpleQuery Select(params DynamicReference[] columns)
+        public SimpleQuery Select(params SimpleReference[] columns)
         {
             return new SimpleQuery(this, columns: columns);
         }
@@ -91,7 +91,7 @@ namespace Simple.Data
         /// </summary>
         /// <param name="columns">The columns.</param>
         /// <returns>A new <see cref="SimpleQuery"/> which will select only the specified columns.</returns>
-        public SimpleQuery Select(IEnumerable<DynamicReference> columns)
+        public SimpleQuery Select(IEnumerable<SimpleReference> columns)
         {
             return new SimpleQuery(this, columns: columns);
         }
@@ -101,17 +101,17 @@ namespace Simple.Data
             return new SimpleQuery(this, criteria: criteria);
         }
 
-        public SimpleQuery OrderBy(DynamicReference reference)
+        public SimpleQuery OrderBy(ObjectReference reference)
         {
             return new SimpleQuery(this, order: new[] {new SimpleOrderByItem(reference)});
         }
 
-        public SimpleQuery OrderByDescending(DynamicReference reference)
+        public SimpleQuery OrderByDescending(ObjectReference reference)
         {
             return new SimpleQuery(this, order: new[] { new SimpleOrderByItem(reference, OrderByDirection.Descending) });
         }
 
-        public SimpleQuery ThenBy(DynamicReference reference)
+        public SimpleQuery ThenBy(ObjectReference reference)
         {
             if (_order == null)
             {
@@ -121,7 +121,7 @@ namespace Simple.Data
             return new SimpleQuery(this, order: _order.Append(new SimpleOrderByItem(reference)));
         }
 
-        public SimpleQuery ThenByDescending(DynamicReference reference)
+        public SimpleQuery ThenByDescending(ObjectReference reference)
         {
             if (_order == null)
             {
@@ -175,9 +175,9 @@ namespace Simple.Data
             if (methodName.EndsWith("descending", StringComparison.OrdinalIgnoreCase))
             {
                 methodName = Regex.Replace(methodName, "_?descending$", "", RegexOptions.IgnoreCase);
-                return OrderByDescending(DynamicReference.FromString(_tableName + "." + methodName));
+                return OrderByDescending(ObjectReference.FromString(_tableName + "." + methodName));
             }
-            return OrderBy(DynamicReference.FromString(_tableName + "." + methodName));
+            return OrderBy(ObjectReference.FromString(_tableName + "." + methodName));
         }
 
         private SimpleQuery ParseThenBy(string methodName)
@@ -186,9 +186,9 @@ namespace Simple.Data
             if (methodName.EndsWith("descending", StringComparison.OrdinalIgnoreCase))
             {
                 methodName = Regex.Replace(methodName, "_?descending$", "", RegexOptions.IgnoreCase);
-                return ThenByDescending(DynamicReference.FromString(_tableName + "." + methodName));
+                return ThenByDescending(ObjectReference.FromString(_tableName + "." + methodName));
             }
-            return ThenBy(DynamicReference.FromString(_tableName + "." + methodName));
+            return ThenBy(ObjectReference.FromString(_tableName + "." + methodName));
         }
 
         public IEnumerable<T> Cast<T>()
@@ -228,6 +228,20 @@ namespace Simple.Data
             return Records.ToArray();
         }
 
+        public dynamic ToScalar()
+        {
+            var data = _adapter.RunQuery(this).ToArray();
+            if (data.Length != 1)
+            {
+                throw new SimpleDataException("Query returned multiple rows; cannot return scalar value.");
+            }
+            if (data[0].Count != 1)
+            {
+                throw new SimpleDataException("Selected row contains multiple values; cannot return scalar value.");
+            }
+            return data[0].Single().Value;
+        }
+
         public IList<T> ToList<T>()
         {
             return Cast<T>().ToList();
@@ -236,6 +250,11 @@ namespace Simple.Data
         public T[] ToArray<T>()
         {
             return Cast<T>().ToArray();
+        }
+
+        public T ToScalar<T>()
+        {
+            return (T) ToScalar();
         }
 
         public dynamic First()

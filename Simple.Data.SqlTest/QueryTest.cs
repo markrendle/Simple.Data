@@ -9,6 +9,12 @@ namespace Simple.Data.SqlTest
     [TestFixture]
     public class QueryTest
     {
+        [TestFixtureSetUp]
+        public void Setup()
+        {
+            DatabaseHelper.Reset();
+        }
+
         [Test]
         public void CountWithNoCriteriaShouldSelectThree()
         {

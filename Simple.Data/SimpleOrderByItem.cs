@@ -2,14 +2,14 @@
 {
     public class SimpleOrderByItem
     {
-        private readonly DynamicReference _reference;
+        private readonly ObjectReference _reference;
         private readonly OrderByDirection _direction;
 
-        public SimpleOrderByItem(DynamicReference reference) : this(reference, OrderByDirection.Ascending)
+        public SimpleOrderByItem(ObjectReference reference) : this(reference, OrderByDirection.Ascending)
         {
         }
 
-        public SimpleOrderByItem(DynamicReference reference, OrderByDirection direction)
+        public SimpleOrderByItem(ObjectReference reference, OrderByDirection direction)
         {
             _reference = reference;
             _direction = direction;
@@ -20,7 +20,7 @@
             get { return _direction; }
         }
 
-        public DynamicReference Reference
+        public ObjectReference Reference
         {
             get { return _reference; }
         }
