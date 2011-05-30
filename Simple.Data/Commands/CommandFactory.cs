@@ -20,6 +20,7 @@ namespace Simple.Data.Commands
                                                                   new DeleteByCommand(),
                                                                   new DeleteAllCommand(),
                                                                   new QueryByCommand(),
+                                                                  new QueryCommand(),
                                                                   new CountCommand(),
                                                                   new CountByCommand(),
                                                                   new ExistsCommand(),

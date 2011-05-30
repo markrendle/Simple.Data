@@ -146,7 +146,21 @@ namespace Simple.Data.IntegrationTest
                 // This won't work on Mock provider, but the SQL should be generated OK
             }
 
-            GeneratedSqlIs("select length([dbo].[users].[name]),min([dbo].[users].[age]) as [youngest] from [dbo].[users] group by [dbo].[users].[name]");
+            GeneratedSqlIs("select len([dbo].[users].[name]),min([dbo].[users].[age]) as [youngest] from [dbo].[users] group by [dbo].[users].[name]");
+        }
+
+        [Test]
+        public void SpecifyingNonAggregateFunctionShouldNotApplyGroupBy()
+        {
+            try
+            {
+                _db.Users.All().Select(_db.Users.Name, _db.Users.Name.Length().As("NameLength")).ToList();
+            }
+            catch (InvalidOperationException)
+            {
+                // This won't work on Mock provider, but the SQL should be generated OK
+            }
+            GeneratedSqlIs("select [dbo].[users].[name],len([dbo].[users].[name]) as [namelength] from [dbo].[users]");
         }
     }
 }

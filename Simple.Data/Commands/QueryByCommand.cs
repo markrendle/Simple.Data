@@ -26,4 +26,22 @@ namespace Simple.Data.Commands
             return new SimpleQuery(dataStrategy.GetAdapter(), table.GetQualifiedName()).Where(criteriaExpression);
         }
     }
+
+    class QueryCommand : ICommand
+    {
+        public bool IsCommandFor(string method)
+        {
+            return method.Equals("query", StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
+        {
+            return a => new SimpleQuery(dataStrategy.GetAdapter(), table.GetQualifiedName());
+        }
+
+        public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
+        {
+            return new SimpleQuery(dataStrategy.GetAdapter(), table.GetQualifiedName());
+        }
+    }
 }

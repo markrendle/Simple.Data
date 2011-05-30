@@ -8,6 +8,7 @@ namespace Simple.Data.Ado
 {
     public class QueryBuilder
     {
+        private readonly IFunctionNameConverter _functionNameConverter = new FunctionNameConverter();
         private readonly AdoAdapter _adoAdapter;
         private readonly DatabaseSchema _schema;
 
@@ -63,6 +64,8 @@ namespace Simple.Data.Ado
 
         private void HandleGrouping()
         {
+            if (!_query.Columns.OfType<FunctionReference>().Any(fr => fr.IsAggregate)) return;
+
             var groupColumns =
                 _query.Columns.Where(c => (!(c is FunctionReference)) || !((FunctionReference) c).IsAggregate);
 
@@ -141,30 +144,39 @@ namespace Simple.Data.Ado
 
         private string FormatColumnClause(SimpleReference reference)
         {
-            var objectReference = reference as ObjectReference;
-            if (!ReferenceEquals(objectReference, null))
-            {
-                var table = _schema.FindTable(objectReference.GetOwner().GetName());
-                var column = table.FindColumn(objectReference.GetName());
-                if (objectReference.Alias == null)
-                    return string.Format("{0}.{1}", table.QualifiedName, column.QuotedName);
-                else
-                    return string.Format("{0}.{1} AS {2}", table.QualifiedName, column.QuotedName,
-                                         _schema.QuoteObjectName(objectReference.Alias));
-            }
+            var formatted = TryFormatAsObjectReference(reference as ObjectReference)
+                   ??
+                   TryFormatAsFunctionReference(reference as FunctionReference);
 
-            var functionReference = reference as FunctionReference;
-            if (!ReferenceEquals(functionReference, null))
-            {
-                return functionReference.Alias == null
-                           ? string.Format("{0}({1})", functionReference.Name,
-                                           FormatColumnClause(functionReference.Argument))
-                           : string.Format("{0}({1}) AS {2}", functionReference.Name,
-                                           FormatColumnClause(functionReference.Argument),
-                                           _schema.QuoteObjectName(functionReference.Alias));
-            }
+            if (formatted != null) return formatted;
 
             throw new InvalidOperationException("SimpleReference type not supported.");
+        }
+
+        private string TryFormatAsFunctionReference(FunctionReference functionReference)
+        {
+            if (ReferenceEquals(functionReference, null)) return null;
+            
+            var sqlName = _functionNameConverter.ConvertToSqlName(functionReference.Name);
+            return functionReference.Alias == null
+                       ? string.Format("{0}({1})", sqlName,
+                                       FormatColumnClause(functionReference.Argument))
+                       : string.Format("{0}({1}) AS {2}", sqlName,
+                                       FormatColumnClause(functionReference.Argument),
+                                       _schema.QuoteObjectName(functionReference.Alias));
+        }
+
+        private string TryFormatAsObjectReference(ObjectReference objectReference)
+        {
+            if (ReferenceEquals(objectReference, null)) return null;
+
+            var table = _schema.FindTable(objectReference.GetOwner().GetName());
+            var column = table.FindColumn(objectReference.GetName());
+            if (objectReference.Alias == null)
+                return string.Format("{0}.{1}", table.QualifiedName, column.QuotedName);
+            else
+                return string.Format("{0}.{1} AS {2}", table.QualifiedName, column.QuotedName,
+                                     _schema.QuoteObjectName(objectReference.Alias));
         }
 
         private string FormatGroupByColumnClause(SimpleReference reference)
@@ -185,5 +197,26 @@ namespace Simple.Data.Ado
 
             throw new InvalidOperationException("SimpleReference type not supported.");
         }
+    }
+
+    class FunctionNameConverter : IFunctionNameConverter
+    {
+        public string ConvertToSqlName(string simpleFunctionName)
+        {
+            if (simpleFunctionName.Equals("length", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return "len";
+            }
+            if (simpleFunctionName.Equals("average", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return "avg";
+            }
+            return simpleFunctionName;
+        }
+    }
+
+    public interface IFunctionNameConverter
+    {
+        string ConvertToSqlName(string simpleFunctionName);
     }
 }
