@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using Simple.Data.Ado.Schema;
@@ -47,59 +48,56 @@ namespace Simple.Data.Ado
 
         private static IEnumerable<IDbDataParameter> CreateParameters(IDbCommand command, ParameterTemplate parameterTemplate, object value)
         {
-            if (parameterTemplate.DbType == DbType.Binary)
+            if (value == null || TypeHelper.IsKnownType(value.GetType()) || parameterTemplate.DbType == DbType.Binary)
             {
                 yield return CreateParameter(command, parameterTemplate, value);
             }
             else
             {
-                var str = value as string;
-                if (str != null)
+                var range = value as IRange;
+                if (range != null)
                 {
-                    yield return CreateParameter(command, parameterTemplate, value);
+                    yield return CreateParameter(command, parameterTemplate, range.Start, "_start");
+                    yield return CreateParameter(command, parameterTemplate, range.End, "_end");
+                    CommandBuilder.SetBetweenInCommandText(command, parameterTemplate.Name);
                 }
                 else
                 {
-                    var range = value as IRange;
-                    if (range != null)
+                    var list = value as IEnumerable;
+                    if (list != null)
                     {
-                        yield return CreateParameter(command, parameterTemplate, range.Start, "_start");
-                        yield return CreateParameter(command, parameterTemplate, range.End, "_end");
-                        CommandBuilder.SetBetweenInCommandText(command, parameterTemplate.Name);
+                        var builder = new StringBuilder();
+                        var array = list.Cast<object>().ToArray();
+                        for (int i = 0; i < array.Length; i++)
+                        {
+                            builder.AppendFormat(",{0}_{1}", parameterTemplate.Name, i);
+                            yield return CreateParameter(command, parameterTemplate, array[i], "_" + i);
+                        }
+                        RewriteSqlEqualityToInClause(command, parameterTemplate, builder);
                     }
                     else
                     {
-                        var list = value as IEnumerable;
-                        if (list != null)
-                        {
-                            var builder = new StringBuilder();
-                            var array = list.Cast<object>().ToArray();
-                            for (int i = 0; i < array.Length; i++)
-                            {
-                                builder.AppendFormat(",{0}_{1}", parameterTemplate.Name, i);
-                                yield return CreateParameter(command, parameterTemplate, array[i], "_" + i);
-                            }
-                            if (command.CommandText.Contains("!= " + parameterTemplate.Name))
-                            {
-                                command.CommandText = command.CommandText.Replace("!= " + parameterTemplate.Name,
-                                                                                  "NOT IN (" +
-                                                                                  builder.ToString().Substring(1) +
-                                                                                  ")");
-                            }
-                            else
-                            {
-                                command.CommandText = command.CommandText.Replace("= " + parameterTemplate.Name,
-                                                                                  "IN (" +
-                                                                                  builder.ToString().Substring(1) +
-                                                                                  ")");
-                            }
-                        }
-                        else
-                        {
-                            yield return CreateParameter(command, parameterTemplate, value);
-                        }
+                        yield return CreateParameter(command, parameterTemplate, value);
                     }
                 }
+            }
+        }
+
+        private static void RewriteSqlEqualityToInClause(IDbCommand command, ParameterTemplate parameterTemplate, StringBuilder builder)
+        {
+            if (command.CommandText.Contains("!= " + parameterTemplate.Name))
+            {
+                command.CommandText = command.CommandText.Replace("!= " + parameterTemplate.Name,
+                                                                  "NOT IN (" +
+                                                                  builder.ToString().Substring(1) +
+                                                                  ")");
+            }
+            else
+            {
+                command.CommandText = command.CommandText.Replace("= " + parameterTemplate.Name,
+                                                                  "IN (" +
+                                                                  builder.ToString().Substring(1) +
+                                                                  ")");
             }
         }
 
@@ -108,8 +106,20 @@ namespace Simple.Data.Ado
             var parameter = command.CreateParameter();
             parameter.ParameterName = parameterTemplate.Name + suffix;
             parameter.DbType = parameterTemplate.DbType;
-            parameter.Value = value ?? DBNull.Value;
+            parameter.Value = FixObjectType(value);
             return parameter;
+        }
+
+        private static object FixObjectType(object value)
+        {
+            if (value == null) return DBNull.Value;
+            if (TypeHelper.IsKnownType(value.GetType())) return value;
+            var dynamicObject = value as DynamicObject;
+            if (dynamicObject != null)
+            {
+                return dynamicObject.ToString();
+            }
+            return value;
         }
     }
 }

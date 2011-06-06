@@ -108,6 +108,7 @@
     <Compile Include="ObjectName.cs" />
     <Compile Include="TraceHelper.cs" />
     <Compile Include="TupleExtensions.cs" />
+    <Compile Include="TypeHelper.cs" />
     <Compile Include="UpdateHelper.cs" />
     <Compile Include="WeakCache.cs" />
   </ItemGroup>

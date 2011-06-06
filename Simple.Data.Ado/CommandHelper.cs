@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.Text;
 using System.Text.RegularExpressions;
 using Simple.Data.Ado.Schema;
@@ -43,7 +44,7 @@ namespace Simple.Data.Ado
                 {
                     var parameter = command.CreateParameter();
                     parameter.ParameterName = _schemaProvider.NameParameter("p" + index);
-                    parameter.Value = values[index] ?? DBNull.Value;
+                    parameter.Value = FixObjectType(values[index]);
                     command.Parameters.Add(parameter);
                     
                     sqlBuilder.Append(parameter.ParameterName);
@@ -65,9 +66,116 @@ namespace Simple.Data.Ado
                 parameter.ParameterName = pair.Key.Name;
                 parameter.DbType = pair.Key.DbType;
                 parameter.Size = pair.Key.MaxLength;
-                parameter.Value = pair.Value ?? DBNull.Value;
+                parameter.Value = FixObjectType(pair.Value);
                 command.Parameters.Add(parameter);
             }
+        }
+
+        private static object FixObjectType(object value)
+        {
+            if (value == null) return DBNull.Value;
+            if (TypeHelper.IsKnownType(value.GetType())) return value;
+            var dynamicObject = value as DynamicObject;
+            if (dynamicObject != null)
+            {
+                return dynamicObject.ToString();
+            }
+            return value;
+        }
+    }
+
+    class ConvertibleValue : IConvertible
+    {
+        private readonly dynamic _value;
+
+        public ConvertibleValue(dynamic value)
+        {
+            _value = value;
+        }
+
+        public TypeCode GetTypeCode()
+        {
+            return TypeCode.Object;
+        }
+
+        public bool ToBoolean(IFormatProvider provider)
+        {
+            return _value;
+        }
+
+        public char ToChar(IFormatProvider provider)
+        {
+            return _value;
+        }
+
+        public sbyte ToSByte(IFormatProvider provider)
+        {
+            return _value;
+        }
+
+        public byte ToByte(IFormatProvider provider)
+        {
+            return _value;
+        }
+
+        public short ToInt16(IFormatProvider provider)
+        {
+            return _value;
+        }
+
+        public ushort ToUInt16(IFormatProvider provider)
+        {
+            return _value;
+        }
+
+        public int ToInt32(IFormatProvider provider)
+        {
+            return _value;
+        }
+
+        public uint ToUInt32(IFormatProvider provider)
+        {
+            return _value;
+        }
+
+        public long ToInt64(IFormatProvider provider)
+        {
+            return _value;
+        }
+
+        public ulong ToUInt64(IFormatProvider provider)
+        {
+            return _value;
+        }
+
+        public float ToSingle(IFormatProvider provider)
+        {
+            return _value;
+        }
+
+        public double ToDouble(IFormatProvider provider)
+        {
+            return _value;
+        }
+
+        public decimal ToDecimal(IFormatProvider provider)
+        {
+            return _value;
+        }
+
+        public DateTime ToDateTime(IFormatProvider provider)
+        {
+            return _value;
+        }
+
+        public string ToString(IFormatProvider provider)
+        {
+            return _value;
+        }
+
+        public object ToType(Type conversionType, IFormatProvider provider)
+        {
+            return Convert.ChangeType(_value, conversionType);
         }
     }
 }
