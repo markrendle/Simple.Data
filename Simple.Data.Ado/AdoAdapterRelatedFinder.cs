@@ -27,7 +27,7 @@ namespace Simple.Data.Ado
             return TryJoin(tableName, relatedTableName) != null;
         }
 
-        public IEnumerable<IDictionary<string, object>> FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName)
+        public object FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName)
         {
             var join = TryJoin(tableName, relatedTableName);
             if (join == null) throw new AdoAdapterException("Could not resolve relationship.");
@@ -60,20 +60,20 @@ namespace Simple.Data.Ado
             return _adapter.GetSchema().FindTable(tableName).GetDetail(relatedTableName);
         }
 
-        private IEnumerable<IDictionary<string, object>> GetMaster(IDictionary<string, object> row, TableJoin masterJoin)
+        private IDictionary<string, object> GetMaster(IDictionary<string, object> row, TableJoin masterJoin)
         {
             var criteria = new Dictionary<string, object> { { masterJoin.MasterColumn.ActualName, row[masterJoin.DetailColumn.HomogenizedName] } };
-            yield return _adapter.Find(masterJoin.Master.ActualName,
+            return _adapter.Find(masterJoin.Master.ActualName,
                                        ExpressionHelper.CriteriaDictionaryToExpression(masterJoin.Master.ActualName,
                                                                                        criteria)).FirstOrDefault();
         }
 
-        private IEnumerable<IDictionary<string, object>> GetDetail(IDictionary<string, object> row, TableJoin join)
+        private SimpleQuery GetDetail(IDictionary<string, object> row, TableJoin join)
         {
-            var criteria = new Dictionary<string, object> { { join.DetailColumn.ActualName, row[join.MasterColumn.HomogenizedName] } };
-            return _adapter.Find(join.Detail.ActualName,
-                                          ExpressionHelper.CriteriaDictionaryToExpression(join.Detail.ActualName,
-                                                                                          criteria));
+            var criteria = ExpressionHelper.CriteriaDictionaryToExpression(join.Detail.ActualName,
+                new Dictionary<string, object>
+                               {{join.DetailColumn.ActualName, row[join.MasterColumn.HomogenizedName]}});
+            return new SimpleQuery(_adapter, join.Detail.ActualName).Where(criteria);
         }
     }
 }

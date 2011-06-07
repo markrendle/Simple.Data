@@ -12,6 +12,7 @@ namespace Simple.Data
 {
     public class SimpleQuery : DynamicObject, IEnumerable
     {
+        private DataStrategy _dataStrategy;
         private readonly Adapter _adapter;
         private readonly string _tableName;
         private readonly IEnumerable<SimpleReference> _columns;
@@ -145,7 +146,7 @@ namespace Simple.Data
         {
             get
             {
-                return _adapter.RunQuery(this).Select(d => new SimpleRecord(d, _tableName));
+                return _adapter.RunQuery(this).Select(d => new SimpleRecord(d, _tableName, _dataStrategy));
             }
         }
 
@@ -339,6 +340,11 @@ namespace Simple.Data
         public bool Any()
         {
             return Exists();
+        }
+
+        public void SetDataStrategy(DataStrategy dataStrategy)
+        {
+            _dataStrategy = dataStrategy;
         }
     }
 }

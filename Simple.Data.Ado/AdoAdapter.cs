@@ -201,7 +201,7 @@ namespace Simple.Data.Ado
         /// <param name="relatedTableName"></param>
         /// <returns>The list of records matching the criteria. If no records are found, return an empty list.</returns>
         /// <remarks>When implementing the <see cref="Adapter"/> interface, if relationships are not possible, throw a <see cref="NotSupportedException"/>.</remarks>
-        public IEnumerable<IDictionary<string, object>> FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName)
+        public object FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName)
         {
             return _relatedFinder.Value.FindRelated(tableName, row, relatedTableName);
         }

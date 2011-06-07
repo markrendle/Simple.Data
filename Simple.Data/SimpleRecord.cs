@@ -63,18 +63,32 @@ namespace Simple.Data
             var relatedAdapter = _database.GetAdapter() as IAdapterWithRelation;
             if (relatedAdapter != null && relatedAdapter.IsValidRelation(_tableName, binder.Name))
             {
-                var relatedRows = relatedAdapter.FindRelated(_tableName, _data, binder.Name);
-                if (relatedRows.Count() == 1 && !binder.Name.IsPlural())
-                {
-                    result = new SimpleRecord(relatedRows.Single(), binder.Name, _database);
-                }
-                else
-                {
-                    result = new SimpleResultSet(relatedRows.Select(dict => new SimpleRecord(dict, binder.Name, _database)));
-                }
+                result = GetRelatedData(binder, relatedAdapter);
                 return true;
             }
             return base.TryGetMember(binder, out result);
+        }
+
+        private object GetRelatedData(GetMemberBinder binder, IAdapterWithRelation relatedAdapter)
+        {
+            object result;
+            var related = relatedAdapter.FindRelated(_tableName, _data, binder.Name);
+            var query = related as SimpleQuery;
+            if (query != null)
+            {
+                query.SetDataStrategy(_database);
+                result = query;
+            }
+            else
+            {
+                result = related is IDictionary<string, object>
+                             ? (object) new SimpleRecord(related as IDictionary<string, object>, binder.Name, _database)
+                             : new SimpleResultSet(
+                                   ((IEnumerable<IDictionary<string, object>>) related).Select(
+                                       dict => new SimpleRecord(dict, binder.Name, _database)));
+
+            }
+            return result;
         }
 
         public override bool TrySetMember(SetMemberBinder binder, object value)
