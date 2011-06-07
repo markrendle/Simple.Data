@@ -97,9 +97,17 @@ namespace Simple.Data
             return new SimpleQuery(this, columns: columns);
         }
 
-        public SimpleQuery Where(SimpleExpression criteria)
+        public SimpleQuery ReplaceWhere(SimpleExpression criteria)
         {
             return new SimpleQuery(this, criteria: criteria);
+        }
+
+        public SimpleQuery Where(SimpleExpression criteria)
+        {
+            return _criteria == null
+                       ? new SimpleQuery(this, criteria: criteria)
+                       : new SimpleQuery(this,
+                                         criteria: new SimpleExpression(_criteria, criteria, SimpleExpressionType.And));
         }
 
         public SimpleQuery OrderBy(ObjectReference reference)
