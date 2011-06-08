@@ -117,5 +117,14 @@ namespace Simple.Data.SqlTest
                 index--;
             }
         }
+
+        [Test]
+        public void ShouldDirectlyQueryDetailTable()
+        {
+            var db = DatabaseHelper.Open();
+            var order = db.Customers.QueryByNameAndAddress("Test", "100 Road").Orders.FirstOrDefault();
+            Assert.IsNotNull(order);
+            Assert.AreEqual(1, order.OrderId);
+        }
     }
 }

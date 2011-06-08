@@ -264,5 +264,20 @@ namespace Simple.Data
             }
             return _name;
         }
+
+        public ObjectReference Rebase(string newBaseReference)
+        {
+            return Rebase(this, newBaseReference);
+        }
+
+        private static ObjectReference Rebase(ObjectReference reference, string newBaseReference)
+        {
+            if (ReferenceEquals(reference._owner, null))
+            {
+                return new ObjectReference(reference._name, new ObjectReference(newBaseReference), reference._dataStrategy, reference._alias);
+            }
+            
+            return new ObjectReference(reference._name, Rebase(reference._owner, newBaseReference), reference._dataStrategy, reference._alias);
+        }
     }
 }

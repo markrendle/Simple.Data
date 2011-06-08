@@ -114,5 +114,33 @@ namespace Simple.Data
         {
             return false;
         }
+
+        public SimpleExpression Rebase(string newBaseReference)
+        {
+            return Rebase(this, newBaseReference);
+        }
+
+        private static SimpleExpression Rebase(SimpleExpression expression, string newBaseReference)
+        {
+            var newLeft = RebaseOperand(expression._leftOperand, newBaseReference);
+            var newRight = RebaseOperand(expression._rightOperand, newBaseReference);
+
+            return new SimpleExpression(newLeft, newRight, expression._type);
+        }
+
+        private static object RebaseOperand(object operand, string newBaseReference)
+        {
+            var asReference = operand as ObjectReference;
+            if (!ReferenceEquals(asReference, null))
+            {
+                return asReference.Rebase(newBaseReference);
+            }
+            var asExpression = operand as SimpleExpression;
+            if (asExpression != null)
+            {
+                return Rebase(asExpression, newBaseReference);
+            }
+            return operand;
+        }
     }
 }

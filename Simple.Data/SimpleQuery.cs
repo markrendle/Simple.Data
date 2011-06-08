@@ -47,6 +47,12 @@ namespace Simple.Data
             _takeCount = takeCount ?? source.TakeCount;
         }
 
+        public override bool TryGetMember(GetMemberBinder binder, out object result)
+        {
+            result = new SimpleQuery(this, binder.Name, _columns, _criteria.Rebase(binder.Name));
+            return true;
+        }
+
         public IEnumerable<SimpleReference> Columns
         {
             get { return _columns ?? Enumerable.Empty<SimpleReference>(); }

@@ -162,5 +162,20 @@ namespace Simple.Data.IntegrationTest
             }
             GeneratedSqlIs("select [dbo].[users].[name],len([dbo].[users].[name]) as [namelength] from [dbo].[users]");
         }
+
+        [Test]
+        public void SpecifyingJoinTableShouldCreateDirectQuery()
+        {
+            try
+            {
+                _db.Users.QueryById(1).UserBio.ToList();
+            }
+            catch (InvalidOperationException)
+            {
+                // This won't work on Mock provider, but the SQL should be generated OK
+            }
+            GeneratedSqlIs("select [dbo].[userbio].[userid],[dbo].[userbio].[text] from [dbo].[userbio]" +
+                " join [dbo].[users] on ([dbo].[users].[id] = [dbo].[userbio].[userid]) where [dbo].[users].[id] = @p1");
+        }
     }
 }

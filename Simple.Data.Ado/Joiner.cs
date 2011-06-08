@@ -14,7 +14,8 @@ namespace Simple.Data.Ado
         private readonly DatabaseSchema _schema;
         private readonly ConcurrentDictionary<ObjectName, string> _done = new ConcurrentDictionary<ObjectName, string>();
 
-        public Joiner(DatabaseSchema schema) : this(JoinType.Outer, schema)
+        public Joiner(DatabaseSchema schema)
+            : this(JoinType.Outer, schema)
         {
         }
 
@@ -89,19 +90,19 @@ namespace Simple.Data.Ado
             get { return _joinType == JoinType.Inner ? string.Empty : "LEFT"; }
         }
 
-        private static IEnumerable<Tuple<ObjectName,ObjectName>> GetTableNames(IEnumerable<ObjectReference> references, string schema)
+        private static IEnumerable<Tuple<ObjectName, ObjectName>> GetTableNames(IEnumerable<ObjectReference> references, string schema)
         {
             return references.SelectMany(r => DynamicReferenceToTuplePairs(r, schema))
                 .TupleSelect((table1, table2) => Tuple.Create(new ObjectName(schema, table1), new ObjectName(schema, table2)))
                 .Distinct();
         }
-        
-        private static IEnumerable<Tuple<ObjectName,ObjectName>> GetTableNames(SimpleExpression expression, string schema)
+
+        private static IEnumerable<Tuple<ObjectName, ObjectName>> GetTableNames(SimpleExpression expression, string schema)
         {
             return expression == null ? Enumerable.Empty<Tuple<ObjectName, ObjectName>>() : GetTableNames(GetReferencesFromExpression(expression), schema);
         }
 
-        private static IEnumerable<Tuple<string,string>> DynamicReferenceToTuplePairs(ObjectReference reference, string schema)
+        private static IEnumerable<Tuple<string, string>> DynamicReferenceToTuplePairs(ObjectReference reference, string schema)
         {
             return reference.GetAllObjectNames()
                 .SkipWhile(s => s.Equals(schema, StringComparison.OrdinalIgnoreCase))
@@ -113,15 +114,15 @@ namespace Simple.Data.Ado
         {
             if (expression.Type == SimpleExpressionType.And || expression.Type == SimpleExpressionType.Or)
             {
-                return GetReferencesFromExpression((SimpleExpression) expression.LeftOperand)
-                    .Concat(GetReferencesFromExpression((SimpleExpression) expression.LeftOperand));
+                return GetReferencesFromExpression((SimpleExpression)expression.LeftOperand)
+                    .Concat(GetReferencesFromExpression((SimpleExpression)expression.LeftOperand));
             }
 
             var result = Enumerable.Empty<ObjectReference>();
 
             if (expression.LeftOperand is ObjectReference)
             {
-                result = result.Concat(new[] {(ObjectReference) expression.LeftOperand});
+                result = result.Concat(new[] { (ObjectReference)expression.LeftOperand });
             }
             if (expression.RightOperand is ObjectReference)
             {
