@@ -244,7 +244,29 @@ namespace Simple.Data
             {
                 throw new SimpleDataException("Query returned multiple rows; cannot return scalar value.");
             }
-            if (data[0].Count != 1)
+            if (data[0].Count == 0)
+            {
+                throw new SimpleDataException("Query returned no rows; cannot return scalar value.");
+            }
+            if (data[0].Count > 1)
+            {
+                throw new SimpleDataException("Selected row contains multiple values; cannot return scalar value.");
+            }
+            return data[0].Single().Value;
+        }
+
+        public dynamic ToScalarOrDefault()
+        {
+            var data = _adapter.RunQuery(this).ToArray();
+            if (data.Length != 1)
+            {
+                throw new SimpleDataException("Query returned multiple rows; cannot return scalar value.");
+            }
+            if (data[0].Count == 0)
+            {
+                return null;
+            }
+            if (data[0].Count > 1)
             {
                 throw new SimpleDataException("Selected row contains multiple values; cannot return scalar value.");
             }
@@ -264,6 +286,11 @@ namespace Simple.Data
         public T ToScalar<T>()
         {
             return (T) ToScalar();
+        }
+
+        public T ToScalarOrDefault<T>()
+        {
+            return ToScalarOrDefault() ?? default(T);
         }
 
         public dynamic First()
@@ -328,7 +355,7 @@ namespace Simple.Data
 
         public int Count()
         {
-            return (int)_adapter.RunQuery(this.Select(new CountSpecialReference())).Single().Single().Value;
+            return this.Select(new CountSpecialReference()).ToScalar();
         }
 
         /// <summary>
