@@ -161,7 +161,6 @@ namespace Simple.Data.Ado
             }
             else
             {
-                const string nullString = null;
                 return table.Columns.Select(c => ObjectReference.FromStrings(table.ActualName, c.ActualName));
             }
         }
