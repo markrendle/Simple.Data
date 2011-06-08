@@ -75,11 +75,8 @@ namespace Simple.Data.Ado
         {
             if (value == null) return DBNull.Value;
             if (TypeHelper.IsKnownType(value.GetType())) return value;
-            var dynamicObject = value as DynamicObject;
-            if (dynamicObject != null)
-            {
-                return dynamicObject.ToString();
-            }
+            var asString = value.ToString();
+            if (asString != value.GetType().FullName) return asString;
             return value;
         }
     }

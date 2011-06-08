@@ -39,21 +39,45 @@ namespace Simple.Data.Ado
         private void SetQueryContext(SimpleQuery query)
         {
             _query = query;
-            _tableName = ObjectName.Parse(query.TableName);
+            _tableName = ObjectName.Parse(query.TableName.Split('.').Last());
             _table = _schema.FindTable(_tableName);
             _commandBuilder = new CommandBuilder(GetSelectClause(_tableName), _schema.SchemaProvider);
         }
 
         private void HandleJoins()
         {
+            var joiner = new Joiner(JoinType.Inner, _schema);
+
+            string dottedTables = RemoveSchemaFromQueryTableName();
+
+            var fromTable = dottedTables.Contains('.')
+                                ? joiner.GetJoinClauses(_tableName, dottedTables.Split('.').Reverse())
+                                : Enumerable.Empty<string>();
+
+            var fromCriteria = _query.Criteria != null
+                                   ? joiner.GetJoinClauses(_tableName, _query.Criteria)
+                                   : Enumerable.Empty<string>();
+
+            var fromColumnList = _query.Columns.Any(r => !(r is SpecialReference))
+                                     ? joiner.GetJoinClauses(_tableName, _query.Columns.OfType<ObjectReference>())
+                                     : Enumerable.Empty<string>();
+
             if (_query.Criteria == null
                 && (_query.Columns.Where(r => !(r is CountSpecialReference)).Count() == 0)) return;
 
-            var joins = new Joiner(JoinType.Inner, _schema).GetJoinClauses(_tableName, _query.Criteria, _query.Columns.OfType<ObjectReference>());
+            var joins = string.Join(" ", fromTable.Concat(fromCriteria).Concat(fromColumnList).Distinct());
+
             if (!string.IsNullOrWhiteSpace(joins))
             {
                 _commandBuilder.Append(" " + joins);
             }
+        }
+
+        private string RemoveSchemaFromQueryTableName()
+        {
+            return _query.TableName.StartsWith(_table.Schema + '.')
+                       ? _query.TableName.Substring(_query.TableName.IndexOf('.') + 1)
+                       : _query.TableName;
         }
 
         private void HandleQueryCriteria()

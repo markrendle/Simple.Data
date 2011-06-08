@@ -62,7 +62,7 @@ namespace Simple.Data.IntegrationTest
             {
                 _db.Users.All().Count();
             }
-            catch (InvalidOperationException)
+            catch (SimpleDataException)
             {
                 // This won't work on Mock provider, but the SQL should be generated OK
             }

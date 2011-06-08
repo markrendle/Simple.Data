@@ -49,7 +49,7 @@ namespace Simple.Data
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            result = new SimpleQuery(this, binder.Name, _columns, _criteria.Rebase(binder.Name));
+            result = new SimpleQuery(this, _tableName + "." + binder.Name);
             return true;
         }
 
