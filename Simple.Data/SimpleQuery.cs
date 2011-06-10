@@ -264,13 +264,13 @@ namespace Simple.Data
         public dynamic ToScalarOrDefault()
         {
             var data = _adapter.RunQuery(this).ToArray();
+            if (data.Length == 0)
+            {
+                return null;
+            }
             if (data.Length != 1)
             {
                 throw new SimpleDataException("Query returned multiple rows; cannot return scalar value.");
-            }
-            if (data[0].Count == 0)
-            {
-                return null;
             }
             if (data[0].Count > 1)
             {

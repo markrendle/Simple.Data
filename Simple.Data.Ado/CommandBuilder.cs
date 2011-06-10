@@ -185,13 +185,8 @@ namespace Simple.Data.Ado
             var parameter = command.CreateParameter();
             parameter.ParameterName = name;
             parameter.DbType = dbType;
-            parameter.Value = GetTheDataParameterValue(value);
+            parameter.Value = CommandHelper.FixObjectType(value);
             return parameter;
-        }
-
-        private static object GetTheDataParameterValue(object value)
-        {
-            return value ?? DBNull.Value;
         }
     }
 }

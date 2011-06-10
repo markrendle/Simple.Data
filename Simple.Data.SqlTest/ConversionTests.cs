@@ -26,6 +26,16 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void WeirdTypeUsedInQueryGetsConvertedToInt()
+        {
+            var weirdValue = new WeirdType(1);
+            var db = DatabaseHelper.Open();
+            var user = db.Users.QueryById(weirdValue).FirstOrDefault();
+            Assert.IsNotNull(user);
+            Assert.AreEqual(1, user.Id);
+        }
+
+        [Test]
         public void InsertingWeirdTypesFromExpando()
         {
             dynamic expando = new ExpandoObject();

@@ -1,0 +1,11 @@
+cd Simple.Data
+call NugetPack.cmd
+cd ..\Simple.Data.Ado
+call NugetPack.cmd
+cd ..\Simple.Data.Mocking
+call NugetPack.cmd
+cd ..\Simple.Data.SqlCe40
+call NugetPack.cmd
+cd ..\Simple.Data.SqlServer
+call NugetPack.cmd
+cd ..

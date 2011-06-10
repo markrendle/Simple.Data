@@ -71,7 +71,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static object FixObjectType(object value)
+        public static object FixObjectType(object value)
         {
             if (value == null) return DBNull.Value;
             if (TypeHelper.IsKnownType(value.GetType())) return value;

@@ -126,5 +126,19 @@ namespace Simple.Data.SqlTest
             Assert.IsNotNull(order);
             Assert.AreEqual(1, order.OrderId);
         }
+
+        [Test]
+        public void ShouldReturnNullWhenNoRowFound()
+        {
+            var db = DatabaseHelper.Open();
+            string name = db.Customers
+                        .Query()
+                        .Select(db.Customers.Name)
+                        .Where(db.Customers.CustomerId == 0) // There is no CustomerId 0
+                        .OrderByName()
+                        .Take(1) // Should return only one record no matter what
+                        .ToScalarOrDefault<string>();
+            Assert.IsNull(name);
+        }
     }
 }
