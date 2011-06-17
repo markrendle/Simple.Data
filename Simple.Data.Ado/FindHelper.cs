@@ -21,11 +21,11 @@ namespace Simple.Data.Ado
         public ICommandBuilder GetFindByCommand(ObjectName tableName, SimpleExpression criteria)
         {
             _commandBuilder.Append(GetSelectClause(tableName));
-            _commandBuilder.Append(" ");
-            _commandBuilder.Append(new Joiner(JoinType.Inner, _schema).GetJoinClauses(tableName, criteria));
 
             if (criteria != null)
             {
+                _commandBuilder.Append(" ");
+                _commandBuilder.Append(string.Join(" ", new Joiner(JoinType.Inner, _schema).GetJoinClauses(tableName, criteria)));
                 _commandBuilder.Append(" where ");
                 _commandBuilder.Append(_expressionFormatter.Format(criteria));
             }

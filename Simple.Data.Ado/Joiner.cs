@@ -26,42 +26,55 @@ namespace Simple.Data.Ado
             _schema = schema;
         }
 
-        public string GetJoinClauses(ObjectName mainTableName, SimpleExpression expression)
+        public IEnumerable<string> GetJoinClauses(ObjectName mainTableName, IEnumerable<string> tableList)
         {
-            _done.AddOrUpdate(mainTableName, string.Empty, (s, o) => string.Empty);
-            var tablePairs = GetTableNames(expression, mainTableName.Schema);
+            var tablePairs = tableList.Select(t => new ObjectName(mainTableName.Schema, t)).ToTuplePairs().ToList();
             foreach (var tablePair in tablePairs)
             {
                 AddJoin(tablePair.Item1, tablePair.Item2);
             }
-            return string.Join(" ", tablePairs.Select(tp => _done[tp.Item2]));
+            return tablePairs.Select(tp => _done[tp.Item2]);
         }
 
-        public string GetJoinClauses(ObjectName mainTableName, SimpleExpression expression, IEnumerable<ObjectReference> references)
+        public IEnumerable<string> GetJoinClauses(ObjectName mainTableName, SimpleExpression expression)
         {
             _done.AddOrUpdate(mainTableName, string.Empty, (s, o) => string.Empty);
-            var tablePairs = GetTableNames(expression, mainTableName.Schema).Concat(GetTableNames(references, mainTableName.Schema)).Distinct();
+            var tablePairs = GetTableNames(expression, mainTableName.Schema).Distinct();
             foreach (var tablePair in tablePairs)
             {
                 AddJoin(tablePair.Item1, tablePair.Item2);
             }
-            return string.Join(" ", tablePairs.Select(tp => _done[tp.Item2]));
+            return tablePairs.Select(tp => _done[tp.Item2]).Distinct();
+        }
+
+        public IEnumerable<string> GetJoinClauses(ObjectName mainTableName, IEnumerable<ObjectReference> references)
+        {
+            _done.AddOrUpdate(mainTableName, string.Empty, (s, o) => string.Empty);
+            var tablePairs = GetTableNames(references, mainTableName.Schema).Distinct();
+            foreach (var tablePair in tablePairs)
+            {
+                AddJoin(tablePair.Item1, tablePair.Item2);
+            }
+            return tablePairs.Select(tp => _done[tp.Item2]).Distinct();
         }
 
         private void AddJoin(ObjectName table1Name, ObjectName table2Name)
         {
-            var table1 = _schema.FindTable(table1Name);
-            var table2 = _schema.FindTable(table2Name);
+            _done.GetOrAdd(table2Name, _ =>
+                                           {
+                                               var table1 = _schema.FindTable(table1Name);
+                                               var table2 = _schema.FindTable(table2Name);
 
-            var foreignKey =
-                table2.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == table1.Schema && fk.MasterTable.Name == table1.ActualName)
-                ??
-                table1.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == table2.Schema && fk.MasterTable.Name == table2.ActualName);
+                                               var foreignKey =
+                                                   table2.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == table1.Schema && fk.MasterTable.Name == table1.ActualName)
+                                                   ??
+                                                   table1.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == table2.Schema && fk.MasterTable.Name == table2.ActualName);
 
-            if (foreignKey == null) throw new SchemaResolutionException(
-                string.Format("Could not join '{0}' and '{1}'", table1.ActualName, table2.ActualName));
+                                               if (foreignKey == null) throw new SchemaResolutionException(
+                                                   string.Format("Could not join '{0}' and '{1}'", table1.ActualName, table2.ActualName));
 
-            _done.GetOrAdd(table2Name, s => MakeJoinText(table2, foreignKey));
+                                               return MakeJoinText(table2, foreignKey);
+                                           });
         }
 
         private string MakeJoinText(Table rightTable, ForeignKey foreignKey)
