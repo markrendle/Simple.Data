@@ -17,7 +17,15 @@ namespace Simple.Data.Commands
         {
             if (dataStrategy is SimpleTransaction) return null;
 
-            var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
+            SimpleExpression criteriaExpression;
+            if (binder.Name.Equals("FindBy") || binder.Name.Equals("find_by"))
+            {
+                criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), binder.NamedArgumentsToDictionary(args));
+            }
+            else
+            {
+                criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
+            }
             try
             {
                 var func = dataStrategy.GetAdapter().CreateFindOneDelegate(table.GetQualifiedName(), criteriaExpression);
