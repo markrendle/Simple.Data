@@ -14,8 +14,16 @@ namespace Simple.Data.Commands
 
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
-            return new SimpleQuery(dataStrategy.GetAdapter(), table.GetQualifiedName()).Where(criteria);
+            SimpleExpression criteriaExpression;
+            if (binder.Name.Equals("FindAllBy") || binder.Name.Equals("find_all_by"))
+            {
+                criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), binder.NamedArgumentsToDictionary(args));
+            }
+            else
+            {
+                criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
+            }
+            return new SimpleQuery(dataStrategy.GetAdapter(), table.GetQualifiedName()).Where(criteriaExpression);
             //var data = dataStrategy.Find(table.GetQualifiedName(), criteria);
             //return CreateSimpleResultSet(table, dataStrategy, data);
         }

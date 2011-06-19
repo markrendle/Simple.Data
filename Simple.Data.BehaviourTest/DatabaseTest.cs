@@ -67,6 +67,23 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestFindByNamedParameterSingleColumn()
+        {
+            _db.Users.FindBy(Name: "Foo");
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[name] = @p1");
+            Parameter(0).Is("Foo");
+        }
+
+        [Test]
+        public void TestFindByNamedParameterTwoColumns()
+        {
+            _db.Users.FindBy(Name: "Foo", Password: "password");
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where ([dbo].[Users].[name] = @p1 and [dbo].[Users].[password] = @p2)");
+            Parameter(0).Is("Foo");
+            Parameter(1).Is("password");
+        }
+
+        [Test]
         public void TestFindByDynamicSingleColumn()
         {
             _db.Users.FindByName("Foo");
@@ -89,6 +106,24 @@ namespace Simple.Data.IntegrationTest
             GeneratedSqlIs("select [dbo].[Users].[id],[dbo].[Users].[name],[dbo].[Users].[password],[dbo].[Users].[age] from [dbo].[Users] where [dbo].[Users].[name] like @p1");
             Parameter(0).Is("Foo");
         }
+
+        [Test]
+        public void TestFindAllByNamedParameterSingleColumn()
+        {
+            _db.Users.FindAllBy(Name: "Foo").ToList();
+            GeneratedSqlIs("select [dbo].[Users].[id],[dbo].[Users].[name],[dbo].[Users].[password],[dbo].[Users].[age] from [dbo].[Users] where [dbo].[Users].[name] = @p1");
+            Parameter(0).Is("Foo");
+        }
+
+        [Test]
+        public void TestFindAllByNamedParameterTwoColumns()
+        {
+            _db.Users.FindAllBy(Name: "Foo", Password: "password").ToList();
+            GeneratedSqlIs("select [dbo].[Users].[id],[dbo].[Users].[name],[dbo].[Users].[password],[dbo].[Users].[age] from [dbo].[Users] where ([dbo].[Users].[name] = @p1 and [dbo].[Users].[password] = @p2)");
+            Parameter(0).Is("Foo");
+            Parameter(1).Is("password");
+        }
+
 
         [Test]
         public void TestFindByDynamicTwoColumns()
