@@ -33,7 +33,7 @@ namespace Simple.Data.Commands
                            {
                                var data = func(a);
                                return (data != null && data.Count > 0)
-                                          ? new SimpleRecord(func(a), table.GetQualifiedName(), dataStrategy)
+                                          ? new SimpleRecord(data, table.GetQualifiedName(), dataStrategy)
                                           : null;
                            };
             }

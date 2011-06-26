@@ -126,7 +126,8 @@ BEGIN
 	INSERT INTO [dbo].[Users] ([Id], [Name], [Password], [Age]) VALUES (3,'Dave','Dave',12)
 	SET IDENTITY_INSERT [dbo].[Users] OFF
 	
-	DECLARE @PagingId AS INT = 1
+	DECLARE @PagingId AS INT
+	SET @PagingId = 1
 	WHILE @PagingId <= 100
 	BEGIN
 		INSERT INTO [dbo].[PagingTest] ([Id]) VALUES (@PagingId)
