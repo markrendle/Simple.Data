@@ -1,0 +1,29 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace Simple.Data
+{
+    public class SimpleQueryJoin
+    {
+        private readonly ObjectReference _table;
+        private readonly SimpleExpression _joinExpression;
+
+        public SimpleQueryJoin(ObjectReference table, SimpleExpression joinExpression)
+        {
+            _table = table;
+            _joinExpression = joinExpression;
+        }
+
+        public SimpleExpression JoinExpression
+        {
+            get { return _joinExpression; }
+        }
+
+        public ObjectReference Table
+        {
+            get { return _table; }
+        }
+    }
+}

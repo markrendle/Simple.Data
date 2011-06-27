@@ -22,7 +22,10 @@ namespace Simple.Data.Ado
             if (!ReferenceEquals(reference, null))
             {
                 var table = _schema.FindTable(reference.GetOwner().ToString());
-                return table.QualifiedName + "." + table.FindColumn(reference.GetName()).QuotedName;
+                var tableName = string.IsNullOrWhiteSpace(reference.GetOwner().Alias)
+                                    ? table.QualifiedName
+                                    : _schema.QuoteObjectName(reference.GetOwner().Alias);
+                return tableName + "." + table.FindColumn(reference.GetName()).QuotedName;
             }
 
             return _commandBuilder.AddParameter(value, GetColumn(otherOperand as ObjectReference)).Name;

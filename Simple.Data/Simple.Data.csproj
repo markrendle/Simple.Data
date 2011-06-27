@@ -89,6 +89,7 @@
     <Compile Include="SimpleList.cs" />
     <Compile Include="SimpleOrderByItem.cs" />
     <Compile Include="SimpleQuery.cs" />
+    <Compile Include="SimpleQueryJoin.cs" />
     <Compile Include="SimpleResultSet.cs" />
     <Compile Include="DynamicSchema.cs" />
     <Compile Include="Extensions\BinderExtensions.cs" />

@@ -54,6 +54,8 @@ namespace Simple.Data.Ado
                                 ? joiner.GetJoinClauses(_tableName, dottedTables.Split('.').Reverse())
                                 : Enumerable.Empty<string>();
 
+            var fromJoins = joiner.GetJoinClauses(_query.Joins, _commandBuilder);
+
             var fromCriteria = _query.Criteria != null
                                    ? joiner.GetJoinClauses(_tableName, _query.Criteria)
                                    : Enumerable.Empty<string>();
@@ -65,7 +67,7 @@ namespace Simple.Data.Ado
             if (_query.Criteria == null
                 && (_query.Columns.Where(r => !(r is CountSpecialReference)).Count() == 0)) return;
 
-            var joins = string.Join(" ", fromTable.Concat(fromCriteria).Concat(fromColumnList).Distinct());
+            var joins = string.Join(" ", fromTable.Concat(fromJoins).Concat(fromCriteria).Concat(fromColumnList).Distinct());
 
             if (!string.IsNullOrWhiteSpace(joins))
             {
@@ -194,11 +196,14 @@ namespace Simple.Data.Ado
             if (ReferenceEquals(objectReference, null)) return null;
 
             var table = _schema.FindTable(objectReference.GetOwner().GetName());
+            var tableName = string.IsNullOrWhiteSpace(objectReference.GetOwner().Alias)
+                                ? table.QualifiedName
+                                : _schema.QuoteObjectName(objectReference.GetOwner().Alias);
             var column = table.FindColumn(objectReference.GetName());
             if (objectReference.Alias == null)
-                return string.Format("{0}.{1}", table.QualifiedName, column.QuotedName);
+                return string.Format("{0}.{1}", tableName, column.QuotedName);
             else
-                return string.Format("{0}.{1} AS {2}", table.QualifiedName, column.QuotedName,
+                return string.Format("{0}.{1} AS {2}", tableName, column.QuotedName,
                                      _schema.QuoteObjectName(objectReference.Alias));
         }
 

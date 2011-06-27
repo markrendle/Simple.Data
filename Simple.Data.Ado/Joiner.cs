@@ -39,7 +39,7 @@ namespace Simple.Data.Ado
         public IEnumerable<string> GetJoinClauses(ObjectName mainTableName, SimpleExpression expression)
         {
             _done.AddOrUpdate(mainTableName, string.Empty, (s, o) => string.Empty);
-            var tablePairs = GetTableNames(expression, mainTableName.Schema).Distinct();
+            var tablePairs = GetTableNames(expression, mainTableName.Schema).Distinct().ToList();
             foreach (var tablePair in tablePairs)
             {
                 AddJoin(tablePair.Item1, tablePair.Item2);
@@ -50,12 +50,26 @@ namespace Simple.Data.Ado
         public IEnumerable<string> GetJoinClauses(ObjectName mainTableName, IEnumerable<ObjectReference> references)
         {
             _done.AddOrUpdate(mainTableName, string.Empty, (s, o) => string.Empty);
-            var tablePairs = GetTableNames(references, mainTableName.Schema).Distinct();
+            var tablePairs = GetTableNames(references, mainTableName.Schema).Distinct().ToList();
             foreach (var tablePair in tablePairs)
             {
                 AddJoin(tablePair.Item1, tablePair.Item2);
             }
             return tablePairs.Select(tp => _done[tp.Item2]).Distinct();
+        }
+
+        public IEnumerable<string> GetJoinClauses(IEnumerable<SimpleQueryJoin> joins, ICommandBuilder commandBuilder)
+        {
+            var expressionFormatter = new ExpressionFormatter(commandBuilder, _schema);
+            foreach (var join in joins)
+            {
+                var builder = new StringBuilder(JoinKeyword);
+                builder.AppendFormat(" JOIN {0}{1} ON ({2})",
+                    _schema.FindTable(ObjectName.Parse(join.Table.ToString())).QualifiedName,
+                    string.IsNullOrWhiteSpace(join.Table.Alias) ? string.Empty : " " + _schema.QuoteObjectName(join.Table.Alias),
+                    expressionFormatter.Format(join.JoinExpression));
+                yield return builder.ToString().Trim();
+            }
         }
 
         private void AddJoin(ObjectName table1Name, ObjectName table2Name)

@@ -104,6 +104,11 @@ namespace Simple.Data
             return true;
         }
 
+        public ObjectReference As(string alias)
+        {
+            return new ObjectReference(_tableName, (_schema != null ? new ObjectReference(_schema.GetName()) : null), _dataStrategy, alias);
+        }
+
         public ObjectReference this[string name]
         {
             get { return new ObjectReference(name, new ObjectReference(_tableName, _dataStrategy)); }

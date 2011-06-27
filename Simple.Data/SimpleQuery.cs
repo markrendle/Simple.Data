@@ -18,11 +18,9 @@ namespace Simple.Data
         private readonly IEnumerable<SimpleReference> _columns;
         private readonly SimpleExpression _criteria;
         private readonly IEnumerable<SimpleOrderByItem> _order;
+        private readonly IDictionary<string, SimpleQueryJoin> _joins; 
         private readonly int? _skipCount;
         private readonly int? _takeCount;
-
-        private readonly object _sync = new object();
-        private IEnumerable<dynamic> _records;
 
         public SimpleQuery(Adapter adapter, string tableName)
         {
@@ -32,6 +30,7 @@ namespace Simple.Data
 
         private SimpleQuery(SimpleQuery source,
             string tableName = null,
+            IDictionary<string,SimpleQueryJoin> joins = null,
             IEnumerable<SimpleReference> columns = null,
             SimpleExpression criteria = null,
             IEnumerable<SimpleOrderByItem> order = null,
@@ -40,6 +39,7 @@ namespace Simple.Data
         {
             _adapter = source._adapter;
             _tableName = tableName ?? source.TableName;
+            _joins = joins ?? source._joins;
             _columns = columns ?? source.Columns ?? Enumerable.Empty<SimpleReference>();
             _criteria = criteria ?? source.Criteria;
             _order = order ?? source.Order;
@@ -49,8 +49,20 @@ namespace Simple.Data
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            result = new SimpleQuery(this, _tableName + "." + binder.Name);
+            if (_joins.ContainsKey(binder.Name))
+            {
+                result = _joins[binder.Name].Table;
+            }
+            else
+            {
+                result = new SimpleQuery(this, _tableName + "." + binder.Name);
+            }
             return true;
+        }
+
+        public IEnumerable<SimpleQueryJoin> Joins
+        {
+            get { return _joins != null ? _joins.Values : Enumerable.Empty<SimpleQueryJoin>(); }
         }
 
         public IEnumerable<SimpleReference> Columns
@@ -181,7 +193,40 @@ namespace Simple.Data
                 result = ParseThenBy(binder.Name);
                 return true;
             }
+            if (binder.Name.Equals("join", StringComparison.OrdinalIgnoreCase))
+            {
+                result = ParseJoin(binder, args);
+                return true;
+            }
             return base.TryInvokeMember(binder, args, out result);
+        }
+
+        private SimpleQuery ParseJoin(InvokeMemberBinder binder, object[] args)
+        {
+            var tableToJoin = args[0] as ObjectReference;
+            if (tableToJoin == null) throw new InvalidOperationException();
+
+            SimpleExpression joinExpression = null;
+
+            if (binder.CallInfo.ArgumentNames.Any(s => !string.IsNullOrWhiteSpace(s)))
+            {
+                joinExpression = ExpressionHelper.CriteriaDictionaryToExpression(tableToJoin, binder.NamedArgumentsToDictionary(args));
+            }
+            else if (args.Length == 2)
+            {
+                joinExpression = args[1] as SimpleExpression;
+            }
+
+            if (joinExpression == null) throw new InvalidOperationException();
+
+            var newJoinsDictionary = _joins != null
+                                         ? new Dictionary<string, SimpleQueryJoin>(_joins)
+                                         : new Dictionary<string, SimpleQueryJoin>();
+
+            var joinName = tableToJoin.Alias ?? tableToJoin.GetName();
+            newJoinsDictionary[joinName] = new SimpleQueryJoin(tableToJoin, joinExpression);
+
+            return new SimpleQuery(this, joins: newJoinsDictionary);
         }
 
         private SimpleQuery ParseOrderBy(string methodName)

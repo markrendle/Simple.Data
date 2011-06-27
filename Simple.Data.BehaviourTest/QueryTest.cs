@@ -13,14 +13,18 @@ namespace Simple.Data.IntegrationTest
         protected override void SetSchema(MockSchemaProvider schemaProvider)
         {
             schemaProvider.SetTables(new[] {"dbo", "Users", "BASE TABLE"},
-                                     new[] {"dbo", "UserBio", "BASE TABLE"});
+                                     new[] {"dbo", "UserBio", "BASE TABLE"},
+                                     new[] {"dbo", "Employee", "BASE TABLE"});
 
             schemaProvider.SetColumns(new object[] {"dbo", "Users", "Id", true},
                                       new[] {"dbo", "Users", "Name"},
                                       new[] {"dbo", "Users", "Password"},
                                       new[] {"dbo", "Users", "Age"},
                                       new[] {"dbo", "UserBio", "UserId"},
-                                      new[] {"dbo", "UserBio", "Text"});
+                                      new[] {"dbo", "UserBio", "Text"},
+                                      new[] {"dbo", "Employee", "Id"},
+                                      new[] {"dbo", "Employee", "Name"},
+                                      new[] {"dbo", "Employee", "ManagerId"});
 
             schemaProvider.SetPrimaryKeys(new object[] { "dbo", "Users", "Id", 0 });
             schemaProvider.SetForeignKeys(new object[] { "FK_Users_UserBio", "dbo", "UserBio", "UserId", "dbo", "Users", "Id", 0 });
@@ -176,6 +180,27 @@ namespace Simple.Data.IntegrationTest
             }
             GeneratedSqlIs("select [dbo].[userbio].[userid],[dbo].[userbio].[text] from [dbo].[userbio]" +
                 " join [dbo].[users] on ([dbo].[users].[id] = [dbo].[userbio].[userid]) where [dbo].[users].[id] = @p1");
+        }
+
+        [Test]
+        public void SelfJoinWithExplicitClause()
+        {
+            var q = _db.Employees.Query()
+                .Join(_db.Employees.As("Manager"), Id: _db.Employees.ManagerId);
+
+            q = q.Select(_db.Employees.Name, q.Manager.Name.As("Manager"));
+
+            try
+            {
+                q.ToList();
+            }
+            catch (InvalidOperationException)
+            {
+                // This won't work on Mock provider, but the SQL should be generated OK
+            }
+
+            GeneratedSqlIs("select [dbo].[employee].[name],[manager].[name] as [Manager] from [dbo].[employee]" +
+                " join [dbo].[employee] [manager] on ([manager].[id] = [dbo].[employee].[managerid])");
         }
     }
 }

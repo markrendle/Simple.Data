@@ -120,5 +120,16 @@ namespace Simple.Data.UnitTest
         {
             new SimpleQuery(null, "foo").ThenByDescending(new ObjectReference("bar"));
         }
+
+        [Test]
+        public void JoinShouldCreateExpression()
+        {
+            dynamic q = new SimpleQuery(null, "foo");
+            q = q.Join(new ObjectReference("bar"), foo_id: new ObjectReference("id", new ObjectReference("foo")));
+            var query = (SimpleQuery) q;
+            Assert.AreEqual(1, query.Joins.Count());
+            var join = query.Joins.Single();
+            Assert.AreEqual("bar", join.Table.GetName());
+        }
     }
 }
