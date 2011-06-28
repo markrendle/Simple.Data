@@ -18,9 +18,10 @@ namespace Simple.Data
         private readonly IEnumerable<SimpleReference> _columns;
         private readonly SimpleExpression _criteria;
         private readonly IEnumerable<SimpleOrderByItem> _order;
-        private readonly IDictionary<string, SimpleQueryJoin> _joins; 
+        internal IDictionary<string, SimpleQueryJoin> _joins; 
         private readonly int? _skipCount;
         private readonly int? _takeCount;
+        private SimpleQueryJoin _tempJoinWaitingForOn;
 
         public SimpleQuery(Adapter adapter, string tableName)
         {
@@ -195,10 +196,27 @@ namespace Simple.Data
             }
             if (binder.Name.Equals("join", StringComparison.OrdinalIgnoreCase))
             {
-                result = ParseJoin(binder, args);
+                result = args.Length == 1 ? (object)Join(args[0] as ObjectReference) : ParseJoin(binder, args);
                 return true;
             }
             return base.TryInvokeMember(binder, args, out result);
+        }
+
+        public SimpleQuery Join(ObjectReference objectReference)
+        {
+            var newJoin = new SimpleQueryJoin(objectReference, null);
+            if (_joins == null) _joins = new Dictionary<string, SimpleQueryJoin>();
+            _joins.Add(newJoin.Name, newJoin);
+            _tempJoinWaitingForOn = newJoin;
+
+            return this;
+        }
+
+        public SimpleQuery On(SimpleExpression joinExpression)
+        {
+            if (_tempJoinWaitingForOn == null) throw new InvalidOperationException("Call to On must be preceded by call to Join.");
+            _joins.Remove(_tempJoinWaitingForOn.Name);
+            return AddNewJoin(new SimpleQueryJoin(_tempJoinWaitingForOn.Table, joinExpression));
         }
 
         private SimpleQuery ParseJoin(InvokeMemberBinder binder, object[] args)
@@ -219,12 +237,19 @@ namespace Simple.Data
 
             if (joinExpression == null) throw new InvalidOperationException();
 
+            var newJoin = new SimpleQueryJoin(tableToJoin, joinExpression);
+
+            return AddNewJoin(newJoin);
+        }
+
+        private SimpleQuery AddNewJoin(SimpleQueryJoin newJoin)
+        {
             var newJoinsDictionary = _joins != null
                                          ? new Dictionary<string, SimpleQueryJoin>(_joins)
                                          : new Dictionary<string, SimpleQueryJoin>();
 
-            var joinName = tableToJoin.Alias ?? tableToJoin.GetName();
-            newJoinsDictionary[joinName] = new SimpleQueryJoin(tableToJoin, joinExpression);
+            var joinName = newJoin.Table.Alias ?? newJoin.Table.GetName();
+            newJoinsDictionary[joinName] = newJoin;
 
             return new SimpleQuery(this, joins: newJoinsDictionary);
         }
@@ -431,6 +456,25 @@ namespace Simple.Data
         public void SetDataStrategy(DataStrategy dataStrategy)
         {
             _dataStrategy = dataStrategy;
+        }
+    }
+
+    public class SimpleQueryJoinHolder
+    {
+        private readonly SimpleQuery _query;
+        private readonly string _joinName;
+
+        public SimpleQueryJoinHolder(SimpleQuery query, string joinName)
+        {
+            _query = query;
+            _joinName = joinName;
+        }
+
+        public SimpleQuery On(SimpleExpression expression)
+        {
+            var join = _query._joins[_joinName];
+            _query._joins[_joinName] = new SimpleQueryJoin(join.Table, expression);
+            return _query;
         }
     }
 }

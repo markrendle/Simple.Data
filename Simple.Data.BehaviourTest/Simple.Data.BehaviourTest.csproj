@@ -61,7 +61,8 @@
     <Compile Include="ExceptionsTesting.cs" />
     <Compile Include="NaturalNamingTest.cs" />
     <Compile Include="ProcedureTest.cs" />
-    <Compile Include="QueryTest.cs" />
+    <Compile Include="Query\ExplicitJoinTest.cs" />
+    <Compile Include="Query\QueryTest.cs" />
     <Compile Include="RangeAndArrayFindTest.cs" />
     <Compile Include="TransactionTest.cs" />
     <Compile Include="DatabaseTest.cs" />
@@ -90,6 +91,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -25,5 +25,10 @@ namespace Simple.Data
         {
             get { return _table; }
         }
+
+        public string Name
+        {
+            get { return _table.Alias ?? _table.GetName(); }
+        }
     }
 }
