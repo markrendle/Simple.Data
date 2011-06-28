@@ -140,5 +140,31 @@ namespace Simple.Data.SqlTest
                         .ToScalarOrDefault<string>();
             Assert.IsNull(name);
         }
+
+        [Test]
+        public void ToScalarListShouldReturnStringList()
+        {
+            var db = DatabaseHelper.Open();
+            List<string> name = db.Customers
+                        .Query()
+                        .Select(db.Customers.Name)
+                        .OrderByName()
+                        .ToScalarList<string>();
+            Assert.IsNotNull(name);
+            Assert.AreNotEqual(0, name.Count);
+        }
+
+        [Test]
+        public void ToScalarArrayShouldReturnStringArray()
+        {
+            var db = DatabaseHelper.Open();
+            string[] name = db.Customers
+                        .Query()
+                        .Select(db.Customers.Name)
+                        .OrderByName()
+                        .ToScalarArray<string>();
+            Assert.IsNotNull(name);
+            Assert.AreNotEqual(0, name.Length);
+        }
     }
 }
