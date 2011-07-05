@@ -27,10 +27,9 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void JoinWithExplicitClauseUsingNamedParameters()
         {
-            var q = _db.Employees.Query()
-                .Join(_db.Department, Id: _db.Employees.DepartmentId);
-
-            q = q.Select(_db.Employees.Name, _db.Department.Name.As("Department"));
+var q = _db.Employees.Query()
+    .Join(_db.Department, Id: _db.Employees.DepartmentId)
+    .Select(_db.Employees.Name, _db.Department.Name.As("Department"));
 
             try
             {
@@ -49,9 +48,8 @@ namespace Simple.Data.IntegrationTest.Query
         public void JoinWithExplicitClauseUsingExpression()
         {
             var q = _db.Employees.Query()
-                .Join(_db.Department, _db.Department.Id == _db.Employees.DepartmentId);
-
-            q = q.Select(_db.Employees.Name, _db.Department.Name.As("Department"));
+                .Join(_db.Department).On(_db.Department.Id == _db.Employees.DepartmentId)
+                .Select(_db.Employees.Name, _db.Department.Name.As("Department"));
 
             try
             {
@@ -69,10 +67,10 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void SelfJoinWithExplicitClauseUsingNamedParameters()
         {
-            var q = _db.Employees.Query()
-                .Join(_db.Employees.As("Manager"), Id: _db.Employees.ManagerId);
+var q = _db.Employees.Query()
+    .Join(_db.Employees.As("Manager"), Id: _db.Employees.ManagerId);
 
-            q = q.Select(_db.Employees.Name, q.Manager.Name.As("Manager"));
+q = q.Select(_db.Employees.Name, q.Manager.Name.As("Manager"));
 
             try
             {
@@ -90,11 +88,9 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void SelfJoinWithExplicitClauseUsingExpression()
         {
-            var q = _db.Employees.Query();
-
-            q = q.Join(_db.Employees.As("Manager")).On(q.Manager.Id == _db.Employees.ManagerId);
-
-            q = q.Select(_db.Employees.Name, q.Manager.Name.As("Manager"));
+var q = _db.Employees.Query();
+q = q.Join(_db.Employees.As("Manager")).On(q.Manager.Id == _db.Employees.ManagerId);
+q = q.Select(_db.Employees.Name, q.Manager.Name.As("Manager"));
 
             try
             {

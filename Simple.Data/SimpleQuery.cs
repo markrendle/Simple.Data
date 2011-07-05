@@ -50,7 +50,7 @@ namespace Simple.Data
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            if (_joins.ContainsKey(binder.Name))
+            if (_joins != null && _joins.ContainsKey(binder.Name))
             {
                 result = _joins[binder.Name].Table;
             }

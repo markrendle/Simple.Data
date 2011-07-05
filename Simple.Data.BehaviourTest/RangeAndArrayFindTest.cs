@@ -52,7 +52,7 @@ namespace Simple.Data.IntegrationTest
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
-            database.Users.FindAllByJoinDate("01/01/2011".to("31/01/2011")).ToList();
+            database.Users.FindAllByJoinDate("2011-01-01".to("2011-01-31")).ToList();
             Assert.AreEqual("select [dbo].[users].[id],[dbo].[users].[name],[dbo].[users].[password],[dbo].[users].[age],[dbo].[users].[joindate] from [dbo].[users] where [dbo].[users].[joindate] between @p1_start and @p1_end".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual(new DateTime(2011,1,1), mockDatabase.Parameters[0]);
             Assert.AreEqual(new DateTime(2011,1,31), mockDatabase.Parameters[1]);
