@@ -86,11 +86,53 @@ q = q.Select(_db.Employees.Name, q.Manager.Name.As("Manager"));
         }
 
         [Test]
+        public void SelfJoinWithExplicitClauseUsingOutParameterAndNamedParameters()
+        {
+            dynamic manager;
+            var q = _db.Employees.Query()
+                .Join(_db.Employees.As("Manager"), out manager).On(Id: _db.Employees.ManagerId)
+                .Select(_db.Employees.Name, manager.Name.As("Manager"));
+
+            try
+            {
+                q.ToList();
+            }
+            catch (InvalidOperationException)
+            {
+                // This won't work on Mock provider, but the SQL should be generated OK
+            }
+
+            GeneratedSqlIs("select [dbo].[employee].[name],[manager].[name] as [Manager] from [dbo].[employee]" +
+                " join [dbo].[employee] [manager] on ([manager].[id] = [dbo].[employee].[managerid])");
+        }
+
+        [Test]
         public void SelfJoinWithExplicitClauseUsingExpression()
         {
 var q = _db.Employees.Query();
 q = q.Join(_db.Employees.As("Manager")).On(q.Manager.Id == _db.Employees.ManagerId);
 q = q.Select(_db.Employees.Name, q.Manager.Name.As("Manager"));
+
+            try
+            {
+                q.ToList();
+            }
+            catch (InvalidOperationException)
+            {
+                // This won't work on Mock provider, but the SQL should be generated OK
+            }
+
+            GeneratedSqlIs("select [dbo].[employee].[name],[manager].[name] as [Manager] from [dbo].[employee]" +
+                " join [dbo].[employee] [manager] on ([manager].[id] = [dbo].[employee].[managerid])");
+        }
+
+        [Test]
+        public void SelfJoinWithExplicitClauseUsingExpressionAndOutParameter()
+        {
+            dynamic manager;
+            var q = _db.Employees.Query()
+                .Join(_db.Employees.As("Manager"), out manager).On(manager.Id == _db.Employees.ManagerId)
+                .Select(_db.Employees.Name, manager.Name.As("Manager"));
 
             try
             {

@@ -184,6 +184,10 @@ namespace Simple.Data
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
+            if (base.TryInvokeMember(binder, args, out result))
+            {
+                return true;
+            }
             if (binder.Name.StartsWith("order", StringComparison.OrdinalIgnoreCase))
             {
                 result = ParseOrderBy(binder.Name);
@@ -199,7 +203,13 @@ namespace Simple.Data
                 result = args.Length == 1 ? (object)Join(args[0] as ObjectReference) : ParseJoin(binder, args);
                 return true;
             }
-            return base.TryInvokeMember(binder, args, out result);
+            if (binder.Name.Equals("on", StringComparison.OrdinalIgnoreCase))
+            {
+                result = ParseOn(binder, args);
+                return true;
+            }
+
+            return false;
         }
 
         public SimpleQuery Join(ObjectReference objectReference)
@@ -208,6 +218,17 @@ namespace Simple.Data
             if (_joins == null) _joins = new Dictionary<string, SimpleQueryJoin>();
             _joins.Add(newJoin.Name, newJoin);
             _tempJoinWaitingForOn = newJoin;
+
+            return this;
+        }
+
+        public SimpleQuery Join(ObjectReference objectReference, out dynamic queryObjectReference)
+        {
+            var newJoin = new SimpleQueryJoin(objectReference, null);
+            if (_joins == null) _joins = new Dictionary<string, SimpleQueryJoin>();
+            _joins.Add(newJoin.Name, newJoin);
+            _tempJoinWaitingForOn = newJoin;
+            queryObjectReference = objectReference;
 
             return this;
         }
@@ -240,6 +261,15 @@ namespace Simple.Data
             var newJoin = new SimpleQueryJoin(tableToJoin, joinExpression);
 
             return AddNewJoin(newJoin);
+        }
+
+        private SimpleQuery ParseOn(InvokeMemberBinder binder, object[] args)
+        {
+            if (_tempJoinWaitingForOn == null) throw new InvalidOperationException("Call to On must be preceded by call to Join.");
+            _joins.Remove(_tempJoinWaitingForOn.Name);
+            var joinExpression = ExpressionHelper.CriteriaDictionaryToExpression(_tempJoinWaitingForOn.Table,
+                                                                                 binder.NamedArgumentsToDictionary(args));
+            return AddNewJoin(new SimpleQueryJoin(_tempJoinWaitingForOn.Table, joinExpression));
         }
 
         private SimpleQuery AddNewJoin(SimpleQueryJoin newJoin)

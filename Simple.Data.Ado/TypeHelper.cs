@@ -23,6 +23,7 @@ namespace Simple.Data.Ado
                                                                   typeof (DateTime),
                                                                   typeof (string),
                                                                   typeof (byte[]),
+                                                                  typeof (Guid),
                                                               };
         
         public static bool IsKnownType(Type type)
