@@ -51,5 +51,17 @@ namespace Simple.Data.IntegrationTest
             MockHelper.UseMockAdapter(adapter);
             return Database.Open();
         }
+
+        protected static void SwallowException(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (InvalidOperationException)
+            {
+                // This won't work on Mock provider, but the SQL should be generated OK
+            }
+        }
     }
 }

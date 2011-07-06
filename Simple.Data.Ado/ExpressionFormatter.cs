@@ -9,24 +9,21 @@ namespace Simple.Data.Ado
     {
         private readonly ICommandBuilder _commandBuilder;
         private readonly DatabaseSchema _schema;
+        private readonly ReferenceFormatter _referenceFormatter;
 
         public ExpressionFormatter(ICommandBuilder commandBuilder, DatabaseSchema schema)
         {
             _commandBuilder = commandBuilder;
             _schema = schema;
+            _referenceFormatter = new ReferenceFormatter(_schema);
         }
 
         protected override string FormatObject(object value, object otherOperand)
         {
-            var reference = value as ObjectReference;
-            if (!ReferenceEquals(reference, null))
-            {
-                var table = _schema.FindTable(reference.GetOwner().ToString());
-                var tableName = string.IsNullOrWhiteSpace(reference.GetOwner().Alias)
-                                    ? table.QualifiedName
-                                    : _schema.QuoteObjectName(reference.GetOwner().Alias);
-                return tableName + "." + table.FindColumn(reference.GetName()).QuotedName;
-            }
+            var objectReference = value as SimpleReference;
+
+            if (!ReferenceEquals(objectReference, null))
+                return _referenceFormatter.FormatColumnClause(objectReference);
 
             return _commandBuilder.AddParameter(value, GetColumn(otherOperand as ObjectReference)).Name;
         }
@@ -43,7 +40,7 @@ namespace Simple.Data.Ado
 
         private Column GetColumn(ObjectReference reference)
         {
-            if (reference == null)
+            if (ReferenceEquals(reference, null))
             {
                 return null;
             }

@@ -145,18 +145,27 @@ namespace Simple.Data.Ado
                     .Concat(GetReferencesFromExpression((SimpleExpression)expression.LeftOperand));
             }
 
-            var result = Enumerable.Empty<ObjectReference>();
+            return Enumerable.Empty<ObjectReference>()
+                .Concat(GetObjectReference(expression.LeftOperand))
+                .Concat(GetObjectReference(expression.RightOperand));
+        }
 
-            if (expression.LeftOperand is ObjectReference)
+        private static IEnumerable<ObjectReference> GetObjectReference(object obj)
+        {
+            var objectReference = obj as ObjectReference;
+            if (ReferenceEquals(objectReference, null))
             {
-                result = result.Concat(new[] { (ObjectReference)expression.LeftOperand });
-            }
-            if (expression.RightOperand is ObjectReference)
-            {
-                result = result.Concat(new[] { (ObjectReference)expression.RightOperand });
+                var functionReference = obj as FunctionReference;
+                if (!(ReferenceEquals(functionReference, null)))
+                {
+                    objectReference = functionReference.Argument as ObjectReference;
+                }
             }
 
-            return result;
+            if (!(ReferenceEquals(objectReference, null)))
+            {
+                yield return objectReference;
+            }
         }
     }
 }

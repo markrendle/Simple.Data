@@ -17,6 +17,7 @@ namespace Simple.Data
         private readonly string _tableName;
         private readonly IEnumerable<SimpleReference> _columns;
         private readonly SimpleExpression _criteria;
+        private readonly SimpleExpression _havingCriteria;
         private readonly IEnumerable<SimpleOrderByItem> _order;
         internal IDictionary<string, SimpleQueryJoin> _joins; 
         private readonly int? _skipCount;
@@ -34,6 +35,7 @@ namespace Simple.Data
             IDictionary<string,SimpleQueryJoin> joins = null,
             IEnumerable<SimpleReference> columns = null,
             SimpleExpression criteria = null,
+            SimpleExpression having = null,
             IEnumerable<SimpleOrderByItem> order = null,
             int? skipCount = null,
             int? takeCount = null)
@@ -43,9 +45,15 @@ namespace Simple.Data
             _joins = joins ?? source._joins;
             _columns = columns ?? source.Columns ?? Enumerable.Empty<SimpleReference>();
             _criteria = criteria ?? source.Criteria;
+            _havingCriteria = having ?? source.HavingCriteria;
             _order = order ?? source.Order;
             _skipCount = skipCount ?? source.SkipCount;
             _takeCount = takeCount ?? source.TakeCount;
+        }
+
+        public SimpleExpression HavingCriteria
+        {
+            get { return _havingCriteria; }
         }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
@@ -207,6 +215,15 @@ namespace Simple.Data
             {
                 result = ParseOn(binder, args);
                 return true;
+            }
+            if (binder.Name.Equals("having", StringComparison.OrdinalIgnoreCase))
+            {
+                var clause = args.SingleOrDefault() as SimpleExpression;
+                if (clause != null)
+                {
+                    result = new SimpleQuery(this, having: clause);
+                    return true;
+                }
             }
 
             return false;

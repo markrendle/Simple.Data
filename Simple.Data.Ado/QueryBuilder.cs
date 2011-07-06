@@ -9,6 +9,7 @@ namespace Simple.Data.Ado
     public class QueryBuilder
     {
         private readonly IFunctionNameConverter _functionNameConverter = new FunctionNameConverter();
+        private readonly ReferenceFormatter _referenceFormatter;
         private readonly AdoAdapter _adoAdapter;
         private readonly DatabaseSchema _schema;
 
@@ -21,6 +22,7 @@ namespace Simple.Data.Ado
         {
             _adoAdapter = adoAdapter;
             _schema = _adoAdapter.GetSchema();
+            _referenceFormatter = new ReferenceFormatter(_schema);
         }
 
         public ICommandBuilder Build(SimpleQuery query)
@@ -30,6 +32,7 @@ namespace Simple.Data.Ado
             HandleJoins();
             HandleQueryCriteria();
             HandleGrouping();
+            HandleHavingCriteria();
             HandleOrderBy();
             HandlePaging();
 
@@ -46,6 +49,9 @@ namespace Simple.Data.Ado
 
         private void HandleJoins()
         {
+            if (_query.Criteria == null && _query.HavingCriteria == null
+                && (_query.Columns.Where(r => !(r is CountSpecialReference)).Count() == 0)) return;
+
             var joiner = new Joiner(JoinType.Inner, _schema);
 
             string dottedTables = RemoveSchemaFromQueryTableName();
@@ -60,14 +66,19 @@ namespace Simple.Data.Ado
                                    ? joiner.GetJoinClauses(_tableName, _query.Criteria)
                                    : Enumerable.Empty<string>();
 
+            var fromHavingCriteria = _query.HavingCriteria != null
+                                         ? joiner.GetJoinClauses(_tableName, _query.HavingCriteria)
+                                         : Enumerable.Empty<string>();
+
             var fromColumnList = _query.Columns.Any(r => !(r is SpecialReference))
                                      ? joiner.GetJoinClauses(_tableName, _query.Columns.OfType<ObjectReference>())
                                      : Enumerable.Empty<string>();
 
-            if (_query.Criteria == null
-                && (_query.Columns.Where(r => !(r is CountSpecialReference)).Count() == 0)) return;
-
-            var joins = string.Join(" ", fromTable.Concat(fromJoins).Concat(fromCriteria).Concat(fromColumnList).Distinct());
+            var joins = string.Join(" ", fromTable.Concat(fromJoins)
+                                             .Concat(fromCriteria)
+                                             .Concat(fromHavingCriteria)
+                                             .Concat(fromColumnList)
+                                             .Distinct());
 
             if (!string.IsNullOrWhiteSpace(joins))
             {
@@ -88,14 +99,20 @@ namespace Simple.Data.Ado
             _commandBuilder.Append(" WHERE " + new ExpressionFormatter(_commandBuilder, _schema).Format(_query.Criteria));
         }
 
+        private void HandleHavingCriteria()
+        {
+            if (_query.HavingCriteria == null) return;
+            _commandBuilder.Append(" HAVING " + new ExpressionFormatter(_commandBuilder, _schema).Format(_query.HavingCriteria));
+        }
+
         private void HandleGrouping()
         {
-            if (!_query.Columns.OfType<FunctionReference>().Any(fr => fr.IsAggregate)) return;
+            if (_query.HavingCriteria == null && !_query.Columns.OfType<FunctionReference>().Any(fr => fr.IsAggregate)) return;
 
             var groupColumns =
-                _query.Columns.Where(c => (!(c is FunctionReference)) || !((FunctionReference) c).IsAggregate);
+                GetColumnsToSelect(_table).Where(c => (!(c is FunctionReference)) || !((FunctionReference) c).IsAggregate).ToList();
 
-            if (!groupColumns.Any()) return;
+            if (groupColumns.Count == 0) return;
 
             _commandBuilder.Append(" GROUP BY " + string.Join(",", groupColumns.Select(FormatGroupByColumnClause)));
         }
@@ -145,7 +162,7 @@ namespace Simple.Data.Ado
                 ?
                 FormatSpecialReference((SpecialReference)_query.Columns.Single())
                 :
-                string.Join(",", GetColumnsToSelect(table).Select(FormatColumnClause));
+                string.Join(",", GetColumnsToSelect(table).Select(_referenceFormatter.FormatColumnClause));
         }
 
         private static string FormatSpecialReference(SpecialReference reference)
@@ -167,7 +184,37 @@ namespace Simple.Data.Ado
             }
         }
 
-        private string FormatColumnClause(SimpleReference reference)
+        private string FormatGroupByColumnClause(SimpleReference reference)
+        {
+            var objectReference = reference as ObjectReference;
+            if (!ReferenceEquals(objectReference, null))
+            {
+                var table = _schema.FindTable(objectReference.GetOwner().GetName());
+                var column = table.FindColumn(objectReference.GetName());
+                return string.Format("{0}.{1}", table.QualifiedName, column.QuotedName);
+            }
+
+            var functionReference = reference as FunctionReference;
+            if (!ReferenceEquals(functionReference, null))
+            {
+                return FormatGroupByColumnClause(functionReference.Argument);
+            }
+
+            throw new InvalidOperationException("SimpleReference type not supported.");
+        }
+    }
+
+    class ReferenceFormatter
+    {
+        private readonly IFunctionNameConverter _functionNameConverter = new FunctionNameConverter();
+        private readonly DatabaseSchema _schema;
+
+        public ReferenceFormatter(DatabaseSchema schema)
+        {
+            _schema = schema;
+        }
+
+        public string FormatColumnClause(SimpleReference reference)
         {
             var formatted = TryFormatAsObjectReference(reference as ObjectReference)
                    ??
@@ -181,7 +228,7 @@ namespace Simple.Data.Ado
         private string TryFormatAsFunctionReference(FunctionReference functionReference)
         {
             if (ReferenceEquals(functionReference, null)) return null;
-            
+
             var sqlName = _functionNameConverter.ConvertToSqlName(functionReference.Name);
             return functionReference.Alias == null
                        ? string.Format("{0}({1})", sqlName,
@@ -207,24 +254,6 @@ namespace Simple.Data.Ado
                                      _schema.QuoteObjectName(objectReference.Alias));
         }
 
-        private string FormatGroupByColumnClause(SimpleReference reference)
-        {
-            var objectReference = reference as ObjectReference;
-            if (!ReferenceEquals(objectReference, null))
-            {
-                var table = _schema.FindTable(objectReference.GetOwner().GetName());
-                var column = table.FindColumn(objectReference.GetName());
-                return string.Format("{0}.{1}", table.QualifiedName, column.QuotedName);
-            }
-
-            var functionReference = reference as FunctionReference;
-            if (!ReferenceEquals(functionReference, null))
-            {
-                return FormatGroupByColumnClause(functionReference.Argument);
-            }
-
-            throw new InvalidOperationException("SimpleReference type not supported.");
-        }
     }
 
     class FunctionNameConverter : IFunctionNameConverter

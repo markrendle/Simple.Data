@@ -10,6 +10,71 @@ namespace Simple.Data
 {
     public abstract class SimpleReference : DynamicObject
     {
+        /// <summary>
+        /// Implements the operator == to create a <see cref="SimpleExpression"/> with the type <see cref="SimpleExpressionType.Equal"/>.
+        /// </summary>
+        /// <param name="column">The column.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>The expression.</returns>
+        public static SimpleExpression operator ==(SimpleReference column, object value)
+        {
+            return new SimpleExpression(column, value, SimpleExpressionType.Equal);
+        }
+
+        /// <summary>
+        /// Implements the operator != to create a <see cref="SimpleExpression"/> with the type <see cref="SimpleExpressionType.NotEqual"/>.
+        /// </summary>
+        /// <param name="column">The column.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>The expression.</returns>
+        public static SimpleExpression operator !=(SimpleReference column, object value)
+        {
+            return new SimpleExpression(column, value, SimpleExpressionType.NotEqual);
+        }
+
+        /// <summary>
+        /// Implements the operator &lt; to create a <see cref="SimpleExpression"/> with the type <see cref="SimpleExpressionType.LessThan"/>.
+        /// </summary>
+        /// <param name="column">The column.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>The expression.</returns>
+        public static SimpleExpression operator <(SimpleReference column, object value)
+        {
+            return new SimpleExpression(column, value, SimpleExpressionType.LessThan);
+        }
+
+        /// <summary>
+        /// Implements the operator &gt; to create a <see cref="SimpleExpression"/> with the type <see cref="SimpleExpressionType.GreaterThan"/>.
+        /// </summary>
+        /// <param name="column">The column.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>The expression.</returns>
+        public static SimpleExpression operator >(SimpleReference column, object value)
+        {
+            return new SimpleExpression(column, value, SimpleExpressionType.GreaterThan);
+        }
+
+        /// <summary>
+        /// Implements the operator &lt;= to create a <see cref="SimpleExpression"/> with the type <see cref="SimpleExpressionType.LessThanOrEqual"/>.
+        /// </summary>
+        /// <param name="column">The column.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>The expression.</returns>
+        public static SimpleExpression operator <=(SimpleReference column, object value)
+        {
+            return new SimpleExpression(column, value, SimpleExpressionType.LessThanOrEqual);
+        }
+
+        /// <summary>
+        /// Implements the operator &gt;= to create a <see cref="SimpleExpression"/> with the type <see cref="SimpleExpressionType.GreaterThanOrEqual"/>.
+        /// </summary>
+        /// <param name="column">The column.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>The expression.</returns>
+        public static SimpleExpression operator >=(SimpleReference column, object value)
+        {
+            return new SimpleExpression(column, value, SimpleExpressionType.GreaterThanOrEqual);
+        }
     }
 
     /// <summary>
@@ -65,6 +130,11 @@ namespace Simple.Data
             return _dataStrategy;
         }
 
+        private DataStrategy FindDatabaseInOwnerHierarchy()
+        {
+            return _dataStrategy ?? (_owner == null ? null : _owner.FindDatabaseInOwnerHierarchy());
+        }
+
         /// <summary>
         /// Gets the name of the referenced object.
         /// </summary>
@@ -86,7 +156,7 @@ namespace Simple.Data
                 var table = _dataStrategy.SetMemberAsTable(this);
                 if (table.TryInvokeMember(binder, args, out result)) return true;
             }
-            if ((!ReferenceEquals(_owner, null)) && GetOwner().GetDatabase() != null)
+            if (FindDatabaseInOwnerHierarchy() != null)
             {
                 var command = CommandFactory.GetCommandFor(binder.Name);
                 if (command != null)
@@ -144,72 +214,6 @@ namespace Simple.Data
         internal static ObjectReference FromStrings(params string[] source)
         {
             return source.Aggregate<string, ObjectReference>(null, (current, element) => new ObjectReference(element, current));
-        }
-
-        /// <summary>
-        /// Implements the operator == to create a <see cref="SimpleExpression"/> with the type <see cref="SimpleExpressionType.Equal"/>.
-        /// </summary>
-        /// <param name="column">The column.</param>
-        /// <param name="value">The value.</param>
-        /// <returns>The expression.</returns>
-        public static SimpleExpression operator ==(ObjectReference column, object value)
-        {
-            return new SimpleExpression(column, value, SimpleExpressionType.Equal);
-        }
-
-        /// <summary>
-        /// Implements the operator != to create a <see cref="SimpleExpression"/> with the type <see cref="SimpleExpressionType.NotEqual"/>.
-        /// </summary>
-        /// <param name="column">The column.</param>
-        /// <param name="value">The value.</param>
-        /// <returns>The expression.</returns>
-        public static SimpleExpression operator !=(ObjectReference column, object value)
-        {
-            return new SimpleExpression(column, value, SimpleExpressionType.NotEqual);
-        }
-
-        /// <summary>
-        /// Implements the operator &lt; to create a <see cref="SimpleExpression"/> with the type <see cref="SimpleExpressionType.LessThan"/>.
-        /// </summary>
-        /// <param name="column">The column.</param>
-        /// <param name="value">The value.</param>
-        /// <returns>The expression.</returns>
-        public static SimpleExpression operator <(ObjectReference column, object value)
-        {
-            return new SimpleExpression(column, value, SimpleExpressionType.LessThan);
-        }
-
-        /// <summary>
-        /// Implements the operator &gt; to create a <see cref="SimpleExpression"/> with the type <see cref="SimpleExpressionType.GreaterThan"/>.
-        /// </summary>
-        /// <param name="column">The column.</param>
-        /// <param name="value">The value.</param>
-        /// <returns>The expression.</returns>
-        public static SimpleExpression operator >(ObjectReference column, object value)
-        {
-            return new SimpleExpression(column, value, SimpleExpressionType.GreaterThan);
-        }
-
-        /// <summary>
-        /// Implements the operator &lt;= to create a <see cref="SimpleExpression"/> with the type <see cref="SimpleExpressionType.LessThanOrEqual"/>.
-        /// </summary>
-        /// <param name="column">The column.</param>
-        /// <param name="value">The value.</param>
-        /// <returns>The expression.</returns>
-        public static SimpleExpression operator <=(ObjectReference column, object value)
-        {
-            return new SimpleExpression(column, value, SimpleExpressionType.LessThanOrEqual);
-        }
-
-        /// <summary>
-        /// Implements the operator &gt;= to create a <see cref="SimpleExpression"/> with the type <see cref="SimpleExpressionType.GreaterThanOrEqual"/>.
-        /// </summary>
-        /// <param name="column">The column.</param>
-        /// <param name="value">The value.</param>
-        /// <returns>The expression.</returns>
-        public static SimpleExpression operator >=(ObjectReference column, object value)
-        {
-            return new SimpleExpression(column, value, SimpleExpressionType.GreaterThanOrEqual);
         }
 
         /// <summary>

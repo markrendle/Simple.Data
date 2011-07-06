@@ -27,9 +27,9 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void JoinWithExplicitClauseUsingNamedParameters()
         {
-var q = _db.Employees.Query()
-    .Join(_db.Department, Id: _db.Employees.DepartmentId)
-    .Select(_db.Employees.Name, _db.Department.Name.As("Department"));
+            var q = _db.Employees.Query()
+                .Join(_db.Department, Id: _db.Employees.DepartmentId)
+                .Select(_db.Employees.Name, _db.Department.Name.As("Department"));
 
             try
             {
@@ -67,10 +67,10 @@ var q = _db.Employees.Query()
         [Test]
         public void SelfJoinWithExplicitClauseUsingNamedParameters()
         {
-var q = _db.Employees.Query()
-    .Join(_db.Employees.As("Manager"), Id: _db.Employees.ManagerId);
+            var q = _db.Employees.Query()
+                .Join(_db.Employees.As("Manager"), Id: _db.Employees.ManagerId);
 
-q = q.Select(_db.Employees.Name, q.Manager.Name.As("Manager"));
+            q = q.Select(_db.Employees.Name, q.Manager.Name.As("Manager"));
 
             try
             {
@@ -109,9 +109,9 @@ q = q.Select(_db.Employees.Name, q.Manager.Name.As("Manager"));
         [Test]
         public void SelfJoinWithExplicitClauseUsingExpression()
         {
-var q = _db.Employees.Query();
-q = q.Join(_db.Employees.As("Manager")).On(q.Manager.Id == _db.Employees.ManagerId);
-q = q.Select(_db.Employees.Name, q.Manager.Name.As("Manager"));
+            var q = _db.Employees.Query();
+            q = q.Join(_db.Employees.As("Manager")).On(q.Manager.Id == _db.Employees.ManagerId);
+            q = q.Select(_db.Employees.Name, q.Manager.Name.As("Manager"));
 
             try
             {
@@ -134,17 +134,40 @@ q = q.Select(_db.Employees.Name, q.Manager.Name.As("Manager"));
                 .Join(_db.Employees.As("Manager"), out manager).On(manager.Id == _db.Employees.ManagerId)
                 .Select(_db.Employees.Name, manager.Name.As("Manager"));
 
-            try
-            {
-                q.ToList();
-            }
-            catch (InvalidOperationException)
-            {
-                // This won't work on Mock provider, but the SQL should be generated OK
-            }
+            SwallowException(() => q.ToList());
 
             GeneratedSqlIs("select [dbo].[employee].[name],[manager].[name] as [Manager] from [dbo].[employee]" +
                 " join [dbo].[employee] [manager] on ([manager].[id] = [dbo].[employee].[managerid])");
+        }
+    }
+
+    [TestFixture]
+    public class HavingTest : DatabaseIntegrationContext
+    {
+        [Test]
+        public void HavingClauseWithNaturalJoin()
+        {
+            var q = _db.Customers.Query()
+                .Having(_db.Customers.Orders.OrderDate.Max() < new DateTime(2011, 1, 1));
+
+            SwallowException(() => q.ToList());
+
+            GeneratedSqlIs("select [dbo].[customer].[customerid] from [dbo].[customer] " +
+                "join [dbo].[orders] on ([dbo].[customer].[customerid] = [dbo].[orders].[customerid]) " +
+                "group by [dbo].[customer].[customerid] " +
+                "having max([dbo].[orders].[orderdate]) < @p1");
+        }
+
+        protected override void SetSchema(MockSchemaProvider schemaProvider)
+        {
+            schemaProvider.SetTables(new[] { "dbo", "Customer", "BASE TABLE" },
+                                         new[] { "dbo", "Orders", "BASE TABLE" });
+            schemaProvider.SetColumns(new[] { "dbo", "Customer", "CustomerId" },
+                                          new[] { "dbo", "Orders", "OrderId" },
+                                          new[] { "dbo", "Orders", "CustomerId" },
+                                          new[] { "dbo", "Orders", "OrderDate" });
+            schemaProvider.SetPrimaryKeys(new object[] { "dbo", "Customer", "CustomerId", 0 });
+            schemaProvider.SetForeignKeys(new object[] { "FK_Orders_Customer", "dbo", "Orders", "CustomerId", "dbo", "Customer", "CustomerId", 0 });
         }
     }
 }
