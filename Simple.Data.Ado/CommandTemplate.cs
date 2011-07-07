@@ -41,6 +41,8 @@ namespace Simple.Data.Ado
 
         private IEnumerable<IDbDataParameter> CreateParameters(IDbCommand command, IEnumerable<object> parameterValues)
         {
+            if (!parameterValues.Any(pv => pv != null)) return Enumerable.Empty<IDbDataParameter>();
+
             return parameterValues.Any(o => o is IEnumerable && !(o is string)) || parameterValues.Any(o => o is IRange)
                        ? parameterValues.SelectMany((v,i) => CreateParameters(command, _parameters[i], v))
                        : parameterValues.Select((v, i) => CreateParameter(command, _parameters[i], v));

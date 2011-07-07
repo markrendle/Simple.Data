@@ -9,13 +9,13 @@ namespace Simple.Data.Ado
     {
         private readonly ICommandBuilder _commandBuilder;
         private readonly DatabaseSchema _schema;
-        private readonly ReferenceFormatter _referenceFormatter;
+        private readonly SimpleReferenceFormatter _simpleReferenceFormatter;
 
         public ExpressionFormatter(ICommandBuilder commandBuilder, DatabaseSchema schema)
         {
             _commandBuilder = commandBuilder;
             _schema = schema;
-            _referenceFormatter = new ReferenceFormatter(_schema);
+            _simpleReferenceFormatter = new SimpleReferenceFormatter(_schema);
         }
 
         protected override string FormatObject(object value, object otherOperand)
@@ -23,7 +23,7 @@ namespace Simple.Data.Ado
             var objectReference = value as SimpleReference;
 
             if (!ReferenceEquals(objectReference, null))
-                return _referenceFormatter.FormatColumnClause(objectReference);
+                return _simpleReferenceFormatter.FormatColumnClause(objectReference);
 
             return _commandBuilder.AddParameter(value, GetColumn(otherOperand as ObjectReference)).Name;
         }

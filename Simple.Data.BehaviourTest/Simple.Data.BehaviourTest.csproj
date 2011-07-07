@@ -59,9 +59,11 @@
   <ItemGroup>
     <Compile Include="DatabaseIntegrationContext.cs" />
     <Compile Include="ExceptionsTesting.cs" />
+    <Compile Include="FindTest.cs" />
     <Compile Include="NaturalNamingTest.cs" />
     <Compile Include="ProcedureTest.cs" />
     <Compile Include="Query\ExplicitJoinTest.cs" />
+    <Compile Include="Query\HavingTest.cs" />
     <Compile Include="Query\QueryTest.cs" />
     <Compile Include="RangeAndArrayFindTest.cs" />
     <Compile Include="TransactionTest.cs" />
