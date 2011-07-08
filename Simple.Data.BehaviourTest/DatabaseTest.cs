@@ -1,6 +1,4 @@
-﻿using System;
-using System.Dynamic;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Simple.Data.Mocking.Ado;
 
 namespace Simple.Data.IntegrationTest
@@ -12,30 +10,10 @@ namespace Simple.Data.IntegrationTest
         {
             schemaProvider.SetTables(new[] { "dbo", "Users", "BASE TABLE" });
             schemaProvider.SetColumns(new object[] { "dbo", "Users", "Id", true },
-                                            new[] { "dbo", "Users", "Name" },
-                                            new[] { "dbo", "Users", "Password" },
-                                            new[] { "dbo", "Users", "Age" });
+                                      new[] { "dbo", "Users", "Name" },
+                                      new[] { "dbo", "Users", "Password" },
+                                      new[] { "dbo", "Users", "Age" });
             schemaProvider.SetPrimaryKeys(new object[] { "dbo", "Users", "Id", 0 });
-        }
-
-        [Test]
-        public void TestInsertWithNamedArguments()
-        {
-            _db.Users.Insert(Name: "Steve", Age: 50);
-            GeneratedSqlIs("insert into [dbo].[Users] ([Name],[Age]) values (@p0,@p1)");
-            Parameter(0).Is("Steve");
-            Parameter(1).Is(50);
-        }
-
-        [Test]
-        public void TestInsertWithStaticTypeObject()
-        {
-            var user = new User { Name = "Steve", Age = 50 };
-            _db.Users.Insert(user);
-            GeneratedSqlIs("insert into [dbo].[Users] ([Name],[Password],[Age]) values (@p0,@p1,@p2)");
-            Parameter(0).Is("Steve");
-            Parameter(1).Is(DBNull.Value);
-            Parameter(2).Is(50);
         }
 
         [Test]
@@ -184,25 +162,5 @@ namespace Simple.Data.IntegrationTest
             Parameter(1).Is("J%");
         }
 
-        [Test]
-        public void TestInsertOnTable()
-        {
-            dynamic person = new ExpandoObject();
-            person.Name = "Phil";
-            person.Age = 42;
-            _db.Users.Insert(person);
-            GeneratedSqlIs("insert into [dbo].[Users] ([Name],[Age]) values (@p0,@p1)");
-            Parameter(0).Is("Phil");
-            Parameter(1).Is(42);
-        }
-
-        [Test]
-        public void TestThatInsertUsesDBNull()
-        {
-            dynamic person = new ExpandoObject();
-            person.Name = null;
-            _db.Users.Insert(person);
-            Parameter(0).Is(DBNull.Value);
-        }
     }
 }

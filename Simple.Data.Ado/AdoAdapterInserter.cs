@@ -8,6 +8,8 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data.Ado
 {
+    using Schema;
+
     class AdoAdapterInserter
     {
         private readonly AdoAdapter _adapter;
@@ -23,15 +25,25 @@ namespace Simple.Data.Ado
             _transaction = transaction;
         }
 
+        public IEnumerable<IDictionary<string, object>> InsertMany(string tableName, IEnumerable<IDictionary<string,object>> data)
+        {
+            if (data == null) throw new ArgumentNullException("data");
+            var list = data.ToList();
+            var table = _adapter.GetSchema().FindTable(tableName);
+            foreach (var row in list)
+            {
+                CheckInsertablePropertiesAreAvailable(table, row);
+            }
+
+            var bulkInserter = _adapter.ProviderHelper.GetCustomProvider<IBulkInserter>(_adapter.ConnectionProvider) ?? new BulkInserter();
+            return bulkInserter.Insert(_adapter, tableName, list, _transaction);
+        }
+
         public IDictionary<string, object> Insert(string tableName, IEnumerable<KeyValuePair<string, object>> data)
         {
             var table = _adapter.GetSchema().FindTable(tableName);
-            data = data.Where(kvp => table.HasColumn(kvp.Key));
 
-            if (data.Count() == 0)
-            {
-                throw new SimpleDataException("No properties were found which could be mapped to the database.");
-            }
+            CheckInsertablePropertiesAreAvailable(table, data);
 
             var customInserter = _adapter.ProviderHelper.GetCustomProvider<ICustomInserter>(_adapter.ConnectionProvider);
             if (customInserter != null)
@@ -39,7 +51,7 @@ namespace Simple.Data.Ado
                 return customInserter.Insert(_adapter, tableName, data.ToDictionary(), _transaction);
             }
 
-            var dataDictionary = data.Where(kvp => !table.FindColumn(kvp.Key).IsIdentity).ToDictionary();
+            var dataDictionary = data.Where(kvp => table.HasColumn(kvp.Key) && !table.FindColumn(kvp.Key).IsIdentity).ToDictionary();
 
             string columnList =
                 dataDictionary.Keys.Select(table.FindColumn)
@@ -72,6 +84,16 @@ namespace Simple.Data.Ado
 
             Execute(insertSql, dataDictionary.Values.ToArray());
             return null;
+        }
+
+        private void CheckInsertablePropertiesAreAvailable(Table table, IEnumerable<KeyValuePair<string, object>> data)
+        {
+            data = data.Where(kvp => table.HasColumn(kvp.Key));
+
+            if (data.Count() == 0)
+            {
+                throw new SimpleDataException("No properties were found which could be mapped to the database.");
+            }
         }
 
         internal IDictionary<string, object> ExecuteSingletonQuery(string sql, params object[] values)

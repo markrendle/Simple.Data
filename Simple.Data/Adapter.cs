@@ -88,5 +88,10 @@ namespace Simple.Data
         {
             throw new NotImplementedException();
         }
+
+        public virtual IEnumerable<IDictionary<string, object>> InsertMany(string tableName, IEnumerable<IDictionary<string, object>> data)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

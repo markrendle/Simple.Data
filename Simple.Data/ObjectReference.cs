@@ -205,7 +205,7 @@ namespace Simple.Data
         {
             if (!ReferenceEquals(_owner, null))
             {
-                return _owner + "." + _name;
+                return string.Concat(_owner, ".", _name);
             }
             return _name;
         }

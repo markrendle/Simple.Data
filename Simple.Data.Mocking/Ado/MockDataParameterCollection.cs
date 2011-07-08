@@ -180,7 +180,7 @@ namespace Simple.Data.Mocking.Ado
         /// <filterpriority>1</filterpriority>
         public override int Count
         {
-            get { throw new NotImplementedException(); }
+            get { return _collection.Count; }
         }
 
         /// <summary>

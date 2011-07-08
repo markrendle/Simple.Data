@@ -8,6 +8,8 @@ using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
+    using System.Linq;
+
     internal class CommandHelper
     {
         private readonly ISchemaProvider _schemaProvider;
@@ -21,7 +23,8 @@ namespace Simple.Data.Ado
         {
             var command = connection.CreateCommand();
 
-            command.CommandText = PrepareCommand(sql, values, command);
+            command.CommandText = PrepareCommand(sql, command);
+            SetParameterValues(command, values);
 
             return command;
         }
@@ -34,7 +37,7 @@ namespace Simple.Data.Ado
             return command;
         }
 
-        private string PrepareCommand(IEnumerable<char> sql, IList<object> values, IDbCommand command)
+        private string PrepareCommand(IEnumerable<char> sql, IDbCommand command)
         {
             int index = 0;
             var sqlBuilder = new StringBuilder();
@@ -44,7 +47,6 @@ namespace Simple.Data.Ado
                 {
                     var parameter = command.CreateParameter();
                     parameter.ParameterName = _schemaProvider.NameParameter("p" + index);
-                    parameter.Value = FixObjectType(values[index]);
                     command.Parameters.Add(parameter);
                     
                     sqlBuilder.Append(parameter.ParameterName);
@@ -56,6 +58,16 @@ namespace Simple.Data.Ado
                 }
             }
             return sqlBuilder.ToString();
+        }
+
+        public static void SetParameterValues(IDbCommand command, IList<object> values)
+        {
+            int index = 0;
+            foreach (var parameter in command.Parameters.Cast<IDbDataParameter>())
+            {
+                parameter.Value = FixObjectType(values[index]);
+                index++;
+            }
         }
 
         private static void PrepareCommand(CommandBuilder commandBuilder, IDbCommand command)
@@ -78,6 +90,14 @@ namespace Simple.Data.Ado
             var asString = value.ToString();
             if (asString != value.GetType().FullName) return asString;
             return value;
+        }
+
+        public IDbCommand Create(IDbConnection connection, string insertSql)
+        {
+            var command = connection.CreateCommand();
+            command.CommandText = PrepareCommand(insertSql, command);
+            return command;
+
         }
     }
 

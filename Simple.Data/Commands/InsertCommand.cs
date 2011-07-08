@@ -7,6 +7,8 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data.Commands
 {
+    using System.Collections;
+
     class InsertCommand : ICommand
     {
         public bool IsCommandFor(string method)
@@ -16,7 +18,15 @@ namespace Simple.Data.Commands
 
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            return DoInsert(binder, args, dataStrategy, table.GetQualifiedName()).ToDynamicRecord(table.GetQualifiedName(), dataStrategy);
+            var result = DoInsert(binder, args, dataStrategy, table.GetQualifiedName());
+            
+            var dictionary = result as IDictionary<string,object>;
+            if (dictionary != null) return dictionary.ToDynamicRecord(table.GetQualifiedName(), dataStrategy);
+
+            var list = result as IEnumerable<IDictionary<string, object>>;
+            if (list != null) return list.Select(d => d.ToDynamicRecord(table.GetQualifiedName(), dataStrategy));
+
+            return null;
         }
 
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
@@ -24,7 +34,7 @@ namespace Simple.Data.Commands
             throw new NotImplementedException();
         }
 
-        private static IDictionary<string, object> DoInsert(InvokeMemberBinder binder, object[] args, DataStrategy dataStrategy, string tableName)
+        private static object DoInsert(InvokeMemberBinder binder, object[] args, DataStrategy dataStrategy, string tableName)
         {
             return binder.HasSingleUnnamedArgument()
                 ?
@@ -33,20 +43,42 @@ namespace Simple.Data.Commands
                 InsertDictionary(binder, args, dataStrategy, tableName);
         }
 
-        private static IDictionary<string, object> InsertDictionary(InvokeMemberBinder binder, object[] args, DataStrategy dataStrategy, string tableName)
+        private static object InsertDictionary(InvokeMemberBinder binder, object[] args, DataStrategy dataStrategy, string tableName)
         {
             return dataStrategy.Insert(tableName, binder.NamedArgumentsToDictionary(args));
         }
 
-        private static IDictionary<string,object> InsertEntity(object entity, DataStrategy dataStrategy, string tableName)
+        private static object InsertEntity(object entity, DataStrategy dataStrategy, string tableName)
         {
             var dictionary = entity as IDictionary<string, object>;
-            if (dictionary == null)
+            if (dictionary != null)
+                return dataStrategy.Insert(tableName, dictionary);
+
+            var list = entity as IEnumerable<IDictionary<string, object>>;
+            if (list != null)
+                return dataStrategy.Insert(tableName, list);
+
+            var entityList = entity as IEnumerable;
+            if (entityList != null)
             {
-                dictionary = ObjectEx.ObjectToDictionary(entity);
-                if (dictionary.Count == 0)
-                    throw new SimpleDataException("Could not discover data in object.");
+                var array = entityList.Cast<object>().ToArray();
+                var rows = new List<IDictionary<string, object>>();
+                foreach (var o in array)
+                {
+                    dictionary = (o as IDictionary<string, object>) ?? o.ObjectToDictionary();
+                    if (dictionary.Count == 0)
+                    {
+                        throw new SimpleDataException("Could not discover data in object.");
+                    }
+                    rows.Add(dictionary);
+                }
+
+                return dataStrategy.Insert(tableName, rows);
             }
+
+            dictionary = entity.ObjectToDictionary();
+            if (dictionary.Count == 0)
+                throw new SimpleDataException("Could not discover data in object.");
             return dataStrategy.Insert(tableName, dictionary);
         }
     }

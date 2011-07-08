@@ -93,6 +93,11 @@ namespace Simple.Data
         public abstract IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data);
 
         /// <summary>
+        ///  Inserts many records into the specified "table".
+        ///  </summary><param name="tableName">Name of the table.</param><param name="data">The values to insert.</param><returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
+        public abstract IEnumerable<IDictionary<string, object>> Insert(string tableName, IEnumerable<IDictionary<string, object>> data);
+
+        /// <summary>
         ///  Updates the specified "table" according to specified criteria.
         ///  </summary><param name="tableName">Name of the table.</param><param name="data">The new values.</param><param name="criteria">The expression to use as criteria for the update operation.</param><returns>The number of records affected by the update operation.</returns>
         public abstract int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria);

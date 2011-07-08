@@ -84,6 +84,14 @@ namespace Simple.Data
         }
 
         /// <summary>
+        ///  Inserts a record into the specified "table".
+        ///  </summary><param name="tableName">Name of the table.</param><param name="data">The values to insert.</param><returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
+        public override IEnumerable<IDictionary<string, object>> Insert(string tableName, IEnumerable<IDictionary<string, object>> data)
+        {
+            return _adapter.InsertMany(tableName, data);
+        }
+
+        /// <summary>
         ///  Updates the specified "table" according to specified criteria.
         ///  </summary><param name="tableName">Name of the table.</param><param name="data">The new values.</param><param name="criteria">The expression to use as criteria for the update operation.</param><returns>The number of records affected by the update operation.</returns>
         public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)

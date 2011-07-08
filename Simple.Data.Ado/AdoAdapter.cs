@@ -109,6 +109,16 @@ namespace Simple.Data.Ado
             return new AdoAdapterInserter(this).Insert(tableName, data);
         }
 
+        public override IEnumerable<IDictionary<string, object>> InsertMany(string tableName, IEnumerable<IDictionary<string, object>> data)
+        {
+            return new AdoAdapterInserter(this).InsertMany(tableName, data);
+        }
+
+        public IEnumerable<IDictionary<string, object>> InsertMany(string tableName, IEnumerable<IDictionary<string, object>> data, IAdapterTransaction transaction)
+        {
+            return new AdoAdapterInserter(this, ((AdoAdapterTransaction)transaction).Transaction).InsertMany(tableName, data);
+        }
+
         public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
         {
             var commandBuilder = new UpdateHelper(_schema).GetUpdateCommand(tableName, data, criteria);

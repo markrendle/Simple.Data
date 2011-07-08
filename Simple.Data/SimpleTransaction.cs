@@ -107,6 +107,14 @@ namespace Simple.Data
             return _adapter.Insert(tableName, data, AdapterTransaction);
         }
 
+        /// <summary>
+        ///  Inserts a record into the specified "table".
+        ///  </summary><param name="tableName">Name of the table.</param><param name="data">The values to insert.</param><returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
+        public override IEnumerable<IDictionary<string, object>> Insert(string tableName, IEnumerable<IDictionary<string, object>> data)
+        {
+            return _adapter.InsertMany(tableName, data, AdapterTransaction);
+        }
+
         public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
         {
             return _adapter.Update(tableName, data, criteria, AdapterTransaction);

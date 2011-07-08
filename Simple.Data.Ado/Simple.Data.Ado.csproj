@@ -51,6 +51,7 @@
     <Compile Include="AdoAdapterInserter.cs" />
     <Compile Include="AdoAdapterRelatedFinder.cs" />
     <Compile Include="AdoAdapterTransaction.cs" />
+    <Compile Include="BulkInserter.cs" />
     <Compile Include="CommandBuilder.cs" />
     <Compile Include="CommandHelper.cs" />
     <Compile Include="CommandTemplate.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="FindHelper.cs" />
     <Compile Include="FunctionNameConverter.cs" />
     <Compile Include="HomogenizedDictionaryIndex.cs" />
+    <Compile Include="IBulkInserter.cs" />
     <Compile Include="ICommandBuilder.cs" />
     <Compile Include="IConnectionProvider.cs" />
     <Compile Include="ICustomInserter.cs" />
