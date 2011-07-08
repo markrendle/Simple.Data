@@ -276,5 +276,29 @@ namespace Simple.Data
             return new SimpleExpression(column, value, SimpleExpressionType.GreaterThanOrEqual);
         }
 
+        public static MathReference operator +(ObjectReference column, object value)
+        {
+            return new MathReference(column, value, MathOperator.Add);
+        }
+
+        public static MathReference operator -(ObjectReference column, object value)
+        {
+            return new MathReference(column, value, MathOperator.Subtract);
+        }
+
+        public static MathReference operator *(ObjectReference column, object value)
+        {
+            return new MathReference(column, value, MathOperator.Multiply);
+        }
+
+        public static MathReference operator /(ObjectReference column, object value)
+        {
+            return new MathReference(column, value, MathOperator.Divide);
+        }
+
+        public static MathReference operator %(ObjectReference column, object value)
+        {
+            return new MathReference(column, value, MathOperator.Modulo);
+        }
     }
 }

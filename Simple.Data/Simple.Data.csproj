@@ -80,6 +80,7 @@
     <Compile Include="FunctionReference.cs" />
     <Compile Include="HomogenizedEqualityComparer.cs" />
     <Compile Include="IRange.cs" />
+    <Compile Include="MathReference.cs" />
     <Compile Include="Maybe.cs" />
     <Compile Include="OrderByDirection.cs" />
     <Compile Include="Range.cs" />

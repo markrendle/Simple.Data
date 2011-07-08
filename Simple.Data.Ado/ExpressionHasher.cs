@@ -7,7 +7,7 @@ namespace Simple.Data.Ado
     {
         protected override string FormatObject(object value, object otherOperand)
         {
-            var reference = value as ObjectReference;
+            var reference = value as SimpleReference;
             return !ReferenceEquals(reference, null) ? reference.ToString() : "?";
         }
 

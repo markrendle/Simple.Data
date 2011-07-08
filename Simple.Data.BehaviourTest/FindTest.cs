@@ -72,6 +72,46 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestFindModulo()
+        {
+            _db.Users.Find(_db.Users.Id % 2 == 1);
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] % 2 = @p1");
+            Parameter(0).Is(1);
+        }
+
+        [Test]
+        public void TestFindWithAdd()
+        {
+            _db.Users.Find(_db.Users.Id + _db.Users.Age == 42);
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] + [dbo].[Users].[Age] = @p1");
+            Parameter(0).Is(42);
+        }
+
+        [Test]
+        public void TestFindWithSubtract()
+        {
+            _db.Users.Find(_db.Users.Id - _db.Users.Age == 42);
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] - [dbo].[Users].[Age] = @p1");
+            Parameter(0).Is(42);
+        }
+
+        [Test]
+        public void TestFindWithMultiply()
+        {
+            _db.Users.Find(_db.Users.Id * _db.Users.Age == 42);
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] * [dbo].[Users].[Age] = @p1");
+            Parameter(0).Is(42);
+        }
+
+        [Test]
+        public void TestFindWithDivide()
+        {
+            _db.Users.Find(_db.Users.Id / _db.Users.Age == 42);
+            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] / [dbo].[Users].[Age] = @p1");
+            Parameter(0).Is(42);
+        }
+        
+        [Test]
         public void TestFindByNamedParameterSingleColumn()
         {
             _db.Users.FindBy(Name: "Foo");

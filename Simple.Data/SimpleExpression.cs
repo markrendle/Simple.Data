@@ -60,7 +60,7 @@ namespace Simple.Data
             if (operand == null) return Yield(null);
             if (CommonTypes.Contains(operand.GetType())) return Yield(operand);
 
-            if (operand is ObjectReference)
+            if (operand is SimpleReference)
             {
                 return Enumerable.Empty<object>();
             }

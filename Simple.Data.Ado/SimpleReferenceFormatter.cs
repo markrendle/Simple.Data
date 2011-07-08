@@ -17,11 +17,46 @@ namespace Simple.Data.Ado
         {
             var formatted = TryFormatAsObjectReference(reference as ObjectReference)
                             ??
-                            TryFormatAsFunctionReference(reference as FunctionReference);
+                            TryFormatAsFunctionReference(reference as FunctionReference)
+                            ??
+                            TryFormatAsMathReference(reference as MathReference);
 
             if (formatted != null) return formatted;
 
             throw new InvalidOperationException("SimpleReference type not supported.");
+        }
+
+        private string FormatObject(object obj)
+        {
+            var reference = obj as SimpleReference;
+            return reference != null ? FormatColumnClause(reference) : obj.ToString();
+        }
+
+        private string TryFormatAsMathReference(MathReference mathReference)
+        {
+            if (ReferenceEquals(mathReference, null)) return null;
+
+            return string.Format("{0} {1} {2}", FormatObject(mathReference.LeftOperand),
+                                 MathOperatorToString(mathReference.Operator), FormatObject(mathReference.RightOperand));
+        }
+
+        private static string MathOperatorToString(MathOperator @operator)
+        {
+            switch (@operator)
+            {
+                case MathOperator.Add:
+                    return "+";
+                case MathOperator.Subtract:
+                    return "-";
+                case MathOperator.Multiply:
+                    return "*";
+                case MathOperator.Divide:
+                    return "/";
+                case MathOperator.Modulo:
+                    return "%";
+                default:
+                    throw new InvalidOperationException("Invalid MathOperator specified.");
+            }
         }
 
         private string TryFormatAsFunctionReference(FunctionReference functionReference)
