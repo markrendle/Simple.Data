@@ -92,28 +92,28 @@ namespace Simple.Data
             _adapterTransaction.Rollback();
         }
 
-        public override IDictionary<string, object> FindOne(string tableName, SimpleExpression criteria)
+        internal override IDictionary<string, object> FindOne(string tableName, SimpleExpression criteria)
         {
             return Find(tableName, criteria).FirstOrDefault();
         }
 
-        public override int Update(string tableName, IList<IDictionary<string, object>> dataList)
+        internal override int Update(string tableName, IList<IDictionary<string, object>> dataList)
         {
             return _adapter.UpdateMany(tableName, dataList, AdapterTransaction);
         }
 
-        public override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IList<string> keyFields)
+        internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IList<string> keyFields)
         {
             return _adapter.UpdateMany(tableName, dataList, _adapterTransaction, keyFields);
         }
 
 
-        public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
+        internal override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
             return _adapter.Find(tableName, criteria, AdapterTransaction);
         }
 
-        public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
+        internal override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
         {
             return _adapter.Insert(tableName, data, AdapterTransaction);
         }
@@ -121,17 +121,17 @@ namespace Simple.Data
         /// <summary>
         ///  Inserts a record into the specified "table".
         ///  </summary><param name="tableName">Name of the table.</param><param name="data">The values to insert.</param><returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
-        public override IEnumerable<IDictionary<string, object>> Insert(string tableName, IEnumerable<IDictionary<string, object>> data)
+        internal override IEnumerable<IDictionary<string, object>> Insert(string tableName, IEnumerable<IDictionary<string, object>> data)
         {
             return _adapter.InsertMany(tableName, data, AdapterTransaction);
         }
 
-        public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
+        internal override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
         {
             return _adapter.Update(tableName, data, criteria, AdapterTransaction);
         }
 
-        public override int Delete(string tableName, SimpleExpression criteria)
+        internal override int Delete(string tableName, SimpleExpression criteria)
         {
             return _adapter.Delete(tableName, criteria, AdapterTransaction);
         }

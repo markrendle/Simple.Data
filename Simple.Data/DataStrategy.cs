@@ -85,30 +85,30 @@ namespace Simple.Data
         /// <param name="tableName">Name of the table.</param>
         /// <param name="criteria">The criteria. This may be <c>null</c>, in which case all records should be returned.</param>
         /// <returns>The list of records matching the criteria. If no records are found, return an empty list.</returns>
-        public abstract IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria);
+        internal abstract IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria);
 
         /// <summary>
         ///  Inserts a record into the specified "table".
         ///  </summary><param name="tableName">Name of the table.</param><param name="data">The values to insert.</param><returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
-        public abstract IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data);
+        internal abstract IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data);
 
         /// <summary>
         ///  Inserts many records into the specified "table".
         ///  </summary><param name="tableName">Name of the table.</param><param name="data">The values to insert.</param><returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
-        public abstract IEnumerable<IDictionary<string, object>> Insert(string tableName, IEnumerable<IDictionary<string, object>> data);
+        internal abstract IEnumerable<IDictionary<string, object>> Insert(string tableName, IEnumerable<IDictionary<string, object>> data);
 
         /// <summary>
         ///  Updates the specified "table" according to specified criteria.
         ///  </summary><param name="tableName">Name of the table.</param><param name="data">The new values.</param><param name="criteria">The expression to use as criteria for the update operation.</param><returns>The number of records affected by the update operation.</returns>
-        public abstract int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria);
+        internal abstract int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria);
 
         /// <summary>
         ///  Deletes from the specified table.
         ///  </summary><param name="tableName">Name of the table.</param><param name="criteria">The expression to use as criteria for the delete operation.</param><returns>The number of records which were deleted.</returns>
-        public abstract int Delete(string tableName, SimpleExpression criteria);
+        internal abstract int Delete(string tableName, SimpleExpression criteria);
 
-        public abstract IDictionary<string, object> FindOne(string getQualifiedName, SimpleExpression criteriaExpression);
-        public abstract int Update(string tableName, IList<IDictionary<string, object>> dataList);
-        public abstract int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IList<string> keyFields);
+        internal abstract IDictionary<string, object> FindOne(string getQualifiedName, SimpleExpression criteriaExpression);
+        internal abstract int Update(string tableName, IList<IDictionary<string, object>> dataList);
+        internal abstract int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IList<string> keyFields);
     }
 }
