@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<NamespacesMetrics>
-  <Namespace Namespace="Simple.Data.AdapterApi" NTypes="1" NILInstruction="7" NbLinesOfCode="1" NbLinesOfComment="9" PercentageComment="90" PercentageCoverage="-" AfferentCoupling="0" EfferentCoupling="1" />
-  <Namespace Namespace="Simple.Data.SqlServer" NTypes="11" NILInstruction="1801" NbLinesOfCode="115" NbLinesOfComment="3" PercentageComment="2" PercentageCoverage="-" AfferentCoupling="0" EfferentCoupling="15" />
-  <Namespace Namespace="Simple.Data.SqlServer.Properties" NTypes="1" NILInstruction="58" NbLinesOfCode="9" NbLinesOfComment="33" PercentageComment="78" PercentageCoverage="-" AfferentCoupling="1" EfferentCoupling="8" />
-  <Namespace Namespace="Simple.Data.Mocking" NTypes="16" NILInstruction="1147" NbLinesOfCode="130" NbLinesOfComment="22" PercentageComment="14" PercentageCoverage="-" AfferentCoupling="0" EfferentCoupling="8" />
-  <Namespace Namespace="Simple.Data.Mocking.Ado" NTypes="20" NILInstruction="2099" NbLinesOfCode="234" NbLinesOfComment="517" PercentageComment="68" PercentageCoverage="-" AfferentCoupling="0" EfferentCoupling="14" />
-</NamespacesMetrics>

@@ -17,3 +17,4 @@ Releases/2*
 *.docstates
 test-results
 apply_config.bat
+NDependOut

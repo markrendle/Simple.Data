@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<AssembliesMetrics>
-  <Assembly Assembly="Simple.Data.AdapterApi v1.0.0.0" NTypes="1" NAbstractTypes="0" NILInstructionInAsm="7" NbLinesOfCodeInAsm="1" NbLinesOfCommentInAsm="26" PercentageCommentInAsm="96" PercentageCoverageInAsm="-" AfferentCoupling="0" EfferentCoupling="2" RelationalCohesion="1" Instability="1" Abstractness="0" DistFrMainSeq="0" NormDistFrMainSeq="0" />
-  <Assembly Assembly="Simple.Data.SqlServer v0.6.8.0" NTypes="12" NAbstractTypes="0" NILInstructionInAsm="1859" NbLinesOfCodeInAsm="124" NbLinesOfCommentInAsm="52" PercentageCommentInAsm="29" PercentageCoverageInAsm="-" AfferentCoupling="0" EfferentCoupling="71" RelationalCohesion="1.33" Instability="1" Abstractness="0" DistFrMainSeq="0" NormDistFrMainSeq="0" />
-  <Assembly Assembly="Simple.Data.Mocking v0.6.8.0" NTypes="36" NAbstractTypes="0" NILInstructionInAsm="3246" NbLinesOfCodeInAsm="364" NbLinesOfCommentInAsm="546" PercentageCommentInAsm="60" PercentageCoverageInAsm="-" AfferentCoupling="0" EfferentCoupling="88" RelationalCohesion="1.11" Instability="1" Abstractness="0" DistFrMainSeq="0" NormDistFrMainSeq="0" />
-</AssembliesMetrics>
