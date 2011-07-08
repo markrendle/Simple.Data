@@ -97,6 +97,17 @@ namespace Simple.Data
             return Find(tableName, criteria).FirstOrDefault();
         }
 
+        public override int Update(string tableName, IList<IDictionary<string, object>> dataList)
+        {
+            return _adapter.UpdateMany(tableName, dataList, AdapterTransaction);
+        }
+
+        public override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IList<string> keyFields)
+        {
+            return _adapter.UpdateMany(tableName, dataList, _adapterTransaction, keyFields);
+        }
+
+
         public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
             return _adapter.Find(tableName, criteria, AdapterTransaction);

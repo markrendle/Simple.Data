@@ -27,11 +27,12 @@ namespace Simple.Data
         IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, IAdapterTransaction transaction);
 
         /// <summary>
-        ///  Inserts a record into the specified "table".
+        ///  Inserts many records into the specified "table".
         ///  </summary>
-        /// <param name="tableName">Name of the table.</param><param name="data">The values to insert.</param>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="data">The list of records to insert.</param>
         /// <param name="transaction">The transaction with which the operation is associated.</param>
-        /// <returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
+        /// <returns>If possible, return the newly inserted rows, including any automatically-set values such as primary keys or timestamps.</returns>
         IEnumerable<IDictionary<string, object>> InsertMany(string tableName, IEnumerable<IDictionary<string, object>> data, IAdapterTransaction transaction);
 
         /// <summary>
@@ -49,5 +50,15 @@ namespace Simple.Data
         /// <param name="transaction">The transaction with which the operation is associated.</param>
         /// <returns>The number of records which were deleted.</returns>
         int Delete(string tableName, SimpleExpression criteria, IAdapterTransaction transaction);
+
+        /// <summary>
+        ///  Updates the specified "table" according to primary key information where available.
+        ///  </summary>
+        /// <param name="tableName">Name of the table.</param><param name="dataList">The new values.</param>
+        /// <param name="adapterTransaction">The transaction with which the operation is associated.</param>
+        /// <returns>The number of records affected by the update operation.</returns>
+        int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> dataList, IAdapterTransaction adapterTransaction);
+
+        int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> dataList, IAdapterTransaction adapterTransaction, IList<string> keyFields);
     }
 }

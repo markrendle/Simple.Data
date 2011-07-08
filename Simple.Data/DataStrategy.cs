@@ -108,5 +108,7 @@ namespace Simple.Data
         public abstract int Delete(string tableName, SimpleExpression criteria);
 
         public abstract IDictionary<string, object> FindOne(string getQualifiedName, SimpleExpression criteriaExpression);
+        public abstract int Update(string tableName, IList<IDictionary<string, object>> dataList);
+        public abstract int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IList<string> keyFields);
     }
 }

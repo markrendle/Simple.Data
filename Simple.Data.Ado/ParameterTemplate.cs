@@ -3,14 +3,23 @@ using System.Data;
 
 namespace Simple.Data.Ado
 {
+    using Schema;
+
     public class ParameterTemplate : IEquatable<ParameterTemplate>
     {
         private readonly string _name;
         private readonly DbType _dbType;
         private readonly int _maxLength;
+        private readonly Column _column;
 
-        public ParameterTemplate(string name) : this(name, DbType.Object, 0)
+        public ParameterTemplate(string name, Column column)
         {
+            if (name == null) throw new ArgumentNullException("name");
+            _name = name;
+            _column = column;
+            if (column == null) return;
+            _dbType = column.DbType;
+            _maxLength = column.MaxLength;
         }
 
         public ParameterTemplate(string name, DbType dbType, int maxLength)
@@ -34,6 +43,11 @@ namespace Simple.Data.Ado
         public string Name
         {
             get { return _name; }
+        }
+
+        public Column Column
+        {
+            get { return _column; }
         }
 
         public bool Equals(ParameterTemplate other)

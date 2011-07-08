@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<AssemblySortForCompilOrObfusk>
+  <Assembly Assembly="Simple.Data.AdapterApi">8</Assembly>
+  <Assembly Assembly="Simple.Data.SqlServer">9</Assembly>
+  <Assembly Assembly="Simple.Data.Mocking">10</Assembly>
+</AssemblySortForCompilOrObfusk>

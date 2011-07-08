@@ -41,6 +41,42 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestUpdateWithDynamicObjectList()
+        {
+            dynamic record1 = new SimpleRecord();
+            record1.Id = 1;
+            record1.Name = "Steve";
+            record1.Age = 50;
+            dynamic record2 = new SimpleRecord();
+            record2.Id = 2;
+            record2.Name = "Bob";
+            record2.Age = 42;
+            _db.Users.Update(new[] { record1, record2});
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
+            Parameter(0).Is("Bob");
+            Parameter(1).Is(42);
+            Parameter(2).Is(2);
+        }
+
+        [Test]
+        public void TestUpdateByWithDynamicObjectList()
+        {
+            dynamic record1 = new SimpleRecord();
+            record1.Id = 1;
+            record1.Name = "Steve";
+            record1.Age = 50;
+            dynamic record2 = new SimpleRecord();
+            record2.Id = 2;
+            record2.Name = "Bob";
+            record2.Age = 42;
+            _db.Users.UpdateById(new[] { record1, record2 });
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
+            Parameter(0).Is("Bob");
+            Parameter(1).Is(42);
+            Parameter(2).Is(2);
+        }
+
+        [Test]
         public void TestUpdateByWithDynamicObject()
         {
             dynamic record = new SimpleRecord();
@@ -64,6 +100,38 @@ namespace Simple.Data.IntegrationTest
                                Age = 50
                            };
             _db.Users.Update(user);
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4");
+            Parameter(0).Is("Steve");
+            Parameter(1).IsDBNull();
+            Parameter(2).Is(50);
+            Parameter(3).Is(1);
+        }
+
+        [Test]
+        public void TestUpdateWithStaticObjectList()
+        {
+            var users = new[]
+                            {
+                                new User { Id = 2, Name = "Bob", Age = 42 },
+                                new User { Id = 1, Name = "Steve", Age = 50},
+                            };
+            _db.Users.Update(users);
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4");
+            Parameter(0).Is("Steve");
+            Parameter(1).IsDBNull();
+            Parameter(2).Is(50);
+            Parameter(3).Is(1);
+        }
+
+        [Test]
+        public void TestUpdateByWithStaticObjectList()
+        {
+            var users = new[]
+                            {
+                                new User { Id = 2, Name = "Bob", Age = 42 },
+                                new User { Id = 1, Name = "Steve", Age = 50},
+                            };
+            _db.Users.UpdateById(users);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4");
             Parameter(0).Is("Steve");
             Parameter(1).IsDBNull();

@@ -119,6 +119,30 @@ namespace Simple.Data.Ado
             return new AdoAdapterInserter(this, ((AdoAdapterTransaction)transaction).Transaction).InsertMany(tableName, data);
         }
 
+        public override int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data)
+        {
+            var bulkUpdater = this.ProviderHelper.GetCustomProvider<IBulkUpdater>(this.ConnectionProvider) ?? new BulkUpdater();
+            return bulkUpdater.Update(this, tableName, data.ToList(), null);
+        }
+
+        public int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data, IAdapterTransaction transaction)
+        {
+            var bulkUpdater = this.ProviderHelper.GetCustomProvider<IBulkUpdater>(this.ConnectionProvider) ?? new BulkUpdater();
+            return bulkUpdater.Update(this, tableName, data.ToList(), ((AdoAdapterTransaction)transaction).Transaction);
+        }
+
+        public override int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data, IList<string> keyFields)
+        {
+            var bulkUpdater = this.ProviderHelper.GetCustomProvider<IBulkUpdater>(this.ConnectionProvider) ?? new BulkUpdater();
+            return bulkUpdater.Update(this, tableName, data.ToList(), null);
+        }
+
+        public int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data, IAdapterTransaction transaction, IList<string> keyFields)
+        {
+            var bulkUpdater = this.ProviderHelper.GetCustomProvider<IBulkUpdater>(this.ConnectionProvider) ?? new BulkUpdater();
+            return bulkUpdater.Update(this, tableName, data.ToList(), ((AdoAdapterTransaction)transaction).Transaction);
+        }
+
         public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
         {
             var commandBuilder = new UpdateHelper(_schema).GetUpdateCommand(tableName, data, criteria);

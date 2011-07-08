@@ -64,6 +64,16 @@ namespace Simple.Data
             }
         }
 
+        public override int Update(string tableName, IList<IDictionary<string, object>> dataList)
+        {
+            return _adapter.UpdateMany(tableName, dataList);
+        }
+
+        public override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IList<string> keyFields)
+        {
+            return _adapter.UpdateMany(tableName, dataList);
+        }
+
         /// <summary>
         ///  Finds data from the specified "table".
         ///  </summary>

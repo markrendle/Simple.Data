@@ -52,9 +52,11 @@
     <Compile Include="AdoAdapterRelatedFinder.cs" />
     <Compile Include="AdoAdapterTransaction.cs" />
     <Compile Include="BulkInserter.cs" />
+    <Compile Include="BulkUpdater.cs" />
     <Compile Include="CommandBuilder.cs" />
     <Compile Include="CommandHelper.cs" />
     <Compile Include="CommandTemplate.cs" />
+    <Compile Include="ConnectionScope.cs" />
     <Compile Include="DataParameterCollectionEx.cs" />
     <Compile Include="DataReaderExtensions.cs" />
     <Compile Include="DataRecordExtensions.cs" />
@@ -70,6 +72,7 @@
     <Compile Include="FunctionNameConverter.cs" />
     <Compile Include="HomogenizedDictionaryIndex.cs" />
     <Compile Include="IBulkInserter.cs" />
+    <Compile Include="IBulkUpdater.cs" />
     <Compile Include="ICommandBuilder.cs" />
     <Compile Include="IConnectionProvider.cs" />
     <Compile Include="ICustomInserter.cs" />

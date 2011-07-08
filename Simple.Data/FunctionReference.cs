@@ -2,7 +2,9 @@
 
 namespace Simple.Data
 {
-    public class FunctionReference : SimpleReference
+    using System;
+
+    public class FunctionReference : SimpleReference, IEquatable<FunctionReference>
     {
         private static readonly HashSet<string> KnownFunctionNames = new HashSet<string>
                                                                          {
@@ -136,5 +138,31 @@ namespace Simple.Data
             return new SimpleExpression(column, value, SimpleExpressionType.GreaterThanOrEqual);
         }
 
+        public bool Equals(FunctionReference other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Equals(other._name, _name) && Equals(other._argument, _argument) && other._isAggregate.Equals(_isAggregate) && Equals(other._alias, _alias);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != typeof (FunctionReference)) return false;
+            return Equals((FunctionReference) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int result = (_name != null ? _name.GetHashCode() : 0);
+                result = (result*397) ^ (_argument != null ? _argument.GetHashCode() : 0);
+                result = (result*397) ^ _isAggregate.GetHashCode();
+                result = (result*397) ^ (_alias != null ? _alias.GetHashCode() : 0);
+                return result;
+            }
+        }
     }
 }

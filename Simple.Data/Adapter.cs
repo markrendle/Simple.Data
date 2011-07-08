@@ -93,5 +93,15 @@ namespace Simple.Data
         {
             throw new NotImplementedException();
         }
+
+        public virtual int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data, IList<string> keyFields)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

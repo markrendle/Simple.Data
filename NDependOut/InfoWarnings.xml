@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<InfoWarnings>
+  <Info>07/08/2011 13:06:52 Begin full analysis with NDepend v3.8.1</Info>
+  <Info>Concurrent mode</Info>
+  <Info>Assemblies loaded from {C:\Windows\Microsoft.NET\Framework\v4.0.30319} 
+   mscorlib.dll   v4.0.0.0
+   System.Core.dll   v4.0.0.0
+   System.dll   v4.0.0.0
+   System.ComponentModel.Composition.dll   v4.0.0.0
+   Microsoft.CSharp.dll   v4.0.0.0</Info>
+  <Warning>No application or third party assembly found in directory {C:\Windows\Microsoft.NET\Framework\v4.0.30319\WPF}</Warning>
+  <Info>Assemblies loaded from {D:\Code\Simple.Data\Simple.Data\bin\Debug} 
+   Simple.Data.dll   v0.6.8.0</Info>
+  <Warning>No application or third party assembly found in directory {D:\Code\Simple.Data\Simple.Data.Mocking\bin\Debug}</Warning>
+  <Warning>No application or third party assembly found in directory {D:\Code\Simple.Data\Simple.Data.SqlServer\bin\Debug}</Warning>
+  <Warning>No application or third party assembly found in directory {D:\Code\Simple.Data\Simple.Data.AdapterApi\bin\Debug}</Warning>
+  <Warning>No application or third party assembly found in directory {D:\Code\Simple.Data\Simple.Data.Ado\bin\Debug}</Warning>
+  <Warning>No application or third party assembly found in directory {D:\Code\Simple.Data\Simple.Data.SqlCe40\bin\Debug}</Warning>
+  <Info>87 source files parsed ; all source files found ; all source files in-sync with PDB</Info>
+  <Info>0 CQL rule has been extracted from code.</Info>
+  <Info>No dependency cycle detected in assemblies referencement graph.</Info>
+</InfoWarnings>

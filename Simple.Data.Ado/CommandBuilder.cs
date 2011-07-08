@@ -31,9 +31,7 @@ namespace Simple.Data.Ado
         public ParameterTemplate AddParameter(object value, Column column)
         {
             string name = _schemaProvider.NameParameter("p" + Interlocked.Increment(ref _number));
-            var parameterTemplate = column == null
-                                        ? new ParameterTemplate(name)
-                                        : new ParameterTemplate(name, column.DbType, column.MaxLength);
+            var parameterTemplate = new ParameterTemplate(name, column);
             _parameters.Add(parameterTemplate, value);
             return parameterTemplate;
         }
@@ -77,6 +75,23 @@ namespace Simple.Data.Ado
             var command = connection.CreateCommand();
             command.CommandText = Text;
             SetParameters(command);
+            return command;
+        }
+
+        public IDbCommand GetRepeatableCommand(IDbConnection connection)
+        {
+            var command = connection.CreateCommand();
+            command.CommandText = Text;
+
+            foreach (var parameter in _parameters.Keys)
+            {
+                var dbParameter = command.CreateParameter();
+                dbParameter.ParameterName = parameter.Name;
+                dbParameter.SourceColumn = parameter.Column.ActualName;
+                dbParameter.DbType = parameter.DbType;
+                dbParameter.Size = parameter.MaxLength;
+                command.Parameters.Add(dbParameter);
+            }
             return command;
         }
 

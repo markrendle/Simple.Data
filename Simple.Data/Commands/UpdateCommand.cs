@@ -8,6 +8,8 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data.Commands
 {
+    using System.Collections;
+
     internal class UpdateCommand : ICommand
     {
         public bool IsCommandFor(string method)
@@ -35,9 +37,13 @@ namespace Simple.Data.Commands
         internal static object UpdateByKeyFields(string tableName, DataStrategy dataStrategy, object entity, IEnumerable<string> keyFieldNames)
         {
             var record = ObjectToDictionary(entity);
-            var criteria = GetCriteria(keyFieldNames, record);
+            var list = record as IList<IDictionary<string, object>>;
+            if (list != null) return dataStrategy.UpdateMany(tableName, list, keyFieldNames.ToList());
+
+            var dict = record as IDictionary<string, object>;
+            var criteria = GetCriteria(keyFieldNames, dict);
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteria);
-            return dataStrategy.Update(tableName, record, criteriaExpression);
+            return dataStrategy.Update(tableName, dict, criteriaExpression);
         }
 
         private static Dictionary<string, object> GetCriteria(IEnumerable<string> keyFieldNames, IDictionary<string, object> record)
@@ -57,7 +63,7 @@ namespace Simple.Data.Commands
             return criteria;
         }
 
-        private static IDictionary<string,object> ObjectToDictionary(object obj)
+        private static object ObjectToDictionary(object obj)
         {
             var dynamicRecord = obj as SimpleRecord;
             if (dynamicRecord != null)
@@ -71,17 +77,16 @@ namespace Simple.Data.Commands
                 return dictionary;
             }
 
-            return RegularObjectToDictionary(obj);
-        }
-
-        private static IDictionary<string, object> RegularObjectToDictionary(object obj)
-        {
-            var record = new Dictionary<string, object>(HomogenizedEqualityComparer.DefaultInstance);
-            foreach (var property in obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            var list = obj as IEnumerable;
+            if (list != null)
             {
-                record.Add(property.Name, property.GetValue(obj, null));
+                var originals = list.Cast<object>().ToList();
+                var dictionaries = originals.Select(o => ObjectToDictionary(o) as IDictionary<string,object>).Where(o => o != null && o.Count > 0).ToList();
+                if (originals.Count == dictionaries.Count)
+                    return dictionaries;
             }
-            return record;
+
+            return obj.ObjectToDictionary();
         }
     }
 }

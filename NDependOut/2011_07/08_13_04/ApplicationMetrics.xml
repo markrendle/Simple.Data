@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ApplicationMetrics NAsm="3" NbSourceFiles="27" NbLinesOfCode="489" NbLinesOfComment="624" PercentageComment="56" NType="49" NClass="49" NAbstractClass="0" NInterface="0" NValueType="0" NExceptionType="0" NAttributeType="0" NDelegateType="0" NEnumType="0" NGenericMethodsDefinition="0" NGenericTypesDefinition="0" NILInstruction="5112" NMethods="375" NFields="132" NNamespaces="5" NThirdPartyAssemblies="7" NThirdPartyNamespaces="24" NThirdPartyTypes="131" NThirdPartyMethods="152" NThirdPartyFields="11" PercentCodeCoverage="0" PercentPublicType="20.41" PercentPublicMethod="73.6" PercentClassWithAtLeastOnePublicField="0">
+  <PropertyOnInterface Occ="0" Avg="0" StdDev="0" MaxVal="-1" MaxName="" />
+  <MethodOnInterface Occ="0" Avg="0" StdDev="0" MaxVal="-1" MaxName="" />
+  <ArgOnMethodOnInterface Occ="0" Avg="0" StdDev="0" MaxVal="-1" MaxName="" />
+  <PublicPropertyOnClass Occ="49" Avg="1.02" StdDev="2.28" MaxVal="11" MaxName="Simple.Data.Mocking.Ado.MockDataParameter" />
+  <PublicMethodOnClass Occ="49" Avg="5.63" StdDev="7.38" MaxVal="34" MaxName="Simple.Data.Mocking.Ado.MockDataReader" />
+  <ArgOnPublicMethodOnClass Occ="276" Avg="0.75" StdDev="0.83" MaxVal="5" MaxName="Simple.Data.Mocking.Ado.MockDataReader.GetBytes(Int32,Int64,Byte[],Int32,Int32)" />
+  <ILInstructionInNonAbstractMethods Occ="375" Avg="13.63" StdDev="21.74" MaxVal="191" MaxName="Simple.Data.SqlServer.SqlTypeResolver..cctor()" />
+  <TypeWithTheMostILInstruction Occ="49" Avg="104.33" StdDev="148.21" MaxVal="658" MaxName="Simple.Data.SqlServer.SqlSchemaProvider" />
+  <MethodCC Occ="375" Avg="1.6" StdDev="1.91" MaxVal="22" MaxName="Simple.Data.SqlServer.SqlSchemaProvider+&lt;GetParameters&gt;d__3.System.IDisposable.Dispose()" />
+</ApplicationMetrics>
