@@ -5,6 +5,8 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data.Commands
 {
+    using System.Collections.Generic;
+
     class UpdateAllCommand : ICommand
     {
         public bool IsCommandFor(string method)
@@ -17,6 +19,14 @@ namespace Simple.Data.Commands
             var criteria = args.OfType<SimpleExpression>().SingleOrDefault() ?? new SimpleEmptyExpression();
 
             var data = binder.NamedArgumentsToDictionary(args).Where(kv=>!(kv.Value is SimpleExpression)).ToDictionary();
+
+            if (data.Count == 0)
+                data = args.OfType<IDictionary<string, object>>().SingleOrDefault();
+
+            if (data == null)
+            {
+                throw new SimpleDataException("Could not resolve data.");
+            }
 
             var updatedCount = dataStrategy.Update(table.GetQualifiedName(), data, criteria);
             

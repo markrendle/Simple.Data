@@ -3,6 +3,8 @@ using Simple.Data.Mocking.Ado;
 
 namespace Simple.Data.IntegrationTest
 {
+    using System.Collections.Generic;
+
     [TestFixture]
     public class DatabaseTest : DatabaseIntegrationContext
     {
@@ -176,6 +178,16 @@ namespace Simple.Data.IntegrationTest
         public void TestUpdateWithCriteria()
         {
             _db.Users.UpdateAll(_db.Users.Age > 30, Name: "Steve");
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Age] > @p2");
+            Parameter(0).Is("Steve");
+            Parameter(1).Is(30);
+        }
+
+        [Test]
+        public void TestUpdateWithCriteriaAndDictionary()
+        {
+            var data = new Dictionary<string, object> { { "Name", "Steve" } };
+            _db.Users.UpdateAll(_db.Users.Age > 30, data);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Age] > @p2");
             Parameter(0).Is("Steve");
             Parameter(1).Is(30);
