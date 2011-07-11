@@ -13,12 +13,26 @@ namespace Simple.Data.IntegrationTest.Query
             var q = _db.Customers.Query()
                 .Having(_db.Customers.Orders.OrderDate.Max() < new DateTime(2011, 1, 1));
 
-            SwallowException(() => q.ToList());
+            EatException<InvalidOperationException>(() => q.ToList());
 
             GeneratedSqlIs("select [dbo].[customer].[customerid] from [dbo].[customer] " +
                            "join [dbo].[orders] on ([dbo].[customer].[customerid] = [dbo].[orders].[customerid]) " +
                            "group by [dbo].[customer].[customerid] " +
                            "having max([dbo].[orders].[orderdate]) < @p1");
+        }
+
+        [Test]
+        public void HavingClauseWithDetailTableCount()
+        {
+            var q = _db.Customers.Query()
+                .Having(_db.Customers.Orders.OrderId.Count() >= 100);
+
+            EatException<InvalidOperationException>(() => q.ToList());
+
+            GeneratedSqlIs("select [dbo].[customer].[customerid] from [dbo].[customer] " +
+                           "join [dbo].[orders] on ([dbo].[customer].[customerid] = [dbo].[orders].[customerid]) " +
+                           "group by [dbo].[customer].[customerid] " +
+                           "having count([dbo].[orders].[orderid]) >= @p1");
         }
 
         [Test]
@@ -28,7 +42,7 @@ namespace Simple.Data.IntegrationTest.Query
                 .Select(_db.Orders.CustomerId)
                 .Having(_db.Orders.OrderDate.Max() < new DateTime(2011, 1, 1));
 
-            SwallowException(() => q.ToList());
+            EatException<InvalidOperationException>(() => q.ToList());
 
             GeneratedSqlIs("select [dbo].[orders].[customerid] from [dbo].[orders] " +
                            "group by [dbo].[orders].[customerid] " +

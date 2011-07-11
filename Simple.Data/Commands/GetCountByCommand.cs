@@ -3,7 +3,7 @@ using System.Dynamic;
 
 namespace Simple.Data.Commands
 {
-    class CountByCommand : ICommand
+    class GetCountByCommand : ICommand
     {
         /// <summary>
         /// Determines whether the instance is able to handle the specified method.
@@ -14,7 +14,7 @@ namespace Simple.Data.Commands
         /// </returns>
         public bool IsCommandFor(string method)
         {
-            return method.StartsWith("countby", StringComparison.InvariantCultureIgnoreCase) || method.StartsWith("count_by", StringComparison.InvariantCultureIgnoreCase);
+            return method.StartsWith("getcountby", StringComparison.InvariantCultureIgnoreCase) || method.StartsWith("get_count_by", StringComparison.InvariantCultureIgnoreCase);
         }
 
         /// <summary>

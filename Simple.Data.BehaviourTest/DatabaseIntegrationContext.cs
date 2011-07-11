@@ -52,16 +52,23 @@ namespace Simple.Data.IntegrationTest
             return Database.Open();
         }
 
-        protected static void SwallowException(Action action)
+        protected static void EatException(Action action)
+        {
+            EatException<Exception>(action);
+        }
+
+        protected static void EatException<TException>(Action action)
+            where TException : Exception
         {
             try
             {
                 action();
             }
-            catch (InvalidOperationException)
+            catch (TException)
             {
                 // This won't work on Mock provider, but the SQL should be generated OK
             }
+
         }
     }
 }

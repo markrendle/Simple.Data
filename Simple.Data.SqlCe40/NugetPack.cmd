@@ -1,1 +1,1 @@
-..\nuget\nuget pack -sym Simple.Data.SqlCe40.csproj
+nuget pack -sym Simple.Data.SqlCe40.csproj

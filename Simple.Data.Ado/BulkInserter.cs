@@ -114,7 +114,7 @@ namespace Simple.Data.Ado
             foreach (var kvp in row)
             {
                 int index = columns.IndexOf(table.FindColumn(kvp.Key));
-                if (index == -1)
+                if (index > -1)
                 {
                     values[index] = kvp.Value;
                 }
@@ -147,7 +147,7 @@ namespace Simple.Data.Ado
             foreach (var kvp in row)
             {
                 int index = columns.IndexOf(table.FindColumn(kvp.Key));
-                if (index == -1)
+                if (index > -1)
                 {
                     values[index] = kvp.Value;
                 }

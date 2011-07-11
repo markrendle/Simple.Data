@@ -19,21 +19,21 @@ namespace Simple.Data.SqlTest
         public void CountWithNoCriteriaShouldSelectThree()
         {
             var db = DatabaseHelper.Open();
-            Assert.AreEqual(3, db.Users.Count());
+            Assert.AreEqual(3, db.Users.GetCount());
         }
 
         [Test]
         public void CountWithCriteriaShouldSelectTwo()
         {
             var db = DatabaseHelper.Open();
-            Assert.AreEqual(2, db.Users.Count(db.Users.Age > 30));
+            Assert.AreEqual(2, db.Users.GetCount(db.Users.Age > 30));
         }
 
         [Test]
         public void CountByShouldSelectOne()
         {
             var db = DatabaseHelper.Open();
-            Assert.AreEqual(1, db.Users.CountByName("Bob"));
+            Assert.AreEqual(1, db.Users.GetCountByName("Bob"));
         }
 
         [Test]
@@ -165,6 +165,51 @@ namespace Simple.Data.SqlTest
                         .ToScalarArray<string>();
             Assert.IsNotNull(name);
             Assert.AreNotEqual(0, name.Length);
+        }
+
+        [Test]
+        public void HavingWithMinDateShouldReturnCorrectRow()
+        {
+            var db = DatabaseHelper.Open();
+            var row =
+                db.GroupTestMaster.Query().Having(db.GroupTestMaster.GroupTestDetail.Date.Min() >=
+                                                  new DateTime(2000, 1, 1))
+                                                  .FirstOrDefault();
+            Assert.IsNotNull(row);
+            Assert.AreEqual("Two", row.Name);
+        }
+        [Test]
+        public void HavingWithMaxDateShouldReturnCorrectRow()
+        {
+            var db = DatabaseHelper.Open();
+            var row =
+                db.GroupTestMaster.Query().Having(db.GroupTestMaster.GroupTestDetail.Date.Max() <
+                                                  new DateTime(2009, 1, 1))
+                                                  .FirstOrDefault();
+            Assert.IsNotNull(row);
+            Assert.AreEqual("One", row.Name);
+        }
+
+        [Test]
+        public void HavingWithCountShouldReturnCorrectRow()
+        {
+            var db = DatabaseHelper.Open();
+            var row = db.GroupTestMaster.Query()
+                .Having(db.GroupTestMaster.GroupTestDetail.Id.Count() == 2)
+                .FirstOrDefault();
+            Assert.IsNotNull(row);
+            Assert.AreEqual("Two", row.Name);
+        }
+
+        [Test]
+        public void HavingWithAverageShouldReturnCorrectRow()
+        {
+            var db = DatabaseHelper.Open();
+            var row = db.GroupTestMaster.Query()
+                .Having(db.GroupTestMaster.GroupTestDetail.Number.Average() == 2)
+                .FirstOrDefault();
+            Assert.IsNotNull(row);
+            Assert.AreEqual("One", row.Name);
         }
     }
 }

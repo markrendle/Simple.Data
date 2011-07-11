@@ -1,1 +1,1 @@
-..\nuget\nuget push Simple.Data.Core.%1.nupkg
+nuget push Simple.Data.Core.%1.nupkg

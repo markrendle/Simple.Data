@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Simple.Data.Commands
 {
-    class CountCommand : ICommand
+    class GetCountCommand : ICommand
     {
         /// <summary>
         /// Determines whether the instance is able to handle the specified method.
@@ -17,7 +17,7 @@ namespace Simple.Data.Commands
         /// </returns>
         public bool IsCommandFor(string method)
         {
-            return method.Equals("count", StringComparison.InvariantCultureIgnoreCase);
+            return method.Equals("getcount", StringComparison.InvariantCultureIgnoreCase) || method.Equals("get_count", StringComparison.InvariantCultureIgnoreCase);
         }
 
         /// <summary>

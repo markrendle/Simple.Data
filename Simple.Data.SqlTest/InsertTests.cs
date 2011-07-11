@@ -46,6 +46,31 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void TestMultiInsertWithStaticTypeObjects()
+        {
+            var db = DatabaseHelper.Open();
+
+            var users = new[]
+                            {
+                                new User { Name = "Slartibartfast", Password = "bistromathics", Age = 777 },
+                                new User { Name = "Wowbagger", Password = "teatime", Age = int.MaxValue }
+                            };
+
+            IList<User> actuals = db.Users.Insert(users).ToList<User>();
+
+            Assert.AreEqual(2, actuals.Count);
+            Assert.AreNotEqual(0, actuals[0].Id);
+            Assert.AreEqual("Slartibartfast", actuals[0].Name);
+            Assert.AreEqual("bistromathics", actuals[0].Password);
+            Assert.AreEqual(777, actuals[0].Age);
+
+            Assert.AreNotEqual(0, actuals[1].Id);
+            Assert.AreEqual("Wowbagger", actuals[1].Name);
+            Assert.AreEqual("teatime", actuals[1].Password);
+            Assert.AreEqual(int.MaxValue, actuals[1].Age);
+        }
+
+        [Test]
         public void TestInsertWithDynamicTypeObject()
         {
             var db = DatabaseHelper.Open();
@@ -61,6 +86,37 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual("Marvin", actual.Name);
             Assert.AreEqual("diodes", actual.Password);
             Assert.AreEqual(42000000, actual.Age);
+        }
+
+        [Test]
+        public void TestMultiInsertWithDynamicTypeObjects()
+        {
+            var db = DatabaseHelper.Open();
+
+            dynamic user1 = new ExpandoObject();
+            user1.Name = "Slartibartfast";
+            user1.Password = "bistromathics";
+            user1.Age = 777;
+
+            dynamic user2 = new ExpandoObject();
+            user2.Name = "Wowbagger";
+            user2.Password = "teatime";
+            user2.Age = int.MaxValue;
+
+            var users = new[] { user1, user2 };
+
+            IList<dynamic> actuals = db.Users.Insert(users).ToList();
+
+            Assert.AreEqual(2, actuals.Count);
+            Assert.AreNotEqual(0, actuals[0].Id);
+            Assert.AreEqual("Slartibartfast", actuals[0].Name);
+            Assert.AreEqual("bistromathics", actuals[0].Password);
+            Assert.AreEqual(777, actuals[0].Age);
+
+            Assert.AreNotEqual(0, actuals[1].Id);
+            Assert.AreEqual("Wowbagger", actuals[1].Name);
+            Assert.AreEqual("teatime", actuals[1].Password);
+            Assert.AreEqual(int.MaxValue, actuals[1].Age);
         }
 
         [Test]

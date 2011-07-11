@@ -92,12 +92,13 @@ namespace Simple.Data
                 var table = _dataStrategy.SetMemberAsTable(this);
                 if (table.TryInvokeMember(binder, args, out result)) return true;
             }
-            if (FindDatabaseInOwnerHierarchy() != null)
+            var dataStrategy = FindDatabaseInOwnerHierarchy();
+            if (dataStrategy != null)
             {
                 var command = CommandFactory.GetCommandFor(binder.Name);
                 if (command != null)
                 {
-                    var schema = _owner._dataStrategy.SetMemberAsSchema(_owner);
+                    var schema = dataStrategy.SetMemberAsSchema(_owner);
                     var table = schema.GetTable(_name);
                     result = command.Execute(_dataStrategy ?? _owner._dataStrategy, table, binder, args);
                 }

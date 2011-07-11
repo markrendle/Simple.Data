@@ -14,6 +14,10 @@ IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Schema
 DROP TABLE [dbo].[SchemaTable]
 IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[test].[SchemaTable]') AND type in (N'U'))
 DROP TABLE [test].[SchemaTable]
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GroupTestDetail]') AND type in (N'U'))
+DROP TABLE [dbo].[GroupTestDetail]
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GroupTestMaster]') AND type in (N'U'))
+DROP TABLE [dbo].[GroupTestMaster]
 GO
 IF EXISTS (SELECT * FROM sys.schemas WHERE name = N'test')
 DROP SCHEMA [test]
@@ -199,3 +203,32 @@ CREATE FUNCTION [dbo].[VarcharAndReturnInt] (@AValue varchar(50)) RETURNS INT AS
   END
   RETURN 42
 END
+GO
+CREATE TABLE [dbo].[GroupTestMaster] (
+		[Id]       INT            IDENTITY (1, 1) NOT NULL,
+		[Name]     NVARCHAR (100) NOT NULL
+	);
+
+ALTER TABLE [dbo].[GroupTestMaster]
+	ADD CONSTRAINT [PK_GroupTestMaster] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
+GO
+CREATE TABLE [dbo].[GroupTestDetail] (
+		[Id]    INT      IDENTITY (1, 1) NOT NULL,
+		[Date]  DATETIME NOT NULL,
+		[Number] INT NOT NULL,
+		[MasterId] INT      NOT NULL
+	);
+
+ALTER TABLE [dbo].[GroupTestDetail]
+	ADD CONSTRAINT [PK_GroupTestDetail] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
+
+ALTER TABLE [dbo].[GroupTestDetail] WITH NOCHECK
+	ADD CONSTRAINT [FK_GroupTestDetail_GroupTestMaster] FOREIGN KEY ([MasterId]) REFERENCES [dbo].[GroupTestMaster] ([Id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+INSERT INTO [dbo].[GroupTestMaster] VALUES ('One')
+INSERT INTO [dbo].[GroupTestMaster] VALUES ('Two')
+INSERT INTO [dbo].[GroupTestDetail] VALUES ('1999-1-1',1,1)
+INSERT INTO [dbo].[GroupTestDetail] VALUES ('2000-1-1',2,1)
+INSERT INTO [dbo].[GroupTestDetail] VALUES ('2001-1-1',3,1)
+INSERT INTO [dbo].[GroupTestDetail] VALUES ('2010-1-1',2,2)
+INSERT INTO [dbo].[GroupTestDetail] VALUES ('2011-1-1',3,2)

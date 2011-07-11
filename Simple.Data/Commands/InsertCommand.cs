@@ -24,7 +24,7 @@ namespace Simple.Data.Commands
             if (dictionary != null) return dictionary.ToDynamicRecord(table.GetQualifiedName(), dataStrategy);
 
             var list = result as IEnumerable<IDictionary<string, object>>;
-            if (list != null) return list.Select(d => d.ToDynamicRecord(table.GetQualifiedName(), dataStrategy));
+            if (list != null) return new SimpleResultSet(list.Select(d => d.ToDynamicRecord(table.GetQualifiedName(), dataStrategy)));
 
             return null;
         }

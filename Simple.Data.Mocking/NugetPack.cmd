@@ -1,1 +1,1 @@
-..\nuget\nuget pack -sym Simple.Data.Mocking.csproj
+nuget pack -sym Simple.Data.Mocking.csproj

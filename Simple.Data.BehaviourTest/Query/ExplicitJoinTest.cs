@@ -134,7 +134,7 @@ namespace Simple.Data.IntegrationTest.Query
                 .Join(_db.Employees.As("Manager"), out manager).On(manager.Id == _db.Employees.ManagerId)
                 .Select(_db.Employees.Name, manager.Name.As("Manager"));
 
-            SwallowException(() => q.ToList());
+            EatException(() => q.ToList());
 
             GeneratedSqlIs("select [dbo].[employee].[name],[manager].[name] as [Manager] from [dbo].[employee]" +
                 " join [dbo].[employee] [manager] on ([manager].[id] = [dbo].[employee].[managerid])");

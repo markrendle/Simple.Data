@@ -21,8 +21,8 @@ namespace Simple.Data.Commands
                                                                   new DeleteAllCommand(),
                                                                   new QueryByCommand(),
                                                                   new QueryCommand(),
-                                                                  new CountCommand(),
-                                                                  new CountByCommand(),
+                                                                  new GetCountCommand(),
+                                                                  new GetCountByCommand(),
                                                                   new ExistsCommand(),
                                                                   new ExistsByCommand(),
                                                               };
