@@ -43,15 +43,5 @@ namespace Simple.Data.Commands
             result.SetOutputValues(_arguments);
             return result;
         }
-
-        private static SimpleResultSet ToResultSet(object source)
-        {
-            if (source == null) return SimpleResultSet.Empty;
-
-            var dicts = source as IEnumerable<IDictionary<string, object>>;
-            if (dicts == null) throw new InvalidOperationException("Adapter returned incorrect Type.");
-
-            return new SimpleResultSet(dicts.Select(dict => new SimpleRecord(dict)));
-        }
     }
 }

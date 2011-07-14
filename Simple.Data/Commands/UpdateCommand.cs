@@ -46,7 +46,7 @@ namespace Simple.Data.Commands
             return dataStrategy.Update(tableName, dict, criteriaExpression);
         }
 
-        private static Dictionary<string, object> GetCriteria(IEnumerable<string> keyFieldNames, IDictionary<string, object> record)
+        private static IEnumerable<KeyValuePair<string, object>> GetCriteria(IEnumerable<string> keyFieldNames, IDictionary<string, object> record)
         {
             var criteria = new Dictionary<string, object>();
 

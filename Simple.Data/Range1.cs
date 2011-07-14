@@ -8,6 +8,8 @@ namespace Simple.Data
     public struct Range<T> : IRange, IEquatable<Range<T>>
         where T : IComparable<T>
     {
+        private static readonly EqualityComparer<T> EqualityComparer = EqualityComparer<T>.Default;
+ 
         private readonly T _start;
         private readonly T _end;
 
@@ -48,7 +50,7 @@ namespace Simple.Data
         /// <param name="other">An object to compare with this object.</param>
         public bool Equals(Range<T> other)
         {
-            return Equals(other._start, _start) && Equals(other._end, _end);
+            return EqualityComparer.Equals(other._start, _start) && EqualityComparer.Equals(other._end, _end);
         }
 
         /// <summary>

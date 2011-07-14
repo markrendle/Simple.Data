@@ -52,6 +52,8 @@
     <Compile Include="AdoAdapterRelatedFinder.cs" />
     <Compile Include="AdoAdapterTransaction.cs" />
     <Compile Include="BulkInserter.cs" />
+    <Compile Include="BulkInserterHelper.cs" />
+    <Compile Include="BulkInserterTransactionHelper.cs" />
     <Compile Include="BulkUpdater.cs" />
     <Compile Include="CommandBuilder.cs" />
     <Compile Include="CommandHelper.cs" />
@@ -106,7 +108,6 @@
     <Compile Include="Schema\ISchemaProvider.cs" />
     <Compile Include="Schema\Key.cs" />
     <Compile Include="Schema\Parameter.cs" />
-    <Compile Include="Schema\SchemaSpecificStringExtensions.cs" />
     <Compile Include="Schema\Procedure.cs" />
     <Compile Include="Schema\ProcedureCollection.cs" />
     <Compile Include="Schema\Table.cs" />
@@ -118,7 +119,6 @@
     <Compile Include="TupleExtensions.cs" />
     <Compile Include="TypeHelper.cs" />
     <Compile Include="UpdateHelper.cs" />
-    <Compile Include="WeakCache.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Simple.Data\Simple.Data.csproj">

@@ -8,6 +8,10 @@ namespace Simple.Data
 {
     class AdapterFactory : IAdapterFactory
     {
+        protected AdapterFactory()
+        {
+            
+        }
         public Adapter Create(object settings)
         {
             return Create(settings.ObjectToDictionary());

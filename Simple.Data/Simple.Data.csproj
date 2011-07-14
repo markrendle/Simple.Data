@@ -111,7 +111,6 @@
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Commands\FindAllByCommand.cs" />
     <Compile Include="Commands\FindByCommand.cs" />
-    <Compile Include="Extensions\SerializationInfoExtensions.cs" />
     <Compile Include="Adapter.cs" />
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\InsertCommand.cs" />
@@ -123,11 +122,6 @@
     <Compile Include="IAdapterWithTransactions.cs" />
     <Compile Include="MefHelper.cs" />
     <Compile Include="MethodNameParser.cs" />
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataStrategy.cs" />
     <Compile Include="SimpleDataException.cs" />
@@ -143,10 +137,6 @@
     <None Include="app.config" />
     <Compile Include="SimpleRecord.Dictionary2.cs" />
     <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

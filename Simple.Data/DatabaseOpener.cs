@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using Simple.Data.Properties;
-
-namespace Simple.Data
+﻿namespace Simple.Data
 {
+    using System;
+
     public interface IDatabaseOpener
     {
         dynamic OpenDefault();
@@ -96,7 +91,7 @@ namespace Simple.Data
         public static void UseMockDatabase(Database database)
         {
             _openDefault = () => database;
-            _openFile = _openConnection = _openNamedConnection = (ignore) => database;
+            _openFile = _openConnection = _openNamedConnection = ignore => database;
             _open = (ignore1, ignore2) => database;
             _openConnectionWithProvider = (ignore1, ignore2) => database;
         }
@@ -104,15 +99,15 @@ namespace Simple.Data
         public static void UseMockAdapter(Adapter adapter)
         {
             _openDefault = () => new Database(adapter);
-            _openFile = _openConnection = _openNamedConnection = (ignore) => new Database(adapter);
+            _openFile = _openConnection = _openNamedConnection = ignore => new Database(adapter);
             _open = (ignore1, ignore2) => new Database(adapter);
             _openConnectionWithProvider = (ignore1, ignore2) => new Database(adapter);
         }
 
         public static void UseMockDatabase(Func<Database> databaseCreator)
         {
-            _openDefault = () => databaseCreator();
-            _openFile = _openConnection = _openNamedConnection = (ignore) => databaseCreator();
+            _openDefault = databaseCreator;
+            _openFile = _openConnection = _openNamedConnection = ignore => databaseCreator();
             _open = (ignore1, ignore2) => databaseCreator();
             _openConnectionWithProvider = (ignore1, ignore2) => databaseCreator();
         }
@@ -120,7 +115,7 @@ namespace Simple.Data
         public static void UseMockAdapter(Func<Adapter> adapterCreator)
         {
             _openDefault = () => new Database(adapterCreator());
-            _openFile = _openConnection = _openNamedConnection = (ignore) => new Database(adapterCreator());
+            _openFile = _openConnection = _openNamedConnection = ignore => new Database(adapterCreator());
             _open = (ignore1, ignore2) => new Database(adapterCreator());
             _openConnectionWithProvider = (ignore1, ignore2) => new Database(adapterCreator());
         }
@@ -153,18 +148,6 @@ namespace Simple.Data
         private static Database OpenMethod(string adapterName, object settings)
         {
             return new Database(AdapterFactory.Create(adapterName, settings));
-        }
-
-        private static string DefaultConnectionString
-        {
-            get
-            {
-                return !string.IsNullOrWhiteSpace(Settings.Default.DefaultConnectionString)
-                           ? Settings.Default.DefaultConnectionString
-#pragma warning disable 618
-                           : Settings.Default.ConnectionString;
-#pragma warning restore 618
-            }
         }
     }
 }
