@@ -18,3 +18,4 @@ Releases/2*
 test-results
 apply_config.bat
 NDependOut
+*.dotCover

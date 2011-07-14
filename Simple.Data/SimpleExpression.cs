@@ -57,7 +57,7 @@ namespace Simple.Data
 
         private static IEnumerable<object> GetValues(object operand)
         {
-            if (operand == null) return Yield(null);
+            if (ReferenceEquals(operand, null)) return Yield(null);
             if (CommonTypes.Contains(operand.GetType())) return Yield(operand);
 
             if (operand is SimpleReference)

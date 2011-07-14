@@ -30,10 +30,6 @@ namespace Simple.Data
         {
         }
 
-        internal ObjectReference(string name, ObjectReference owner, DataStrategy dataStrategy) : this(name, owner, dataStrategy, null)
-        {
-        }
-
         internal ObjectReference(string name, ObjectReference owner, DataStrategy dataStrategy, string alias)
         {
             _name = name;
@@ -56,14 +52,9 @@ namespace Simple.Data
             return _owner;
         }
 
-        private DataStrategy GetDatabase()
-        {
-            return _dataStrategy;
-        }
-
         public ObjectReference GetTop()
         {
-            return _owner == null ? this : _owner.GetTop();
+            return ReferenceEquals(_owner, null) ? this : _owner.GetTop();
         }
 
         private DataStrategy FindDatabaseInOwnerHierarchy()

@@ -530,23 +530,4 @@ namespace Simple.Data
             _dataStrategy = dataStrategy;
         }
     }
-
-    public class SimpleQueryJoinHolder
-    {
-        private readonly SimpleQuery _query;
-        private readonly string _joinName;
-
-        public SimpleQueryJoinHolder(SimpleQuery query, string joinName)
-        {
-            _query = query;
-            _joinName = joinName;
-        }
-
-        public SimpleQuery On(SimpleExpression expression)
-        {
-            var join = _query._joins[_joinName];
-            _query._joins[_joinName] = new SimpleQueryJoin(join.Table, expression);
-            return _query;
-        }
-    }
 }

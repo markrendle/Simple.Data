@@ -6,38 +6,6 @@ namespace Simple.Data.Extensions
 {
     static class EnumerableExtensions
     {
-        public static T BestMatch<T>(this IEnumerable<T> source, params Func<T,bool>[] predicates)
-        {
-            foreach (var predicate in predicates)
-            {
-                try
-                {
-                    return source.Single(predicate);
-                }
-                catch (InvalidOperationException)
-                {
-                }
-            }
-
-            throw new InvalidOperationException();
-        }
-
-        public static T BestMatchOrDefault<T>(this IEnumerable<T> source, params Func<T, bool>[] predicates)
-        {
-            foreach (var predicate in predicates)
-            {
-                try
-                {
-                    return source.Single(predicate);
-                }
-                catch (InvalidOperationException)
-                {
-                }
-            }
-
-            return default(T);
-        }
-
         public static IDictionary<TKey,TValue> ToDictionary<TKey,TValue>(this IEnumerable<KeyValuePair<TKey,TValue>> source)
         {
             var dict = source as IDictionary<TKey, TValue>;

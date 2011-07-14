@@ -40,13 +40,13 @@ namespace Simple.Data.IntegrationTest.Query
         {
             var q = _db.Orders.Query()
                 .Select(_db.Orders.CustomerId)
-                .Having(_db.Orders.OrderDate.Max() < new DateTime(2011, 1, 1));
+                .Having(_db.Orders.OrderDate.Max() <= new DateTime(2011, 1, 1));
 
             EatException<InvalidOperationException>(() => q.ToList());
 
             GeneratedSqlIs("select [dbo].[orders].[customerid] from [dbo].[orders] " +
                            "group by [dbo].[orders].[customerid] " +
-                           "having max([dbo].[orders].[orderdate]) < @p1");
+                           "having max([dbo].[orders].[orderdate]) <= @p1");
         }
 
         protected override void SetSchema(MockSchemaProvider schemaProvider)

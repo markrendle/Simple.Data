@@ -15,29 +15,5 @@ namespace Simple.Data.Extensions
                                                                           property.GetValue(obj, null)))
                                                                           .ToDictionary();
         }
-
-        public static IEnumerable<object> FlattenCriteriaArray(this IEnumerable<object> source)
-        {
-            return !source.Any(o => o is IRange)
-                ? source
-                : FlattenCriteriaArrayImpl(source);
-        }
-
-        private static IEnumerable<object> FlattenCriteriaArrayImpl(IEnumerable<object> source)
-        {
-            foreach (var o in source)
-            {
-                var range = o as IRange;
-                if (range != null)
-                {
-                    yield return range.Start;
-                    yield return range.End;
-                }
-                else
-                {
-                    yield return o;
-                }
-            }
-        }
     }
 }

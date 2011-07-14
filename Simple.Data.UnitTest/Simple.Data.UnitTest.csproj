@@ -69,13 +69,17 @@
     <Compile Include="DynamicStringExtensionsTest.cs" />
     <Compile Include="DynamicReferenceTest.cs" />
     <Compile Include="DynamicTableTest.cs" />
+    <Compile Include="ExpressionHelperTest.cs" />
     <Compile Include="ListHelper.cs" />
+    <Compile Include="MathReferenceTest.cs" />
     <Compile Include="MethodNameParserTest.cs" />
+    <Compile Include="ObjectReferenceTest.cs" />
     <Compile Include="PluralizationTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RangeTest.cs" />
     <Compile Include="SimpleExpressionTest.cs" />
     <Compile Include="SimpleQueryTest.cs" />
+    <Compile Include="SpecialReferenceTests.cs" />
     <Compile Include="StringExtensionsTest.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -2,6 +2,8 @@
 
 namespace Simple.Data
 {
+    using System.Collections.Generic;
+
     public static class Maybe
     {
         public static Maybe<T> Some<T>(T value)
@@ -101,7 +103,7 @@ namespace Simple.Data
             /// <param name="other">An object to compare with this object.</param>
             public override bool Equals(Maybe<T> other)
             {
-                return other != null && other.HasValue && Equals(other.Value, _value);
+                return other != null && other.HasValue && EqualityComparer<T>.Default.Equals(other.Value, _value);
             }
 
             /// <summary>

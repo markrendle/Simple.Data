@@ -19,13 +19,14 @@ namespace Simple.Data
 
         public static SimpleExpression CriteriaDictionaryToExpression(ObjectReference table, IEnumerable<KeyValuePair<string, object>> dictionary)
         {
-            if (dictionary.Count() == 1)
+            var list = dictionary.ToList();
+            if (list.Count == 1)
             {
-                return CriteriaPairToExpression(table, dictionary.Single());
+                return CriteriaPairToExpression(table, list[0]);
             }
 
-            return new SimpleExpression(CriteriaPairToExpression(table, dictionary.First()),
-                                        CriteriaDictionaryToExpression(table, dictionary.Skip(1)),
+            return new SimpleExpression(CriteriaPairToExpression(table, list[0]),
+                                        CriteriaDictionaryToExpression(table, list.Skip(1)),
                                         SimpleExpressionType.And);
         }
 

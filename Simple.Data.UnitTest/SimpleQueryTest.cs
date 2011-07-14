@@ -131,5 +131,19 @@ namespace Simple.Data.UnitTest
             var join = query.Joins.Single();
             Assert.AreEqual("bar", join.Table.GetName());
         }
+
+        [Test]
+        public void JoinOnShouldSetAJoin()
+        {
+            dynamic db = new Database(null);
+            dynamic quux;
+            SimpleQuery q = db.foo.Query().Join(new ObjectReference("bar").As("quux"), out quux).On(db.foo.id == quux.foo_id);
+            var join = q.Joins.Single();
+            Assert.AreEqual("quux", join.Name);
+            Assert.AreEqual(quux, join.Table);
+            Assert.AreEqual(db.foo.id, join.JoinExpression.LeftOperand);
+            Assert.AreEqual(quux.foo_id, join.JoinExpression.RightOperand);
+            Assert.AreEqual(SimpleExpressionType.Equal, join.JoinExpression.Type);
+        }
     }
 }
