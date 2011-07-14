@@ -9,37 +9,38 @@ namespace Simple.Data.Ado
     {
         private readonly IDbTransaction _transaction;
 
-        public BulkInserterTransactionHelper(IDbTransaction transaction)
+        public BulkInserterTransactionHelper(AdoAdapter adapter, IEnumerable<IDictionary<string, object>> data, Table table, List<Column> columns, IDbTransaction transaction)
+            : base(adapter, data, table, columns)
         {
             _transaction = transaction;
         }
 
-        public override IEnumerable<IDictionary<string, object>> InsertRowsWithSeparateStatements(AdoAdapter adapter, IEnumerable<IDictionary<string, object>> data, Table table, List<Column> columns, string insertSql, string selectSql)
+        public override IEnumerable<IDictionary<string, object>> InsertRowsWithSeparateStatements(string insertSql, string selectSql)
         {
-            var insertCommand = new CommandHelper(adapter.SchemaProvider).Create(_transaction.Connection, insertSql);
+            var insertCommand = new CommandHelper(Adapter.SchemaProvider).Create(_transaction.Connection, insertSql);
             var selectCommand = _transaction.Connection.CreateCommand();
             selectCommand.CommandText = selectSql;
             insertCommand.Transaction = _transaction;
             selectCommand.Transaction = _transaction;
-            return data.Select(row => InsertRow(row, columns, table, insertCommand, selectCommand)).ToList();
+            return Data.Select(row => InsertRow(row, insertCommand, selectCommand)).ToList();
         }
 
-        public override IEnumerable<IDictionary<string, object>> InsertRowsWithCompoundStatement(AdoAdapter adapter, IEnumerable<IDictionary<string, object>> data, Table table, List<Column> columns, string selectSql, string insertSql)
+        public override IEnumerable<IDictionary<string, object>> InsertRowsWithCompoundStatement(string insertSql, string selectSql)
         {
             insertSql += "; " + selectSql;
-            var command = new CommandHelper(adapter.SchemaProvider).Create(_transaction.Connection, insertSql);
+            var command = new CommandHelper(Adapter.SchemaProvider).Create(_transaction.Connection, insertSql);
             command.Transaction = _transaction;
-            return data.Select(row => InsertRowAndSelect(row, columns, table, command)).ToList();
+            return Data.Select(row => InsertRowAndSelect(row, command)).ToList();
         }
 
-        public override void InsertRowsWithoutFetchBack(AdoAdapter adapter, IEnumerable<IDictionary<string, object>> data, Table table, List<Column> columns, string insertSql)
+        public override void InsertRowsWithoutFetchBack(string insertSql)
         {
-            using (var insertCommand = new CommandHelper(adapter.SchemaProvider).Create(_transaction.Connection, insertSql))
+            using (var insertCommand = new CommandHelper(Adapter.SchemaProvider).Create(_transaction.Connection, insertSql))
             {
                 insertCommand.Transaction = _transaction;
-                foreach (var row in data)
+                foreach (var row in Data)
                 {
-                    InsertRow(row, columns, table, insertCommand);
+                    InsertRow(row, insertCommand);
                 }
             }
 

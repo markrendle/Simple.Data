@@ -3,13 +3,12 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Data;
+    using Schema;
 
     class BulkInserter : IBulkInserter
     {
         public IEnumerable<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IEnumerable<IDictionary<string, object>> data, IDbTransaction transaction)
         {
-            var helper = transaction == null ? new BulkInserterHelper() : new BulkInserterTransactionHelper(transaction);
-
             var table = adapter.GetSchema().FindTable(tableName);
             var columns = table.Columns.Where(c => !c.IsIdentity).ToList();
 
@@ -18,25 +17,36 @@
 
             string insertSql = "insert into " + table.QualifiedName + " (" + columnList + ") values (" + valueList + ")";
 
+            var helper = transaction == null
+                             ? new BulkInserterHelper(adapter, data, table, columns)
+                             : new BulkInserterTransactionHelper(adapter, data, table, columns, transaction);
+
             var identityFunction = adapter.GetIdentityFunction();
             if (!string.IsNullOrWhiteSpace(identityFunction))
             {
-                var identityColumn = table.Columns.FirstOrDefault(col => col.IsIdentity);
-
-                if (identityColumn != null)
-                {
-                    var selectSql = "select * from " + table.QualifiedName + " where " + identityColumn.QuotedName +
-                                     " = " + identityFunction;
-                    if (adapter.ProviderSupportsCompoundStatements)
-                    {
-                        return helper.InsertRowsWithCompoundStatement(adapter, data, table, columns, selectSql, insertSql);
-                    }
-
-                    return helper.InsertRowsWithSeparateStatements(adapter, data, table, columns, insertSql, selectSql);
-                }
+               return InsertRowsAndReturn(adapter, identityFunction, helper, insertSql, table);
             }
 
-            helper.InsertRowsWithoutFetchBack(adapter, data, table, columns, insertSql);
+            helper.InsertRowsWithoutFetchBack(insertSql);
+
+            return null;
+        }
+
+        private static IEnumerable<IDictionary<string, object>> InsertRowsAndReturn(AdoAdapter adapter, string identityFunction, BulkInserterHelper helper,
+                                                string insertSql, Table table)
+        {
+            var identityColumn = table.Columns.FirstOrDefault(col => col.IsIdentity);
+
+            if (identityColumn != null)
+            {
+                var selectSql = "select * from " + table.QualifiedName + " where " + identityColumn.QuotedName +
+                                " = " + identityFunction;
+                if (adapter.ProviderSupportsCompoundStatements)
+                {
+                    return helper.InsertRowsWithCompoundStatement(insertSql, selectSql);
+                }
+                return helper.InsertRowsWithSeparateStatements(insertSql, selectSql);
+            }
 
             return null;
         }

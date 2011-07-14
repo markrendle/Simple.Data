@@ -25,7 +25,7 @@ namespace Simple.Data
             get { return _end; }
         }
 
-        public IEnumerable<object> AsEnumerable()
+        IEnumerable<object> IRange.AsEnumerable()
         {
             yield return _start;
             yield return _end;

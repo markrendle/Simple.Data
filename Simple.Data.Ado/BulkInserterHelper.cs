@@ -8,60 +8,68 @@ namespace Simple.Data.Ado
 
     class BulkInserterHelper
     {
-        public virtual void InsertRowsWithoutFetchBack(AdoAdapter adapter, IEnumerable<IDictionary<string, object>> data, Table table, List<Column> columns,
-                                                       string insertSql)
+        protected readonly AdoAdapter Adapter;
+        protected readonly IEnumerable<IDictionary<string, object>> Data;
+        private readonly Table _table;
+        private readonly List<Column> _columns;
+
+        public BulkInserterHelper(AdoAdapter adapter, IEnumerable<IDictionary<string, object>> data, Table table, List<Column> columns)
         {
-            using (var connection = adapter.CreateConnection())
+            Adapter = adapter;
+            Data = data;
+            _table = table;
+            _columns = columns;
+        }
+
+        public virtual void InsertRowsWithoutFetchBack(string insertSql)
+        {
+            using (var connection = Adapter.CreateConnection())
             {
-                using (var insertCommand = new CommandHelper(adapter.SchemaProvider).Create(connection, insertSql))
+                using (var insertCommand = new CommandHelper(Adapter.SchemaProvider).Create(connection, insertSql))
                 {
                     connection.Open();
-                    foreach (var row in data)
+                    foreach (var row in Data)
                     {
-                        InsertRow(row, columns, table, insertCommand);
+                        InsertRow(row, insertCommand);
                     }
                 }
             }
         }
 
-        public virtual IEnumerable<IDictionary<string, object>> InsertRowsWithSeparateStatements(AdoAdapter adapter, IEnumerable<IDictionary<string, object>> data,
-                                                                                                 Table table, List<Column> columns,
-                                                                                                 string insertSql, string selectSql)
+        public virtual IEnumerable<IDictionary<string, object>> InsertRowsWithSeparateStatements(string insertSql, string selectSql)
         {
-            using (var connection = adapter.CreateConnection())
+            using (var connection = Adapter.CreateConnection())
             {
-                using (var insertCommand = new CommandHelper(adapter.SchemaProvider).Create(connection, insertSql))
+                using (var insertCommand = new CommandHelper(Adapter.SchemaProvider).Create(connection, insertSql))
                 using (var selectCommand = connection.CreateCommand())
                 {
                     selectCommand.CommandText = selectSql;
                     connection.Open();
-                    return data.Select(row => InsertRow(row, columns, table, insertCommand, selectCommand)).ToList();
+                    return Data.Select(row => InsertRow(row, insertCommand, selectCommand)).ToList();
                 }
             }
         }
 
-        public virtual IEnumerable<IDictionary<string, object>> InsertRowsWithCompoundStatement(AdoAdapter adapter, IEnumerable<IDictionary<string, object>> data,
-                                                                                                Table table, List<Column> columns,
-                                                                                                string selectSql, string insertSql)
+        public virtual IEnumerable<IDictionary<string, object>> InsertRowsWithCompoundStatement(string insertSql, string selectSql)
         {
             insertSql += "; " + selectSql;
 
-            using (var connection = adapter.CreateConnection())
+            using (var connection = Adapter.CreateConnection())
             {
-                using (var command = new CommandHelper(adapter.SchemaProvider).Create(connection, insertSql))
+                using (var command = new CommandHelper(Adapter.SchemaProvider).Create(connection, insertSql))
                 {
                     connection.Open();
-                    return data.Select(row => InsertRowAndSelect(row, columns, table, command)).ToList();
+                    return Data.Select(row => InsertRowAndSelect(row, command)).ToList();
                 }
             }
         }
 
-        protected static IDictionary<string, object> InsertRowAndSelect(IDictionary<string, object> row, List<Column> columns, Table table, IDbCommand command)
+        protected IDictionary<string, object> InsertRowAndSelect(IDictionary<string, object> row, IDbCommand command)
         {
             var values = new object[command.Parameters.Count];
             foreach (var kvp in row)
             {
-                int index = columns.IndexOf(table.FindColumn(kvp.Key));
+                int index = _columns.IndexOf(_table.FindColumn(kvp.Key));
                 if (index > -1)
                 {
                     values[index] = kvp.Value;
@@ -73,12 +81,12 @@ namespace Simple.Data.Ado
             return insertedRow;
         }
 
-        protected static int InsertRow(IDictionary<string, object> row, List<Column> columns, Table table, IDbCommand command)
+        protected int InsertRow(IDictionary<string, object> row, IDbCommand command)
         {
             var values = new object[command.Parameters.Count];
             foreach (var kvp in row)
             {
-                int index = columns.IndexOf(table.FindColumn(kvp.Key));
+                int index = _columns.IndexOf(_table.FindColumn(kvp.Key));
                 if (index > -1)
                 {
                     values[index] = kvp.Value;
@@ -89,12 +97,12 @@ namespace Simple.Data.Ado
             return TryExecute(command);
         }
 
-        protected static IDictionary<string, object> InsertRow(IDictionary<string, object> row, List<Column> columns, Table table, IDbCommand insertCommand, IDbCommand selectCommand)
+        protected IDictionary<string, object> InsertRow(IDictionary<string, object> row, IDbCommand insertCommand, IDbCommand selectCommand)
         {
             var values = new object[insertCommand.Parameters.Count];
             foreach (var kvp in row)
             {
-                int index = columns.IndexOf(table.FindColumn(kvp.Key));
+                int index = _columns.IndexOf(_table.FindColumn(kvp.Key));
                 if (index > -1)
                 {
                     values[index] = kvp.Value;
