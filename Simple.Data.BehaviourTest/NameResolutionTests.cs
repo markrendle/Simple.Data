@@ -5,6 +5,9 @@ using Simple.Data.Mocking.Ado;
 
 namespace Simple.Data.IntegrationTest
 {
+    using System.Data.Entity.Design.PluralizationServices;
+    using System.Globalization;
+    using Extensions;
 
 
     public class SingularNamesResolutionTests : DatabaseIntegrationContext
@@ -38,11 +41,13 @@ namespace Simple.Data.IntegrationTest
         protected override void SetSchema(MockSchemaProvider schemaProvider)
         {
             schemaProvider.SetTables(new[] { "dbo", "Customers", "BASE TABLE" },
-                                         new[] { "dbo", "Orders", "BASE TABLE" });
+                                         new[] { "dbo", "Orders", "BASE TABLE" },
+                                         new[] { "dbo", "Company", "BASE TABLE"});
             schemaProvider.SetColumns(new[] { "dbo", "Customers", "CustomerId" },
                                           new[] { "dbo", "Orders", "OrderId" },
                                           new[] { "dbo", "Orders", "CustomerId" },
-                                          new[] { "dbo", "Orders", "OrderDate" });
+                                          new[] { "dbo", "Orders", "OrderDate" },
+                                          new[] { "dbo", "Company", "Id"});
             schemaProvider.SetPrimaryKeys(new object[] { "dbo", "Customers", "CustomerId", 0 });
             schemaProvider.SetForeignKeys(new object[] { "FK_Orders_Customers", "dbo", "Orders", "CustomerId", "dbo", "Customers", "CustomerId", 0 });
         }
@@ -60,6 +65,42 @@ namespace Simple.Data.IntegrationTest
             _db["dbo"]["Customer"].All().ToList();
             GeneratedSqlIs("select [dbo].[Customers].[CustomerId] from [dbo].[Customers]");
         }
+
+        [Test]
+        public void CompaniesPluralizationIsResolved()
+        {
+            Database.SetPluralizer(new EntityPluralizer());
+            _db.Companies.All().ToList();
+            GeneratedSqlIs("select [dbo].[Company].[Id] from [dbo].[Company]");
+        }
+
+    class EntityPluralizer : IPluralizer
+    {
+        private readonly PluralizationService _pluralizationService =
+            PluralizationService.CreateService(CultureInfo.CurrentCulture);
+
+        public bool IsPlural(string word)
+        {
+            return _pluralizationService.IsPlural(word);
+        }
+
+        public bool IsSingular(string word)
+        {
+            return _pluralizationService.IsSingular(word);
+        }
+
+        public string Pluralize(string word)
+        {
+            bool upper = (word.IsAllUpperCase());
+            word = _pluralizationService.Pluralize(word);
+            return upper ? word.ToUpper(_pluralizationService.Culture) : word;
+        }
+
+        public string Singularize(string word)
+        {
+            return _pluralizationService.Singularize(word);
+        }
+    }
     }
 
     [TestFixture]

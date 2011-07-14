@@ -15,6 +15,7 @@ namespace Simple.Data
     public partial class Database : DataStrategy
     {
         private static readonly IDatabaseOpener DatabaseOpener;
+        private static IPluralizer _pluralizer;
         private readonly ConcurrentDictionary<string, dynamic> _members = new ConcurrentDictionary<string, dynamic>();
         private readonly Adapter _adapter;
 
@@ -130,6 +131,17 @@ namespace Simple.Data
         protected override Database GetDatabase()
         {
             return this;
+        }
+
+        public static IPluralizer GetPluralizer()
+        {
+            return _pluralizer;
+        }
+
+        public static void SetPluralizer(IPluralizer pluralizer)
+        {
+            _pluralizer = pluralizer;
+            Extensions.StringExtensions.SetPluralizer(pluralizer);
         }
     }
 }

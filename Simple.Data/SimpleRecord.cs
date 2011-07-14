@@ -60,6 +60,7 @@ namespace Simple.Data
                 result = null;
                 return false;
             }
+
             var relatedAdapter = _database.GetAdapter() as IAdapterWithRelation;
             if (relatedAdapter != null && relatedAdapter.IsValidRelation(_tableName, binder.Name))
             {
@@ -108,7 +109,7 @@ namespace Simple.Data
             return _data.Keys.AsEnumerable();
         }
 
-        private static object ConvertResult(object result)
+        private object ConvertResult(object result)
         {
             if (result is SimpleList || result is SimpleRecord) return result;
 
@@ -120,6 +121,12 @@ namespace Simple.Data
             if (list != null)
             {
                 return new SimpleList(list.Select(ConvertResult));
+            }
+
+            var func = result as Func<IDictionary<string, object>, object>;
+            if (func != null)
+            {
+                result = func(_data);
             }
 
             return result;

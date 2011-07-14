@@ -211,4 +211,7 @@ Global
 		{70536BA8-AF0D-46F3-B04C-45177F56B320} = {182AEEFE-9B89-4264-BCED-91A00D1EF896}
 		{E9160373-8BD2-4D69-B88E-1D3B5BC0A6FB} = {182AEEFE-9B89-4264-BCED-91A00D1EF896}
 	EndGlobalSection
+	GlobalSection(NDepend) = preSolution
+		Project = ".\Simple_Data.ndproj"
+	EndGlobalSection
 EndGlobal

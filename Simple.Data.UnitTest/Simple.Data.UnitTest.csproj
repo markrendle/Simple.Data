@@ -51,6 +51,7 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Entity.Design" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
@@ -70,6 +71,7 @@
     <Compile Include="DynamicTableTest.cs" />
     <Compile Include="ListHelper.cs" />
     <Compile Include="MethodNameParserTest.cs" />
+    <Compile Include="PluralizationTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RangeTest.cs" />
     <Compile Include="SimpleExpressionTest.cs" />

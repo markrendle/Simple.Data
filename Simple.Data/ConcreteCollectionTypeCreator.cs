@@ -49,37 +49,25 @@ namespace Simple.Data
 
                 try
                 {
-                    var code = System.Convert.GetTypeCode(value);
+                    var code = Convert.GetTypeCode(value);
 
                     if (type.IsEnum)
                     {
-                        if (value is string)
-                        {
-                            result = Enum.Parse(type, (string)value);
-                            return true;
-                        }
-                        else
-                        {
-                            result = Enum.ToObject(type, value);
-                            return true;
-                        }
+                        return ConvertEnum(type, value, out result);
                     }
-                    else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                    if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
                     {
                         result = System.Convert.ChangeType(value, Nullable.GetUnderlyingType(type));
                         return true;
                     }
-                    else if (code != TypeCode.Object)
+                    if (code != TypeCode.Object)
                     {
                         result = System.Convert.ChangeType(value, type);
                         return true;
                     }
-                    else
-                    {
-                        var data = value as IDictionary<string, object>;
-                        if (data != null)
-                            return ConcreteTypeCreator.Get(type).TryCreate(data, out result);
-                    }
+                    var data = value as IDictionary<string, object>;
+                    if (data != null)
+                        return ConcreteTypeCreator.Get(type).TryCreate(data, out result);
                 }
                 catch (FormatException)
                 {
@@ -93,6 +81,18 @@ namespace Simple.Data
                 return true;
             }
 
+            private static bool ConvertEnum(Type type, object value, out object result)
+            {
+                if (value is string)
+                {
+                    result = Enum.Parse(type, (string) value);
+                    return true;
+                }
+                
+                result = Enum.ToObject(type, value);
+                return true;
+            }
+
             protected bool TryConvertElements(Type type, IEnumerable items, out Array result)
             {
                 result = null;
@@ -103,9 +103,9 @@ namespace Simple.Data
                     list = items.OfType<object>().ToList();
 
                 var array = Array.CreateInstance(type, list.Count);
-                object element;
                 for(var i = 0; i < array.Length; i++)
                 {
+                    object element;
                     if(!TryConvertElement(type, list[i], out element))
                         return false;
                     array.SetValue(element, i);
