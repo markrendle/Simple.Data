@@ -79,6 +79,7 @@
     <Compile Include="RangeTest.cs" />
     <Compile Include="SimpleExpressionTest.cs" />
     <Compile Include="SimpleQueryTest.cs" />
+    <Compile Include="SimpleRecordAsDictionaryTest.cs" />
     <Compile Include="SpecialReferenceTests.cs" />
     <Compile Include="StringExtensionsTest.cs" />
   </ItemGroup>
