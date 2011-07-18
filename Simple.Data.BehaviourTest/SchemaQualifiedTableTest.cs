@@ -107,13 +107,12 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
-        [Ignore]
         public void TestFindAllByDynamic()
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
-            database.foo.Users.FindAllByName("Foo");
-            Assert.AreEqual("select [foo].[Users].* from [foo].[Users] where [foo].[Users].[name] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            database.foo.Users.FindAllByName("Foo").ToList();
+            Assert.AreEqual("select [foo].[Users].[Id],[foo].[Users].[Name],[foo].[Users].[Password],[foo].[Users].[Age] from [foo].[Users] where [foo].[Users].[name] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Foo", mockDatabase.Parameters[0]);
         }
 

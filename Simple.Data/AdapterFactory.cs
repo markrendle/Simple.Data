@@ -8,10 +8,17 @@ namespace Simple.Data
 {
     class AdapterFactory : IAdapterFactory
     {
-        protected AdapterFactory()
+        private readonly Composer _composer;
+
+        protected AdapterFactory() : this(Composer.Default)
         {
-            
         }
+
+        protected AdapterFactory(Composer composer)
+        {
+            _composer = composer;
+        }
+
         public Adapter Create(object settings)
         {
             return Create(settings.ObjectToDictionary());
@@ -39,7 +46,7 @@ namespace Simple.Data
 
         protected Adapter DoCreate(string adapterName, IEnumerable<KeyValuePair<string, object>> settings)
         {
-            var adapter = MefHelper.Compose<Adapter>(adapterName);
+            var adapter = _composer.Compose<Adapter>(adapterName);
             adapter.Setup(settings);
             return adapter;
         }

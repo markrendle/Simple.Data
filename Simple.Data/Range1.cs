@@ -27,8 +27,23 @@ namespace Simple.Data
 
         IEnumerable<object> IRange.AsEnumerable()
         {
-            yield return _start;
-            yield return _end;
+            return AsEnumerable().Cast<object>();
+        }
+
+        public IEnumerable<T> AsEnumerable()
+        {
+            var end = _end;
+            return AsEnumerable(_ => end);
+        }
+
+        public IEnumerable<T> AsEnumerable(Func<T,T> step)
+        {
+            T current = _start;
+            do
+            {
+                yield return current;
+                current = step(current);
+            } while (current.CompareTo(_end) <= 0);
         }
 
         public T Start

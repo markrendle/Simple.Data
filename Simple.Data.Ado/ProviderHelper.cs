@@ -70,12 +70,12 @@ namespace Simple.Data.Ado
 
         private static IConnectionProvider ComposeProvider()
         {
-            return MefHelper.Compose<IConnectionProvider>();
+            return Composer.Default.Compose<IConnectionProvider>();
         }
 
         private static IConnectionProvider ComposeProvider(string extension)
         {
-            return MefHelper.Compose<IConnectionProvider>(extension);
+            return Composer.Default.Compose<IConnectionProvider>(extension);
         }
 
         public IConnectionProvider GetProviderByConnectionName(string connectionName)

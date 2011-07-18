@@ -8,9 +8,9 @@ using System.Text;
 
 namespace Simple.Data
 {
-    class MefHelper
+    class MefHelper : Composer
     {
-        public static T Compose<T>()
+        public override T Compose<T>()
         {
             using (var container = CreateContainer())
             {
@@ -21,7 +21,7 @@ namespace Simple.Data
             }
         }
 
-        public static T Compose<T>(string contractName)
+        public override T Compose<T>(string contractName)
         {
             using (var container = CreateContainer())
             {

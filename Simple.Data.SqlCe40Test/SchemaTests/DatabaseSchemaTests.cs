@@ -41,12 +41,11 @@ namespace Simple.Data.SqlCe40Test.SchemaTests
         }
 
         [Test]
-        [Ignore]
         public void TestForeignKey()
         {
             var foreignKey = Schema.FindTable("Orders").ForeignKeys.Single();
-            Assert.AreEqual("Customers", foreignKey.MasterTable);
-            Assert.AreEqual("Orders", foreignKey.DetailTable);
+            Assert.AreEqual("Customers", foreignKey.MasterTable.Name);
+            Assert.AreEqual("Orders", foreignKey.DetailTable.Name);
             Assert.AreEqual("CustomerId", foreignKey.Columns[0]);
             Assert.AreEqual("CustomerId", foreignKey.UniqueColumns[0]);
         }

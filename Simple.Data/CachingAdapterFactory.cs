@@ -8,10 +8,21 @@ namespace Simple.Data
 {
     class CachingAdapterFactory : AdapterFactory
     {
+        public CachingAdapterFactory()
+        {
+            
+        }
+
+        public CachingAdapterFactory(Composer composer) : base(composer)
+        {
+            
+        }
+
         private readonly ConcurrentDictionary<string, Adapter> _cache = new ConcurrentDictionary<string, Adapter>();
         public override Adapter Create(string adapterName, IEnumerable<KeyValuePair<string, object>> settings)
         {
-            return _cache.GetOrAdd(HashSettings(adapterName, settings), s => DoCreate(adapterName, settings));
+            var mat = (settings ?? Enumerable.Empty<KeyValuePair<string,object>>()).ToList();
+            return _cache.GetOrAdd(HashSettings(adapterName, mat), s => DoCreate(adapterName, mat));
         }
 
         private static string HashSettings(string adapterName, IEnumerable<KeyValuePair<string, object>> settings)
