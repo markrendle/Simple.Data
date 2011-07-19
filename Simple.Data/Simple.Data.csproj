@@ -77,24 +77,29 @@
     <Compile Include="Database.Open.cs" />
     <Compile Include="EnumerableEx.cs" />
     <Compile Include="ExistsSpecialReference.cs" />
+    <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Extensions\HomogenizeEx.cs" />
     <Compile Include="Extensions\ResultSetExtensions.cs" />
     <Compile Include="FunctionReference.cs" />
+    <Compile Include="HavingClause.cs" />
     <Compile Include="HomogenizedEqualityComparer.cs" />
     <Compile Include="IPluralizer.cs" />
     <Compile Include="IRange.cs" />
     <Compile Include="MathReference.cs" />
     <Compile Include="Maybe.cs" />
+    <Compile Include="OrderByClause.cs" />
     <Compile Include="OrderByDirection.cs" />
     <Compile Include="Range.cs" />
     <Compile Include="Range1.cs" />
+    <Compile Include="SelectClause.cs" />
     <Compile Include="SimpleEmptyExpression.cs" />
     <Compile Include="SimpleFunction.cs" />
     <Compile Include="SimpleList.cs" />
     <Compile Include="SimpleObservable.cs" />
     <Compile Include="SimpleOrderByItem.cs" />
     <Compile Include="SimpleQuery.cs" />
-    <Compile Include="SimpleQueryJoin.cs" />
+    <Compile Include="SimpleQueryClauseBase.cs" />
+    <Compile Include="JoinClause.cs" />
     <Compile Include="SimpleReference.cs" />
     <Compile Include="SimpleResultSet.cs" />
     <Compile Include="DynamicSchema.cs" />
@@ -132,9 +137,12 @@
     <Compile Include="SimpleExpressionType.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="SimpleTransaction.cs" />
+    <Compile Include="SkipClause.cs" />
     <Compile Include="SpecialReference.cs" />
+    <Compile Include="TakeClause.cs" />
     <Compile Include="UnresolvableObjectException.cs" />
     <Compile Include="Commands\UpdateByCommand.cs" />
+    <Compile Include="WhereClause.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -119,7 +119,7 @@ namespace Simple.Data.Ado
 
         private void HandleOrderBy()
         {
-            if (_query.Order == null) return;
+            if (!_query.Order.Any()) return;
 
             var orderNames = _query.Order.Select(ToOrderByDirective);
             _commandBuilder.Append(" ORDER BY " + string.Join(", ", orderNames));
@@ -141,7 +141,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        private string ToOrderByDirective(SimpleOrderByItem item)
+        private string ToOrderByDirective(OrderByClause item)
         {
             var col = _table.FindColumn(item.Reference.GetName());
             var direction = item.Direction == OrderByDirection.Descending ? " DESC" : string.Empty;

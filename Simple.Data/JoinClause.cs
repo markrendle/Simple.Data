@@ -5,12 +5,12 @@ using System.Text;
 
 namespace Simple.Data
 {
-    public class SimpleQueryJoin
+    public class JoinClause : SimpleQueryClauseBase
     {
         private readonly ObjectReference _table;
         private readonly SimpleExpression _joinExpression;
 
-        public SimpleQueryJoin(ObjectReference table, SimpleExpression joinExpression)
+        public JoinClause(ObjectReference table, SimpleExpression joinExpression)
         {
             _table = table;
             _joinExpression = joinExpression;

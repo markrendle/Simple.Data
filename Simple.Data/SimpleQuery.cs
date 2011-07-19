@@ -17,88 +17,109 @@ namespace Simple.Data
         private DataStrategy _dataStrategy;
         private readonly Adapter _adapter;
         private readonly string _tableName;
-        private readonly IEnumerable<SimpleReference> _columns;
-        private readonly SimpleExpression _criteria;
-        private readonly SimpleExpression _havingCriteria;
-        private readonly IEnumerable<SimpleOrderByItem> _order;
-        internal IDictionary<string, SimpleQueryJoin> _joins; 
-        private readonly int? _skipCount;
-        private readonly int? _takeCount;
-        private SimpleQueryJoin _tempJoinWaitingForOn;
+
+        private readonly SimpleQueryClauseBase[] _clauses;
+        private JoinClause _tempJoinWaitingForOn;
 
         public SimpleQuery(Adapter adapter, string tableName)
         {
             _adapter = adapter;
             _tableName = tableName;
+            _clauses = new SimpleQueryClauseBase[0];
         }
 
         private SimpleQuery(SimpleQuery source,
-            string tableName = null,
-            IDictionary<string,SimpleQueryJoin> joins = null,
-            IEnumerable<SimpleReference> columns = null,
-            SimpleExpression criteria = null,
-            SimpleExpression having = null,
-            IEnumerable<SimpleOrderByItem> order = null,
-            int? skipCount = null,
-            int? takeCount = null)
+            SimpleQueryClauseBase[] clauses)
         {
             _adapter = source._adapter;
-            _tableName = tableName ?? source.TableName;
-            _joins = joins ?? source._joins;
-            _columns = columns ?? source.Columns ?? Enumerable.Empty<SimpleReference>();
-            _criteria = criteria ?? source.Criteria;
-            _havingCriteria = having ?? source.HavingCriteria;
-            _order = order ?? source.Order;
-            _skipCount = skipCount ?? source.SkipCount;
-            _takeCount = takeCount ?? source.TakeCount;
+            _tableName = source.TableName;
+            _clauses = clauses;
+        }
+
+        private SimpleQuery(SimpleQuery source,
+            string tableName,
+            SimpleQueryClauseBase[] clauses)
+        {
+            _adapter = source._adapter;
+            _tableName = tableName;
+            _clauses = clauses;
         }
 
         public SimpleExpression HavingCriteria
         {
-            get { return _havingCriteria; }
+            get
+            {
+                var havingClause = _clauses.OfType<HavingClause>().SingleOrDefault();
+                return havingClause == null ? null : havingClause.Criteria;
+            }
         }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            if (_joins != null && _joins.ContainsKey(binder.Name))
+            if (_tempJoinWaitingForOn != null && _tempJoinWaitingForOn.Name.Equals(binder.Name))
             {
-                result = _joins[binder.Name].Table;
+                result = _tempJoinWaitingForOn.Table;
             }
             else
             {
-                result = new SimpleQuery(this, _tableName + "." + binder.Name);
+                var join = _clauses.OfType<JoinClause>().FirstOrDefault(j => j.Name.Equals(binder.Name));
+                if (join != null)
+                {
+                    result = join.Table;
+                }
+                else
+                {
+                    result = new SimpleQuery(this, _tableName + "." + binder.Name,
+                                             (SimpleQueryClauseBase[]) _clauses.Clone());
+                }
             }
             return true;
         }
 
-        public IEnumerable<SimpleQueryJoin> Joins
+        public IEnumerable<JoinClause> Joins
         {
-            get { return _joins != null ? _joins.Values : Enumerable.Empty<SimpleQueryJoin>(); }
+            get { return _clauses.OfType<JoinClause>(); }
         }
 
         public IEnumerable<SimpleReference> Columns
         {
-            get { return _columns ?? Enumerable.Empty<SimpleReference>(); }
+            get
+            {
+                var selectClause = _clauses.OfType<SelectClause>().SingleOrDefault();
+                return selectClause == null ? Enumerable.Empty<SimpleReference>() : selectClause.Columns;
+            }
         }
 
         public int? TakeCount
         {
-            get { return _takeCount; }
+            get
+            {
+                var takeClause = _clauses.OfType<TakeClause>().SingleOrDefault();
+                return takeClause == null ? null : (int?)takeClause.Count;
+            }
         }
 
         public int? SkipCount
         {
-            get { return _skipCount; }
+            get
+            {
+                var skipClause = _clauses.OfType<SkipClause>().SingleOrDefault();
+                return skipClause == null ? null : (int?)skipClause.Count;
+            }
         }
 
-        public IEnumerable<SimpleOrderByItem> Order
+        public IEnumerable<OrderByClause> Order
         {
-            get { return _order; }
+            get { return _clauses.OfType<OrderByClause>(); }
         }
 
         public SimpleExpression Criteria
         {
-            get { return _criteria; }
+            get
+            {
+                var whereClause = _clauses.OfType<WhereClause>().SingleOrDefault();
+                return whereClause == null ? null : whereClause.Criteria;
+            }
         }
 
         public string TableName
@@ -113,7 +134,7 @@ namespace Simple.Data
         /// <returns>A new <see cref="SimpleQuery"/> which will select only the specified columns.</returns>
         public SimpleQuery Select(params SimpleReference[] columns)
         {
-            return new SimpleQuery(this, columns: columns);
+            return new SimpleQuery(this, _clauses.Append(new SelectClause(columns)));
         }
 
         /// <summary>
@@ -123,60 +144,65 @@ namespace Simple.Data
         /// <returns>A new <see cref="SimpleQuery"/> which will select only the specified columns.</returns>
         public SimpleQuery Select(IEnumerable<SimpleReference> columns)
         {
-            return new SimpleQuery(this, columns: columns);
+            return new SimpleQuery(this, _clauses.Append(new SelectClause(columns)));
         }
 
         public SimpleQuery ReplaceWhere(SimpleExpression criteria)
         {
-            return new SimpleQuery(this, criteria: criteria);
+            return new SimpleQuery(this, _clauses.Append(new WhereClause(criteria)));
         }
 
         public SimpleQuery Where(SimpleExpression criteria)
         {
-            return _criteria == null
-                       ? new SimpleQuery(this, criteria: criteria)
-                       : new SimpleQuery(this,
-                                         criteria: new SimpleExpression(_criteria, criteria, SimpleExpressionType.And));
+            var currentWhere = _clauses.OfType<WhereClause>().SingleOrDefault();
+            if (currentWhere == null)
+            {
+                return new SimpleQuery(this, _clauses.Append(new WhereClause(criteria)));
+            }
+
+            var index = Array.IndexOf(_clauses, currentWhere);
+
+            return new SimpleQuery(this, _clauses.Replace(index, new WhereClause(currentWhere.Criteria && criteria)));
         }
 
         public SimpleQuery OrderBy(ObjectReference reference)
         {
-            return new SimpleQuery(this, order: new[] {new SimpleOrderByItem(reference)});
+            return new SimpleQuery(this, _clauses.Append(new OrderByClause(reference)));
         }
 
         public SimpleQuery OrderByDescending(ObjectReference reference)
         {
-            return new SimpleQuery(this, order: new[] { new SimpleOrderByItem(reference, OrderByDirection.Descending) });
+            return new SimpleQuery(this, _clauses.Append(new OrderByClause(reference, OrderByDirection.Descending)));
         }
 
         public SimpleQuery ThenBy(ObjectReference reference)
         {
-            if (_order == null)
+            if (!_clauses.OfType<OrderByClause>().Any())
             {
                 throw new InvalidOperationException("ThenBy requires an existing OrderBy");
             }
 
-            return new SimpleQuery(this, order: _order.Append(new SimpleOrderByItem(reference)));
+            return new SimpleQuery(this, _clauses.Append(new OrderByClause(reference)));
         }
 
         public SimpleQuery ThenByDescending(ObjectReference reference)
         {
-            if (_order == null)
+            if (!_clauses.OfType<OrderByClause>().Any())
             {
                 throw new InvalidOperationException("ThenBy requires an existing OrderBy");
             }
 
-            return new SimpleQuery(this, order: _order.Append(new SimpleOrderByItem(reference, OrderByDirection.Descending)));
+            return new SimpleQuery(this, _clauses.Append(new OrderByClause(reference, OrderByDirection.Descending)));
         }
 
         public SimpleQuery Skip(int skip)
         {
-            return new SimpleQuery(this, skipCount: skip);
+            return new SimpleQuery(this, _clauses.Append(new SkipClause(skip)));
         }
 
         public SimpleQuery Take(int take)
         {
-            return new SimpleQuery(this, takeCount: take);
+            return new SimpleQuery(this, _clauses.Append(new TakeClause(take)));
         }
 
         protected IEnumerable<dynamic> Run()
@@ -217,10 +243,10 @@ namespace Simple.Data
             }
             if (binder.Name.Equals("having", StringComparison.OrdinalIgnoreCase))
             {
-                var clause = args.SingleOrDefault() as SimpleExpression;
-                if (clause != null)
+                var expression = args.SingleOrDefault() as SimpleExpression;
+                if (expression != null)
                 {
-                    result = new SimpleQuery(this, having: clause);
+                    result = new SimpleQuery(this, _clauses.Append(new HavingClause(expression)));
                     return true;
                 }
             }
@@ -230,19 +256,14 @@ namespace Simple.Data
 
         public SimpleQuery Join(ObjectReference objectReference)
         {
-            var newJoin = new SimpleQueryJoin(objectReference, null);
-            if (_joins == null) _joins = new Dictionary<string, SimpleQueryJoin>();
-            _joins.Add(newJoin.Name, newJoin);
-            _tempJoinWaitingForOn = newJoin;
+            _tempJoinWaitingForOn = new JoinClause(objectReference, null);
 
             return this;
         }
 
         public SimpleQuery Join(ObjectReference objectReference, out dynamic queryObjectReference)
         {
-            var newJoin = new SimpleQueryJoin(objectReference, null);
-            if (_joins == null) _joins = new Dictionary<string, SimpleQueryJoin>();
-            _joins.Add(newJoin.Name, newJoin);
+            var newJoin = new JoinClause(objectReference, null);
             _tempJoinWaitingForOn = newJoin;
             queryObjectReference = objectReference;
 
@@ -252,8 +273,7 @@ namespace Simple.Data
         public SimpleQuery On(SimpleExpression joinExpression)
         {
             if (_tempJoinWaitingForOn == null) throw new InvalidOperationException("Call to On must be preceded by call to Join.");
-            _joins.Remove(_tempJoinWaitingForOn.Name);
-            return AddNewJoin(new SimpleQueryJoin(_tempJoinWaitingForOn.Table, joinExpression));
+            return AddNewJoin(new JoinClause(_tempJoinWaitingForOn.Table, joinExpression));
         }
 
         private SimpleQuery ParseJoin(InvokeMemberBinder binder, object[] args)
@@ -274,7 +294,7 @@ namespace Simple.Data
 
             if (joinExpression == null) throw new InvalidOperationException();
 
-            var newJoin = new SimpleQueryJoin(tableToJoin, joinExpression);
+            var newJoin = new JoinClause(tableToJoin, joinExpression);
 
             return AddNewJoin(newJoin);
         }
@@ -282,22 +302,14 @@ namespace Simple.Data
         private SimpleQuery ParseOn(InvokeMemberBinder binder, object[] args)
         {
             if (_tempJoinWaitingForOn == null) throw new InvalidOperationException("Call to On must be preceded by call to Join.");
-            _joins.Remove(_tempJoinWaitingForOn.Name);
             var joinExpression = ExpressionHelper.CriteriaDictionaryToExpression(_tempJoinWaitingForOn.Table,
                                                                                  binder.NamedArgumentsToDictionary(args));
-            return AddNewJoin(new SimpleQueryJoin(_tempJoinWaitingForOn.Table, joinExpression));
+            return new SimpleQuery(this, _clauses.Append(new JoinClause(_tempJoinWaitingForOn.Table, joinExpression)));
         }
 
-        private SimpleQuery AddNewJoin(SimpleQueryJoin newJoin)
+        private SimpleQuery AddNewJoin(JoinClause newJoin)
         {
-            var newJoinsDictionary = _joins != null
-                                         ? new Dictionary<string, SimpleQueryJoin>(_joins)
-                                         : new Dictionary<string, SimpleQueryJoin>();
-
-            var joinName = newJoin.Table.Alias ?? newJoin.Table.GetName();
-            newJoinsDictionary[joinName] = newJoin;
-
-            return new SimpleQuery(this, joins: newJoinsDictionary);
+            return new SimpleQuery(this, _clauses.Append(newJoin));
         }
 
         private SimpleQuery ParseOrderBy(string methodName)

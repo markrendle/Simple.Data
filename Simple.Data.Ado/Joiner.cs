@@ -58,7 +58,7 @@ namespace Simple.Data.Ado
             return tablePairs.Select(tp => _done[tp.Item2]).Distinct();
         }
 
-        public IEnumerable<string> GetJoinClauses(IEnumerable<SimpleQueryJoin> joins, ICommandBuilder commandBuilder)
+        public IEnumerable<string> GetJoinClauses(IEnumerable<JoinClause> joins, ICommandBuilder commandBuilder)
         {
             var expressionFormatter = new ExpressionFormatter(commandBuilder, _schema);
             foreach (var join in joins)

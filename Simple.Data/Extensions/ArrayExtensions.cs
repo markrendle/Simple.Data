@@ -1,0 +1,27 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace Simple.Data.Extensions
+{
+    public static class ArrayExtensions
+    {
+        public static T[] Append<T>(this T[] array, T newItem)
+            where T : class
+        {
+            if (array.Length == 0) return new[] {newItem};
+            var newArray = new T[array.Length + 1];
+            array.CopyTo(newArray, 0);
+            newArray[array.Length] = newItem;
+            return newArray;
+        }
+
+        public static T[] Replace<T>(this T[] array, int index, T newItem)
+        {
+            var newArray = (T[])array.Clone();
+            newArray[index] = newItem;
+            return newArray;
+        }
+    }
+}
