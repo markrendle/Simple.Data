@@ -59,21 +59,6 @@ namespace Simple.Data.SqlCe40
             return "@@IDENTITY";
         }
 
-        public bool TryGetNewRowSelect(Table table, out string selectSql)
-        {
-            var identityColumn = table.Columns.FirstOrDefault(col => col.IsIdentity);
-
-            if (identityColumn == null)
-            {
-                selectSql = null;
-                return false;
-            }
-
-            selectSql = "select * from " + table.QualifiedName + " where " + identityColumn.QuotedName +
-                        " = @@IDENTITY";
-            return true;
-        }
-        
         public bool SupportsCompoundStatements
         {
             get { return false; }

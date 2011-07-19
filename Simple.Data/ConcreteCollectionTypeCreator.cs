@@ -27,7 +27,7 @@ namespace Simple.Data
             return _creators.First(c => c.IsCollectionType(type)).TryCreate(type, items, out result);
         }
 
-        private abstract class Creator
+        internal abstract class Creator
         {
             public abstract bool IsCollectionType(Type type);
 

@@ -10,6 +10,8 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data
 {
+    using System.Threading.Tasks;
+
     public class SimpleQuery : DynamicObject, IEnumerable
     {
         private DataStrategy _dataStrategy;
@@ -177,17 +179,14 @@ namespace Simple.Data
             return new SimpleQuery(this, takeCount: take);
         }
 
-        protected IEnumerable<dynamic> Records
+        protected IEnumerable<dynamic> Run()
         {
-            get
-            {
-                return _adapter.RunQuery(this).Select(d => new SimpleRecord(d, _tableName, _dataStrategy));
-            }
+            return _adapter.RunQuery(this).Select(d => new SimpleRecord(d, _tableName, _dataStrategy));
         }
 
         public IEnumerator GetEnumerator()
         {
-            return Records.GetEnumerator();
+            return Run().GetEnumerator();
         }
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
@@ -325,12 +324,12 @@ namespace Simple.Data
 
         public IEnumerable<T> Cast<T>()
         {
-            return Records.Select(item => (T)item);
+            return Run().Select(item => (T)item);
         }
 
         public IEnumerable<T> OfType<T>()
         {
-            foreach (var item in Records)
+            foreach (var item in Run())
             {
                 bool success = true;
                 T cast;
@@ -352,12 +351,12 @@ namespace Simple.Data
 
         public IList<dynamic> ToList()
         {
-            return Records.ToList();
+            return Run().ToList();
         }
 
         public dynamic[] ToArray()
         {
-            return Records.ToArray();
+            return Run().ToArray();
         }
 
         public dynamic ToScalar()
@@ -443,12 +442,12 @@ namespace Simple.Data
 
         public dynamic First()
         {
-            return Records.First();
+            return Run().First();
         }
 
         public dynamic FirstOrDefault()
         {
-            return Records.FirstOrDefault();
+            return Run().FirstOrDefault();
         }
 
         public T First<T>()
@@ -473,12 +472,12 @@ namespace Simple.Data
 
         public dynamic Single()
         {
-            return Records.First();
+            return Run().First();
         }
 
         public dynamic SingleOrDefault()
         {
-            return Records.FirstOrDefault();
+            return Run().FirstOrDefault();
         }
 
         public T Single<T>()
@@ -548,5 +547,10 @@ namespace Simple.Data
         }
 
         private Func<IObservable<dynamic>> _asObservableImplementation;
+
+        public Task<IEnumerable<dynamic>> RunTask()
+        {
+            return Task.Factory.StartNew<IEnumerable<dynamic>>(Run);
+        }
     }
 }

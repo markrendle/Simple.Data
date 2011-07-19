@@ -24,21 +24,5 @@ namespace Simple.Data.SqlCe40
 
             return string.Format("{0} OFFSET {1} ROWS FETCH NEXT {2} ROWS ONLY", sql, skipParameterName, takeParameterName);
         }
-
-        private static string ExtractOrderBy(string columns, ref string fromEtc)
-        {
-            string orderBy;
-            int index = fromEtc.IndexOf("ORDER BY", StringComparison.InvariantCultureIgnoreCase);
-            if (index > -1)
-            {
-                orderBy = fromEtc.Substring(index).Trim();
-                fromEtc = fromEtc.Remove(index).Trim();
-            }
-            else
-            {
-                orderBy = "ORDER BY " + columns.Split(',').First().Trim();
-            }
-            return orderBy;
-        }
     }
 }

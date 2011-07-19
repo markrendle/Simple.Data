@@ -10,3 +10,5 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("2aa66263-94ee-46d5-bb0f-bae22bcec3e8")]
+
+[assembly: InternalsVisibleTo("Simple.Data.SqlCe40Test")]
