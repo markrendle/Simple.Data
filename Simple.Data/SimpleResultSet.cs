@@ -131,14 +131,44 @@ namespace Simple.Data
             return Cast<T>().FirstOrDefault(predicate);
         }
 
+        public dynamic Last()
+        {
+            return _sourceEnumerator.Current.Last();
+        }
+
+        public dynamic LastOrDefault()
+        {
+            return _sourceEnumerator.Current.LastOrDefault();
+        }
+
+        public T Last<T>()
+        {
+            return Cast<T>().Last();
+        }
+
+        public T LastOrDefault<T>()
+        {
+            return Cast<T>().LastOrDefault();
+        }
+
+        public T Last<T>(Func<T, bool> predicate)
+        {
+            return Cast<T>().Last(predicate);
+        }
+
+        public T LastOrDefault<T>(Func<T, bool> predicate)
+        {
+            return Cast<T>().LastOrDefault(predicate);
+        }
+
         public dynamic Single()
         {
-            return _sourceEnumerator.Current.First();
+            return _sourceEnumerator.Current.Single();
         }
 
         public dynamic SingleOrDefault()
         {
-            return _sourceEnumerator.Current.FirstOrDefault();
+            return _sourceEnumerator.Current.SingleOrDefault();
         }
 
         public T Single<T>()
@@ -180,6 +210,13 @@ namespace Simple.Data
                 result = Cast<object>();
                 return true;
             }
+
+            if (ConcreteCollectionTypeCreator.IsCollectionType(binder.Type))
+            {
+                if (ConcreteCollectionTypeCreator.TryCreate(binder.Type, this, out result))
+                    return true;
+            }
+            
             return base.TryConvert(binder, out result);
         }
 

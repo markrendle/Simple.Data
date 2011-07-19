@@ -96,6 +96,7 @@ namespace Simple.Data
 
         public dynamic First()
         {
+            if (_innerList.Count == 0) throw new InvalidOperationException();
             return _innerList.First();
         }
 

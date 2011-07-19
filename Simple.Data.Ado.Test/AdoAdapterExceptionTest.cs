@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Data.SqlClient;
+    using System.IO;
     using NUnit.Framework;
 
     [TestFixture]
@@ -61,6 +62,26 @@
             Assert.AreEqual(typeof(AdoAdapter), actual.AdapterType);
             Assert.AreEqual("Foo", actual.Message);
             Assert.AreEqual("Bar", actual.CommandText);
+            Assert.AreEqual("quux", actual.Parameters["P"]);
+        }
+
+        [Test]
+        public void SerializationTest()
+        {
+            var param = new Dictionary<string, object> { { "P", "quux" } };
+            var source = new AdoAdapterException("Foo", param);
+
+            var stream = new MemoryStream();
+            var serializer = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+            serializer.Serialize(stream, source);
+
+            stream.Position = 0;
+
+            var actual = serializer.Deserialize(stream) as AdoAdapterException;
+
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(typeof(AdoAdapter), actual.AdapterType);
+            Assert.AreEqual("Foo", actual.CommandText);
             Assert.AreEqual("quux", actual.Parameters["P"]);
         }
     }

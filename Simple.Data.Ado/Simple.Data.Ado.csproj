@@ -59,7 +59,9 @@
     <Compile Include="CommandHelper.cs" />
     <Compile Include="CommandTemplate.cs" />
     <Compile Include="ConnectionScope.cs" />
+    <Compile Include="DatabaseObservable.cs" />
     <Compile Include="DataParameterCollectionEx.cs" />
+    <Compile Include="DataReaderEnumerator.cs" />
     <Compile Include="DataReaderExtensions.cs" />
     <Compile Include="DataRecordExtensions.cs" />
     <Compile Include="DbCommandExtensions.cs" />
@@ -80,6 +82,7 @@
     <Compile Include="ICustomInserter.cs" />
     <Compile Include="IExpressionFormatter.cs" />
     <Compile Include="IFunctionNameConverter.cs" />
+    <Compile Include="IObservableQueryRunner.cs" />
     <Compile Include="IQueryPager.cs" />
     <Compile Include="ISchemaGetter.cs" />
     <Compile Include="Joiner.cs" />
@@ -129,7 +132,6 @@
   <ItemGroup>
     <Compile Include="AdoAdapter.IAdapterWithFunctions.cs" />
     <None Include="app.config" />
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

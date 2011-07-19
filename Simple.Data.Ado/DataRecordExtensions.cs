@@ -6,7 +6,7 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data.Ado
 {
-    internal static class DataRecordExtensions
+    public static class DataRecordExtensions
     {
         public static dynamic ToDynamicRecord(this IDataRecord dataRecord)
         {

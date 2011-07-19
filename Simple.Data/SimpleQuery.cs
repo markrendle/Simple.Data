@@ -529,5 +529,24 @@ namespace Simple.Data
         {
             _dataStrategy = dataStrategy;
         }
+
+        public IObservable<dynamic> AsObservable()
+        {
+            if (_asObservableImplementation != null) return _asObservableImplementation();
+
+            try
+            {
+                _asObservableImplementation = () => _adapter.RunQueryAsObservable(this).Map(d => new SimpleRecord(d, _tableName, _dataStrategy));
+                return _asObservableImplementation();
+            }
+            catch (NotImplementedException)
+            {
+                _asObservableImplementation = () => _adapter.RunQuery(this).Select(d => new SimpleRecord(d, _tableName, _dataStrategy)).ToObservable();
+            }
+
+            return _asObservableImplementation();
+        }
+
+        private Func<IObservable<dynamic>> _asObservableImplementation;
     }
 }

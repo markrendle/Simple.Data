@@ -49,6 +49,7 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="ActionDisposable.cs" />
     <Compile Include="AdapterException.cs" />
     <Compile Include="AdapterFactory.cs" />
     <Compile Include="AdapterWithFunctionsExtensions.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="SimpleEmptyExpression.cs" />
     <Compile Include="SimpleFunction.cs" />
     <Compile Include="SimpleList.cs" />
+    <Compile Include="SimpleObservable.cs" />
     <Compile Include="SimpleOrderByItem.cs" />
     <Compile Include="SimpleQuery.cs" />
     <Compile Include="SimpleQueryJoin.cs" />
@@ -137,7 +139,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <Compile Include="SimpleRecord.Dictionary2.cs" />
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

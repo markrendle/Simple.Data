@@ -43,6 +43,14 @@ namespace Simple.Data.UnitTest
             AssertHelper(Db.foo.id % 2 <= 1, SimpleExpressionType.LessThanOrEqual, 1);
         }
 
+        [Test]
+        public void EqualsShouldPass()
+        {
+            MathReference first = Db.foo.id % 1;
+            MathReference second = Db.foo.id % 1;
+            Assert.IsTrue(first.Equals(second));
+        }
+
         private static void AssertHelper<T>(SimpleExpression actual, SimpleExpressionType expectedType, T expectedRightOperand)
         {
             Assert.AreEqual(Db.foo.id, ((MathReference)actual.LeftOperand).LeftOperand);

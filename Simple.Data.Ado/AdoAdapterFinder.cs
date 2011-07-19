@@ -56,16 +56,6 @@ namespace Simple.Data.Ado
             return ExecuteQuery(commandTemplate, criteria.GetValues());
         }
 
-        public Func<object[], IEnumerable<IDictionary<string, object>>> CreateFindDelegate(string tableName, SimpleExpression criteria)
-        {
-            if (criteria == null)
-            {
-                return _ => FindAll(ObjectName.Parse(tableName));
-            }
-            var commandTemplate = GetCommandTemplate(tableName, criteria);
-            return args => ExecuteQuery(commandTemplate, args);
-        }
-
         private CommandTemplate GetCommandTemplate(string tableName, SimpleExpression criteria)
         {
             var tableCommandCache = _commandCaches.GetOrAdd(tableName,
@@ -112,7 +102,7 @@ namespace Simple.Data.Ado
         {
             try
             {
-                return command.ToBufferedEnumerable(connection);
+                return command.ToEnumerable(connection);
             }
             catch (DbException ex)
             {
@@ -124,38 +114,12 @@ namespace Simple.Data.Ado
         {
             try
             {
-                return command.ToBufferedEnumerable(connection, index);
+                return command.ToEnumerable(connection, index);
             }
             catch (DbException ex)
             {
                 throw new AdoAdapterException(ex.Message, command);
             }
-        }
-
-        private static IDictionary<string, object> TryExecuteSingletonQuery(IDbConnection connection, IDbCommand command)
-        {
-            try
-            {
-                using (connection)
-                using (command)
-                {
-                    if (connection.State != ConnectionState.Open)
-                        connection.Open();
-                    using (var reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            var index = reader.CreateDictionaryIndex();
-                            return reader.ToDictionary(index);
-                        }
-                    }
-                }
-            }
-            catch (DbException ex)
-            {
-                throw new AdoAdapterException(ex.Message, command);
-            }
-            return null;
         }
 
         private static IDictionary<string, object> TryExecuteSingletonQuery(IDbConnection connection, IDbCommand command, IDictionary<string,int> index)

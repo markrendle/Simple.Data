@@ -1,6 +1,7 @@
 ﻿namespace Simple.Data.UnitTest
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
@@ -119,6 +120,19 @@
             target.Add(entry);
 
             var enumerator = target.GetEnumerator();
+            Assert.IsTrue(enumerator.MoveNext());
+            Assert.AreEqual(entry, enumerator.Current);
+            Assert.IsFalse(enumerator.MoveNext());
+        }
+
+        [Test]
+        public void NonGenericEnumeratorTest()
+        {
+            var target = CreateTarget();
+            var entry = CreateEntry(0);
+            target.Add(entry);
+
+            var enumerator = ((IEnumerable)target).GetEnumerator();
             Assert.IsTrue(enumerator.MoveNext());
             Assert.AreEqual(entry, enumerator.Current);
             Assert.IsFalse(enumerator.MoveNext());

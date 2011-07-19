@@ -8,6 +8,7 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data.Ado
 {
+    [Serializable]
     public class AdoAdapterException : AdapterException
     {
         private readonly string _commandText;
@@ -49,6 +50,32 @@ namespace Simple.Data.Ado
 
         public AdoAdapterException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
+            _commandText = info.GetString("_commandText");
+            try
+            {
+                var array = info.GetValue("_parameters", typeof (KeyValuePair<string, object>[]));
+                if (array != null)
+                {
+                    _parameters = ((KeyValuePair<string, object>[]) array).ToDictionary();
+                }
+            }
+            catch (SerializationException)
+            {
+            }
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue("_commandText", _commandText);
+            if (_parameters != null)
+            {
+                info.AddValue("_parameters", _parameters.ToArray(), typeof(KeyValuePair<string,object>[]));
+            }
+            else
+            {
+                info.AddValue("_parameters", null);
+            }
         }
 
         public IDictionary<string, object> Parameters

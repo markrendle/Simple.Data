@@ -59,6 +59,11 @@ namespace Simple.Data
 
         public abstract IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query);
 
+        public virtual IObservable<IDictionary<string, object>> RunQueryAsObservable(SimpleQuery query)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         ///  Inserts a record into the specified "table".
         ///  </summary><param name="tableName">Name of the table.</param><param name="data">The values to insert.</param><returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>

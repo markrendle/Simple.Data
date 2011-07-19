@@ -64,6 +64,7 @@
     <Compile Include="AdapterFactoryTest.cs" />
     <Compile Include="BinderHelperTest.cs" />
     <Compile Include="BufferedEnumerableTest.cs" />
+    <Compile Include="ComposerTest.cs" />
     <Compile Include="ConcreteCollectionTypeCreatorTest.cs" />
     <Compile Include="DatabaseOpenerTest.cs" />
     <Compile Include="DynamicEnumerableTest.cs" />
@@ -83,10 +84,13 @@
     <Compile Include="SimpleDataExceptionTest.cs" />
     <Compile Include="SimpleExpressionTest.cs" />
     <Compile Include="SimpleListAsListTest.cs" />
+    <Compile Include="SimpleListTest.cs" />
     <Compile Include="SimpleQueryTest.cs" />
     <Compile Include="SimpleRecordAsDictionaryTest.cs" />
+    <Compile Include="SimpleResultSetTest.cs" />
     <Compile Include="SpecialReferenceTests.cs" />
     <Compile Include="StringExtensionsTest.cs" />
+    <Compile Include="UnresolvableObjectExceptionTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Simple.Data\Simple.Data.csproj">

@@ -86,11 +86,6 @@ namespace Simple.Data.Ado
             return _finder.CreateFindOneDelegate(tableName, criteria);
         }
 
-        public override Func<object[], IEnumerable<IDictionary<string, object>>> CreateFindDelegate(string tableName, SimpleExpression criteria)
-        {
-            return _finder.CreateFindDelegate(tableName, criteria);
-        }
-
         public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
             return _finder.Find(tableName, criteria);
@@ -101,7 +96,15 @@ namespace Simple.Data.Ado
             var connection = _connectionProvider.CreateConnection();
             return new QueryBuilder(this).Build(query)
                 .GetCommand(connection)
-                .ToBufferedEnumerable(connection);
+                .ToEnumerable(connection);
+        }
+
+        public override IObservable<IDictionary<string, object>> RunQueryAsObservable(SimpleQuery query)
+        {
+            var connection = _connectionProvider.CreateConnection();
+            return new QueryBuilder(this).Build(query)
+                .GetCommand(connection)
+                .ToObservable(connection, this);
         }
 
         public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)

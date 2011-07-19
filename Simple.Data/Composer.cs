@@ -15,6 +15,7 @@ namespace Simple.Data
         }
 
         public abstract T Compose<T>();
+
         public abstract T Compose<T>(string contractName);
 
         internal static void SetDefault(Composer composer)

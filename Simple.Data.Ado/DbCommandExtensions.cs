@@ -1,51 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using Simple.Data.Extensions;
-
-namespace Simple.Data.Ado
+﻿namespace Simple.Data.Ado
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Data;
+    using System.Data.Common;
+    using System.Linq;
+
     static class DbCommandExtensions
     {
-        public static IEnumerable<IDictionary<string, object>> ToBufferedEnumerable(this IDbCommand command, IDbConnection connection)
+        public static IEnumerable<IDictionary<string, object>> ToEnumerable(this IDbCommand command, IDbConnection connection)
         {
-            try
-            {
-                if (connection.State == ConnectionState.Closed)
-                    connection.Open();
-            }
-            catch (DbException ex)
-            {
-                throw new AdoAdapterException(ex.Message, ex);
-            }
-            var reader = command.ExecuteReaderWithExceptionWrap();
-            var index = reader.CreateDictionaryIndex();
-            return BufferedEnumerable.Create(() => reader.Read()
-                                                       ? Maybe.Some(reader.ToDictionary(index))
-                                                       : Maybe<IDictionary<string, object>>.None,
-                                                       () => DisposeCommandAndReader(connection, command, reader));
+            return ToEnumerable(command, connection, null);
         }
 
-        public static IEnumerable<IDictionary<string, object>> ToBufferedEnumerable(this IDbCommand command, IDbConnection connection, IDictionary<string,int> index)
+        public static IEnumerable<IDictionary<string, object>> ToEnumerable(this IDbCommand command, IDbConnection connection, IDictionary<string, int> index)
         {
-            try
-            {
-                if (connection.State == ConnectionState.Closed)
-                    connection.Open();
-            }
-            catch (DbException ex)
-            {
-                throw new AdoAdapterException(ex.Message, ex);
-            }
-            var reader = command.ExecuteReaderWithExceptionWrap();
-            return BufferedEnumerable.Create(() => reader.Read()
-                                                       ? Maybe.Some(reader.ToDictionary(index))
-                                                       : Maybe<IDictionary<string, object>>.None,
-                                                       () => DisposeCommandAndReader(connection, command, reader));
+            return new DataReaderEnumerator(command, connection, index).Wrap();
+        }
+
+        public static IObservable<IDictionary<string, object>> ToObservable(this IDbCommand command, IDbConnection connection, AdoAdapter adapter)
+        {
+            return ToObservable(command, connection, adapter, null);
+        }
+
+        public static IObservable<IDictionary<string, object>> ToObservable(this IDbCommand command, IDbConnection connection, AdoAdapter adapter, IDictionary<string, int> index)
+        {
+            var runner = adapter.ProviderHelper.GetCustomProvider<IObservableQueryRunner>(adapter.ConnectionProvider) ?? new ObservableQueryRunner();
+            return runner.Run(command, connection, index);
         }
 
         public static IDbDataParameter AddParameter(this IDbCommand command, string name, object value)
@@ -72,12 +54,39 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static void DisposeCommandAndReader(IDbConnection connection, IDbCommand command, IDataReader reader)
+        internal static void DisposeCommandAndReader(IDbConnection connection, IDbCommand command, IDataReader reader)
         {
             using (connection)
             using (command)
             using (reader)
             { /* NoOp */ }
+        }
+    }
+
+    class EnumerableShim<T> : IEnumerable<T>
+    {
+        private readonly IEnumerator<T> _enumerator; 
+        public EnumerableShim(IEnumerator<T> enumerator)
+        {
+            _enumerator = enumerator;
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return _enumerator;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+    }
+
+    static class EnumerableShim
+    {
+        public static IEnumerable<T> Wrap<T>(this IEnumerator<T> enumerator)
+        {
+            return new EnumerableShim<T>(enumerator);
         }
     }
 }
