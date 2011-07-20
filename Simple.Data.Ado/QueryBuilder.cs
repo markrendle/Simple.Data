@@ -16,7 +16,11 @@ namespace Simple.Data.Ado
         private ObjectName _tableName;
         private Table _table;
         private SimpleQuery _query;
+        private SimpleExpression _whereCriteria;
+        private SimpleExpression _havingCriteria;
+        private SimpleReference[] _columns;
         private CommandBuilder _commandBuilder;
+        private List<SimpleQueryClauseBase> _unhandledClauses; 
 
         public QueryBuilder(AdoAdapter adoAdapter)
         {
@@ -25,8 +29,9 @@ namespace Simple.Data.Ado
             _simpleReferenceFormatter = new SimpleReferenceFormatter(_schema);
         }
 
-        public ICommandBuilder Build(SimpleQuery query)
+        public ICommandBuilder Build(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
         {
+            _unhandledClauses = new List<SimpleQueryClauseBase>();
             SetQueryContext(query);
 
             HandleJoins();
@@ -36,12 +41,28 @@ namespace Simple.Data.Ado
             HandleOrderBy();
             HandlePaging();
 
+            unhandledClauses = _unhandledClauses;
             return _commandBuilder;
         }
 
         private void SetQueryContext(SimpleQuery query)
         {
             _query = query;
+            var selectClause = _query.Clauses.OfType<SelectClause>().SingleOrDefault();
+            if (selectClause != null)
+            {
+                _columns = selectClause.Columns.ToArray();
+            }
+            else
+            {
+                _columns = new SimpleReference[0];
+            }
+
+            _whereCriteria = _query.Clauses.OfType<WhereClause>().Aggregate(SimpleExpression.Empty,
+                                                                            (seed, where) => seed && where.Criteria);
+            _havingCriteria = _query.Clauses.OfType<HavingClause>().Aggregate(SimpleExpression.Empty,
+                                                                              (seed, having) => seed && having.Criteria);
+
             _tableName = ObjectName.Parse(query.TableName.Split('.').Last());
             _table = _schema.FindTable(_tableName);
             _commandBuilder = new CommandBuilder(GetSelectClause(_tableName), _schema.SchemaProvider);
@@ -49,8 +70,9 @@ namespace Simple.Data.Ado
 
         private void HandleJoins()
         {
-            if (_query.Criteria == null && _query.HavingCriteria == null
-                && (_query.Columns.Where(r => !(r is CountSpecialReference)).Count() == 0)) return;
+            if (_whereCriteria == SimpleExpression.Empty && _havingCriteria == SimpleExpression.Empty
+                && (!_query.Clauses.OfType<JoinClause>().Any())
+                && (_columns.Where(r => !(r is CountSpecialReference)).Count() == 0)) return;
 
             var joiner = new Joiner(JoinType.Inner, _schema);
 
@@ -60,18 +82,14 @@ namespace Simple.Data.Ado
                                 ? joiner.GetJoinClauses(_tableName, dottedTables.Split('.').Reverse())
                                 : Enumerable.Empty<string>();
 
-            var fromJoins = joiner.GetJoinClauses(_query.Joins, _commandBuilder);
+            var fromJoins = joiner.GetJoinClauses(_query.Clauses.OfType<JoinClause>(), _commandBuilder);
 
-            var fromCriteria = _query.Criteria != null
-                                   ? joiner.GetJoinClauses(_tableName, _query.Criteria)
-                                   : Enumerable.Empty<string>();
+            var fromCriteria = joiner.GetJoinClauses(_tableName, _whereCriteria);
 
-            var fromHavingCriteria = _query.HavingCriteria != null
-                                         ? joiner.GetJoinClauses(_tableName, _query.HavingCriteria)
-                                         : Enumerable.Empty<string>();
+            var fromHavingCriteria = joiner.GetJoinClauses(_tableName, _havingCriteria);
 
-            var fromColumnList = _query.Columns.Any(r => !(r is SpecialReference))
-                                     ? joiner.GetJoinClauses(_tableName, _query.Columns.OfType<ObjectReference>())
+            var fromColumnList = _columns.Any(r => !(r is SpecialReference))
+                                     ? joiner.GetJoinClauses(_tableName, _columns.OfType<ObjectReference>())
                                      : Enumerable.Empty<string>();
 
             var joins = string.Join(" ", fromTable.Concat(fromJoins)
@@ -95,19 +113,19 @@ namespace Simple.Data.Ado
 
         private void HandleQueryCriteria()
         {
-            if (_query.Criteria == null) return;
-            _commandBuilder.Append(" WHERE " + new ExpressionFormatter(_commandBuilder, _schema).Format(_query.Criteria));
+            if (_whereCriteria == SimpleExpression.Empty) return;
+            _commandBuilder.Append(" WHERE " + new ExpressionFormatter(_commandBuilder, _schema).Format(_whereCriteria));
         }
 
         private void HandleHavingCriteria()
         {
-            if (_query.HavingCriteria == null) return;
-            _commandBuilder.Append(" HAVING " + new ExpressionFormatter(_commandBuilder, _schema).Format(_query.HavingCriteria));
+            if (_havingCriteria == SimpleExpression.Empty) return;
+            _commandBuilder.Append(" HAVING " + new ExpressionFormatter(_commandBuilder, _schema).Format(_havingCriteria));
         }
 
         private void HandleGrouping()
         {
-            if (_query.HavingCriteria == null && !_query.Columns.OfType<FunctionReference>().Any(fr => fr.IsAggregate)) return;
+            if (_havingCriteria == SimpleExpression.Empty && !_columns.OfType<FunctionReference>().Any(fr => fr.IsAggregate)) return;
 
             var groupColumns =
                 GetColumnsToSelect(_table).Where(c => (!(c is FunctionReference)) || !((FunctionReference) c).IsAggregate).ToList();
@@ -119,24 +137,29 @@ namespace Simple.Data.Ado
 
         private void HandleOrderBy()
         {
-            if (!_query.Order.Any()) return;
+            if (!_query.Clauses.OfType<OrderByClause>().Any()) return;
 
-            var orderNames = _query.Order.Select(ToOrderByDirective);
+            var orderNames = _query.Clauses.OfType<OrderByClause>().Select(ToOrderByDirective);
             _commandBuilder.Append(" ORDER BY " + string.Join(", ", orderNames));
         }
 
         private void HandlePaging()
         {
-            if (_query.SkipCount != null || _query.TakeCount != null)
+            const int maxInt = 2147483646;
+
+            var skipClause = _query.Clauses.OfType<SkipClause>().FirstOrDefault() ?? new SkipClause(0);
+            var takeClause = _query.Clauses.OfType<TakeClause>().FirstOrDefault() ?? new TakeClause(maxInt);
+            if (skipClause.Count != 0 || takeClause.Count != maxInt)
             {
                 var queryPager = _adoAdapter.ProviderHelper.GetCustomProvider<IQueryPager>(_adoAdapter.ConnectionProvider);
                 if (queryPager == null)
                 {
-                    throw new NotSupportedException("Paging is not supported by the current ADO provider.");
+                    _unhandledClauses.AddRange(_query.OfType<SkipClause>());
+                    _unhandledClauses.AddRange(_query.OfType<TakeClause>());
                 }
 
-                var skipTemplate = _commandBuilder.AddParameter("skip", DbType.Int32, _query.SkipCount ?? 0);
-                var takeTemplate = _commandBuilder.AddParameter("take", DbType.Int32, _query.TakeCount ?? int.MaxValue - _query.SkipCount);
+                var skipTemplate = _commandBuilder.AddParameter("skip", DbType.Int32, skipClause.Count);
+                var takeTemplate = _commandBuilder.AddParameter("take", DbType.Int32, takeClause.Count);
                 _commandBuilder.SetText(queryPager.ApplyPaging(_commandBuilder.Text, skipTemplate.Name, takeTemplate.Name));
             }
         }
@@ -158,11 +181,12 @@ namespace Simple.Data.Ado
 
         private string GetColumnsClause(Table table)
         {
-            return _query.Columns.Count() == 1 && _query.Columns.Single() is SpecialReference
-                ?
-                FormatSpecialReference((SpecialReference)_query.Columns.Single())
-                :
-                string.Join(",", GetColumnsToSelect(table).Select(_simpleReferenceFormatter.FormatColumnClause));
+            if (_columns != null && _columns.Length == 1 && _columns[0] is SpecialReference)
+            {
+                return FormatSpecialReference((SpecialReference) _columns[0]);
+            }
+
+            return string.Join(",", GetColumnsToSelect(table).Select(_simpleReferenceFormatter.FormatColumnClause));
         }
 
         private static string FormatSpecialReference(SpecialReference reference)
@@ -174,9 +198,9 @@ namespace Simple.Data.Ado
 
         private IEnumerable<SimpleReference> GetColumnsToSelect(Table table)
         {
-            if (_query.Columns.Any())
+            if (_columns != null && _columns.Length > 0)
             {
-                return _query.Columns;
+                return _columns;
             }
             else
             {

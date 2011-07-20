@@ -12,6 +12,8 @@ namespace Simple.Data
     /// </summary>
     public class SimpleExpression
     {
+        public static readonly SimpleExpression Empty = new SimpleEmptyExpression();
+
         private readonly object _leftOperand;
         private readonly object _rightOperand;
         private readonly SimpleExpressionType _type;
@@ -90,6 +92,8 @@ namespace Simple.Data
         /// <returns>A new <see cref="SimpleExpression"/> combining both expressions with an AND operator.</returns>
         public static SimpleExpression operator &(SimpleExpression left, SimpleExpression right)
         {
+            if (left == Empty) return right;
+            if (right == Empty) return left;
             return new SimpleExpression(left, right, SimpleExpressionType.And);
         }
 
@@ -102,6 +106,8 @@ namespace Simple.Data
         /// <returns>A new <see cref="SimpleExpression"/> combining both expressions with an OR operator.</returns>
         public static SimpleExpression operator |(SimpleExpression left, SimpleExpression right)
         {
+            if (left == Empty) return right;
+            if (right == Empty) return left;
             return new SimpleExpression(left, right, SimpleExpressionType.Or);
         }
 

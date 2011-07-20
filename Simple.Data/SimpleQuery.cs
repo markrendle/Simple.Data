@@ -45,13 +45,9 @@ namespace Simple.Data
             _clauses = clauses;
         }
 
-        public SimpleExpression HavingCriteria
+        public IEnumerable<SimpleQueryClauseBase> Clauses
         {
-            get
-            {
-                var havingClause = _clauses.OfType<HavingClause>().SingleOrDefault();
-                return havingClause == null ? null : havingClause.Criteria;
-            }
+            get { return _clauses; }
         }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
@@ -74,52 +70,6 @@ namespace Simple.Data
                 }
             }
             return true;
-        }
-
-        public IEnumerable<JoinClause> Joins
-        {
-            get { return _clauses.OfType<JoinClause>(); }
-        }
-
-        public IEnumerable<SimpleReference> Columns
-        {
-            get
-            {
-                var selectClause = _clauses.OfType<SelectClause>().SingleOrDefault();
-                return selectClause == null ? Enumerable.Empty<SimpleReference>() : selectClause.Columns;
-            }
-        }
-
-        public int? TakeCount
-        {
-            get
-            {
-                var takeClause = _clauses.OfType<TakeClause>().SingleOrDefault();
-                return takeClause == null ? null : (int?)takeClause.Count;
-            }
-        }
-
-        public int? SkipCount
-        {
-            get
-            {
-                var skipClause = _clauses.OfType<SkipClause>().SingleOrDefault();
-                return skipClause == null ? null : (int?)skipClause.Count;
-            }
-        }
-
-        public IEnumerable<OrderByClause> Order
-        {
-            get { return _clauses.OfType<OrderByClause>(); }
-        }
-
-        public SimpleExpression Criteria
-        {
-            get
-            {
-                var whereClause = _clauses.OfType<WhereClause>().SingleOrDefault();
-                return whereClause == null ? null : whereClause.Criteria;
-            }
         }
 
         public string TableName
@@ -149,20 +99,12 @@ namespace Simple.Data
 
         public SimpleQuery ReplaceWhere(SimpleExpression criteria)
         {
-            return new SimpleQuery(this, _clauses.Append(new WhereClause(criteria)));
+            return new SimpleQuery(this, _clauses.Where(c => !(c is WhereClause)).ToArray().Append(new WhereClause(criteria)));
         }
 
         public SimpleQuery Where(SimpleExpression criteria)
         {
-            var currentWhere = _clauses.OfType<WhereClause>().SingleOrDefault();
-            if (currentWhere == null)
-            {
-                return new SimpleQuery(this, _clauses.Append(new WhereClause(criteria)));
-            }
-
-            var index = Array.IndexOf(_clauses, currentWhere);
-
-            return new SimpleQuery(this, _clauses.Replace(index, new WhereClause(currentWhere.Criteria && criteria)));
+            return new SimpleQuery(this, _clauses.Append(new WhereClause(criteria)));
         }
 
         public SimpleQuery OrderBy(ObjectReference reference)
@@ -207,7 +149,8 @@ namespace Simple.Data
 
         protected IEnumerable<dynamic> Run()
         {
-            return _adapter.RunQuery(this).Select(d => new SimpleRecord(d, _tableName, _dataStrategy));
+            IEnumerable<SimpleQueryClauseBase> unhandledClauses;
+            return _adapter.RunQuery(this, out unhandledClauses).Select(d => new SimpleRecord(d, _tableName, _dataStrategy));
         }
 
         public IEnumerator GetEnumerator()
@@ -373,14 +316,14 @@ namespace Simple.Data
 
         public dynamic ToScalar()
         {
-            var data = _adapter.RunQuery(this).ToArray();
+            var data = Run().OfType<IDictionary<string,object>>().ToArray();
+            if (data.Length == 0)
+            {
+                throw new SimpleDataException("Query returned no rows; cannot return scalar value.");
+            }
             if (data.Length != 1)
             {
                 throw new SimpleDataException("Query returned multiple rows; cannot return scalar value.");
-            }
-            if (data[0].Count == 0)
-            {
-                throw new SimpleDataException("Query returned no rows; cannot return scalar value.");
             }
             if (data[0].Count > 1)
             {
@@ -391,7 +334,7 @@ namespace Simple.Data
 
         public dynamic ToScalarOrDefault()
         {
-            var data = _adapter.RunQuery(this).ToArray();
+            var data = Run().ToArray();
             if (data.Length == 0)
             {
                 return null;
@@ -429,7 +372,7 @@ namespace Simple.Data
 
         private IEnumerable<dynamic> ToScalarEnumerable()
         {
-            return _adapter.RunQuery(this).Select(dict => dict.Values.FirstOrDefault());
+            return Run().OfType<IDictionary<string,object>>().Select(dict => dict.Values.FirstOrDefault());
         }
 
         public IList<T> ToList<T>()
@@ -523,7 +466,7 @@ namespace Simple.Data
         /// <returns><c>true</c> if the query matches any record; otherwise, <c>false</c>.</returns>
         public bool Exists()
         {
-            return _adapter.RunQuery(this.Select(new ExistsSpecialReference())).Count() == 1;
+            return this.Select(new ExistsSpecialReference()).Run().Count() == 1;
         }
 
         /// <summary>
@@ -547,12 +490,17 @@ namespace Simple.Data
 
             try
             {
-                _asObservableImplementation = () => _adapter.RunQueryAsObservable(this).Map(d => new SimpleRecord(d, _tableName, _dataStrategy));
+                _asObservableImplementation = () =>
+                                                  {
+                                                      IEnumerable<SimpleQueryClauseBase> unhandledClauses;
+                                                      return _adapter.RunQueryAsObservable(this, out unhandledClauses)
+                                                          .Map(d => new SimpleRecord(d, _tableName, _dataStrategy));
+                                                  };
                 return _asObservableImplementation();
             }
             catch (NotImplementedException)
             {
-                _asObservableImplementation = () => _adapter.RunQuery(this).Select(d => new SimpleRecord(d, _tableName, _dataStrategy)).ToObservable();
+                _asObservableImplementation = () => Run().Select(d => new SimpleRecord(d, _tableName, _dataStrategy)).ToObservable();
             }
 
             return _asObservableImplementation();

@@ -38,6 +38,8 @@ namespace Simple.Data.Ado
 
         public IEnumerable<string> GetJoinClauses(ObjectName mainTableName, SimpleExpression expression)
         {
+            if (expression == SimpleExpression.Empty) return Enumerable.Empty<string>();
+
             _done.AddOrUpdate(mainTableName, string.Empty, (s, o) => string.Empty);
             var tablePairs = GetTableNames(expression, mainTableName.Schema).Distinct().ToList();
             foreach (var tablePair in tablePairs)

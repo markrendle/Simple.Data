@@ -16,6 +16,8 @@ namespace Simple.Data.Ado
         private readonly Dictionary<ParameterTemplate, object> _parameters = new Dictionary<ParameterTemplate, object>();
         private readonly StringBuilder _text;
 
+        public string Joins { get; set; }
+
         public CommandBuilder(ISchemaProvider schemaProvider)
         {
             _text = new StringBuilder();

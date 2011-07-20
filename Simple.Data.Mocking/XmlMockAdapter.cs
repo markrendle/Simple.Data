@@ -32,9 +32,12 @@ namespace Simple.Data.Mocking
                 .Select(e => e.AttributesToDictionary());
         }
 
-        public override IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query)
+        public override IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
         {
-            return Find(query.TableName, query.Criteria);
+            unhandledClauses = Enumerable.Empty<SimpleQueryClauseBase>();
+            var criteria = query.Clauses.OfType<WhereClause>().Aggregate(SimpleExpression.Empty,
+                                                                            (seed, where) => seed && where.Criteria);
+            return Find(query.TableName, criteria);
         }
 
         public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)

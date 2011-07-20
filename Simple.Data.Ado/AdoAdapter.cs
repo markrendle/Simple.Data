@@ -91,18 +91,18 @@ namespace Simple.Data.Ado
             return _finder.Find(tableName, criteria);
         }
 
-        public override IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query)
+        public override IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
         {
             var connection = _connectionProvider.CreateConnection();
-            return new QueryBuilder(this).Build(query)
+            return new QueryBuilder(this).Build(query, out unhandledClauses)
                 .GetCommand(connection)
                 .ToEnumerable(connection);
         }
 
-        public override IObservable<IDictionary<string, object>> RunQueryAsObservable(SimpleQuery query)
+        public override IObservable<IDictionary<string, object>> RunQueryAsObservable(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
         {
             var connection = _connectionProvider.CreateConnection();
-            return new QueryBuilder(this).Build(query)
+            return new QueryBuilder(this).Build(query, out unhandledClauses)
                 .GetCommand(connection)
                 .ToObservable(connection, this);
         }
