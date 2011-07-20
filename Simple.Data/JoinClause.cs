@@ -5,6 +5,10 @@ using System.Text;
 
 namespace Simple.Data
 {
+    /// <summary>
+    /// Represents an explicit join in a <see cref="SimpleQuery"/>.
+    /// There may be zero, one or multiple instances of this type in <see cref="SimpleQuery.Clauses"/>.
+    /// </summary>
     public class JoinClause : SimpleQueryClauseBase
     {
         private readonly ObjectReference _table;
