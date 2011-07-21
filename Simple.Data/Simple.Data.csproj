@@ -75,6 +75,7 @@
     <Compile Include="ConcreteTypeCreator.cs" />
     <Compile Include="CountSpecialReference.cs" />
     <Compile Include="Database.Open.cs" />
+    <Compile Include="DatabaseOpenerMethods.cs" />
     <Compile Include="EnumerableEx.cs" />
     <Compile Include="ExistsSpecialReference.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="FunctionReference.cs" />
     <Compile Include="HavingClause.cs" />
     <Compile Include="HomogenizedEqualityComparer.cs" />
+    <Compile Include="IDatabaseOpener.cs" />
     <Compile Include="IPluralizer.cs" />
     <Compile Include="IRange.cs" />
     <Compile Include="MathReference.cs" />

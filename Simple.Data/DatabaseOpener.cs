@@ -1,151 +1,94 @@
 ﻿namespace Simple.Data
 {
     using System;
-
-    public interface IDatabaseOpener
-    {
-        dynamic OpenDefault();
-        dynamic OpenFile(string filename);
-        dynamic OpenConnection(string connectionString);
-        dynamic OpenConnection(string connectionString, string providerName);
-        dynamic Open(string adapterName, object settings);
-        dynamic OpenNamedConnection(string connectionName);
-    }
+    using System.Threading;
 
     internal class DatabaseOpener : IDatabaseOpener
     {
         private static readonly IAdapterFactory AdapterFactory = new CachingAdapterFactory();
-        [ThreadStatic]
-        private static Func<Database> _openDefault;
-        [ThreadStatic]
-        private static Func<string, Database> _openFile;
-        [ThreadStatic]
-        private static Func<string, Database> _openConnection;
-        [ThreadStatic]
-        private static Func<string, string, Database> _openConnectionWithProvider;
-        [ThreadStatic]
-        private static Func<string, Database> _openNamedConnection;
-        [ThreadStatic]
-        private static Func<string, object, Database> _open;
+        private static readonly ThreadLocal<DatabaseOpenerMethods> LocalOpenMethods = new ThreadLocal<DatabaseOpenerMethods>(() => new DatabaseOpenerMethods());
 
-        private static Func<Database> OpenDefaultImpl
+        protected static DatabaseOpenerMethods OpenMethods
         {
-            get { return _openDefault ?? OpenDefaultMethod; }
-        }
-
-        private static Func<string,Database> OpenFileImpl
-        {
-            get { return _openFile ?? OpenFileMethod; }
-        }
-
-        private static Func<string, Database> OpenConnectionImpl
-        {
-            get { return _openConnection ?? OpenConnectionMethod; }
-        }
-
-        private static Func<string,string,Database> OpenConnectionWithProviderImpl
-        {
-            get { return _openConnectionWithProvider ?? OpenConnectionMethod; }
-        }
-
-        private static Func<string, Database> OpenNamedConnectionImpl
-        {
-            get { return _openNamedConnection ?? OpenNamedConnectionMethod; }
-        }
-
-        private static Func<string, object, Database> OpenImpl
-        {
-            get { return _open ?? OpenMethod; }
+            get { return LocalOpenMethods.Value; }
         }
 
         public dynamic OpenDefault()
         {
-            return OpenDefaultImpl();
+            return OpenMethods.OpenDefaultImpl();
         }
 
         public dynamic OpenFile(string filename)
         {
-            return OpenFileImpl(filename);
+            return OpenMethods.OpenFileImpl(filename);
         }
 
         public dynamic OpenConnection(string connectionString)
         {
-            return OpenConnectionImpl(connectionString);
+            return OpenMethods.OpenConnectionImpl(connectionString);
         }
 
         public dynamic OpenConnection(string connectionString, string providerName)
         {
-            return OpenConnectionWithProviderImpl(connectionString, providerName);
+            return OpenMethods.OpenConnectionWithProviderImpl(connectionString, providerName);
         }
 
         public dynamic Open(string adapterName, object settings)
         {
-            return OpenImpl(adapterName, settings);
+            return OpenMethods.OpenImpl(adapterName, settings);
         }
 
         public dynamic OpenNamedConnection(string connectionName)
         {
-            return OpenNamedConnectionImpl(connectionName);
+            return OpenMethods.OpenNamedConnectionImpl(connectionName);
         }
 
         public static void UseMockDatabase(Database database)
         {
-            _openDefault = () => database;
-            _openFile = _openConnection = _openNamedConnection = ignore => database;
-            _open = (ignore1, ignore2) => database;
-            _openConnectionWithProvider = (ignore1, ignore2) => database;
+            OpenMethods.UseMockDatabase(database);
         }
 
         public static void UseMockAdapter(Adapter adapter)
         {
-            _openDefault = () => new Database(adapter);
-            _openFile = _openConnection = _openNamedConnection = ignore => new Database(adapter);
-            _open = (ignore1, ignore2) => new Database(adapter);
-            _openConnectionWithProvider = (ignore1, ignore2) => new Database(adapter);
+            OpenMethods.UseMockAdapter(adapter);
         }
 
         public static void UseMockDatabase(Func<Database> databaseCreator)
         {
-            _openDefault = databaseCreator;
-            _openFile = _openConnection = _openNamedConnection = ignore => databaseCreator();
-            _open = (ignore1, ignore2) => databaseCreator();
-            _openConnectionWithProvider = (ignore1, ignore2) => databaseCreator();
+            OpenMethods.UseMockDatabase(databaseCreator);
         }
 
         public static void UseMockAdapter(Func<Adapter> adapterCreator)
         {
-            _openDefault = () => new Database(adapterCreator());
-            _openFile = _openConnection = _openNamedConnection = ignore => new Database(adapterCreator());
-            _open = (ignore1, ignore2) => new Database(adapterCreator());
-            _openConnectionWithProvider = (ignore1, ignore2) => new Database(adapterCreator());
+            OpenMethods.UseMockAdapter(adapterCreator);
         }
 
-        private static Database OpenDefaultMethod()
+        internal static Database OpenDefaultMethod()
         {
             return new Database(AdapterFactory.Create("Ado", new { ConnectionName = "Simple.Data.Properties.Settings.DefaultConnectionString" }));
         }
 
-        private static Database OpenFileMethod(string filename)
+        internal static Database OpenFileMethod(string filename)
         {
             return new Database(AdapterFactory.Create("Ado", new { Filename = filename }));
         }
 
-        private static Database OpenConnectionMethod(string connectionString)
+        internal static Database OpenConnectionMethod(string connectionString)
         {
             return new Database(AdapterFactory.Create("Ado", new { ConnectionString = connectionString }));
         }
 
-        private static Database OpenConnectionMethod(string connectionString, string providerName)
+        internal static Database OpenConnectionMethod(string connectionString, string providerName)
         {
             return new Database(AdapterFactory.Create("Ado", new { ConnectionString = connectionString, ProviderName = providerName }));
         }
 
-        private static Database OpenNamedConnectionMethod(string connectionName)
+        internal static Database OpenNamedConnectionMethod(string connectionName)
         {
             return new Database(AdapterFactory.Create("Ado", new { ConnectionName = connectionName }));
         }
 
-        private static Database OpenMethod(string adapterName, object settings)
+        internal static Database OpenMethod(string adapterName, object settings)
         {
             return new Database(AdapterFactory.Create(adapterName, settings));
         }
