@@ -49,6 +49,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.TestHelper", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceTestConsole", "PerformanceTestConsole\PerformanceTestConsole.csproj", "{C88EA51F-59C4-4283-97AC-06440F4AA4F6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Profiling", "Profiling", "{2AAC5DFA-3851-4324-A51F-5BC46BEB777C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProfilingApp", "ProfilingApp\ProfilingApp.csproj", "{9AAF3008-8033-4A26-93D2-97928E7801E9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -199,6 +203,16 @@ Global
 		{C88EA51F-59C4-4283-97AC-06440F4AA4F6}.Release|Mixed Platforms.Build.0 = Release|x86
 		{C88EA51F-59C4-4283-97AC-06440F4AA4F6}.Release|x86.ActiveCfg = Release|x86
 		{C88EA51F-59C4-4283-97AC-06440F4AA4F6}.Release|x86.Build.0 = Release|x86
+		{9AAF3008-8033-4A26-93D2-97928E7801E9}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{9AAF3008-8033-4A26-93D2-97928E7801E9}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{9AAF3008-8033-4A26-93D2-97928E7801E9}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{9AAF3008-8033-4A26-93D2-97928E7801E9}.Debug|x86.ActiveCfg = Debug|x86
+		{9AAF3008-8033-4A26-93D2-97928E7801E9}.Debug|x86.Build.0 = Debug|x86
+		{9AAF3008-8033-4A26-93D2-97928E7801E9}.Release|Any CPU.ActiveCfg = Release|x86
+		{9AAF3008-8033-4A26-93D2-97928E7801E9}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{9AAF3008-8033-4A26-93D2-97928E7801E9}.Release|Mixed Platforms.Build.0 = Release|x86
+		{9AAF3008-8033-4A26-93D2-97928E7801E9}.Release|x86.ActiveCfg = Release|x86
+		{9AAF3008-8033-4A26-93D2-97928E7801E9}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -210,6 +224,7 @@ Global
 		{96C623FD-869E-4DCE-98A1-17075EE384F9} = {182AEEFE-9B89-4264-BCED-91A00D1EF896}
 		{70536BA8-AF0D-46F3-B04C-45177F56B320} = {182AEEFE-9B89-4264-BCED-91A00D1EF896}
 		{E9160373-8BD2-4D69-B88E-1D3B5BC0A6FB} = {182AEEFE-9B89-4264-BCED-91A00D1EF896}
+		{9AAF3008-8033-4A26-93D2-97928E7801E9} = {2AAC5DFA-3851-4324-A51F-5BC46BEB777C}
 	EndGlobalSection
 	GlobalSection(NDepend) = preSolution
 		Project = ".\Simple_Data.ndproj"

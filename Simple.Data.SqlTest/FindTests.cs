@@ -142,5 +142,15 @@ namespace Simple.Data.SqlTest
             var u = db.VwCustomers.FindByCustomerId(1);
             Assert.IsNotNull(u);
         }
+
+        [Test]
+        public void TestCast()
+        {
+            var db = DatabaseHelper.Open();
+            var userQuery = db.Users.All().Cast<User>() as IEnumerable<User>;
+            Assert.IsNotNull(userQuery);
+            var users = userQuery.ToList();
+            Assert.AreNotEqual(0, users.Count);
+        }
     }
 }

@@ -21,14 +21,26 @@ namespace Simple.Data
         private readonly ConcurrentDictionary<string, Adapter> _cache = new ConcurrentDictionary<string, Adapter>();
         public override Adapter Create(string adapterName, IEnumerable<KeyValuePair<string, object>> settings)
         {
-            var mat = (settings ?? Enumerable.Empty<KeyValuePair<string,object>>()).ToList();
-            return _cache.GetOrAdd(HashSettings(adapterName, mat), s => DoCreate(adapterName, mat));
+            List<KeyValuePair<string, object>> mat;
+            string hash;
+            if (settings == null)
+            {
+                mat = new List<KeyValuePair<string, object>>();
+                hash = adapterName;
+            }
+            else
+            {
+                mat = settings.ToList();
+                hash = HashSettings(adapterName, mat);
+            }
+            
+            return _cache.GetOrAdd(hash, _ => DoCreate(adapterName, mat));
         }
 
         private static string HashSettings(string adapterName, IEnumerable<KeyValuePair<string, object>> settings)
         {
             return adapterName +
-                       string.Join("#", settings.Select(kvp => kvp.Key + kvp.Value));
+                       string.Join("#", settings.Select(kvp => kvp.Key + "=" + kvp.Value));
         }
     }
 }

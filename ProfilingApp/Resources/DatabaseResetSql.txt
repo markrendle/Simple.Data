@@ -1,0 +1,50 @@
+SET NOCOUNT ON;
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Comment]') AND type in (N'U'))
+DROP TABLE [dbo].[Comment];
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Post]') AND type in (N'U'))
+DROP TABLE [dbo].[Post];
+
+CREATE TABLE [dbo].[Post] (
+	[Id]      INT            IDENTITY (1, 1) NOT NULL,
+	[Title]   NVARCHAR (100) NOT NULL,
+	[Content] NVARCHAR (MAX) NOT NULL,
+	[Created] DATETIME       NOT NULL
+);
+
+ALTER TABLE [dbo].[Post]
+	ADD CONSTRAINT [PK_Post] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
+
+CREATE TABLE [dbo].[Comment] (
+	[Id]         INT            IDENTITY (1, 1) NOT NULL,
+	[PostId]     INT            NOT NULL,
+	[Content]    NVARCHAR (MAX) NOT NULL,
+	[Created]    DATETIME       NOT NULL
+);
+
+ALTER TABLE [dbo].[Comment]
+	ADD CONSTRAINT [PK_Comment] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
+
+SET IDENTITY_INSERT [dbo].[Post] ON
+
+DECLARE @PostId AS INT
+DECLARE @PostIdStr AS NVARCHAR(3)
+DECLARE @Loop AS INT
+SET @PostId = 1
+WHILE @PostId <= 100
+BEGIN
+	SET @PostIdStr = CAST(@PostId AS NVARCHAR(3))
+	INSERT INTO [dbo].[Post] ([Id], [Title], [Content], [Created]) VALUES (@PostId, 'Post ' + @PostIdStr, 'This is post number ' + @PostIdStr, GETDATE())
+	SET @Loop = 10
+	WHILE @Loop > 0
+	BEGIN
+	    INSERT INTO [dbo].[Comment] ([PostId], [Content], [Created]) VALUES (@PostId, 'This is just a comment.', GETDATE())
+	    SET @Loop = @Loop - 1
+	END
+	SET @PostId = @PostId + 1
+END
+
+SET IDENTITY_INSERT [dbo].[Post] OFF
+
+ALTER TABLE [dbo].[Comment] WITH NOCHECK
+	ADD CONSTRAINT [FK_Comment_Post] FOREIGN KEY ([PostId]) REFERENCES [dbo].[Post] ([Id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
