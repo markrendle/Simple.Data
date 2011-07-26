@@ -5,6 +5,8 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data.Ado
 {
+    using System;
+
     public static class DataReaderExtensions
     {
         public static IDictionary<string,object> ToDictionary(this IDataReader dataReader)
@@ -45,43 +47,19 @@ namespace Simple.Data.Ado
             {
                 reader.GetValues(values);
 
-                for (var i = 0; i < reader.FieldCount; i++)
-                {
-                    var value = values[i];
-                    if (value is DBNull)
-                        values[i] = null;
-                }
+                ReplaceDbNullsWithClrNulls(values);
 
                 yield return OptimizedDictionary.Create(index, values);
             }
         }
 
-        public static IEnumerable<object> ToDynamicList(this IDataReader reader)
+        private static void ReplaceDbNullsWithClrNulls(object[] values)
         {
-            var list = new List<object>();
-            using (reader)
+            int dbNullIndex;
+            while ((dbNullIndex = Array.IndexOf(values, DBNull.Value)) > -1)
             {
-                while (reader.Read())
-                {
-                    list.Add(reader.ToDynamicRecord());
-                }
+                values[dbNullIndex] = null;
             }
-
-            return list.AsEnumerable();
-        }
-
-        public static IEnumerable<object> ToDynamicList(this IDataReader reader, Database database, string tableName)
-        {
-            var list = new List<object>();
-            using (reader)
-            {
-                while (reader.Read())
-                {
-                    list.Add(reader.ToDynamicRecord(tableName, database));
-                }
-            }
-
-            return list.AsEnumerable();
         }
     }
 }

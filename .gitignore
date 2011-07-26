@@ -19,3 +19,4 @@ test-results
 apply_config.bat
 NDependOut
 *.dotCover
+*_mm_cache.bin
