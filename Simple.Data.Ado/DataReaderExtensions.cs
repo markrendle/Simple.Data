@@ -44,6 +44,14 @@ namespace Simple.Data.Ado
             while (reader.Read())
             {
                 reader.GetValues(values);
+
+                for (var i = 0; i < reader.FieldCount; i++)
+                {
+                    var value = values[i];
+                    if (value is DBNull)
+                        values[i] = null;
+                }
+
                 yield return OptimizedDictionary.Create(index, values);
             }
         }
