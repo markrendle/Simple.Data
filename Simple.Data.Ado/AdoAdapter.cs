@@ -99,6 +99,56 @@ namespace Simple.Data.Ado
                 .ToEnumerable(connection);
         }
 
+        private IEnumerable<IDictionary<string, object>> RunQueryWithCount(SimpleQuery query, WithCountClause withCountClause, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
+        {
+            var countQuery = query.ClearSkip().ClearTake().Select(new CountSpecialReference());
+            var unhandledClausesList = new List<IEnumerable<SimpleQueryClauseBase>>(2);
+            using (var enumerator = RunQueries(new[] { countQuery, query }, unhandledClausesList).GetEnumerator())
+            {
+                unhandledClauses = unhandledClausesList[1];
+                if (!enumerator.MoveNext())
+                {
+                    throw new InvalidOperationException();
+                }
+                var countRow = enumerator.Current.Single();
+                withCountClause.SetCount((int) countRow.First().Value);
+                if (!enumerator.MoveNext())
+                {
+                    throw new InvalidOperationException();
+                }
+                return enumerator.Current;
+            }
+        }
+
+        public override IEnumerable<IEnumerable<IDictionary<string,object>>> RunQueries(SimpleQuery[] queries, List<IEnumerable<SimpleQueryClauseBase>> unhandledClauses)
+        {
+            if (ProviderSupportsCompoundStatements && queries.Length > 1)
+            {
+                var commandBuilders = new ICommandBuilder[queries.Length];
+                for (int i = 0; i < queries.Length; i++)
+                {
+                    IEnumerable<SimpleQueryClauseBase> unhandledClausesForThisQuery;
+                    commandBuilders[i] = new QueryBuilder(this, i).Build(queries[i], out unhandledClausesForThisQuery);
+                    unhandledClauses.Add(unhandledClausesForThisQuery);
+                }
+                var connection = _connectionProvider.CreateConnection();
+                var command = CommandBuilder.CreateCommand(commandBuilders, connection);
+                foreach (var item in command.ToEnumerables(connection))
+                {
+                    yield return item.ToList();
+                }
+            }
+            else
+            {
+                foreach (SimpleQuery t in queries)
+                {
+                    IEnumerable<SimpleQueryClauseBase> unhandledClausesForThisQuery;
+                    yield return RunQuery(t, out unhandledClausesForThisQuery);
+                    unhandledClauses.Add(unhandledClausesForThisQuery);
+                }
+            }
+        }
+
         public override IObservable<IDictionary<string, object>> RunQueryAsObservable(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
         {
             var connection = _connectionProvider.CreateConnection();

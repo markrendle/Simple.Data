@@ -11,6 +11,7 @@ namespace Simple.Data.Ado
         private readonly IFunctionNameConverter _functionNameConverter = new FunctionNameConverter();
         private readonly SimpleReferenceFormatter _simpleReferenceFormatter;
         private readonly AdoAdapter _adoAdapter;
+        private readonly int _bulkIndex;
         private readonly DatabaseSchema _schema;
 
         private ObjectName _tableName;
@@ -20,11 +21,16 @@ namespace Simple.Data.Ado
         private SimpleExpression _havingCriteria;
         private SimpleReference[] _columns;
         private CommandBuilder _commandBuilder;
-        private List<SimpleQueryClauseBase> _unhandledClauses; 
+        private List<SimpleQueryClauseBase> _unhandledClauses;
 
-        public QueryBuilder(AdoAdapter adoAdapter)
+        public QueryBuilder(AdoAdapter adoAdapter) : this(adoAdapter, -1)
+        {
+        }
+
+        public QueryBuilder(AdoAdapter adoAdapter, int bulkIndex)
         {
             _adoAdapter = adoAdapter;
+            _bulkIndex = bulkIndex;
             _schema = _adoAdapter.GetSchema();
             _simpleReferenceFormatter = new SimpleReferenceFormatter(_schema);
         }
@@ -65,7 +71,7 @@ namespace Simple.Data.Ado
 
             _tableName = ObjectName.Parse(query.TableName.Split('.').Last());
             _table = _schema.FindTable(_tableName);
-            _commandBuilder = new CommandBuilder(GetSelectClause(_tableName), _schema.SchemaProvider);
+            _commandBuilder = new CommandBuilder(GetSelectClause(_tableName), _schema.SchemaProvider, _bulkIndex);
         }
 
         private void HandleJoins()

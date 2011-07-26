@@ -139,18 +139,42 @@ namespace Simple.Data
 
         public SimpleQuery Skip(int skip)
         {
-            return new SimpleQuery(this, _clauses.Append(new SkipClause(skip)));
+            return new SimpleQuery(this, _clauses.ReplaceOrAppend(new SkipClause(skip)));
+        }
+
+        public SimpleQuery ClearSkip()
+        {
+            return new SimpleQuery(this, _clauses.Where(c => !(c is SkipClause)).ToArray());
         }
 
         public SimpleQuery Take(int take)
         {
-            return new SimpleQuery(this, _clauses.Append(new TakeClause(take)));
+            return new SimpleQuery(this, _clauses.ReplaceOrAppend(new TakeClause(take)));
+        }
+
+        public SimpleQuery ClearTake()
+        {
+            return new SimpleQuery(this, _clauses.Where(c => !(c is TakeClause)).ToArray());
         }
 
         protected IEnumerable<dynamic> Run()
         {
+            if (_clauses.OfType<WithCountClause>().Any())
+            {
+                return RunWithCount();
+            }
             IEnumerable<SimpleQueryClauseBase> unhandledClauses;
             return _adapter.RunQuery(this, out unhandledClauses).Select(d => new SimpleRecord(d, _tableName, _dataStrategy));
+        }
+
+        private IEnumerable<dynamic> RunWithCount()
+        {
+            var withCountClause = _clauses.OfType<WithCountClause>().Single();
+            var countQuery = this.ClearSkip().ClearTake().Select(new CountSpecialReference());
+            var unhandledClausesList = new List<IEnumerable<SimpleQueryClauseBase>>();
+            var results = _adapter.RunQueries(new[] { countQuery, this }, unhandledClausesList).ToList();
+            withCountClause.SetCount((int)results[0].Single().First().Value);
+            return results[1].Select(d => new SimpleRecord(d, _tableName, _dataStrategy));
         }
 
         public IEnumerator GetEnumerator()
@@ -217,6 +241,13 @@ namespace Simple.Data
         {
             if (_tempJoinWaitingForOn == null) throw new InvalidOperationException("Call to On must be preceded by call to Join.");
             return AddNewJoin(new JoinClause(_tempJoinWaitingForOn.Table, joinExpression));
+        }
+
+        public SimpleQuery WithTotalCount(out Future<int> count)
+        {
+            Action<int> setCount;
+            count = Future<int>.Create(out setCount);
+            return new SimpleQuery(this, _clauses.Append(new WithCountClause(setCount)));
         }
 
         private SimpleQuery ParseJoin(InvokeMemberBinder binder, object[] args)

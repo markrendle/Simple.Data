@@ -14,6 +14,11 @@
             return ToEnumerable(command, connection, null);
         }
 
+        public static IEnumerable<IEnumerable<IDictionary<string, object>>> ToEnumerables(this IDbCommand command, IDbConnection connection)
+        {
+            return new DataReaderMultipleEnumerator(command, connection).Wrap();
+        }
+
         public static IEnumerable<IDictionary<string, object>> ToEnumerable(this IDbCommand command, IDbConnection connection, IDictionary<string, int> index)
         {
             return new DataReaderEnumerator(command, connection, index).Wrap();

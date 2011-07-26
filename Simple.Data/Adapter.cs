@@ -108,5 +108,7 @@ namespace Simple.Data
         {
             throw new NotImplementedException();
         }
+
+        public abstract IEnumerable<IEnumerable<IDictionary<string, object>>> RunQueries(SimpleQuery[] queries, List<IEnumerable<SimpleQueryClauseBase>> unhandledClauses);
     }
 }

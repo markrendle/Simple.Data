@@ -60,7 +60,7 @@ namespace Simple.Data.Mocking.Ado
 
         public bool SupportsCompoundStatements
         {
-            get { return false; }
+            get { return true; }
         }
     }
 }

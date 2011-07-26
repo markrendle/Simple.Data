@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace Simple.Data.Ado
 {
+    using System;
     using System.Collections;
+    using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
 
-    internal class DataReaderEnumerator : IEnumerator<IDictionary<string, object>>
+    class DataReaderMultipleEnumerator : IEnumerator<IEnumerable<IDictionary<string, object>>>
     {
         private readonly IDbConnection _connection;
         private IDictionary<string, int> _index;
@@ -17,12 +14,11 @@ namespace Simple.Data.Ado
         private IDataReader _reader;
         private bool _lastRead;
 
-        public DataReaderEnumerator(IDbCommand command, IDbConnection connection)
-            : this(command, connection, null)
+        public DataReaderMultipleEnumerator(IDbCommand command, IDbConnection connection) : this(command, connection, null)
         {
         }
 
-        public DataReaderEnumerator(IDbCommand command, IDbConnection connection, IDictionary<string, int> index)
+        public DataReaderMultipleEnumerator(IDbCommand command, IDbConnection connection, IDictionary<string, int> index)
         {
             _command = command;
             _connection = connection;
@@ -44,8 +40,11 @@ namespace Simple.Data.Ado
             if (_reader == null)
             {
                 ExecuteReader();
+                _lastRead = true;
+                return true;
             }
-            return _lastRead = _reader.Read();
+            _lastRead = _reader.NextResult();
+            return _lastRead;
         }
 
         private void ExecuteReader()
@@ -69,12 +68,16 @@ namespace Simple.Data.Ado
             ExecuteReader();
         }
 
-        public IDictionary<string, object> Current
+        public IEnumerable<IDictionary<string, object>> Current
         {
             get
             {
                 if (!_lastRead) throw new InvalidOperationException();
-                return _reader.ToDictionary();
+                var index = _reader.CreateDictionaryIndex();
+                while (_reader.Read())
+                {
+                    yield return _reader.ToDictionary(index);
+                }
             }
         }
 

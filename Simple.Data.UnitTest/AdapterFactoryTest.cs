@@ -76,5 +76,10 @@
         {
             throw new NotImplementedException();
         }
+
+        public override IEnumerable<IEnumerable<IDictionary<string, object>>> RunQueries(SimpleQuery[] queries, List<IEnumerable<SimpleQueryClauseBase>> unhandledClauses)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

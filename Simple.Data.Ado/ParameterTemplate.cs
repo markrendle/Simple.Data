@@ -50,6 +50,13 @@ namespace Simple.Data.Ado
             get { return _column; }
         }
 
+        public ParameterTemplate Rename(string newName)
+        {
+            return _column == null
+                       ? new ParameterTemplate(newName, _dbType, _maxLength)
+                       : new ParameterTemplate(newName, _column);
+        }
+
         public bool Equals(ParameterTemplate other)
         {
             if (ReferenceEquals(null, other)) return false;

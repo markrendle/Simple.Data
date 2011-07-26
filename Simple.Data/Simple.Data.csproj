@@ -82,6 +82,7 @@
     <Compile Include="Extensions\HomogenizeEx.cs" />
     <Compile Include="Extensions\ResultSetExtensions.cs" />
     <Compile Include="FunctionReference.cs" />
+    <Compile Include="Future1.cs" />
     <Compile Include="HavingClause.cs" />
     <Compile Include="HomogenizedEqualityComparer.cs" />
     <Compile Include="IDatabaseOpener.cs" />
@@ -145,6 +146,7 @@
     <Compile Include="UnresolvableObjectException.cs" />
     <Compile Include="Commands\UpdateByCommand.cs" />
     <Compile Include="WhereClause.cs" />
+    <Compile Include="WithCountClause.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

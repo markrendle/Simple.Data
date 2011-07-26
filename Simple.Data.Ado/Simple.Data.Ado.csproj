@@ -63,6 +63,7 @@
     <Compile Include="DataParameterCollectionEx.cs" />
     <Compile Include="DataReaderEnumerator.cs" />
     <Compile Include="DataReaderExtensions.cs" />
+    <Compile Include="DataReaderMultipleEnumerator.cs" />
     <Compile Include="DataRecordExtensions.cs" />
     <Compile Include="DbCommandExtensions.cs" />
     <Compile Include="DbConnectionExtensions.cs" />

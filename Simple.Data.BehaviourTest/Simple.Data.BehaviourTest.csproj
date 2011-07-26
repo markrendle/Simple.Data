@@ -67,6 +67,7 @@
     <Compile Include="Query\ExplicitJoinTest.cs" />
     <Compile Include="Query\HavingTest.cs" />
     <Compile Include="Query\QueryTest.cs" />
+    <Compile Include="Query\WithCountTest.cs" />
     <Compile Include="RangeAndArrayFindTest.cs" />
     <Compile Include="TransactionTest.cs" />
     <Compile Include="DatabaseTest.cs" />

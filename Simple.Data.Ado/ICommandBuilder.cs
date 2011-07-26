@@ -13,5 +13,6 @@ namespace Simple.Data.Ado
         IDbCommand GetRepeatableCommand(IDbConnection connection);
         CommandTemplate GetCommandTemplate(Table table);
         IEnumerable<KeyValuePair<ParameterTemplate, object>> Parameters { get; }
+        string Text { get; }
     }
 }

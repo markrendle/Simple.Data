@@ -111,6 +111,17 @@ namespace Simple.Data.Mocking
             return keyAttribute.Value.Split(',');
         }
 
+        public override IEnumerable<IEnumerable<IDictionary<string, object>>> RunQueries(SimpleQuery[] queries, List<IEnumerable<SimpleQueryClauseBase>> unhandledClauses)
+        {
+            foreach (var query in queries)
+            {
+                IEnumerable<SimpleQueryClauseBase> unhandledClausesForThisQuery;
+                var result = RunQuery(query, out unhandledClausesForThisQuery);
+                unhandledClauses.Add(unhandledClausesForThisQuery);
+                yield return result;
+            }
+        }
+
         private IEnumerable<IDictionary<string, object>> FindAll(string tableName)
         {
             return GetTableElement(tableName).Elements().Select(e => e.AttributesToDictionary());

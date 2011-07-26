@@ -15,6 +15,7 @@ namespace Simple.Data.Ado
         private readonly ISchemaProvider _schemaProvider;
         private readonly Dictionary<ParameterTemplate, object> _parameters = new Dictionary<ParameterTemplate, object>();
         private readonly StringBuilder _text;
+        private readonly string _parameterSuffix;
 
         public string Joins { get; set; }
 
@@ -24,15 +25,16 @@ namespace Simple.Data.Ado
             _schemaProvider = schemaProvider;
         }
 
-        public CommandBuilder(string text, ISchemaProvider schemaProvider)
+        public CommandBuilder(string text, ISchemaProvider schemaProvider, int bulkIndex)
         {
             _text = new StringBuilder(text);
             _schemaProvider = schemaProvider;
+            _parameterSuffix = (bulkIndex >= 0) ? "_c" + bulkIndex : string.Empty;
         }
 
         public ParameterTemplate AddParameter(object value, Column column)
         {
-            string name = _schemaProvider.NameParameter("p" + Interlocked.Increment(ref _number));
+            string name = _schemaProvider.NameParameter("p" + Interlocked.Increment(ref _number) + _parameterSuffix);
             var parameterTemplate = new ParameterTemplate(name, column);
             _parameters.Add(parameterTemplate, value);
             return parameterTemplate;
@@ -40,7 +42,7 @@ namespace Simple.Data.Ado
 
         public ParameterTemplate AddParameter(string name, DbType dbType, object value)
         {
-            name = _schemaProvider.NameParameter(name);
+            name = _schemaProvider.NameParameter(name + _parameterSuffix);
             var parameterTemplate = new ParameterTemplate(name, dbType, 0);
             _parameters.Add(parameterTemplate, value);
             return parameterTemplate;
@@ -76,7 +78,7 @@ namespace Simple.Data.Ado
         {
             var command = connection.CreateCommand();
             command.CommandText = Text;
-            SetParameters(command);
+            SetParameters(command, string.Empty);
             return command;
         }
 
@@ -103,11 +105,17 @@ namespace Simple.Data.Ado
             return new CommandTemplate(_text.ToString(), _parameters.Keys.ToArray(), new Dictionary<string, int>(index, HomogenizedEqualityComparer.DefaultInstance));
         }
 
-        private void SetParameters(IDbCommand command)
+        private void SetParameters(IDbCommand command, string suffix)
         {
-            if (_parameters.Any(kvp => kvp.Value is IRange) || _parameters.Any(kvp => kvp.Value is IEnumerable && !(kvp.Value is string)))
+            SetParameters(command, _parameters);
+        }
+
+        private static void SetParameters(IDbCommand command, IEnumerable<KeyValuePair<ParameterTemplate, object>> parameters)
+        {
+            var parameterList = parameters.ToList();
+            if (parameterList.Any(kvp => kvp.Value is IRange) || parameterList.Any(kvp => kvp.Value is IEnumerable && !(kvp.Value is string)))
             {
-                foreach (var pair in _parameters)
+                foreach (var pair in parameterList)
                 {
                     foreach (var parameter in CreateParameterComplex(pair.Key, pair.Value, command))
                     {
@@ -117,7 +125,7 @@ namespace Simple.Data.Ado
             }
             else
             {
-                foreach (var pair in _parameters)
+                foreach (var pair in parameterList)
                 {
                     command.Parameters.Add(CreateSingleParameter(pair.Value, command, pair.Key.Name, pair.Key.DbType));
                 }
@@ -204,6 +212,18 @@ namespace Simple.Data.Ado
             parameter.DbType = dbType;
             parameter.Value = CommandHelper.FixObjectType(value);
             return parameter;
+        }
+
+        internal static IDbCommand CreateCommand(ICommandBuilder[] commandBuilders, IDbConnection connection)
+        {
+            var command = connection.CreateCommand();
+            for (int i = 0; i < commandBuilders.Length; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(command.CommandText)) command.CommandText += "; ";
+                command.CommandText += commandBuilders[i].Text;
+                SetParameters(command, commandBuilders[i].Parameters);
+            }
+            return command;
         }
     }
 }
