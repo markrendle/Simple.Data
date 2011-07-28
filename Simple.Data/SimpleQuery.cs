@@ -365,7 +365,7 @@ namespace Simple.Data
 
         public dynamic ToScalarOrDefault()
         {
-            var data = Run().ToArray();
+            var data = Run().OfType<IDictionary<string, object>>().ToArray();
             if (data.Length == 0)
             {
                 return null;
