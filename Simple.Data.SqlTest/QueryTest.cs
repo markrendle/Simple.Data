@@ -226,5 +226,13 @@ namespace Simple.Data.SqlTest
             Assert.IsNotNull(row);
             Assert.AreEqual("One", row.Name);
         }
+
+        [Test]
+        public void ToScalarOrDefault()
+        {
+            var db = DatabaseHelper.Open();
+            int max = db.Users.FindAllByName("ZXCVBNM").Select(db.Users.Age.Max()).ToScalarOrDefault<int>();
+            Assert.AreEqual(0, max);
+        }
     }
 }

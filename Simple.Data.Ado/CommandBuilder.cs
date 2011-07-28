@@ -19,10 +19,15 @@ namespace Simple.Data.Ado
 
         public string Joins { get; set; }
 
-        public CommandBuilder(ISchemaProvider schemaProvider)
+        public CommandBuilder(ISchemaProvider schemaProvider) : this(schemaProvider, -1)
+        {
+        }
+
+        public CommandBuilder(ISchemaProvider schemaProvider, int bulkIndex)
         {
             _text = new StringBuilder();
             _schemaProvider = schemaProvider;
+            _parameterSuffix = (bulkIndex >= 0) ? "_c" + bulkIndex : string.Empty;
         }
 
         public CommandBuilder(string text, ISchemaProvider schemaProvider, int bulkIndex)
@@ -30,6 +35,14 @@ namespace Simple.Data.Ado
             _text = new StringBuilder(text);
             _schemaProvider = schemaProvider;
             _parameterSuffix = (bulkIndex >= 0) ? "_c" + bulkIndex : string.Empty;
+        }
+
+        public ParameterTemplate AddParameter(object value)
+        {
+            string name = _schemaProvider.NameParameter("p" + Interlocked.Increment(ref _number) + _parameterSuffix);
+            var parameterTemplate = new ParameterTemplate(name, value);
+            _parameters.Add(parameterTemplate, value);
+            return parameterTemplate;
         }
 
         public ParameterTemplate AddParameter(object value, Column column)

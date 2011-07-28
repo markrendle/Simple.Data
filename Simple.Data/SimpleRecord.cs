@@ -61,11 +61,14 @@ namespace Simple.Data
                 return false;
             }
 
-            var relatedAdapter = _database.GetAdapter() as IAdapterWithRelation;
-            if (relatedAdapter != null && relatedAdapter.IsValidRelation(_tableName, binder.Name))
+            if (_database != null)
             {
-                result = GetRelatedData(binder, relatedAdapter);
-                return true;
+                var relatedAdapter = _database.GetAdapter() as IAdapterWithRelation;
+                if (relatedAdapter != null && relatedAdapter.IsValidRelation(_tableName, binder.Name))
+                {
+                    result = GetRelatedData(binder, relatedAdapter);
+                    return true;
+                }
             }
             return base.TryGetMember(binder, out result);
         }

@@ -122,6 +122,11 @@ namespace Simple.Data.Mocking
             }
         }
 
+        public override bool IsExpressionFunction(string functionName, params object[] args)
+        {
+            return false;
+        }
+
         private IEnumerable<IDictionary<string, object>> FindAll(string tableName)
         {
             return GetTableElement(tableName).Elements().Select(e => e.AttributesToDictionary());

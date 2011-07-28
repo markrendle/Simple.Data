@@ -41,11 +41,22 @@ namespace Simple.Data.Ado
 
         private IEnumerable<IDbDataParameter> CreateParameters(IDbCommand command, IEnumerable<object> parameterValues)
         {
-            if (!parameterValues.Any(pv => pv != null)) return Enumerable.Empty<IDbDataParameter>();
+            var fixedParameters = _parameters.Where(pt => pt.Type == ParameterType.FixedValue).ToArray();
+            if ((!parameterValues.Any(pv => pv != null)) && fixedParameters.Length == 0) yield break;
 
-            return parameterValues.Any(o => o is IEnumerable && !(o is string)) || parameterValues.Any(o => o is IRange)
-                       ? parameterValues.SelectMany((v,i) => CreateParameters(command, _parameters[i], v))
-                       : parameterValues.Select((v, i) => CreateParameter(command, _parameters[i], v));
+            foreach (var fixedParameter in fixedParameters)
+            {
+                yield return CreateParameter(command, fixedParameter, fixedParameter.FixedValue);
+            }
+            
+            var columnParameters = _parameters.Where(pt => pt.Type != ParameterType.FixedValue).ToArray();
+
+            foreach (var parameter in parameterValues.Any(o => o is IEnumerable && !(o is string)) || parameterValues.Any(o => o is IRange)
+                       ? parameterValues.SelectMany((v, i) => CreateParameters(command, columnParameters[i], v))
+                       : parameterValues.Select((v, i) => CreateParameter(command, columnParameters[i], v)))
+            {
+                yield return parameter;
+            }
         }
 
         private static IEnumerable<IDbDataParameter> CreateParameters(IDbCommand command, ParameterTemplate parameterTemplate, object value)

@@ -9,7 +9,7 @@ namespace Simple.Data.Ado
     public class QueryBuilder
     {
         private readonly IFunctionNameConverter _functionNameConverter = new FunctionNameConverter();
-        private readonly SimpleReferenceFormatter _simpleReferenceFormatter;
+        private SimpleReferenceFormatter _simpleReferenceFormatter;
         private readonly AdoAdapter _adoAdapter;
         private readonly int _bulkIndex;
         private readonly DatabaseSchema _schema;
@@ -32,7 +32,8 @@ namespace Simple.Data.Ado
             _adoAdapter = adoAdapter;
             _bulkIndex = bulkIndex;
             _schema = _adoAdapter.GetSchema();
-            _simpleReferenceFormatter = new SimpleReferenceFormatter(_schema);
+            _commandBuilder = new CommandBuilder(_schema.SchemaProvider, _bulkIndex);
+            _simpleReferenceFormatter = new SimpleReferenceFormatter(_schema, _commandBuilder);
         }
 
         public ICommandBuilder Build(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
@@ -71,7 +72,7 @@ namespace Simple.Data.Ado
 
             _tableName = ObjectName.Parse(query.TableName.Split('.').Last());
             _table = _schema.FindTable(_tableName);
-            _commandBuilder = new CommandBuilder(GetSelectClause(_tableName), _schema.SchemaProvider, _bulkIndex);
+            _commandBuilder.SetText(GetSelectClause(_tableName));
         }
 
         private void HandleJoins()

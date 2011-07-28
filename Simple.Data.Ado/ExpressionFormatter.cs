@@ -15,7 +15,7 @@ namespace Simple.Data.Ado
         {
             _commandBuilder = commandBuilder;
             _schema = schema;
-            _simpleReferenceFormatter = new SimpleReferenceFormatter(_schema);
+            _simpleReferenceFormatter = new SimpleReferenceFormatter(_schema, _commandBuilder);
         }
 
         protected override string FormatObject(object value, object otherOperand)

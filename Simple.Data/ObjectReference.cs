@@ -57,9 +57,9 @@ namespace Simple.Data
             return ReferenceEquals(_owner, null) ? this : _owner.GetTop();
         }
 
-        private DataStrategy FindDatabaseInOwnerHierarchy()
+        protected internal override DataStrategy FindDataStrategyInHierarchy()
         {
-            return _dataStrategy ?? (_owner == null ? null : _owner.FindDatabaseInOwnerHierarchy());
+            return _dataStrategy ?? (_owner == null ? null : _owner.FindDataStrategyInHierarchy());
         }
 
         /// <summary>
@@ -78,12 +78,14 @@ namespace Simple.Data
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
+            if (base.TryInvokeMember(binder, args, out result)) return true;
+
             if (_dataStrategy != null)
             {
                 var table = _dataStrategy.SetMemberAsTable(this);
                 if (table.TryInvokeMember(binder, args, out result)) return true;
             }
-            var dataStrategy = FindDatabaseInOwnerHierarchy();
+            var dataStrategy = FindDataStrategyInHierarchy();
             if (dataStrategy != null)
             {
                 var command = CommandFactory.GetCommandFor(binder.Name);
@@ -91,13 +93,17 @@ namespace Simple.Data
                 {
                     var schema = dataStrategy.SetMemberAsSchema(_owner);
                     var table = schema.GetTable(_name);
-                    result = command.Execute(_dataStrategy ?? _owner._dataStrategy, table, binder, args);
+                    result = command.Execute(dataStrategy, table, binder, args);
                 }
                 else
                 {
-                    if (!FunctionReference.TryCreate(binder.Name, this, out result))
+                    if (dataStrategy.IsExpressionFunction(binder.Name, args))
                     {
                         result = new SimpleExpression(this, new SimpleFunction(binder.Name, args), SimpleExpressionType.Function);
+                    }
+                    else
+                    {
+                        result = new FunctionReference(binder.Name, this, args);
                     }
                 }
                 return true;

@@ -1,16 +1,20 @@
 namespace Simple.Data.Ado
 {
     using System;
+    using System.Collections.Generic;
+    using System.Text;
     using Schema;
 
     class SimpleReferenceFormatter
     {
         private readonly IFunctionNameConverter _functionNameConverter = new FunctionNameConverter();
         private readonly DatabaseSchema _schema;
+        private readonly ICommandBuilder _commandBuilder;
 
-        public SimpleReferenceFormatter(DatabaseSchema schema)
+        public SimpleReferenceFormatter(DatabaseSchema schema, ICommandBuilder commandBuilder)
         {
             _schema = schema;
+            _commandBuilder = commandBuilder;
         }
 
         public string FormatColumnClause(SimpleReference reference)
@@ -65,11 +69,23 @@ namespace Simple.Data.Ado
 
             var sqlName = _functionNameConverter.ConvertToSqlName(functionReference.Name);
             return functionReference.Alias == null
-                       ? string.Format("{0}({1})", sqlName,
-                                       FormatColumnClause(functionReference.Argument))
+                       ? string.Format("{0}({1}{2})", sqlName,
+                                       FormatColumnClause(functionReference.Argument),
+                                       FormatAdditionalArguments(functionReference.AdditionalArguments))
                        : string.Format("{0}({1}) AS {2}", sqlName,
                                        FormatColumnClause(functionReference.Argument),
                                        _schema.QuoteObjectName(functionReference.Alias));
+        }
+
+        private string FormatAdditionalArguments(IEnumerable<object> additionalArguments)
+        {
+            StringBuilder builder = null;
+            foreach (var additionalArgument in additionalArguments)
+            {
+                if (builder == null) builder = new StringBuilder();
+                builder.AppendFormat(",{0}", _commandBuilder.AddParameter(additionalArgument));
+            }
+            return builder != null ? builder.ToString() : string.Empty;
         }
 
         private string TryFormatAsObjectReference(ObjectReference objectReference)

@@ -81,5 +81,10 @@
         {
             throw new NotImplementedException();
         }
+
+        public override bool IsExpressionFunction(string functionName, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

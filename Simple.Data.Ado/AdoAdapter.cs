@@ -149,6 +149,13 @@ namespace Simple.Data.Ado
             }
         }
 
+        public override bool IsExpressionFunction(string functionName, params object[] args)
+        {
+            return functionName.Equals("like", StringComparison.OrdinalIgnoreCase)
+                && args.Length == 1
+                && args[0] is string;
+        }
+
         public override IObservable<IDictionary<string, object>> RunQueryAsObservable(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
         {
             var connection = _connectionProvider.CreateConnection();

@@ -110,5 +110,10 @@ namespace Simple.Data
         internal abstract IDictionary<string, object> FindOne(string getQualifiedName, SimpleExpression criteriaExpression);
         internal abstract int Update(string tableName, IList<IDictionary<string, object>> dataList);
         internal abstract int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IList<string> keyFields);
+
+        internal bool IsExpressionFunction(string name, object[] args)
+        {
+            return GetAdapter().IsExpressionFunction(name, args);
+        }
     }
 }

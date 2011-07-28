@@ -110,5 +110,7 @@ namespace Simple.Data
         }
 
         public abstract IEnumerable<IEnumerable<IDictionary<string, object>>> RunQueries(SimpleQuery[] queries, List<IEnumerable<SimpleQueryClauseBase>> unhandledClauses);
+
+        public abstract bool IsExpressionFunction(string functionName, params object[] args);
     }
 }

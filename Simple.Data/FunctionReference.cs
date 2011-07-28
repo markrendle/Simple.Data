@@ -3,6 +3,8 @@
 namespace Simple.Data
 {
     using System;
+    using System.Linq;
+    using Commands;
 
     public class FunctionReference : SimpleReference, IEquatable<FunctionReference>
     {
@@ -17,22 +19,30 @@ namespace Simple.Data
                                                                              };
         private readonly string _name;
         private readonly SimpleReference _argument;
+        private readonly object[] _additionalArguments;
         private readonly bool _isAggregate;
         private readonly string _alias;
 
-        internal FunctionReference(string name, SimpleReference argument)
+        internal FunctionReference(string name, SimpleReference argument, params object[] additionalArguments)
         {
             _name = name;
             _argument = argument;
+            _additionalArguments = additionalArguments;
             _isAggregate = AggregateFunctionNames.Contains(name.ToLowerInvariant());
         }
 
-        private FunctionReference(string name, SimpleReference argument, bool isAggregate, string alias)
+        private FunctionReference(string name, SimpleReference argument, bool isAggregate, string alias, params object[] additionalArguments)
         {
             _name = name;
             _argument = argument;
             _isAggregate = isAggregate;
             _alias = alias;
+            _additionalArguments = additionalArguments;
+        }
+
+        public IEnumerable<object> AdditionalArguments
+        {
+            get { return _additionalArguments.AsEnumerable(); }
         }
 
         public FunctionReference As(string alias)
@@ -163,6 +173,27 @@ namespace Simple.Data
                 result = (result*397) ^ (_alias != null ? _alias.GetHashCode() : 0);
                 return result;
             }
+        }
+
+        public override bool TryInvokeMember(System.Dynamic.InvokeMemberBinder binder, object[] args, out object result)
+        {
+            if (base.TryInvokeMember(binder, args, out result)) return true;
+
+            var dataStrategy = _argument.FindDataStrategyInHierarchy();
+            if (dataStrategy != null)
+            {
+                if (dataStrategy.IsExpressionFunction(binder.Name, args))
+                {
+                    result = new SimpleExpression(this, new SimpleFunction(binder.Name, args), SimpleExpressionType.Function);
+                }
+                else
+                {
+                    result = new FunctionReference(binder.Name, this, args);
+                }
+                return true;
+            }
+
+            return false;
         }
     }
 }

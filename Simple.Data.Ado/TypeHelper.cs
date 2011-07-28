@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace Simple.Data.Ado
 {
+    using System.Data;
+
     static class TypeHelper
     {
         private static readonly HashSet<Type> BaseTypes = new HashSet<Type>

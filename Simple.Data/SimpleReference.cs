@@ -4,6 +4,9 @@ namespace Simple.Data
 
     public abstract class SimpleReference : DynamicObject
     {
-
+        protected internal virtual DataStrategy FindDataStrategyInHierarchy()
+        {
+            return null;
+        }
     }
 }

@@ -65,6 +65,7 @@
     <Compile Include="NaturalNamingTest.cs" />
     <Compile Include="ProcedureTest.cs" />
     <Compile Include="Query\ExplicitJoinTest.cs" />
+    <Compile Include="Query\FunctionTest.cs" />
     <Compile Include="Query\HavingTest.cs" />
     <Compile Include="Query\QueryTest.cs" />
     <Compile Include="Query\WithCountTest.cs" />

@@ -7,6 +7,7 @@ namespace Simple.Data.Ado
 
     public interface ICommandBuilder
     {
+        ParameterTemplate AddParameter(object value);
         ParameterTemplate AddParameter(object value, Column column);
         void Append(string text);
         IDbCommand GetCommand(IDbConnection connection);
