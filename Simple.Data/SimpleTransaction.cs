@@ -156,7 +156,7 @@ namespace Simple.Data
             return _adapter as Adapter;
         }
 
-        protected override Database GetDatabase()
+        protected internal override Database GetDatabase()
         {
             return _database;
         }

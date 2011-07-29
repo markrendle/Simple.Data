@@ -41,7 +41,7 @@ namespace Simple.Data.Ado
             using (var cn = _adapter.CreateConnection())
             using (var command = cn.CreateCommand())
             {
-                command.CommandText = procedure.QuotedName;
+                command.CommandText = procedure.QualifiedName;
                 command.CommandType = CommandType.StoredProcedure;
                 SetParameters(procedure, command, suppliedParameters);
                 try

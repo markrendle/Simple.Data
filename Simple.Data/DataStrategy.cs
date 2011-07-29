@@ -70,6 +70,13 @@ namespace Simple.Data
             return (DynamicTable)_members[reference.GetName()];
         }
 
+        internal DynamicTable SetMemberAsTable(ObjectReference reference, DynamicTable table)
+        {
+            if (reference == null) throw new ArgumentNullException("reference");
+            _members.TryUpdate(reference.GetName(), table, reference);
+            return (DynamicTable)_members[reference.GetName()];
+        }
+
         internal DynamicSchema SetMemberAsSchema(ObjectReference reference)
         {
             if (reference == null) throw new ArgumentNullException("reference");
@@ -77,7 +84,14 @@ namespace Simple.Data
             return (DynamicSchema)_members[reference.GetName()];
         }
 
-        protected abstract Database GetDatabase();
+        internal DynamicSchema SetMemberAsSchema(ObjectReference reference, DynamicSchema schema)
+        {
+            if (reference == null) throw new ArgumentNullException("reference");
+            _members.TryUpdate(reference.GetName(), schema, reference);
+            return (DynamicSchema)_members[reference.GetName()];
+        }
+
+        protected internal abstract Database GetDatabase();
 
         /// <summary>
         ///  Finds data from the specified "table".

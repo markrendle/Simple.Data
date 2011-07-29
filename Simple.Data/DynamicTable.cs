@@ -76,7 +76,9 @@ namespace Simple.Data
         {
             try
             {
-                return CommandFactory.GetCommandFor(name).CreateDelegate(_dataStrategy, this, binder, args);
+                var command = CommandFactory.GetCommandFor(name);
+                if (command == null) return null;
+                return command.CreateDelegate(_dataStrategy, this, binder, args);
             }
             catch (NotImplementedException)
             {

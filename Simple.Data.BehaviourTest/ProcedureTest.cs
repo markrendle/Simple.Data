@@ -17,7 +17,7 @@ namespace Simple.Data.IntegrationTest
         {
             var mockSchemaProvider = new MockSchemaProvider();
             mockSchemaProvider.SetProcedures(new[] { "dbo", "ProcedureWithParameters" },
-                new[] { "dbo", "ProcedureWithoutParameters"});
+                new[] { "dbo", "ProcedureWithoutParameters"},new[] { "foo", "ProcedureInAnotherSchema"});
             mockSchemaProvider.SetParameters(new[] { "dbo", "ProcedureWithParameters", "@One" },
                                           new[] { "dbo", "ProcedureWithParameters", "@Two" });
             return new Database(new AdoAdapter(new MockConnectionProvider(new MockDbConnection(mockDatabase), mockSchemaProvider)));
@@ -38,7 +38,7 @@ namespace Simple.Data.IntegrationTest
             var db = CreateDatabase(mockDatabase);
             db.ProcedureWithoutParameters();
             Assert.IsNotNull(mockDatabase.Sql);
-            Assert.AreEqual("[ProcedureWithoutParameters]".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual("[dbo].[ProcedureWithoutParameters]".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual(0, mockDatabase.Parameters.Count());
         }
 
@@ -49,7 +49,7 @@ namespace Simple.Data.IntegrationTest
             var db = CreateDatabase(mockDatabase);
             db.ProcedureWithParameters(One: 1, Two: 2);
             Assert.AreEqual(1, mockDatabase.CommandTexts.Count);
-            Assert.AreEqual("[ProcedureWithParameters]".ToLowerInvariant(), mockDatabase.CommandTexts[0].ToLowerInvariant());
+            Assert.AreEqual("[dbo].[ProcedureWithParameters]".ToLowerInvariant(), mockDatabase.CommandTexts[0].ToLowerInvariant());
             Assert.AreEqual(2, mockDatabase.CommandParameters[0].Count);
             Assert.IsTrue(mockDatabase.CommandParameters[0].ContainsKey("@One"));
             Assert.AreEqual(1, mockDatabase.CommandParameters[0]["@One"]);
@@ -64,12 +64,23 @@ namespace Simple.Data.IntegrationTest
             var db = CreateDatabase(mockDatabase);
             db.ProcedureWithParameters(1, 2);
             Assert.AreEqual(1, mockDatabase.CommandTexts.Count);
-            Assert.AreEqual("[ProcedureWithParameters]".ToLowerInvariant(), mockDatabase.CommandTexts[0].ToLowerInvariant());
+            Assert.AreEqual("[dbo].[ProcedureWithParameters]".ToLowerInvariant(), mockDatabase.CommandTexts[0].ToLowerInvariant());
             Assert.AreEqual(2, mockDatabase.CommandParameters[0].Count);
             Assert.IsTrue(mockDatabase.CommandParameters[0].ContainsKey("@One"));
             Assert.AreEqual(1, mockDatabase.CommandParameters[0]["@One"]);
             Assert.IsTrue(mockDatabase.CommandParameters[0].ContainsKey("@Two"));
             Assert.AreEqual(2, mockDatabase.CommandParameters[0]["@Two"]);
+        }
+
+        [Test]
+        public void CallingMethodOnObjectInDatabase_Should_CallProcedure()
+        {
+            var mockDatabase = new MockDatabase();
+            var db = CreateDatabase(mockDatabase);
+            db.foo.ProcedureInAnotherSchema();
+            Assert.IsNotNull(mockDatabase.Sql);
+            Assert.AreEqual("[foo].[ProcedureInAnotherSchema]".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual(0, mockDatabase.Parameters.Count());
         }
     }
 }

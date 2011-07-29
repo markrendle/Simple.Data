@@ -82,9 +82,23 @@ namespace Simple.Data
 
             if (_dataStrategy != null)
             {
-                var table = _dataStrategy.SetMemberAsTable(this);
-                if (table.TryInvokeMember(binder, args, out result)) return true;
+                // Probably a table...
+                var table = new DynamicTable(_name, _dataStrategy);
+                if (table.TryInvokeMember(binder, args, out result))
+                {
+                    _dataStrategy.SetMemberAsTable(this, table);
+                    return true;
+                }
+
+                // Or it could be a schema reference...
+                var schema = new DynamicSchema(_name, _dataStrategy);
+                if (schema.TryInvokeMember(binder, args, out result))
+                {
+                    _dataStrategy.SetMemberAsSchema(this); 
+                    return true;
+                }
             }
+
             var dataStrategy = FindDataStrategyInHierarchy();
             if (dataStrategy != null)
             {

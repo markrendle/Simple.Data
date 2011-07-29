@@ -7,17 +7,19 @@ using System.Text;
 
 namespace Simple.Data
 {
+    using Commands;
+
     public class DynamicSchema : DynamicObject
     {
         private readonly string _name;
-        private readonly DataStrategy _database;
+        private readonly DataStrategy _dataStrategy;
 
         private readonly ConcurrentDictionary<string, dynamic> _tables = new ConcurrentDictionary<string, dynamic>();
 
         public DynamicSchema(string name, DataStrategy dataStrategy)
         {
             _name = name;
-            _database = dataStrategy;
+            _dataStrategy = dataStrategy;
         }
 
         /// <summary>
@@ -31,6 +33,18 @@ namespace Simple.Data
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             return GetDynamicTable(binder.Name, out result);
+        }
+
+        public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
+        {
+            var adapterWithFunctions = _dataStrategy.GetAdapter() as IAdapterWithFunctions;
+            if (adapterWithFunctions != null && adapterWithFunctions.IsValidFunction(binder.Name))
+            {
+                var command = new ExecuteFunctionCommand(_dataStrategy.GetDatabase(), adapterWithFunctions, string.Format("{0}.{1}", _name, binder.Name),
+                                                         binder.ArgumentsToDictionary(args));
+                return command.Execute(out result);
+            }
+            return base.TryInvokeMember(binder, args, out result);
         }
 
         public DynamicTable this[string name]
@@ -58,7 +72,7 @@ namespace Simple.Data
 
         private DynamicTable CreateDynamicTable(string name)
         {
-            return new DynamicTable(name, _database, this);
+            return new DynamicTable(name, _dataStrategy, this);
         }
     }
 }
