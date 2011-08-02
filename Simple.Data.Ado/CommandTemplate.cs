@@ -43,6 +43,7 @@ namespace Simple.Data.Ado
         {
             var fixedParameters = _parameters.Where(pt => pt.Type == ParameterType.FixedValue).ToArray();
             if ((!parameterValues.Any(pv => pv != null)) && fixedParameters.Length == 0) yield break;
+            parameterValues = parameterValues.Where(pv => pv != null);
 
             foreach (var fixedParameter in fixedParameters)
             {

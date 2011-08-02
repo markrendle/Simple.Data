@@ -32,6 +32,15 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestFindWithTwoCriteriasOneBeingNull()
+        {
+            _db.Users.Find(_db.Users.Id == 1 || _db.Users.Id == null);
+            GeneratedSqlIs("select [dbo].[users].* from [dbo].[users] where ([dbo].[users].[id] = @p1 OR [dbo].[users].[id] IS NULL)");
+            Parameter(0).Is(1);
+            Parameter(1).DoesNotExist();
+        }
+
+        [Test]
         public void TestFindNotEqualWithInt32()
         {
             _db.Users.Find(_db.Users.Id != 1);
