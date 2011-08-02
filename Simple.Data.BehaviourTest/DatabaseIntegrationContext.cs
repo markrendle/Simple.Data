@@ -37,6 +37,9 @@ namespace Simple.Data.IntegrationTest
             dynamic obj = new ExpandoObject();
             obj.Is = new Action<object>(v => Assert.AreEqual(v, _mockDatabase.Parameters[index]));
             obj.IsDBNull = new Action(() => Assert.AreEqual(DBNull.Value, _mockDatabase.Parameters[index]));
+            obj.Exists = new Action(()=> Assert.DoesNotThrow(() => _mockDatabase.Parameters[index].ToString()));
+            obj.DoesNotExist = new Action(
+                    () => Assert.Throws<IndexOutOfRangeException>(() => _mockDatabase.Parameters[index].ToString()));
             return obj;
         }
 
