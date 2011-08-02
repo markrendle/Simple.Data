@@ -44,6 +44,8 @@ BEGIN
 	DROP TABLE [dbo].[Images];
 	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Blobs]') AND type in (N'U'))
 	DROP TABLE [dbo].[Blobs]
+	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EnumTest]') AND type in (N'U'))
+	DROP TABLE [dbo].[EnumTest]
 
 	CREATE TABLE [dbo].[Users] (
 		[Id]       INT            IDENTITY (1, 1) NOT NULL,
@@ -110,6 +112,14 @@ BEGIN
 
 	ALTER TABLE [dbo].[Blobs]
 		ADD CONSTRAINT [PK_Blobs] PRIMARY KEY CLUSTERED ([Id] ASC)	
+
+	CREATE TABLE [dbo].[EnumTest](
+		[Id] [int] IDENTITY (1, 1) NOT NULL,
+		[Flag] [int] NOT NULL
+	)
+
+	ALTER TABLE [dbo].[EnumTest]
+		ADD CONSTRAINT [PK_EnumTest] PRIMARY KEY CLUSTERED ([Id] ASC)	
 
 	BEGIN TRANSACTION
 	SET IDENTITY_INSERT [dbo].[Customers] ON

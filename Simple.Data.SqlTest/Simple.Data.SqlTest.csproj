@@ -60,6 +60,7 @@
     <Compile Include="DatabaseHelper.cs" />
     <Compile Include="DatabaseOpenerTests.cs" />
     <Compile Include="DbImage.cs" />
+    <Compile Include="EnumTest.cs" />
     <Compile Include="InsertTests.cs" />
     <Compile Include="NaturalJoinTest.cs" />
     <Compile Include="ProcedureTest.cs" />

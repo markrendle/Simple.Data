@@ -87,6 +87,7 @@ namespace Simple.Data.Ado
         {
             if (value == null) return DBNull.Value;
             if (TypeHelper.IsKnownType(value.GetType())) return value;
+            if (value is Enum) return value;
             var asString = value.ToString();
             if (asString != value.GetType().FullName) return asString;
             return value;
