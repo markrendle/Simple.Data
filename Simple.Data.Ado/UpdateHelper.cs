@@ -37,10 +37,15 @@ namespace Simple.Data.Ado
         {
             var table = _schema.FindTable(tableName);
             var setClause = string.Join(", ",
-                data.Select(
-                    kvp =>
-                    string.Format("{0} = {1}", table.FindColumn(kvp.Key).QuotedName, _commandBuilder.AddParameter(kvp.Value, table.FindColumn(kvp.Key)).Name)));
+                data.Where(kvp => table.HasColumn(kvp.Key))
+                .Select(kvp => CreateColumnUpdateClause(kvp.Key, kvp.Value, table)));
             return string.Format("update {0} set {1}", table.QualifiedName, setClause);
+        }
+
+        private string CreateColumnUpdateClause(string columnName, object value, Table table)
+        {
+            var column = table.FindColumn(columnName);
+            return string.Format("{0} = {1}", column.QuotedName, _commandBuilder.AddParameter(value, column).Name);
         }
     }
 }

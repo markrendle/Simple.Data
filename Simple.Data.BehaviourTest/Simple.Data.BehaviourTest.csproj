@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DatabaseIntegrationContext.cs" />
+    <Compile Include="DeleteTest.cs" />
     <Compile Include="ExceptionsTesting.cs" />
     <Compile Include="FindTest.cs" />
     <Compile Include="InsertTest.cs" />
@@ -71,7 +72,7 @@
     <Compile Include="Query\WithCountTest.cs" />
     <Compile Include="RangeAndArrayFindTest.cs" />
     <Compile Include="TransactionTest.cs" />
-    <Compile Include="DatabaseTest.cs" />
+    <Compile Include="UpdateTest.cs" />
     <Compile Include="NameResolutionTests.cs" />
     <Compile Include="NaturalJoinTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
