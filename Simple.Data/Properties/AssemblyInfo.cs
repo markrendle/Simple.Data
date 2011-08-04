@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Security;
+using System.Security.Permissions;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -18,3 +20,6 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("Simple.Data.IntegrationTest")]
 [assembly: InternalsVisibleTo("Simple.Data.Mocking")]
 [assembly: InternalsVisibleTo("Simple.Data.Mocking.Test")]
+
+[assembly: SecurityRules(SecurityRuleSet.Level2, SkipVerificationInFullTrust = true)]
+[assembly: AllowPartiallyTrustedCallers]

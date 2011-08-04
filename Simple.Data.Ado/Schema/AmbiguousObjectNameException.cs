@@ -3,46 +3,48 @@ using System.Runtime.Serialization;
 
 namespace Simple.Data.Ado.Schema
 {
+    using System.Security;
+
     [Serializable]
+    [SecurityCritical]
     public class AmbiguousObjectNameException : Exception
     {
-        private readonly string _name;
-
         public AmbiguousObjectNameException()
         {
         }
 
         public AmbiguousObjectNameException(string name)
         {
-            _name = name;
+            Name = name;
         }
 
         public AmbiguousObjectNameException(string name, string message) : base(message)
         {
-            _name = name;
+            Name = name;
         }
 
         public AmbiguousObjectNameException(string name, string message, Exception inner) : base(message, inner)
         {
-            _name = name;
+            Name = name;
         }
 
         protected AmbiguousObjectNameException(
             SerializationInfo info,
             StreamingContext context) : base(info, context)
         {
-            _name = info.GetString("_name");
         }
 
         public string Name
         {
-            get { return _name; }
+            get { return Data.Contains("Name") ?  Data["Name"].ToString() : null; }
+            private set { Data["Name"] = value; }
         }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-            info.AddValue("_name", _name);
-        }
+        //[SecurityCritical]
+        //public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        //{
+        //    base.GetObjectData(info, context);
+        //    info.AddValue("Name", Name);
+        //}
     }
 }

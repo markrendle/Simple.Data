@@ -6,46 +6,41 @@ using System.Text;
 
 namespace Simple.Data
 {
-    [Serializable]
-    public class UnresolvableObjectException : Exception
-    {
-        private readonly string _objectName;
+    using System.Security;
 
+    [Serializable]
+    public sealed class UnresolvableObjectException : Exception
+    {
         public UnresolvableObjectException()
         {
         }
 
         public UnresolvableObjectException(string objectName)
         {
-            _objectName = objectName;
+            ObjectName = objectName;
         }
 
         public UnresolvableObjectException(string objectName, string message) : base(message)
         {
-            _objectName = objectName;
+            ObjectName = objectName;
         }
 
         public UnresolvableObjectException(string objectName, string message, Exception inner) : base(message, inner)
         {
-            _objectName = objectName;
+            ObjectName = objectName;
         }
 
-        protected UnresolvableObjectException(
+        private UnresolvableObjectException(
             SerializationInfo info,
             StreamingContext context) : base(info, context)
         {
-            _objectName = info.GetString("_objectName");
+            ObjectName = info.GetString("ObjectName");
         }
 
         public string ObjectName
         {
-            get { return _objectName; }
-        }
-
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-            info.AddValue("_objectName", _objectName);
+            get { return Data.Contains("ObjectName") ? Data["ObjectName"].ToString() : null; }
+            private set { Data["ObjectName"] = value; }
         }
     }
 }

@@ -8,11 +8,13 @@ using System.Text;
 
 namespace Simple.Data.Ado
 {
+    using System.Security;
+
     public static class TraceHelper
     {
         public static void WriteTrace(this IDbCommand command)
         {
-            if (Trace.Listeners.Count == 0) return;
+//            if (Trace.Listeners.Count == 0) return;
             try
             {
                 var str = new StringBuilder();

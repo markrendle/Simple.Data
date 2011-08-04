@@ -8,6 +8,8 @@ using System.Text;
 
 namespace Simple.Data
 {
+    using System.Diagnostics;
+
     class MefHelper : Composer
     {
         public override T Compose<T>()
@@ -23,11 +25,19 @@ namespace Simple.Data
 
         public override T Compose<T>(string contractName)
         {
-            using (var container = CreateContainer())
+            try
             {
-                var export = container.GetExport<T>(contractName);
-                if (export == null) throw new ArgumentException("Unrecognised file.");
-                return export.Value;
+                using (var container = CreateContainer())
+                {
+                    var export = container.GetExport<T>(contractName);
+                    if (export == null) throw new ArgumentException("Unrecognised file.");
+                    return export.Value;
+                }
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                Trace.WriteLine(ex.Message);
+                throw;
             }
         }
 
