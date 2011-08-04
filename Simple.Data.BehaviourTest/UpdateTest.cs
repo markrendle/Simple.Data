@@ -10,12 +10,20 @@ namespace Simple.Data.IntegrationTest
     {
         protected override void SetSchema(MockSchemaProvider schemaProvider)
         {
-            schemaProvider.SetTables(new[] { "dbo", "Users", "BASE TABLE" });
+            schemaProvider.SetTables(new[] { "dbo", "Users", "BASE TABLE" },
+                                     new[] {"dbo", "USER_TABLE", "BASE TABLE"});
+
             schemaProvider.SetColumns(new object[] { "dbo", "Users", "Id", true },
                                       new[] { "dbo", "Users", "Name" },
                                       new[] { "dbo", "Users", "Password" },
-                                      new[] { "dbo", "Users", "Age" });
-            schemaProvider.SetPrimaryKeys(new object[] { "dbo", "Users", "Id", 0 });
+                                      new[] { "dbo", "Users", "Age" },
+                                      new object[] { "dbo", "USER_TABLE", "ID", true },
+                                      new[] { "dbo", "USER_TABLE", "NAME" },
+                                      new[] { "dbo", "USER_TABLE", "PASSWORD" },
+                                      new[] { "dbo", "USER_TABLE", "AGE" });
+
+            schemaProvider.SetPrimaryKeys(new object[] { "dbo", "Users", "Id", 0 },
+                                          new object[] { "dbo", "USER_TABLE", "ID", 0 });
         }
 
         [Test]
@@ -104,6 +112,24 @@ namespace Simple.Data.IntegrationTest
             _db.Users.Update(user);
             GeneratedSqlIs(
                 "update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4");
+            Parameter(0).Is("Steve");
+            Parameter(1).IsDBNull();
+            Parameter(2).Is(50);
+            Parameter(3).Is(1);
+        }
+
+        [Test]
+        public void TestUpdateWithStaticObjectWithShoutyCase()
+        {
+            var user = new User
+            {
+                Id = 1,
+                Name = "Steve",
+                Age = 50
+            };
+            _db.UserTable.Update(user);
+            GeneratedSqlIs(
+                "update [dbo].[USER_TABLE] set [NAME] = @p1, [PASSWORD] = @p2, [AGE] = @p3 where [dbo].[USER_TABLE].[ID] = @p4");
             Parameter(0).Is("Steve");
             Parameter(1).IsDBNull();
             Parameter(2).Is(50);

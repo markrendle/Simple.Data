@@ -52,13 +52,15 @@ namespace Simple.Data.Commands
 
             foreach (var keyFieldName in keyFieldNames)
             {
-                if (!record.ContainsKey(keyFieldName))
+                var name = keyFieldName;
+                var keyValuePair = record.Where(kvp => kvp.Key.Homogenize().Equals(name.Homogenize())).SingleOrDefault();
+                if (string.IsNullOrWhiteSpace(keyValuePair.Key))
                 {
                     throw new InvalidOperationException("Key field value not set.");
                 }
 
-                criteria.Add(keyFieldName, record[keyFieldName]);
-                record.Remove(keyFieldName);
+                criteria.Add(keyFieldName, keyValuePair.Value);
+                record.Remove(keyValuePair);
             }
             return criteria;
         }
