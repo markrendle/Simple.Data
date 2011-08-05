@@ -119,7 +119,7 @@ namespace Simple.Data.Mocking.Ado
 
         public override void Prepare()
         {
-            throw new NotImplementedException();
+            // NO-OP
         }
 
         /// <summary>

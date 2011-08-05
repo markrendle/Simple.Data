@@ -51,31 +51,6 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
-        public void TestInsertWithStaticTypeObjectList()
-        {
-            var users = new[] { new User { Name = "Steve", Age = 50 } };
-            _db.Users.Insert(users);
-            GeneratedSqlIs("insert into [dbo].[Users] ([Name],[Password],[Age]) values (@p0,@p1,@p2)");
-            Parameter(0).Is("Steve");
-            Parameter(1).Is(DBNull.Value);
-            Parameter(2).Is(50);
-        }
-
-        [Test]
-        public void TestInsertWithDynamicObjectList()
-        {
-            dynamic person = new ExpandoObject();
-            person.Name = "Phil";
-            person.Age = 42;
-            var people = new[] { person };
-            _db.Users.Insert(people);
-            GeneratedSqlIs("insert into [dbo].[Users] ([Name],[Password],[Age]) values (@p0,@p1,@p2)");
-            Parameter(0).Is("Phil");
-            Parameter(1).Is(DBNull.Value);
-            Parameter(2).Is(42);
-        }
-
-        [Test]
 // ReSharper disable InconsistentNaming
         public void TestThatInsertUsesDBNull()
 // ReSharper restore InconsistentNaming

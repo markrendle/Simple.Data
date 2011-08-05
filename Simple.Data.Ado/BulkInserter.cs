@@ -21,10 +21,14 @@
                              ? new BulkInserterHelper(adapter, data, table, columns)
                              : new BulkInserterTransactionHelper(adapter, data, table, columns, transaction);
 
-            var identityFunction = adapter.GetIdentityFunction();
-            if (!string.IsNullOrWhiteSpace(identityFunction))
+            var identityColumn = table.Columns.FirstOrDefault(col => col.IsIdentity);
+            if (identityColumn != null)
             {
-               return InsertRowsAndReturn(adapter, identityFunction, helper, insertSql, table);
+                var identityFunction = adapter.GetIdentityFunction();
+                if (!string.IsNullOrWhiteSpace(identityFunction))
+                {
+                    return InsertRowsAndReturn(adapter, identityFunction, helper, insertSql, table);
+                }
             }
 
             helper.InsertRowsWithoutFetchBack(insertSql);

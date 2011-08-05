@@ -28,6 +28,7 @@ namespace Simple.Data.Ado
                 using (var insertCommand = new CommandHelper(Adapter.SchemaProvider).Create(connection, insertSql))
                 {
                     connection.Open();
+                    //insertCommand.Prepare();
                     foreach (var row in Data)
                     {
                         InsertRow(row, insertCommand);
@@ -45,6 +46,8 @@ namespace Simple.Data.Ado
                 {
                     selectCommand.CommandText = selectSql;
                     connection.Open();
+                    //insertCommand.Prepare();
+                    //selectCommand.Prepare();
                     return Data.Select(row => InsertRow(row, insertCommand, selectCommand)).ToList();
                 }
             }
@@ -59,6 +62,7 @@ namespace Simple.Data.Ado
                 using (var command = new CommandHelper(Adapter.SchemaProvider).Create(connection, insertSql))
                 {
                     connection.Open();
+                    //command.Prepare();
                     return Data.Select(row => InsertRowAndSelect(row, command)).ToList();
                 }
             }
