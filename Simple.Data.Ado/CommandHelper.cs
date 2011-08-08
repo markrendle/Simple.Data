@@ -60,6 +60,38 @@ namespace Simple.Data.Ado
             return sqlBuilder.ToString();
         }
 
+        private string PrepareInsertCommand(string sql, IDbCommand command, IEnumerable<Column> columns)
+        {
+            var columnLookup = columns.ToDictionary(c => c.QuotedName, c => c);
+            if (columnLookup.Count == 0) return PrepareCommand(sql, command);
+
+            int openParenIndex = sql.IndexOf('(');
+            int closeParenLength = sql.IndexOf(')') - openParenIndex;
+            var columnNameList = sql.Substring(openParenIndex, closeParenLength).Trim('(', ')').Split(',');
+            int index = 0;
+            var sqlBuilder = new StringBuilder();
+            foreach (var c in sql)
+            {
+                if (c == '?')
+                {
+                    var parameter = command.CreateParameter();
+                    parameter.ParameterName = _schemaProvider.NameParameter("p" + index);
+                    var column = columnLookup[columnNameList[index]];
+                    parameter.DbType = column.DbType;
+                    parameter.Size = column.MaxLength;
+                    command.Parameters.Add(parameter);
+                    
+                    sqlBuilder.Append(parameter.ParameterName);
+                    index++;
+                }
+                else
+                {
+                    sqlBuilder.Append(c);
+                }
+            }
+            return sqlBuilder.ToString();
+        }
+
         public static void SetParameterValues(IDbCommand command, IList<object> values)
         {
             int index = 0;
@@ -97,6 +129,14 @@ namespace Simple.Data.Ado
         {
             var command = connection.CreateCommand();
             command.CommandText = PrepareCommand(insertSql, command);
+            return command;
+
+        }
+
+        public IDbCommand CreateInsert(IDbConnection connection, string insertSql, IEnumerable<Column> columns)
+        {
+            var command = connection.CreateCommand();
+            command.CommandText = PrepareInsertCommand(insertSql, command, columns);
             return command;
 
         }

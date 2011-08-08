@@ -1,8 +1,10 @@
 namespace Simple.Data.Ado
 {
+    using System;
     using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
+    using System.Diagnostics;
     using System.Linq;
     using Schema;
 
@@ -25,10 +27,11 @@ namespace Simple.Data.Ado
         {
             using (var connection = Adapter.CreateConnection())
             {
-                using (var insertCommand = new CommandHelper(Adapter.SchemaProvider).Create(connection, insertSql))
+                using (var insertCommand = new CommandHelper(Adapter.SchemaProvider).CreateInsert(connection, insertSql, _columns))
                 {
                     connection.Open();
-                    //insertCommand.Prepare();
+                    TryPrepare(insertCommand);
+                    insertCommand.Prepare();
                     foreach (var row in Data)
                     {
                         InsertRow(row, insertCommand);
@@ -41,13 +44,12 @@ namespace Simple.Data.Ado
         {
             using (var connection = Adapter.CreateConnection())
             {
-                using (var insertCommand = new CommandHelper(Adapter.SchemaProvider).Create(connection, insertSql))
+                using (var insertCommand = new CommandHelper(Adapter.SchemaProvider).CreateInsert(connection, insertSql, _columns))
                 using (var selectCommand = connection.CreateCommand())
                 {
                     selectCommand.CommandText = selectSql;
                     connection.Open();
-                    //insertCommand.Prepare();
-                    //selectCommand.Prepare();
+                    TryPrepare(insertCommand, selectCommand);
                     return Data.Select(row => InsertRow(row, insertCommand, selectCommand)).ToList();
                 }
             }
@@ -59,10 +61,10 @@ namespace Simple.Data.Ado
 
             using (var connection = Adapter.CreateConnection())
             {
-                using (var command = new CommandHelper(Adapter.SchemaProvider).Create(connection, insertSql))
+                using (var command = new CommandHelper(Adapter.SchemaProvider).CreateInsert(connection, insertSql, _columns))
                 {
                     connection.Open();
-                    //command.Prepare();
+                    TryPrepare(command);
                     return Data.Select(row => InsertRowAndSelect(row, command)).ToList();
                 }
             }
@@ -150,6 +152,21 @@ namespace Simple.Data.Ado
             catch (DbException ex)
             {
                 throw new AdoAdapterException(ex.Message, command);
+            }
+        }
+
+        private static void TryPrepare(params IDbCommand[] commands)
+        {
+            foreach (var command in commands)
+            {
+                try
+                {
+                    command.Prepare();
+                }
+                catch (InvalidOperationException)
+                {
+                    Trace.TraceWarning("Could not prepare command.");
+                }
             }
         }
     }

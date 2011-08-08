@@ -152,6 +152,11 @@ namespace Simple.Data
             return new SimpleQuery(this, _clauses.ReplaceOrAppend(new TakeClause(take)));
         }
 
+        public SimpleQuery Distinct()
+        {
+            return new SimpleQuery(this, _clauses.ReplaceOrAppend(new DistinctClause()));
+        }
+
         public SimpleQuery ClearTake()
         {
             return new SimpleQuery(this, _clauses.Where(c => !(c is TakeClause)).ToArray());

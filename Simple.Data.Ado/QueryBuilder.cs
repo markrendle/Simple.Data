@@ -181,7 +181,10 @@ namespace Simple.Data.Ado
         private string GetSelectClause(ObjectName tableName)
         {
             var table = _schema.FindTable(tableName);
-            return string.Format("select {0} from {1}",
+            string template = _query.Clauses.OfType<DistinctClause>().Any()
+                                  ? "select distinct {0} from {1}"
+                                  : "select {0} from {1}";
+            return string.Format(template,
                 GetColumnsClause(table),
                 table.QualifiedName);
         }

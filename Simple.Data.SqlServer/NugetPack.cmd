@@ -1,1 +1,1 @@
-nuget pack -sym Simple.Data.SqlServer.csproj
+nuget pack -sym Simple.Data.SqlServer.csproj -Properties Configuration=Release
