@@ -32,5 +32,17 @@ namespace Simple.Data.SqlCe40Test
             var products = db.Products.FindAll(db.Products.CategoryId == 4);
             Assert.Pass();
         }
+
+        [Test]
+        public void DistinctShouldReturnDistinctList()
+        {
+            var db = Database.OpenFile(DatabasePath);
+            List<string> countries = db.Customers.All()
+                .Select(db.Customers.Country)
+                .Distinct()
+                .ToScalarList<string>();
+
+            Assert.AreEqual(countries.Distinct().Count(), countries.Count);
+        }
     }
 }
