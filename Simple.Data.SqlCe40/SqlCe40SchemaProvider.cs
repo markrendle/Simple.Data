@@ -44,6 +44,7 @@ namespace Simple.Data.SqlCe40
                                                                                   {"nvarchar", DbType.String},
                                                                                   {"nchar", DbType.StringFixedLength},
                                                                                   {"xml", DbType.Xml},
+                                                                                  {"image", DbType.Binary},
                                                                               }; 
         
         private readonly IConnectionProvider _connectionProvider;
