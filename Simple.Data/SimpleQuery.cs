@@ -1,24 +1,23 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using Microsoft.CSharp.RuntimeBinder;
-using Simple.Data.Extensions;
-
-namespace Simple.Data
+﻿namespace Simple.Data
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Dynamic;
+    using System.Linq;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
+    using Extensions;
+    using Microsoft.CSharp.RuntimeBinder;
 
     public class SimpleQuery : DynamicObject, IEnumerable
     {
-        private DataStrategy _dataStrategy;
         private readonly Adapter _adapter;
-        private readonly string _tableName;
 
         private readonly SimpleQueryClauseBase[] _clauses;
+        private readonly string _tableName;
+        private Func<IObservable<dynamic>> _asObservableImplementation;
+        private DataStrategy _dataStrategy;
         private JoinClause _tempJoinWaitingForOn;
 
         public SimpleQuery(Adapter adapter, string tableName)
@@ -29,7 +28,7 @@ namespace Simple.Data
         }
 
         private SimpleQuery(SimpleQuery source,
-            SimpleQueryClauseBase[] clauses)
+                            SimpleQueryClauseBase[] clauses)
         {
             _adapter = source._adapter;
             _tableName = source.TableName;
@@ -37,8 +36,8 @@ namespace Simple.Data
         }
 
         private SimpleQuery(SimpleQuery source,
-            string tableName,
-            SimpleQueryClauseBase[] clauses)
+                            string tableName,
+                            SimpleQueryClauseBase[] clauses)
         {
             _adapter = source._adapter;
             _tableName = tableName;
@@ -49,6 +48,20 @@ namespace Simple.Data
         {
             get { return _clauses; }
         }
+
+        public string TableName
+        {
+            get { return _tableName; }
+        }
+
+        #region IEnumerable Members
+
+        public IEnumerator GetEnumerator()
+        {
+            return Run().GetEnumerator();
+        }
+
+        #endregion
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
@@ -72,11 +85,6 @@ namespace Simple.Data
             return true;
         }
 
-        public string TableName
-        {
-            get { return _tableName; }
-        }
-
         /// <summary>
         /// Selects only the specified columns.
         /// </summary>
@@ -84,7 +92,14 @@ namespace Simple.Data
         /// <returns>A new <see cref="SimpleQuery"/> which will select only the specified columns.</returns>
         public SimpleQuery Select(params SimpleReference[] columns)
         {
+            ThrowIfThereIsAlreadyASelectClause();
             return new SimpleQuery(this, _clauses.Append(new SelectClause(columns)));
+        }
+
+        private void ThrowIfThereIsAlreadyASelectClause()
+        {
+            if (_clauses.OfType<SelectClause>().Any())
+                throw new InvalidOperationException("Query already contains a Select clause.");
         }
 
         /// <summary>
@@ -99,7 +114,8 @@ namespace Simple.Data
 
         public SimpleQuery ReplaceWhere(SimpleExpression criteria)
         {
-            return new SimpleQuery(this, _clauses.Where(c => !(c is WhereClause)).ToArray().Append(new WhereClause(criteria)));
+            return new SimpleQuery(this,
+                                   _clauses.Where(c => !(c is WhereClause)).ToArray().Append(new WhereClause(criteria)));
         }
 
         public SimpleQuery Where(SimpleExpression criteria)
@@ -119,12 +135,17 @@ namespace Simple.Data
 
         public SimpleQuery ThenBy(ObjectReference reference)
         {
-            if (!_clauses.OfType<OrderByClause>().Any())
-            {
-                throw new InvalidOperationException("ThenBy requires an existing OrderBy");
-            }
+            ThrowIfNoOrderByClause("ThenBy requires an existing OrderBy");
 
             return new SimpleQuery(this, _clauses.Append(new OrderByClause(reference)));
+        }
+
+        private void ThrowIfNoOrderByClause(string message)
+        {
+            if (!_clauses.OfType<OrderByClause>().Any())
+            {
+                throw new InvalidOperationException(message);
+            }
         }
 
         public SimpleQuery ThenByDescending(ObjectReference reference)
@@ -169,22 +190,18 @@ namespace Simple.Data
                 return RunWithCount();
             }
             IEnumerable<SimpleQueryClauseBase> unhandledClauses;
-            return _adapter.RunQuery(this, out unhandledClauses).Select(d => new SimpleRecord(d, _tableName, _dataStrategy));
+            return
+                _adapter.RunQuery(this, out unhandledClauses).Select(d => new SimpleRecord(d, _tableName, _dataStrategy));
         }
 
         private IEnumerable<dynamic> RunWithCount()
         {
             var withCountClause = _clauses.OfType<WithCountClause>().Single();
-            var countQuery = this.ClearSkip().ClearTake().Select(new CountSpecialReference());
+            var countQuery = ClearSkip().ClearTake().Select(new CountSpecialReference());
             var unhandledClausesList = new List<IEnumerable<SimpleQueryClauseBase>>();
             var results = _adapter.RunQueries(new[] { countQuery, this }, unhandledClausesList).ToList();
-            withCountClause.SetCount((int)results[0].Single().First().Value);
+            withCountClause.SetCount((int) results[0].Single().First().Value);
             return results[1].Select(d => new SimpleRecord(d, _tableName, _dataStrategy));
-        }
-
-        public IEnumerator GetEnumerator()
-        {
-            return Run().GetEnumerator();
         }
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
@@ -205,7 +222,7 @@ namespace Simple.Data
             }
             if (binder.Name.Equals("join", StringComparison.OrdinalIgnoreCase))
             {
-                result = args.Length == 1 ? (object)Join(args[0] as ObjectReference) : ParseJoin(binder, args);
+                result = args.Length == 1 ? Join(args[0] as ObjectReference) : ParseJoin(binder, args);
                 return true;
             }
             if (binder.Name.Equals("on", StringComparison.OrdinalIgnoreCase))
@@ -244,7 +261,8 @@ namespace Simple.Data
 
         public SimpleQuery On(SimpleExpression joinExpression)
         {
-            if (_tempJoinWaitingForOn == null) throw new InvalidOperationException("Call to On must be preceded by call to Join.");
+            if (_tempJoinWaitingForOn == null)
+                throw new InvalidOperationException("Call to On must be preceded by call to Join.");
             return AddNewJoin(new JoinClause(_tempJoinWaitingForOn.Table, joinExpression));
         }
 
@@ -264,7 +282,8 @@ namespace Simple.Data
 
             if (binder.CallInfo.ArgumentNames.Any(s => !string.IsNullOrWhiteSpace(s)))
             {
-                joinExpression = ExpressionHelper.CriteriaDictionaryToExpression(tableToJoin, binder.NamedArgumentsToDictionary(args));
+                joinExpression = ExpressionHelper.CriteriaDictionaryToExpression(tableToJoin,
+                                                                                 binder.NamedArgumentsToDictionary(args));
             }
             else if (args.Length == 2)
             {
@@ -278,9 +297,10 @@ namespace Simple.Data
             return AddNewJoin(newJoin);
         }
 
-        private SimpleQuery ParseOn(InvokeMemberBinder binder, object[] args)
+        private SimpleQuery ParseOn(InvokeMemberBinder binder, IEnumerable<object> args)
         {
-            if (_tempJoinWaitingForOn == null) throw new InvalidOperationException("Call to On must be preceded by call to Join.");
+            if (_tempJoinWaitingForOn == null)
+                throw new InvalidOperationException("Call to On must be preceded by call to Join.");
             var joinExpression = ExpressionHelper.CriteriaDictionaryToExpression(_tempJoinWaitingForOn.Table,
                                                                                  binder.NamedArgumentsToDictionary(args));
             return new SimpleQuery(this, _clauses.Append(new JoinClause(_tempJoinWaitingForOn.Table, joinExpression)));
@@ -315,7 +335,7 @@ namespace Simple.Data
 
         public IEnumerable<T> Cast<T>()
         {
-            return Run().Select(item => (T)item);
+            return Run().Select(item => (T) item);
         }
 
         public IEnumerable<T> OfType<T>()
@@ -326,7 +346,7 @@ namespace Simple.Data
                 T cast;
                 try
                 {
-                    cast = (T)(object)item;
+                    cast = (T) (object) item;
                 }
                 catch (RuntimeBinderException)
                 {
@@ -352,7 +372,7 @@ namespace Simple.Data
 
         public dynamic ToScalar()
         {
-            var data = Run().OfType<IDictionary<string,object>>().ToArray();
+            var data = Run().OfType<IDictionary<string, object>>().ToArray();
             if (data.Length == 0)
             {
                 throw new SimpleDataException("Query returned no rows; cannot return scalar value.");
@@ -408,7 +428,7 @@ namespace Simple.Data
 
         private IEnumerable<dynamic> ToScalarEnumerable()
         {
-            return Run().OfType<IDictionary<string,object>>().Select(dict => dict.Values.FirstOrDefault());
+            return Run().OfType<IDictionary<string, object>>().Select(dict => dict.Values.FirstOrDefault());
         }
 
         public IList<T> ToList<T>()
@@ -493,7 +513,7 @@ namespace Simple.Data
 
         public int Count()
         {
-            return this.Select(new CountSpecialReference()).ToScalar();
+            return Select(new CountSpecialReference()).ToScalar();
         }
 
         /// <summary>
@@ -502,7 +522,7 @@ namespace Simple.Data
         /// <returns><c>true</c> if the query matches any record; otherwise, <c>false</c>.</returns>
         public bool Exists()
         {
-            return this.Select(new ExistsSpecialReference()).Run().Count() == 1;
+            return Select(new ExistsSpecialReference()).Run().Count() == 1;
         }
 
         /// <summary>
@@ -536,13 +556,12 @@ namespace Simple.Data
             }
             catch (NotImplementedException)
             {
-                _asObservableImplementation = () => Run().Select(d => new SimpleRecord(d, _tableName, _dataStrategy)).ToObservable();
+                _asObservableImplementation =
+                    () => Run().Select(d => new SimpleRecord(d, _tableName, _dataStrategy)).ToObservable();
             }
 
             return _asObservableImplementation();
         }
-
-        private Func<IObservable<dynamic>> _asObservableImplementation;
 
         public Task<IEnumerable<dynamic>> RunTask()
         {
