@@ -189,7 +189,7 @@ namespace Simple.Data.Ado
         }
 
        
-        public override int UpdateMany(string tableName, IList<IDictionary<string, object>> data, IEnumerable<string> criteriaFieldNames)
+        public override int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data, IEnumerable<string> criteriaFieldNames)
         {
             var bulkUpdater = this.ProviderHelper.GetCustomProvider<IBulkUpdater>(this.ConnectionProvider) ?? new BulkUpdater();
             return bulkUpdater.Update(this, tableName, data.ToList(), criteriaFieldNames, null);
@@ -205,12 +205,6 @@ namespace Simple.Data.Ado
         {
             var bulkUpdater = this.ProviderHelper.GetCustomProvider<IBulkUpdater>(this.ConnectionProvider) ?? new BulkUpdater();
             return bulkUpdater.Update(this, tableName, data.ToList(), ((AdoAdapterTransaction)transaction).Transaction);
-        }
-
-        public override int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data, IList<string> keyFields)
-        {
-            var bulkUpdater = this.ProviderHelper.GetCustomProvider<IBulkUpdater>(this.ConnectionProvider) ?? new BulkUpdater();
-            return bulkUpdater.Update(this, tableName, data.ToList(), null);
         }
 
         public int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data, IAdapterTransaction transaction, IList<string> keyFields)

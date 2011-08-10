@@ -55,14 +55,7 @@ namespace Simple.Data
 
         internal override IDictionary<string, object> FindOne(string tableName, SimpleExpression criteria)
         {
-            try
-            {
-                return _adapter.FindOne(tableName, criteria);
-            }
-            catch (NotImplementedException)
-            {
-                return Find(tableName, criteria).FirstOrDefault();
-            }
+            return _adapter.FindOne(tableName, criteria);
         }
 
         internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList)

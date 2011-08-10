@@ -139,11 +139,6 @@ namespace Simple.Data.Mocking
             return Update(tableName, dict, criteria);
         }
 
-        public override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IEnumerable<string> criteriaFieldNames)
-        {
-            throw new NotImplementedException();
-        }
-
         private IEnumerable<IDictionary<string, object>> FindAll(string tableName)
         {
             return GetTableElement(tableName).Elements().Select(e => e.AttributesToDictionary());

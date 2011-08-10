@@ -86,10 +86,5 @@
         {
             throw new NotImplementedException();
         }
-
-        public override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IEnumerable<string> criteriaFieldNames)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
