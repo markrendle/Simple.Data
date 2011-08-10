@@ -5,6 +5,8 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data.Commands
 {
+    using System.Collections.Generic;
+
     class UpdateByCommand : ICommand
     {
         public bool IsCommandFor(string method)
@@ -16,7 +18,7 @@ namespace Simple.Data.Commands
         {
             if (binder.HasSingleUnnamedArgument())
             {
-                return UpdateCommand.UpdateByKeyFields(table.GetQualifiedName(), dataStrategy, args[0],
+                return UpdateByKeyFields(table.GetQualifiedName(), dataStrategy, args[0],
                                                 MethodNameParser.ParseCriteriaNamesFromMethodName(binder.Name));
             }
 
@@ -31,6 +33,37 @@ namespace Simple.Data.Commands
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             throw new NotImplementedException();
+        }
+
+        internal static object UpdateByKeyFields(string tableName, DataStrategy dataStrategy, object entity, IEnumerable<string> keyFieldNames)
+        {
+            var record = UpdateCommand.ObjectToDictionary(entity);
+            var list = record as IList<IDictionary<string, object>>;
+            if (list != null) return dataStrategy.UpdateMany(tableName, list, keyFieldNames);
+
+            var dict = record as IDictionary<string, object>;
+            var criteria = GetCriteria(keyFieldNames, dict);
+            var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteria);
+            return dataStrategy.Update(tableName, dict, criteriaExpression);
+        }
+
+        private static IEnumerable<KeyValuePair<string, object>> GetCriteria(IEnumerable<string> keyFieldNames, IDictionary<string, object> record)
+        {
+            var criteria = new Dictionary<string, object>();
+
+            foreach (var keyFieldName in keyFieldNames)
+            {
+                var name = keyFieldName;
+                var keyValuePair = record.Where(kvp => kvp.Key.Homogenize().Equals(name.Homogenize())).SingleOrDefault();
+                if (string.IsNullOrWhiteSpace(keyValuePair.Key))
+                {
+                    throw new InvalidOperationException("Key field value not set.");
+                }
+
+                criteria.Add(keyFieldName, keyValuePair.Value);
+                record.Remove(keyValuePair);
+            }
+            return criteria;
         }
     }
 }

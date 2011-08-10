@@ -20,13 +20,13 @@ namespace Simple.Data.Commands
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             if (args.Length != 1) throw new ArgumentException("Incorrect number of arguments to Update method.");
-            var keyFieldNames = dataStrategy.GetAdapter().GetKeyFieldNames(table.GetQualifiedName()).ToArray();
-            if (keyFieldNames.Length == 0)
-            {
-                throw new NotSupportedException("Adapter does not support key-based update for this object.");
-            }
 
-            return UpdateByKeyFields(table.GetQualifiedName(), dataStrategy, args[0], keyFieldNames);
+            var record = ObjectToDictionary(args[0]);
+            var list = record as IList<IDictionary<string, object>>;
+            if (list != null) return dataStrategy.UpdateMany(table.GetQualifiedName(), list);
+
+            var dict = record as IDictionary<string, object>;
+            return dataStrategy.Update(table.GetQualifiedName(), dict);
         }
 
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
@@ -34,38 +34,7 @@ namespace Simple.Data.Commands
             throw new NotImplementedException();
         }
 
-        internal static object UpdateByKeyFields(string tableName, DataStrategy dataStrategy, object entity, IEnumerable<string> keyFieldNames)
-        {
-            var record = ObjectToDictionary(entity);
-            var list = record as IList<IDictionary<string, object>>;
-            if (list != null) return dataStrategy.UpdateMany(tableName, list, keyFieldNames.ToList());
-
-            var dict = record as IDictionary<string, object>;
-            var criteria = GetCriteria(keyFieldNames, dict);
-            var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteria);
-            return dataStrategy.Update(tableName, dict, criteriaExpression);
-        }
-
-        private static IEnumerable<KeyValuePair<string, object>> GetCriteria(IEnumerable<string> keyFieldNames, IDictionary<string, object> record)
-        {
-            var criteria = new Dictionary<string, object>();
-
-            foreach (var keyFieldName in keyFieldNames)
-            {
-                var name = keyFieldName;
-                var keyValuePair = record.Where(kvp => kvp.Key.Homogenize().Equals(name.Homogenize())).SingleOrDefault();
-                if (string.IsNullOrWhiteSpace(keyValuePair.Key))
-                {
-                    throw new InvalidOperationException("Key field value not set.");
-                }
-
-                criteria.Add(keyFieldName, keyValuePair.Value);
-                record.Remove(keyValuePair);
-            }
-            return criteria;
-        }
-
-        private static object ObjectToDictionary(object obj)
+        internal static object ObjectToDictionary(object obj)
         {
             var dynamicRecord = obj as SimpleRecord;
             if (dynamicRecord != null)

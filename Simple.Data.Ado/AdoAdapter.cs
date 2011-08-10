@@ -11,6 +11,8 @@ using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
+    using Extensions;
+
     [Export("Ado", typeof(Adapter))]
     public partial class AdoAdapter : Adapter, IAdapterWithRelation, IAdapterWithTransactions
     {
@@ -179,6 +181,20 @@ namespace Simple.Data.Ado
             return new AdoAdapterInserter(this, ((AdoAdapterTransaction)transaction).Transaction).InsertMany(tableName, data);
         }
 
+        public override int Update(string tableName, IDictionary<string, object> data)
+        {
+            var keyFieldNames = GetKeyFieldNames(tableName).ToArray();
+            if (keyFieldNames.Length == 0) throw new AdoAdapterException("No Primary Key found for implicit update");
+            return Update(tableName, data, GetCriteria(tableName, keyFieldNames, data));
+        }
+
+       
+        public override int UpdateMany(string tableName, IList<IDictionary<string, object>> data, IEnumerable<string> criteriaFieldNames)
+        {
+            var bulkUpdater = this.ProviderHelper.GetCustomProvider<IBulkUpdater>(this.ConnectionProvider) ?? new BulkUpdater();
+            return bulkUpdater.Update(this, tableName, data.ToList(), criteriaFieldNames, null);
+        }
+
         public override int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data)
         {
             var bulkUpdater = this.ProviderHelper.GetCustomProvider<IBulkUpdater>(this.ConnectionProvider) ?? new BulkUpdater();
@@ -201,6 +217,19 @@ namespace Simple.Data.Ado
         {
             var bulkUpdater = this.ProviderHelper.GetCustomProvider<IBulkUpdater>(this.ConnectionProvider) ?? new BulkUpdater();
             return bulkUpdater.Update(this, tableName, data.ToList(), ((AdoAdapterTransaction)transaction).Transaction);
+        }
+
+        public int Update(string tableName, IDictionary<string, object> data, IAdapterTransaction adapterTransaction)
+        {
+            var keyFieldNames = GetKeyFieldNames(tableName).ToArray();
+            if (keyFieldNames.Length == 0) throw new AdoAdapterException("No Primary Key found for implicit update");
+            return Update(tableName, data, GetCriteria(tableName, keyFieldNames, data), adapterTransaction);
+        }
+
+        public int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IEnumerable<string> criteriaFieldNames, IAdapterTransaction adapterTransaction)
+        {
+            var bulkUpdater = this.ProviderHelper.GetCustomProvider<IBulkUpdater>(this.ConnectionProvider) ?? new BulkUpdater();
+            return bulkUpdater.Update(this, tableName, dataList, criteriaFieldNames, ((AdoAdapterTransaction)adapterTransaction).Transaction);
         }
 
         public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
@@ -226,7 +255,7 @@ namespace Simple.Data.Ado
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
         /// <returns>A list of field names; an empty list if no key is defined.</returns>
-        public override IEnumerable<string> GetKeyFieldNames(string tableName)
+        public IEnumerable<string> GetKeyFieldNames(string tableName)
         {
             return _schema.FindTable(tableName).PrimaryKey.AsEnumerable();
         }

@@ -65,14 +65,14 @@ namespace Simple.Data
             }
         }
 
-        internal override int Update(string tableName, IList<IDictionary<string, object>> dataList)
+        internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList)
         {
             return _adapter.UpdateMany(tableName, dataList);
         }
 
-        internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IList<string> keyFields)
+        internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IEnumerable<string> criteriaFieldNames)
         {
-            return _adapter.UpdateMany(tableName, dataList);
+            return _adapter.UpdateMany(tableName, dataList, criteriaFieldNames);
         }
 
         /// <summary>
@@ -108,6 +108,17 @@ namespace Simple.Data
         internal override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
         {
             return _adapter.Update(tableName, data, criteria);
+        }
+
+        /// <summary>
+        ///  Updates the specified "table" using data-store specific key fields.
+        ///  </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="data">The new values.</param>
+        /// <returns>The number of records affected by the update operation.</returns>
+        internal override int Update(string tableName, IDictionary<string, object> data)
+        {
+            return _adapter.Update(tableName, data);
         }
 
         /// <summary>

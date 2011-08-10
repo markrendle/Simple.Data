@@ -97,16 +97,15 @@ namespace Simple.Data
             return Find(tableName, criteria).FirstOrDefault();
         }
 
-        internal override int Update(string tableName, IList<IDictionary<string, object>> dataList)
+        internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList)
         {
             return _adapter.UpdateMany(tableName, dataList, AdapterTransaction);
         }
 
-        internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IList<string> keyFields)
+        internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IEnumerable<string> criteriaFieldNames)
         {
-            return _adapter.UpdateMany(tableName, dataList, _adapterTransaction, keyFields);
+            return _adapter.UpdateMany(tableName, dataList, criteriaFieldNames, AdapterTransaction);
         }
-
 
         internal override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
@@ -129,6 +128,11 @@ namespace Simple.Data
         internal override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
         {
             return _adapter.Update(tableName, data, criteria, AdapterTransaction);
+        }
+
+        internal override int Update(string tableName, IDictionary<string, object> data)
+        {
+            return _adapter.Update(tableName, data, AdapterTransaction);
         }
 
         internal override int Delete(string tableName, SimpleExpression criteria)

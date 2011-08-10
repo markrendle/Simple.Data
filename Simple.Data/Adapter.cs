@@ -70,8 +70,12 @@ namespace Simple.Data
         public abstract IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data);
 
         /// <summary>
-        ///  Updates the specified "table" according to specified criteria.
-        ///  </summary><param name="tableName">Name of the table.</param><param name="data">The new values.</param><param name="criteria">The expression to use as criteria for the update operation.</param><returns>The number of records affected by the update operation.</returns>
+        /// Updates the specified "table" according to specified criteria.
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="data">The new values.</param>
+        /// <param name="criteria">The expression to use as criteria for the update operation.</param>
+        /// <returns>The number of records affected by the update operation.</returns>
         public abstract int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria);
 
         /// <summary>
@@ -82,7 +86,7 @@ namespace Simple.Data
         /// <summary>
         ///  Gets the names of the fields which comprise the unique identifier for the specified table.
         ///  </summary><param name="tableName">Name of the table.</param><returns></returns>
-        public abstract IEnumerable<string> GetKeyFieldNames(string tableName);
+//        public abstract IEnumerable<string> GetKeyFieldNames(string tableName);
 
         public virtual Func<object[],IDictionary<string,object>> CreateFindOneDelegate(string tableName, SimpleExpression criteria)
         {
@@ -112,5 +116,44 @@ namespace Simple.Data
         public abstract IEnumerable<IEnumerable<IDictionary<string, object>>> RunQueries(SimpleQuery[] queries, List<IEnumerable<SimpleQueryClauseBase>> unhandledClauses);
 
         public abstract bool IsExpressionFunction(string functionName, params object[] args);
+
+        /// <summary>
+        /// Updates the specified "table" according to default keys (to be handled by adapter).
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="data">The new values.</param>
+        /// <returns>The number of records affected by the update operation.</returns>
+        /// <remarks>For example, the Ado adapter will fulfil this functionality using Primary Key data.</remarks>
+        public abstract int Update(string tableName, IDictionary<string, object> data);
+
+        public virtual int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IEnumerable<string> criteriaFieldNames)
+        {
+            int updatedCount = 0;
+            var criteriaFieldNameList = criteriaFieldNames.ToList();
+            foreach (var data in dataList)
+            {
+                updatedCount += Update(tableName, data, GetCriteria(tableName, criteriaFieldNameList, data));
+            }
+            return updatedCount;
+        }
+
+        protected static SimpleExpression GetCriteria(string tableName, IEnumerable<string> keyFieldNames, IDictionary<string, object> record)
+        {
+            var criteria = new Dictionary<string, object>();
+
+            foreach (var keyFieldName in keyFieldNames)
+            {
+                var name = keyFieldName;
+                var keyValuePair = record.Where(kvp => kvp.Key.Homogenize().Equals(name.Homogenize())).SingleOrDefault();
+                if (string.IsNullOrWhiteSpace(keyValuePair.Key))
+                {
+                    throw new InvalidOperationException("Key field value not set.");
+                }
+
+                criteria.Add(keyFieldName, keyValuePair.Value);
+                record.Remove(keyValuePair);
+            }
+            return ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteria);
+        }
     }
 }

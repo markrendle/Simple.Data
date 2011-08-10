@@ -5,6 +5,9 @@ using System.Xml.Linq;
 
 namespace Simple.Data.Mocking
 {
+    using System.Collections;
+    using Extensions;
+
     public class XmlMockAdapter : Adapter, IAdapterWithRelation
     {
         private readonly Lazy<XElement> _data;
@@ -104,13 +107,6 @@ namespace Simple.Data.Mocking
             return deleted;
         }
 
-        public override IEnumerable<string> GetKeyFieldNames(string tableName)
-        {
-            var keyAttribute = GetTableElement(tableName).Attribute("_keys");
-            if (keyAttribute == null) return Enumerable.Empty<string>();
-            return keyAttribute.Value.Split(',');
-        }
-
         public override IEnumerable<IEnumerable<IDictionary<string, object>>> RunQueries(SimpleQuery[] queries, List<IEnumerable<SimpleQueryClauseBase>> unhandledClauses)
         {
             foreach (var query in queries)
@@ -125,6 +121,27 @@ namespace Simple.Data.Mocking
         public override bool IsExpressionFunction(string functionName, params object[] args)
         {
             return false;
+        }
+
+        public override int Update(string tableName, IDictionary<string, object> data)
+        {
+            return UpdateByKeyFields(tableName, data, GetKeyFieldNames(tableName));
+        }
+
+        internal int UpdateByKeyFields(string tableName, object entity, IEnumerable<string> keyFieldNames)
+        {
+            var record = ObjectToDictionary(entity);
+            var list = record as IList<IDictionary<string, object>>;
+            if (list != null) return UpdateMany(tableName, list, keyFieldNames);
+
+            var dict = record as IDictionary<string, object>;
+            var criteria = GetCriteria(tableName, keyFieldNames, dict);
+            return Update(tableName, dict, criteria);
+        }
+
+        public override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IEnumerable<string> criteriaFieldNames)
+        {
+            throw new NotImplementedException();
         }
 
         private IEnumerable<IDictionary<string, object>> FindAll(string tableName)
@@ -174,6 +191,39 @@ namespace Simple.Data.Mocking
             }
 
             return Enumerable.Empty<IDictionary<string, object>>();
+        }
+
+        private IEnumerable<string> GetKeyFieldNames(string tableName)
+        {
+            var keyAttribute = GetTableElement(tableName).Attribute("_keys");
+            if (keyAttribute == null) return Enumerable.Empty<string>();
+            return keyAttribute.Value.Split(',');
+        }
+
+        private static object ObjectToDictionary(object obj)
+        {
+            var dynamicRecord = obj as SimpleRecord;
+            if (dynamicRecord != null)
+            {
+                return new Dictionary<string, object>(dynamicRecord, HomogenizedEqualityComparer.DefaultInstance);
+            }
+
+            var dictionary = obj as IDictionary<string, object>;
+            if (dictionary != null)
+            {
+                return dictionary;
+            }
+
+            var list = obj as IEnumerable;
+            if (list != null)
+            {
+                var originals = list.Cast<object>().ToList();
+                var dictionaries = originals.Select(o => ObjectToDictionary(o) as IDictionary<string, object>).Where(o => o != null && o.Count > 0).ToList();
+                if (originals.Count == dictionaries.Count)
+                    return dictionaries;
+            }
+
+            return obj.ObjectToDictionary();
         }
     }
 }

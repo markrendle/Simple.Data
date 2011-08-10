@@ -12,16 +12,18 @@ namespace Simple.Data.Ado
     {
         public int Update(AdoAdapter adapter, string tableName, IList<IDictionary<string, object>> data, IDbTransaction transaction)
         {
-            return Update(adapter, tableName, data, transaction, adapter.GetKeyFieldNames(tableName).ToList());
+            return Update(adapter, tableName, data, adapter.GetKeyFieldNames(tableName).ToList(), transaction);
         }
 
-        public int Update(AdoAdapter adapter, string tableName, IList<IDictionary<string, object>> data, IDbTransaction transaction, IList<string> keyFields)
+        public int Update(AdoAdapter adapter, string tableName, IList<IDictionary<string, object>> data, IEnumerable<string> criteriaFieldNames, IDbTransaction transaction)
         {
             int count = 0;
             if (data == null) throw new ArgumentNullException("data");
             if (data.Count < 2) throw new ArgumentException("UpdateMany requires more than one record.");
 
-            if (keyFields.Count == 0) throw new NotSupportedException("Adapter does not support key-based update for this object.");
+            var criteriaFieldNameList = criteriaFieldNames.ToList();
+    
+            if (criteriaFieldNameList.Count == 0) throw new NotSupportedException("Adapter does not support key-based update for this object.");
             if (!AllRowsHaveSameKeys(data)) throw new SimpleDataException("Records have different structures. Bulk updates are only valid on consistent records.");
             var table = adapter.GetSchema().FindTable(tableName);
 
@@ -29,7 +31,7 @@ namespace Simple.Data.Ado
 
             var commandBuilder = new UpdateHelper(adapter.GetSchema()).GetUpdateCommand(tableName, exampleRow,
                                                                     ExpressionHelper.CriteriaDictionaryToExpression(
-                                                                        tableName, GetCriteria(keyFields, exampleRow)));
+                                                                        tableName, GetCriteria(criteriaFieldNameList, exampleRow)));
 
             using (var connectionScope = ConnectionScope.Create(transaction, adapter.CreateConnection))
             using (var command = commandBuilder.GetRepeatableCommand(connectionScope.Connection))

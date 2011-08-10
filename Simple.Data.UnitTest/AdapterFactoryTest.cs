@@ -72,17 +72,22 @@
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<string> GetKeyFieldNames(string tableName)
-        {
-            throw new NotImplementedException();
-        }
-
         public override IEnumerable<IEnumerable<IDictionary<string, object>>> RunQueries(SimpleQuery[] queries, List<IEnumerable<SimpleQueryClauseBase>> unhandledClauses)
         {
             throw new NotImplementedException();
         }
 
         public override bool IsExpressionFunction(string functionName, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int Update(string tableName, IDictionary<string, object> data)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IEnumerable<string> criteriaFieldNames)
         {
             throw new NotImplementedException();
         }
