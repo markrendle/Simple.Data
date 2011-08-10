@@ -5,8 +5,9 @@ using System.Linq;
 
 namespace Simple.Data.Ado
 {
-    public class OptimizedDictionary<TKey,TValue> : IDictionary<TKey,TValue>
+    public class OptimizedDictionary<TKey,TValue> : IDictionary<TKey,TValue>, ICloneable
     {
+        private static readonly DictionaryCloner Cloner = new DictionaryCloner();
         private readonly IDictionary<TKey,int> _index;
         private readonly List<TValue> _values;
 
@@ -251,6 +252,17 @@ namespace Simple.Data.Ado
         public ICollection<TValue> Values
         {
             get { return _values.ToArray(); }
+        }
+
+        /// <summary>
+        /// Creates a new object that is a copy of the current instance.
+        /// </summary>
+        /// <returns>
+        /// A new object that is a copy of this instance.
+        /// </returns>
+        public object Clone()
+        {
+            return new OptimizedDictionary<TKey,TValue>(_index, _values.OfType<object>().Select(Cloner.CloneValue).Cast<TValue>());
         }
     }
 }

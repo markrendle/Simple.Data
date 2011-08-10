@@ -136,6 +136,12 @@ namespace Simple.Data
             return result;
         }
 
+        /// <summary>
+        /// Creates a new object that is a copy of the current instance.
+        /// </summary>
+        /// <returns>
+        /// A new object that is a copy of this instance.
+        /// </returns>
         public object Clone()
         {
             return new SimpleRecord(Cloner.CloneDictionary(_data), _tableName, _database);

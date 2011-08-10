@@ -4,7 +4,7 @@ namespace Simple.Data
     using System.Collections;
     using System.Collections.Generic;
 
-    internal class DictionaryCloner
+    public class DictionaryCloner
     {
         public IDictionary<string, object> CloneDictionary(IDictionary<string,object> source)
         {
@@ -46,7 +46,7 @@ namespace Simple.Data
             }
         }
 
-        private object CloneValue(object source)
+        public object CloneValue(object source)
         {
             if (ReferenceEquals(source, null)) return null;
 
@@ -60,7 +60,7 @@ namespace Simple.Data
             return nestedDictionary != null ? CloneDictionary(nestedDictionary) : source;
         }
 
-        private object CopyNestedDictionaryList(IEnumerable<IDictionary<string, object>> nestedDictionaries, Type collectionType)
+        public object CopyNestedDictionaryList(IEnumerable<IDictionary<string, object>> nestedDictionaries, Type collectionType)
         {
             var collection = Activator.CreateInstance(collectionType) as IList ?? new List<IDictionary<string,object>>();
 
