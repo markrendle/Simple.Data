@@ -13,7 +13,6 @@ using System.Security.Permissions;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("a3becbf2-2e23-4399-a6d0-267e0e278ca6")]
 
-[assembly: InternalsVisibleTo("Simple.Data.Ado")]
 [assembly: InternalsVisibleTo("Simple.Data.AdapterApi")]
 [assembly: InternalsVisibleTo("Simple.Data.TestHelper")]
 [assembly: InternalsVisibleTo("Simple.Data.UnitTest")]

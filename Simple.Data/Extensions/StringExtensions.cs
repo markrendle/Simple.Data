@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Simple.Data.Extensions
 {
-    static class StringExtensions
+    public static class StringExtensions
     {
         public static bool IsPlural(this string str)
         {

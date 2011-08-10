@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Simple.Data
 {
-    class ExpressionHelper
+    public class ExpressionHelper
     {
         public static SimpleExpression CriteriaDictionaryToExpression(string tableName, IEnumerable<KeyValuePair<string, object>> dictionary)
         {

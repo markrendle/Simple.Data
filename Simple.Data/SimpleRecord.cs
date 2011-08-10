@@ -26,17 +26,17 @@ namespace Simple.Data
             _database = database;
         }
 
-        internal SimpleRecord(IDictionary<string, object> data)
+        public SimpleRecord(IDictionary<string, object> data)
             : this(data, null)
         {
         }
 
-        internal SimpleRecord(IDictionary<string, object> data, string tableName)
+        public SimpleRecord(IDictionary<string, object> data, string tableName)
             : this(data, tableName, null)
         {
         }
 
-        internal SimpleRecord(IDictionary<string, object> data, string tableName, DataStrategy dataStrategy)
+        public SimpleRecord(IDictionary<string, object> data, string tableName, DataStrategy dataStrategy)
         {
             _tableName = tableName;
             _database = dataStrategy;

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Simple.Data.Extensions
 {
-    static class EnumerableExtensions
+    public static class EnumerableExtensions
     {
         public static IDictionary<TKey,TValue> ToDictionary<TKey,TValue>(this IEnumerable<KeyValuePair<TKey,TValue>> source)
         {

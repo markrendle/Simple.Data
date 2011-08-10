@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Simple.Data
 {
-    interface IAdapterWithTransactions
+    public interface IAdapterWithTransactions
     {
         IAdapterTransaction BeginTransaction();
         IAdapterTransaction BeginTransaction(string name);

@@ -159,12 +159,12 @@ namespace Simple.Data
             return string.Join(".", GetAllObjectNames());
         }
 
-        internal static ObjectReference FromString(string source)
+        public static ObjectReference FromString(string source)
         {
             return FromStrings(source.Split('.'));
         }
 
-        internal static ObjectReference FromStrings(params string[] source)
+        public static ObjectReference FromStrings(params string[] source)
         {
             return source.Aggregate<string, ObjectReference>(null, (current, element) => new ObjectReference(element, current));
         }

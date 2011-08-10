@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Simple.Data
 {
-    internal abstract class Composer
+    public abstract class Composer
     {
         private static Composer _composer = new MefHelper();
 
