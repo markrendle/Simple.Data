@@ -54,6 +54,9 @@
     <Reference Include="System.Data.Entity.Design" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="Trespasser">
+      <HintPath>..\packages\Trespasser.1.1\lib\net40\Trespasser.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDependentAssemblyPaths Condition=" '$(VS100COMNTOOLS)' != '' " Include="$(VS100COMNTOOLS)..\IDE\PrivateAssemblies">
@@ -67,6 +70,7 @@
     <Compile Include="ComposerTest.cs" />
     <Compile Include="ConcreteCollectionTypeCreatorTest.cs" />
     <Compile Include="DatabaseOpenerTest.cs" />
+    <Compile Include="DictionaryClonerTest.cs" />
     <Compile Include="DynamicEnumerableTest.cs" />
     <Compile Include="DynamicRecordTest.cs" />
     <Compile Include="DynamicStringExtensionsTest.cs" />
@@ -88,6 +92,7 @@
     <Compile Include="SimpleListTest.cs" />
     <Compile Include="SimpleQueryTest.cs" />
     <Compile Include="SimpleRecordAsDictionaryTest.cs" />
+    <Compile Include="SimpleRecordCloneTest.cs" />
     <Compile Include="SimpleResultSetTest.cs" />
     <Compile Include="SpecialReferenceTests.cs" />
     <Compile Include="StringExtensionsTest.cs" />

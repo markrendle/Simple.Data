@@ -8,8 +8,9 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data
 {
-    public partial class SimpleRecord : DynamicObject
+    public partial class SimpleRecord : DynamicObject, ICloneable
     {
+        private static readonly DictionaryCloner Cloner = new DictionaryCloner();
         private readonly ConcreteObject _concreteObject = new ConcreteObject();
         private readonly IDictionary<string, object> _data;
         private readonly DataStrategy _database;
@@ -17,12 +18,12 @@ namespace Simple.Data
 
         public SimpleRecord()
         {
-            _data = new Dictionary<string,object>(HomogenizedEqualityComparer.DefaultInstance);
+            _data = new Dictionary<string, object>(HomogenizedEqualityComparer.DefaultInstance);
         }
 
         public SimpleRecord(DataStrategy database)
         {
-            _data = new Dictionary<string,object>(HomogenizedEqualityComparer.DefaultInstance);
+            _data = new Dictionary<string, object>(HomogenizedEqualityComparer.DefaultInstance);
             _database = database;
         }
 
@@ -51,7 +52,7 @@ namespace Simple.Data
                 var converted = ConvertResult(result);
                 if (!ReferenceEquals(result, converted))
                     _data[binder.Name] = result = converted;
-                
+
                 return true;
             }
 
@@ -133,6 +134,11 @@ namespace Simple.Data
             }
 
             return result;
+        }
+
+        public object Clone()
+        {
+            return new SimpleRecord(Cloner.CloneDictionary(_data), _tableName, _database);
         }
     }
 }
