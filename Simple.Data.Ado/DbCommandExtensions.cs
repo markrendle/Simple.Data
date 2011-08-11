@@ -5,6 +5,7 @@
     using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
+    using System.Dynamic;
     using System.Linq;
 
     static class DbCommandExtensions
@@ -39,9 +40,21 @@
         {
             var parameter = command.CreateParameter();
             parameter.ParameterName = name;
-            parameter.Value = value ?? DBNull.Value;
+            parameter.Value = FixObjectType(value);
             command.Parameters.Add(parameter);
             return parameter;
+        }
+
+        private static object FixObjectType(object value)
+        {
+            if (value == null) return DBNull.Value;
+            if (TypeHelper.IsKnownType(value.GetType())) return value;
+            var dynamicObject = value as DynamicObject;
+            if (dynamicObject != null)
+            {
+                return dynamicObject.ToString();
+            }
+            return value;
         }
 
         public static IDataReader ExecuteReaderWithExceptionWrap(this IDbCommand command)
