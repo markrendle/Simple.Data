@@ -1,5 +1,7 @@
 namespace Simple.Data.IntegrationTest
 {
+    using System.Collections;
+    using System.Collections.Generic;
     using Mocking.Ado;
     using NUnit.Framework;
 
@@ -8,11 +10,13 @@ namespace Simple.Data.IntegrationTest
     {
         protected override void SetSchema(MockSchemaProvider schemaProvider)
         {
-            schemaProvider.SetTables(new[] { "dbo", "Users", "BASE TABLE" });
+            schemaProvider.SetTables(new[] { "dbo", "Users", "BASE TABLE" },
+                                     new[] { "dbo", "MyTable", "BASE TABLE" });
             schemaProvider.SetColumns(new object[] { "dbo", "Users", "Id", true },
                                       new[] { "dbo", "Users", "Name" },
                                       new[] { "dbo", "Users", "Password" },
-                                      new[] { "dbo", "Users", "Age" });
+                                      new[] { "dbo", "Users", "Age" },
+                                      new[] { "dbo", "MyTable", "Column1"});
             schemaProvider.SetPrimaryKeys(new object[] { "dbo", "Users", "Id", 0 });
         }
 
@@ -146,6 +150,20 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestFindByDynamicSingleColumnNull()
+        {
+            _db.MyTable.FindByColumn1(null);
+            GeneratedSqlIs("select [dbo].[MyTable].* from [dbo].[MyTable] where [dbo].[MyTable].[Column1] is null");
+        }
+
+        [Test]
+        public void TestFindAllByDynamicSingleColumnNull()
+        {
+            IEnumerable<MyTable> result = _db.MyTable.FindAllByColumn1(null).ToList<MyTable>();
+            GeneratedSqlIs("select [dbo].[MyTable].[Column1] from [dbo].[MyTable] where [dbo].[MyTable].[Column1] is null");
+        }
+
+        [Test]
         public void TestFindWithLike()
         {
             _db.Users.Find(_db.Users.Name.Like("Foo"));
@@ -195,5 +213,10 @@ namespace Simple.Data.IntegrationTest
             GeneratedSqlIs("select [dbo].[Users].[id],[dbo].[Users].[name],[dbo].[Users].[password],[dbo].[Users].[age] from [dbo].[Users] where [dbo].[Users].[name] = @p1");
             Parameter(0).Is("Foo");
         }
+    }
+
+    class MyTable
+    {
+        public string Column1 { get; set; }
     }
 }
