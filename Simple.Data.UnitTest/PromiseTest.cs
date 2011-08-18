@@ -9,40 +9,40 @@ namespace Simple.Data.UnitTest
     using NUnit.Framework;
 
     [TestFixture]
-    public class FutureTest
+    public class PromiseTest
     {
         [Test]
-        public void FutureShouldHaveHasValueFalseWhenCreated()
+        public void PromiseShouldHaveHasValueFalseWhenCreated()
         {
             Action<int> setAction;
-            var actual = Future<int>.Create(out setAction);
+            var actual = Promise<int>.Create(out setAction);
             Assert.IsFalse(actual.HasValue);
         }
 
         [Test]
-        public void FutureShouldHaveValueAfterSetActionIsCalled()
+        public void PromiseShouldHaveValueAfterSetActionIsCalled()
         {
             Action<int> setAction;
-            var actual = Future<int>.Create(out setAction);
+            var actual = Promise<int>.Create(out setAction);
             setAction(42);
             Assert.IsTrue(actual.HasValue);
             Assert.AreEqual(42, actual.Value);
         }
 
         [Test]
-        public void FutureShouldImplicitlyCastToType()
+        public void PromiseShouldImplicitlyCastToType()
         {
             Action<int> setAction;
-            var actual = Future<int>.Create(out setAction);
+            var actual = Promise<int>.Create(out setAction);
             setAction(42);
             Assert.AreEqual(42, actual);
         }
 
         [Test]
-        public void FutureShouldSpinWhenValueAccessedButNotSet()
+        public void PromiseShouldSpinWhenValueAccessedButNotSet()
         {
             Action<int> setAction;
-            var actual = Future<int>.Create(out setAction);
+            var actual = Promise<int>.Create(out setAction);
             using (new Timer(_ => setAction(42), null, 100, Timeout.Infinite))
             {
                 Assert.AreEqual(42, actual.Value);

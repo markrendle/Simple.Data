@@ -11,9 +11,9 @@ namespace Simple.Data
             _setCount = setCount;
         }
 
-        public Action<int> SetCount
+        public void SetCount(int count)
         {
-            get { return _setCount; }
+            _setCount(count);
         }
     }
 }

@@ -95,6 +95,7 @@
     <Compile Include="Maybe.cs" />
     <Compile Include="OrderByClause.cs" />
     <Compile Include="OrderByDirection.cs" />
+    <Compile Include="Promise.cs" />
     <Compile Include="Range.cs" />
     <Compile Include="Range1.cs" />
     <Compile Include="SelectClause.cs" />

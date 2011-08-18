@@ -121,6 +121,21 @@ namespace Simple.Data.SqlTest
         [Test]
         public void WithTotalCountShouldGiveCount()
         {
+            Promise<int> count;
+            var db = DatabaseHelper.Open();
+            var list = db.PagingTest.QueryById(1.to(50))
+                .WithTotalCount(out count)
+                .Take(10)
+                .ToList();
+
+            Assert.AreEqual(10, list.Count);
+            Assert.IsTrue(count.HasValue);
+            Assert.AreEqual(50, count);
+        }
+
+        [Test]
+        public void WithTotalCountShouldGiveCount_ObsoleteFutureVersion()
+        {
             Future<int> count;
             var db = DatabaseHelper.Open();
             var list = db.PagingTest.QueryById(1.to(50))

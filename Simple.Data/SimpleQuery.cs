@@ -185,10 +185,10 @@
 
         protected IEnumerable<dynamic> Run()
         {
-            if (_clauses.OfType<WithCountClause>().Any())
-            {
-                return RunWithCount();
-            }
+            //if (_clauses.OfType<WithCountClause>().Any())
+            //{
+            //    return RunWithCount();
+            //}
             IEnumerable<SimpleQueryClauseBase> unhandledClauses;
             return
                 _adapter.RunQuery(this, out unhandledClauses).Select(d => new SimpleRecord(d, _tableName, _dataStrategy));
@@ -266,10 +266,18 @@
             return AddNewJoin(new JoinClause(_tempJoinWaitingForOn.Table, joinExpression));
         }
 
+        [Obsolete]
         public SimpleQuery WithTotalCount(out Future<int> count)
         {
             Action<int> setCount;
             count = Future<int>.Create(out setCount);
+            return new SimpleQuery(this, _clauses.Append(new WithCountClause(setCount)));
+        }
+
+        public SimpleQuery WithTotalCount(out Promise<int> count)
+        {
+            Action<int> setCount;
+            count = Promise<int>.Create(out setCount);
             return new SimpleQuery(this, _clauses.Append(new WithCountClause(setCount)));
         }
 

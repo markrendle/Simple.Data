@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System;
+using System.Threading;
 
 namespace Simple.Data
 {
-    using System.Threading;
-
-    public class Future<T>
+    public class Promise<T>
     {
         private T _value;
         private bool _hasValue;
 
-        private Future()
+        private Promise()
         {
-            
+
         }
 
         public T Value
@@ -37,14 +33,14 @@ namespace Simple.Data
             _hasValue = true;
         }
 
-        public static Future<T> Create(out Action<T> setAction)
+        public static Promise<T> Create(out Action<T> setAction)
         {
-            var future = new Future<T>();
+            var future = new Promise<T>();
             setAction = future.Set;
             return future;
         }
 
-        public static implicit operator T(Future<T> future)
+        public static implicit operator T(Promise<T> future)
         {
             return future.Value;
         }

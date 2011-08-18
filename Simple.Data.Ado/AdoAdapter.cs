@@ -95,16 +95,29 @@ namespace Simple.Data.Ado
 
         public override IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
         {
+            if (query.Clauses.OfType<WithCountClause>().Any()) return RunQueryWithCount(query, out unhandledClauses);
+
             var connection = _connectionProvider.CreateConnection();
             return new QueryBuilder(this).Build(query, out unhandledClauses)
                 .GetCommand(connection)
                 .ToEnumerable(connection);
         }
 
-        private IEnumerable<IDictionary<string, object>> RunQueryWithCount(SimpleQuery query, WithCountClause withCountClause, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
+        private IEnumerable<IDictionary<string, object>> RunQueryWithCount(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
         {
+            WithCountClause withCountClause;
+            try
+            {
+                withCountClause = query.Clauses.OfType<WithCountClause>().First();
+            }
+            catch (InvalidOperationException)
+            {
+                // Rethrow with meaning.
+                throw new InvalidOperationException("No WithCountClause specified.");
+            }
+
             var countQuery = query.ClearSkip().ClearTake().Select(new CountSpecialReference());
-            var unhandledClausesList = new List<IEnumerable<SimpleQueryClauseBase>>(2);
+            var unhandledClausesList = new List<IEnumerable<SimpleQueryClauseBase>> { Enumerable.Empty<SimpleQueryClauseBase>(), Enumerable.Empty<SimpleQueryClauseBase>() };
             using (var enumerator = RunQueries(new[] { countQuery, query }, unhandledClausesList).GetEnumerator())
             {
                 unhandledClauses = unhandledClausesList[1];
