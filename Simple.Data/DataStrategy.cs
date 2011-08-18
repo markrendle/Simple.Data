@@ -135,5 +135,28 @@ namespace Simple.Data
         }
 
         internal abstract int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IEnumerable<string> criteriaFieldNames);
+
+        internal abstract int UpdateMany(string tableName, IList<IDictionary<string, object>> newValuesList,
+                                         IList<IDictionary<string, object>> originalValuesList);
+
+        public abstract int Update(string tableName, IDictionary<string, object> newValuesDict, IDictionary<string, object> originalValuesDict);
+
+        protected static SimpleExpression CreateCriteriaFromOriginalValues(string tableName, IDictionary<string, object> newValuesDict, IDictionary<string, object> originalValuesDict)
+        {
+            var criteriaValues = originalValuesDict
+                .Where(originalKvp => newValuesDict.ContainsKey(originalKvp.Key) && !(Equals(newValuesDict[originalKvp.Key], originalKvp.Value)));
+
+            return ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteriaValues);
+        }
+
+        protected static Dictionary<string, object> CreateChangedValuesDict(IEnumerable<KeyValuePair<string, object>> newValuesDict, IDictionary<string, object> originalValuesDict)
+        {
+            var changedValuesDict =
+                newValuesDict.Where(
+                    kvp =>
+                    (!originalValuesDict.ContainsKey(kvp.Key)) || !(Equals(kvp.Value, originalValuesDict[kvp.Key])))
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            return changedValuesDict;
+        }
     }
 }

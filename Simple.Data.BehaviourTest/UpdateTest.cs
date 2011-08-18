@@ -51,6 +51,42 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestUpdateWithDynamicObjectAndOriginalValues()
+        {
+            dynamic newRecord = new SimpleRecord();
+            newRecord.Id = 1;
+            newRecord.Name = "Steve";
+            newRecord.Age = 50;
+            dynamic originalRecord = new SimpleRecord();
+            originalRecord.Id = 2;
+            originalRecord.Name = "Steve";
+            originalRecord.Age = 50;
+
+            _db.Users.Update(newRecord, originalRecord);
+            GeneratedSqlIs("update [dbo].[Users] set [Id] = @p1 where [dbo].[Users].[Id] = @p2");
+            Parameter(0).Is(1);
+            Parameter(1).Is(2);
+        }
+
+        [Test]
+        public void TestUpdateWithDynamicObjectsAndOriginalValues()
+        {
+            dynamic newRecord = new SimpleRecord();
+            newRecord.Id = 1;
+            newRecord.Name = "Steve";
+            newRecord.Age = 50;
+            dynamic originalRecord = new SimpleRecord();
+            originalRecord.Id = 2;
+            originalRecord.Name = "Steve";
+            originalRecord.Age = 50;
+
+            _db.Users.Update(new[] {newRecord}, new[] {originalRecord});
+            GeneratedSqlIs("update [dbo].[Users] set [Id] = @p1 where [dbo].[Users].[Id] = @p2");
+            Parameter(0).Is(1);
+            Parameter(1).Is(2);
+        }
+
+        [Test]
         public void TestUpdateWithDynamicObjectList()
         {
             dynamic record1 = new SimpleRecord();
@@ -118,6 +154,40 @@ namespace Simple.Data.IntegrationTest
             Parameter(3).Is(1);
         }
 
+        [Test]
+        public void TestUpdateWithStaticObjectAndOriginalObject()
+        {
+            var newUser = new User
+                           {
+                               Id = 1,
+                               Name = "Steve",
+                               Age = 50
+                           };
+            var originalUser = new User() {Id = 2, Name = "Steve", Age = 50};
+            _db.Users.Update(newUser, originalUser);
+            GeneratedSqlIs(
+                "update [dbo].[Users] set [Id] = @p1 where [dbo].[Users].[Id] = @p2");
+            Parameter(0).Is(1);
+            Parameter(1).Is(2);
+        }
+
+        [Test]
+        public void TestUpdateWithStaticObjectsAndOriginalObject()
+        {
+            var newUser = new User
+            {
+                Id = 1,
+                Name = "Steve",
+                Age = 50
+            };
+            var originalUser = new User() { Id = 2, Name = "Steve", Age = 50 };
+            _db.Users.Update(new[] {newUser}, new[] {originalUser});
+            GeneratedSqlIs(
+                "update [dbo].[Users] set [Id] = @p1 where [dbo].[Users].[Id] = @p2");
+            Parameter(0).Is(1);
+            Parameter(1).Is(2);
+        }
+        
         [Test]
         public void TestUpdateWithStaticObjectWithShoutyCase()
         {

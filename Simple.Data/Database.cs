@@ -68,6 +68,23 @@ namespace Simple.Data
             return _adapter.UpdateMany(tableName, dataList, criteriaFieldNames);
         }
 
+        internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> newValuesList, IList<IDictionary<string, object>> originalValuesList)
+        {
+            int count = 0;
+            for (int i = 0; i < newValuesList.Count; i++)
+            {
+                count += Update(tableName, newValuesList[i], originalValuesList[i]);
+            }
+            return count;
+        }
+
+        public override int Update(string tableName, IDictionary<string, object> newValuesDict, IDictionary<string, object> originalValuesDict)
+        {
+            SimpleExpression criteria = CreateCriteriaFromOriginalValues(tableName, newValuesDict, originalValuesDict);
+            var changedValuesDict = CreateChangedValuesDict(newValuesDict, originalValuesDict);
+            return _adapter.Update(tableName, changedValuesDict, criteria);
+        }
+
         /// <summary>
         ///  Finds data from the specified "table".
         ///  </summary>

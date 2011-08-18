@@ -19,8 +19,35 @@ namespace Simple.Data.Commands
 
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            if (args.Length != 1) throw new ArgumentException("Incorrect number of arguments to Update method.");
+            if (args.Length == 0 || args.Length > 2) throw new ArgumentException("Incorrect number of arguments to Update method.");
 
+            if (args.Length == 1)
+            {
+                return UpdateUsingKeys(dataStrategy, table, args);
+            }
+
+            return UpdateUsingOriginalValues(dataStrategy, table, args);
+        }
+
+        private static object UpdateUsingOriginalValues(DataStrategy dataStrategy, DynamicTable table, object[] args)
+        {
+            var newValues = ObjectToDictionary(args[0]);
+            var newValuesList = newValues as IList<IDictionary<string, object>>;
+            if (newValuesList != null)
+            {
+                var originalValuesList = ObjectToDictionary(args[1]) as IList<IDictionary<string, object>>;
+                if (originalValuesList == null) throw new InvalidOperationException("Parameter type mismatch; both parameters to Update should be same type.");
+                return dataStrategy.UpdateMany(table.GetQualifiedName(), newValuesList, originalValuesList);
+            }
+
+            var newValuesDict = newValues as IDictionary<string, object>;
+            var originalValuesDict = ObjectToDictionary(args[1]) as IDictionary<string, object>;
+            if (originalValuesDict == null) throw new InvalidOperationException("Parameter type mismatch; both parameters to Update should be same type.");
+            return dataStrategy.Update(table.GetQualifiedName(), newValuesDict, originalValuesDict);
+        }
+
+        private static object UpdateUsingKeys(DataStrategy dataStrategy, DynamicTable table, object[] args)
+        {
             var record = ObjectToDictionary(args[0]);
             var list = record as IList<IDictionary<string, object>>;
             if (list != null) return dataStrategy.UpdateMany(table.GetQualifiedName(), list);
