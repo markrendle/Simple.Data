@@ -38,7 +38,7 @@ namespace Simple.Data.SqlServer
         private static string DequalifyColumns(string original)
         {
             var q = from part in original.Split(',')
-                    select part.Substring(part.LastIndexOf('.') + 1);
+                    select part.Substring(Math.Max(part.LastIndexOf('.') + 1, part.LastIndexOf('[')));
             return string.Join(",", q);
         }
 
