@@ -103,7 +103,7 @@ BEGIN
 	ALTER TABLE [dbo].[Customers]
 		ADD CONSTRAINT [PK_Customers] PRIMARY KEY CLUSTERED ([CustomerId] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
 	    
-	CREATE TABLE [dbo].[PagingTest] ([Id] int not null);
+	CREATE TABLE [dbo].[PagingTest] ([Id] int not null, [Dummy] int);
 
 	CREATE TABLE [dbo].[Blobs](
 		[Id] [int] NOT NULL,

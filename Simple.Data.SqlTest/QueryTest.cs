@@ -134,6 +134,26 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void WithTotalCountWithExplicitSelectShouldGiveCount()
+        {
+            Promise<int> count;
+            var db = DatabaseHelper.Open();
+            List<dynamic> list = db.PagingTest.QueryById(1.to(50))
+                .Select(db.PagingTest.Id)
+                .WithTotalCount(out count)
+                .Take(10)
+                .ToList();
+
+            Assert.IsTrue(count.HasValue);
+            Assert.AreEqual(50, count);
+            Assert.AreEqual(10, list.Count);
+            foreach (var dictionary in list.Cast<IDictionary<string,object>>())
+            {
+                Assert.AreEqual(1, dictionary.Count);
+            }
+        }
+
+        [Test]
         public void WithTotalCountShouldGiveCount_ObsoleteFutureVersion()
         {
             Future<int> count;

@@ -116,7 +116,7 @@ namespace Simple.Data.Ado
                 throw new InvalidOperationException("No WithCountClause specified.");
             }
 
-            var countQuery = query.ClearSkip().ClearTake().Select(new CountSpecialReference());
+            var countQuery = query.ClearSkip().ClearTake().ReplaceSelect(new CountSpecialReference());
             var unhandledClausesList = new List<IEnumerable<SimpleQueryClauseBase>> { Enumerable.Empty<SimpleQueryClauseBase>(), Enumerable.Empty<SimpleQueryClauseBase>() };
             using (var enumerator = RunQueries(new[] { countQuery, query }, unhandledClausesList).GetEnumerator())
             {

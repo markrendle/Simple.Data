@@ -92,14 +92,7 @@
         /// <returns>A new <see cref="SimpleQuery"/> which will select only the specified columns.</returns>
         public SimpleQuery Select(params SimpleReference[] columns)
         {
-            ThrowIfThereIsAlreadyASelectClause();
-            return new SimpleQuery(this, _clauses.Append(new SelectClause(columns)));
-        }
-
-        private void ThrowIfThereIsAlreadyASelectClause()
-        {
-            if (_clauses.OfType<SelectClause>().Any())
-                throw new InvalidOperationException("Query already contains a Select clause.");
+            return Select(columns.AsEnumerable());
         }
 
         /// <summary>
@@ -109,13 +102,40 @@
         /// <returns>A new <see cref="SimpleQuery"/> which will select only the specified columns.</returns>
         public SimpleQuery Select(IEnumerable<SimpleReference> columns)
         {
+            ThrowIfThereIsAlreadyASelectClause();
             return new SimpleQuery(this, _clauses.Append(new SelectClause(columns)));
+        }
+
+        /// <summary>
+        /// Selects only the specified columns.
+        /// </summary>
+        /// <param name="columns">The columns.</param>
+        /// <returns>A new <see cref="SimpleQuery"/> which will select only the specified columns.</returns>
+        public SimpleQuery ReplaceSelect(params SimpleReference[] columns)
+        {
+            return ReplaceSelect(columns.AsEnumerable());
+        }
+
+        /// <summary>
+        /// Selects only the specified columns.
+        /// </summary>
+        /// <param name="columns">The columns.</param>
+        /// <returns>A new <see cref="SimpleQuery"/> which will select only the specified columns.</returns>
+        public SimpleQuery ReplaceSelect(IEnumerable<SimpleReference> columns)
+        {
+            return new SimpleQuery(this, _clauses.Where(c => !(c is SelectClause)).Append(new SelectClause(columns)).ToArray());
+        }
+
+        private void ThrowIfThereIsAlreadyASelectClause()
+        {
+            if (_clauses.OfType<SelectClause>().Any())
+                throw new InvalidOperationException("Query already contains a Select clause.");
         }
 
         public SimpleQuery ReplaceWhere(SimpleExpression criteria)
         {
             return new SimpleQuery(this,
-                                   _clauses.Where(c => !(c is WhereClause)).ToArray().Append(new WhereClause(criteria)));
+                                   _clauses.Where(c => !(c is WhereClause)).Append(new WhereClause(criteria)).ToArray());
         }
 
         public SimpleQuery Where(SimpleExpression criteria)

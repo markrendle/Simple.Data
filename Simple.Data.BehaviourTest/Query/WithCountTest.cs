@@ -33,6 +33,7 @@ namespace Simple.Data.IntegrationTest.Query
 
             GeneratedSqlIs(expected);
         }
+
         [Test]
         public void WithTotalCountShouldCreateCompoundQuery()
         {
@@ -41,6 +42,22 @@ namespace Simple.Data.IntegrationTest.Query
 
             Promise<int> count;
             var q = _db.Users.QueryByName("Foo")
+                .WithTotalCount(out count);
+
+            EatException<InvalidOperationException>(() => q.ToList());
+
+            GeneratedSqlIs(expected);
+        }
+
+        [Test]
+        public void WithTotalCountWithExplicitSelectShouldCreateCompoundQuery()
+        {
+            const string expected = @"select count(*) from [dbo].[users] where [dbo].[users].[name] = @p1_c0; " +
+                @"select [dbo].[users].[name] from [dbo].[users] where [dbo].[users].[name] = @p1_c1";
+
+            Promise<int> count;
+            var q = _db.Users.QueryByName("Foo")
+                .Select(_db.Users.Name)
                 .WithTotalCount(out count);
 
             EatException<InvalidOperationException>(() => q.ToList());
