@@ -27,7 +27,7 @@ namespace Simple.Data.Ado
         {
             using (var connection = Adapter.CreateConnection())
             {
-                using (var insertCommand = new CommandHelper(Adapter.SchemaProvider).CreateInsert(connection, insertSql, _columns))
+                using (var insertCommand = new CommandHelper(Adapter).CreateInsert(connection, insertSql, _columns))
                 {
                     connection.Open();
                     TryPrepare(insertCommand);
@@ -44,7 +44,7 @@ namespace Simple.Data.Ado
         {
             using (var connection = Adapter.CreateConnection())
             {
-                using (var insertCommand = new CommandHelper(Adapter.SchemaProvider).CreateInsert(connection, insertSql, _columns))
+                using (var insertCommand = new CommandHelper(Adapter).CreateInsert(connection, insertSql, _columns))
                 using (var selectCommand = connection.CreateCommand())
                 {
                     selectCommand.CommandText = selectSql;
@@ -61,7 +61,7 @@ namespace Simple.Data.Ado
 
             using (var connection = Adapter.CreateConnection())
             {
-                using (var command = new CommandHelper(Adapter.SchemaProvider).CreateInsert(connection, insertSql, _columns))
+                using (var command = new CommandHelper(Adapter).CreateInsert(connection, insertSql, _columns))
                 {
                     connection.Open();
                     TryPrepare(command);

@@ -10,40 +10,6 @@ namespace Simple.Data.SqlServer
 {
     class SqlSchemaProvider : ISchemaProvider
     {
-        // More info : http://msdn.microsoft.com/en-us/library/ms131092.aspx
-        private static readonly Dictionary<string, DbType> DbTypeLookup = new Dictionary<string, DbType>
-                                                                              {
-                                                                                  {"bigint", DbType.Int64},
-                                                                                  {"binary", DbType.Binary},
-                                                                                  {"bit", DbType.Boolean},
-                                                                                  {"char", DbType.AnsiStringFixedLength},
-                                                                                  {"date", DbType.DateTime},
-                                                                                  {"text", DbType.AnsiString},
-                                                                                  {"uniqueidentifier", DbType.Guid},
-                                                                                  {"time", DbType.DateTime},
-                                                                                  {"datetime2", DbType.DateTime2},
-                                                                                  {"datetimeoffset", DbType.DateTimeOffset},
-                                                                                  {"tinyint", DbType.Byte},
-                                                                                  {"smallint", DbType.Int16},
-                                                                                  {"int", DbType.Int32},
-                                                                                  {"smalldatetime", DbType.DateTime},
-                                                                                  {"real", DbType.Single},
-                                                                                  {"money", DbType.Currency},
-                                                                                  {"datetime", DbType.DateTime},
-                                                                                  {"float", DbType.Double},
-                                                                                  {"sql_variant", DbType.Object},
-                                                                                  {"ntext", DbType.String},
-                                                                                  {"decimal", DbType.Decimal},
-                                                                                  {"numeric", DbType.Decimal},
-                                                                                  {"smallmoney", DbType.Currency},
-                                                                                  {"varbinary", DbType.Binary},
-                                                                                  {"varchar", DbType.AnsiString},
-                                                                                  {"timestamp", DbType.Binary},
-                                                                                  {"image", DbType.Binary},
-                                                                                  {"nvarchar", DbType.String},
-                                                                                  {"nchar", DbType.StringFixedLength},
-                                                                                  {"xml", DbType.Xml},
-                                                                              };
         private readonly IConnectionProvider _connectionProvider;
 
         public SqlSchemaProvider(IConnectionProvider connectionProvider)
@@ -77,7 +43,7 @@ namespace Simple.Data.SqlServer
 
         private static Column SchemaRowToColumn(Table table, DataRow row)
         {
-            return new Column(row["name"].ToString(), table, (bool) row["is_identity"],
+            return new SqlColumn(row["name"].ToString(), table, (bool) row["is_identity"],
                               DbTypeFromInformationSchemaTypeName((string) row["type_name"]), (short) row["max_length"]);
         }
 
@@ -218,9 +184,9 @@ namespace Simple.Data.SqlServer
             return dataTable;
         }
 
-        private static DbType DbTypeFromInformationSchemaTypeName(string informationSchemaTypeName)
+        private static SqlDbType DbTypeFromInformationSchemaTypeName(string informationSchemaTypeName)
         {
-            return DbTypeLookup[informationSchemaTypeName];
+            return DbTypeLookup.GetSqlDbType(informationSchemaTypeName);
         }
     }
 }

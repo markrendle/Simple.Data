@@ -100,14 +100,14 @@ namespace Simple.Data.Ado
         {
             if (_transaction != null)
             {
-                var command = new CommandHelper(_adapter.SchemaProvider).Create(_transaction.Connection, sql, values.ToArray());
+                var command = new CommandHelper(_adapter).Create(_transaction.Connection, sql, values.ToArray());
                 command.Transaction = _transaction;
                 return TryExecuteSingletonQuery(command);
             }
 
             using (var connection = _adapter.CreateConnection())
             {
-                using (var command = new CommandHelper(_adapter.SchemaProvider).Create(connection, sql, values.ToArray()))
+                using (var command = new CommandHelper(_adapter).Create(connection, sql, values.ToArray()))
                 {
                     connection.Open();
                     return TryExecuteSingletonQuery(command);
@@ -119,7 +119,7 @@ namespace Simple.Data.Ado
         {
             if (_transaction != null)
             {
-                var command = new CommandHelper(_adapter.SchemaProvider).Create(_transaction.Connection, insertSql, values.ToArray());
+                var command = new CommandHelper(_adapter).Create(_transaction.Connection, insertSql, values.ToArray());
                 command.Transaction = _transaction;
                 TryExecute(command);
                 command.CommandText = selectSql;
@@ -129,7 +129,7 @@ namespace Simple.Data.Ado
 
             using (var connection = _adapter.CreateConnection())
             {
-                using (var command = new CommandHelper(_adapter.SchemaProvider).Create(connection, insertSql, values.ToArray()))
+                using (var command = new CommandHelper(_adapter).Create(connection, insertSql, values.ToArray()))
                 {
                     connection.Open();
                     TryExecute(command);
@@ -165,13 +165,13 @@ namespace Simple.Data.Ado
         {
             if (_transaction != null)
             {
-                var command = new CommandHelper(_adapter.SchemaProvider).Create(_transaction.Connection, sql, values.ToArray());
+                var command = new CommandHelper(_adapter).Create(_transaction.Connection, sql, values.ToArray());
                 command.Transaction = _transaction;
                 return TryExecute(command);
             }
             using (var connection = _adapter.CreateConnection())
             {
-                using (var command = new CommandHelper(_adapter.SchemaProvider).Create(connection, sql, values.ToArray()))
+                using (var command = new CommandHelper(_adapter).Create(connection, sql, values.ToArray()))
                 {
                     connection.Open();
                     return TryExecute(command);

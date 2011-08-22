@@ -42,7 +42,7 @@ namespace Simple.Data.Ado
         internal AdoAdapter(IConnectionProvider connectionProvider) : this()
         {
             _connectionProvider = connectionProvider;
-            _schema = DatabaseSchema.Get(_connectionProvider);
+            _schema = DatabaseSchema.Get(_connectionProvider, _providerHelper);
             _relatedFinder = new Lazy<AdoAdapterRelatedFinder>(CreateRelatedFinder);
         }
 
@@ -69,7 +69,7 @@ namespace Simple.Data.Ado
             {
                 _connectionProvider = ProviderHelper.GetProviderByConnectionName(Settings.ConnectionName);
             }
-            _schema = DatabaseSchema.Get(_connectionProvider);
+            _schema = DatabaseSchema.Get(_connectionProvider, _providerHelper);
             _relatedFinder = new Lazy<AdoAdapterRelatedFinder>(CreateRelatedFinder);
         }
 
@@ -147,7 +147,7 @@ namespace Simple.Data.Ado
                     unhandledClauses.Add(unhandledClausesForThisQuery);
                 }
                 var connection = _connectionProvider.CreateConnection();
-                var command = CommandBuilder.CreateCommand(commandBuilders, connection);
+                var command = CommandBuilder.CreateCommand(_providerHelper.GetCustomProvider<IDbParameterFactory>(_schema.SchemaProvider), commandBuilders, connection);
                 foreach (var item in command.ToEnumerables(connection))
                 {
                     yield return item.ToList();
@@ -307,7 +307,7 @@ namespace Simple.Data.Ado
 
         internal DatabaseSchema GetSchema()
         {
-            return DatabaseSchema.Get(_connectionProvider);
+            return DatabaseSchema.Get(_connectionProvider, _providerHelper);
         }
 
         /// <summary>

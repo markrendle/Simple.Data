@@ -10,15 +10,22 @@ namespace Simple.Data.Ado.Schema
     {
         private static readonly ConcurrentDictionary<string, DatabaseSchema> Instances = new ConcurrentDictionary<string, DatabaseSchema>();
 
+        private readonly ProviderHelper _providerHelper;
         private readonly ISchemaProvider _schemaProvider;
         private readonly Lazy<TableCollection> _lazyTables;
         private readonly Lazy<ProcedureCollection> _lazyProcedures;
 
-        private DatabaseSchema(ISchemaProvider schemaProvider)
+        private DatabaseSchema(ISchemaProvider schemaProvider, ProviderHelper providerHelper)
         {
             _lazyTables = new Lazy<TableCollection>(CreateTableCollection);
             _lazyProcedures = new Lazy<ProcedureCollection>(CreateProcedureCollection);
             _schemaProvider = schemaProvider;
+            _providerHelper = providerHelper;
+        }
+
+        public ProviderHelper ProviderHelper
+        {
+            get { return _providerHelper; }
         }
 
         public ISchemaProvider SchemaProvider
@@ -84,10 +91,10 @@ namespace Simple.Data.Ado.Schema
                 return _schemaProvider.QuoteObjectName(unquotedName.Name);
         }
 
-        public static DatabaseSchema Get(IConnectionProvider connectionProvider)
+        public static DatabaseSchema Get(IConnectionProvider connectionProvider, ProviderHelper providerHelper)
         {
             return Instances.GetOrAdd(connectionProvider.ConnectionString,
-                                      sp => new DatabaseSchema(connectionProvider.GetSchemaProvider()));
+                                      sp => new DatabaseSchema(connectionProvider.GetSchemaProvider(), providerHelper));
         }
     }
 }

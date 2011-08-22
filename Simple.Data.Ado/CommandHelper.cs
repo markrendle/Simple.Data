@@ -12,11 +12,13 @@ namespace Simple.Data.Ado
 
     internal class CommandHelper
     {
+        private readonly AdoAdapter _adapter;
         private readonly ISchemaProvider _schemaProvider;
 
-        public CommandHelper(ISchemaProvider schemaProvider)
+        public CommandHelper(AdoAdapter adapter)
         {
-            _schemaProvider = schemaProvider;
+            _adapter = adapter;
+            _schemaProvider = adapter.SchemaProvider;
         }
 
         internal IDbCommand Create(IDbConnection connection, string sql, IList<object> values)
@@ -39,6 +41,8 @@ namespace Simple.Data.Ado
 
         private string PrepareCommand(IEnumerable<char> sql, IDbCommand command)
         {
+            var parameterFactory = _adapter.ProviderHelper.GetCustomProvider<IDbParameterFactory>(_schemaProvider)
+                                   ?? new GenericDbParameterFactory(command);
             int index = 0;
             var sqlBuilder = new StringBuilder();
             foreach (var c in sql)
@@ -62,6 +66,9 @@ namespace Simple.Data.Ado
 
         private string PrepareInsertCommand(string sql, IDbCommand command, IEnumerable<Column> columns)
         {
+            var parameterFactory = _adapter.ProviderHelper.GetCustomProvider<IDbParameterFactory>(_schemaProvider)
+                                   ?? new GenericDbParameterFactory(command);
+
             var columnLookup = columns.ToDictionary(c => c.QuotedName, c => c);
             if (columnLookup.Count == 0) return PrepareCommand(sql, command);
 
@@ -74,11 +81,8 @@ namespace Simple.Data.Ado
             {
                 if (c == '?')
                 {
-                    var parameter = command.CreateParameter();
-                    parameter.ParameterName = _schemaProvider.NameParameter("p" + index);
                     var column = columnLookup[columnNameList[index]];
-                    parameter.DbType = column.DbType;
-                    parameter.Size = column.MaxLength;
+                    var parameter = parameterFactory.CreateParameter(_schemaProvider.NameParameter("p" + index), column);
                     command.Parameters.Add(parameter);
                     
                     sqlBuilder.Append(parameter.ParameterName);

@@ -11,12 +11,14 @@ namespace Simple.Data.Ado
 {
     public class CommandTemplate
     {
+        private readonly Func<IDbCommand, IDbParameterFactory> _createGetParameterFactoryFunc;
         private readonly string _commandText;
         private readonly ParameterTemplate[] _parameters;
         private readonly Dictionary<string, int> _index;
 
-        public CommandTemplate(string commandText, ParameterTemplate[] parameterNames, Dictionary<string, int> index)
+        public CommandTemplate(Func<IDbCommand, IDbParameterFactory> createGetParameterFactoryFunc, string commandText, ParameterTemplate[] parameterNames, Dictionary<string, int> index)
         {
+            _createGetParameterFactoryFunc = createGetParameterFactoryFunc;
             _commandText = commandText;
             _parameters = parameterNames;
             _index = index;
@@ -60,7 +62,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static IEnumerable<IDbDataParameter> CreateParameters(IDbCommand command, ParameterTemplate parameterTemplate, object value)
+        private IEnumerable<IDbDataParameter> CreateParameters(IDbCommand command, ParameterTemplate parameterTemplate, object value)
         {
             if (value == null || TypeHelper.IsKnownType(value.GetType()) || parameterTemplate.DbType == DbType.Binary)
             {
@@ -115,11 +117,14 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static IDbDataParameter CreateParameter(IDbCommand command, ParameterTemplate parameterTemplate, object value, string suffix = "")
+        private IDbDataParameter CreateParameter(IDbCommand command, ParameterTemplate parameterTemplate, object value, string suffix = "")
         {
-            var parameter = command.CreateParameter();
-            parameter.ParameterName = parameterTemplate.Name + suffix;
-            parameter.DbType = parameterTemplate.DbType;
+            var factory = _createGetParameterFactoryFunc(command);
+            var parameter = parameterTemplate.Column != null
+                                ? factory.CreateParameter(parameterTemplate.Name + suffix,
+                                                          parameterTemplate.Column)
+                                : factory.CreateParameter(parameterTemplate.Name, parameterTemplate.DbType,
+                                                          parameterTemplate.MaxLength);
             parameter.Value = FixObjectType(value);
             return parameter;
         }

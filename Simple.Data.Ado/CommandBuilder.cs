@@ -12,28 +12,32 @@ namespace Simple.Data.Ado
     class CommandBuilder : ICommandBuilder
     {
         private int _number;
+        private Func<IDbCommand, IDbParameterFactory> _getParameterFactory;
         private readonly ISchemaProvider _schemaProvider;
         private readonly Dictionary<ParameterTemplate, object> _parameters = new Dictionary<ParameterTemplate, object>();
         private readonly StringBuilder _text;
         private readonly string _parameterSuffix;
+        private readonly ProviderHelper _customInterfaceProvider;
 
         public string Joins { get; set; }
 
-        public CommandBuilder(ISchemaProvider schemaProvider) : this(schemaProvider, -1)
+        public CommandBuilder(DatabaseSchema schema) : this(schema, -1)
         {
         }
 
-        public CommandBuilder(ISchemaProvider schemaProvider, int bulkIndex)
+        public CommandBuilder(DatabaseSchema schema, int bulkIndex)
         {
             _text = new StringBuilder();
-            _schemaProvider = schemaProvider;
+            _schemaProvider = schema.SchemaProvider;
+            _customInterfaceProvider = schema.ProviderHelper;
             _parameterSuffix = (bulkIndex >= 0) ? "_c" + bulkIndex : string.Empty;
         }
 
-        public CommandBuilder(string text, ISchemaProvider schemaProvider, int bulkIndex)
+        public CommandBuilder(string text, DatabaseSchema schema, int bulkIndex)
         {
             _text = new StringBuilder(text);
-            _schemaProvider = schemaProvider;
+            _schemaProvider = schema.SchemaProvider;
+            _customInterfaceProvider = schema.ProviderHelper;
             _parameterSuffix = (bulkIndex >= 0) ? "_c" + bulkIndex : string.Empty;
         }
 
@@ -100,22 +104,46 @@ namespace Simple.Data.Ado
             var command = connection.CreateCommand();
             command.CommandText = Text;
 
+            var parameterFactory = CreateParameterFactory(command);
+
             foreach (var parameter in _parameters.Keys)
             {
-                var dbParameter = command.CreateParameter();
-                dbParameter.ParameterName = parameter.Name;
-                dbParameter.SourceColumn = parameter.Column.ActualName;
-                dbParameter.DbType = parameter.DbType;
-                dbParameter.Size = parameter.MaxLength;
-                command.Parameters.Add(dbParameter);
+                command.Parameters.Add(parameterFactory.CreateParameter(parameter.Name, parameter.Column));
             }
             return command;
+        }
+
+
+        private IDbParameterFactory CreateParameterFactory(IDbCommand command)
+        {
+            CreateGetParameterFactoryFunc();
+
+            return _getParameterFactory(command);
+        }
+
+        private Func<IDbCommand, IDbParameterFactory> CreateGetParameterFactoryFunc()
+        {
+            if (_getParameterFactory == null)
+            {
+                var customParameterFactory =
+                    _customInterfaceProvider.GetCustomProvider<IDbParameterFactory>(_schemaProvider);
+                if (customParameterFactory != null)
+                {
+                    _getParameterFactory = _ => customParameterFactory;
+                }
+                else
+                {
+                    _getParameterFactory = c => new GenericDbParameterFactory(c);
+                }
+            }
+
+            return _getParameterFactory;
         }
 
         public CommandTemplate GetCommandTemplate(Table table)
         {
             var index = table.Columns.Select((c, i) => Tuple.Create(c, i)).ToDictionary(t => t.Item1.ActualName, t => t.Item2);
-            return new CommandTemplate(_text.ToString(), _parameters.Keys.ToArray(), new Dictionary<string, int>(index, HomogenizedEqualityComparer.DefaultInstance));
+            return new CommandTemplate(CreateGetParameterFactoryFunc(), _text.ToString(), _parameters.Keys.ToArray(), new Dictionary<string, int>(index, HomogenizedEqualityComparer.DefaultInstance));
         }
 
         private void SetParameters(IDbCommand command, string suffix)
@@ -123,14 +151,21 @@ namespace Simple.Data.Ado
             SetParameters(command, _parameters);
         }
 
-        private static void SetParameters(IDbCommand command, IEnumerable<KeyValuePair<ParameterTemplate, object>> parameters)
+        private void SetParameters(IDbCommand command, IEnumerable<KeyValuePair<ParameterTemplate, object>> parameters)
+        {
+            var parameterFactory = CreateParameterFactory(command);
+            SetParameters(parameterFactory, command, parameters);
+        }
+
+        private static void SetParameters(IDbParameterFactory parameterFactory, IDbCommand command, IEnumerable<KeyValuePair<ParameterTemplate, object>> parameters)
         {
             var parameterList = parameters.ToList();
-            if (parameterList.Any(kvp => kvp.Value is IRange) || parameterList.Any(kvp => kvp.Value is IEnumerable && !(kvp.Value is string)))
+            if (parameterList.Any(kvp => kvp.Value is IRange) ||
+                parameterList.Any(kvp => kvp.Value is IEnumerable && !(kvp.Value is string)))
             {
                 foreach (var pair in parameterList)
                 {
-                    foreach (var parameter in CreateParameterComplex(pair.Key, pair.Value, command))
+                    foreach (var parameter in CreateParameterComplex(parameterFactory, pair.Key, pair.Value, command))
                     {
                         command.Parameters.Add(parameter);
                     }
@@ -140,23 +175,23 @@ namespace Simple.Data.Ado
             {
                 foreach (var pair in parameterList)
                 {
-                    command.Parameters.Add(CreateSingleParameter(pair.Value, command, pair.Key.Name, pair.Key.DbType));
+                    command.Parameters.Add(CreateSingleParameter(parameterFactory, pair.Value, pair.Key));
                 }
             }
         }
 
-        private static IEnumerable<IDbDataParameter> CreateParameterComplex(ParameterTemplate template, object value, IDbCommand command)
+        private static IEnumerable<IDbDataParameter> CreateParameterComplex(IDbParameterFactory parameterFactory, ParameterTemplate template, object value, IDbCommand command)
         {
-            if (template.DbType == DbType.Binary)
+            if (template.Column != null && template.Column.IsBinary)
             {
-                yield return CreateSingleParameter(value, command, template.Name, template.DbType);
+                yield return CreateSingleParameter(parameterFactory, value, template.Name, template.Column);
             }
             else
             {
                 var str = value as string;
                 if (str != null)
                 {
-                    yield return CreateSingleParameter(value, command, template.Name, template.DbType);
+                    yield return CreateSingleParameter(parameterFactory, value, template.Name, template.Column);
                 }
                 else
                 {
@@ -164,8 +199,8 @@ namespace Simple.Data.Ado
                     if (range != null)
                     {
                         yield return
-                            CreateSingleParameter(range.Start, command, template.Name + "_start", template.DbType);
-                        yield return CreateSingleParameter(range.End, command, template.Name + "_end", template.DbType);
+                            CreateSingleParameter(parameterFactory, range.Start, template.Name + "_start", template.Column);
+                        yield return CreateSingleParameter(parameterFactory, range.End, template.Name + "_end", template.Column);
                         SetBetweenInCommandText(command, template.Name);
                     }
                     else
@@ -179,7 +214,7 @@ namespace Simple.Data.Ado
                             {
                                 builder.AppendFormat(",{0}_{1}", template.Name, i);
                                 yield return
-                                    CreateSingleParameter(array[i], command, template.Name + "_" + i, template.DbType);
+                                    CreateSingleParameter(parameterFactory, array[i], template.Name + "_" + i, template.Column);
                             }
                             if (command.CommandText.Contains("!= " + template.Name))
                             {
@@ -197,7 +232,7 @@ namespace Simple.Data.Ado
                         }
                         else
                         {
-                            yield return CreateSingleParameter(value, command, template.Name, template.DbType);
+                            yield return CreateSingleParameter(parameterFactory, value, template);
                         }
                     }
                 }
@@ -218,16 +253,36 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static IDbDataParameter CreateSingleParameter(object value, IDbCommand command, string name, DbType dbType)
+        private static IDbDataParameter CreateSingleParameter(IDbParameterFactory parameterFactory, object value, ParameterTemplate template)    
         {
-            var parameter = command.CreateParameter();
-            parameter.ParameterName = name;
-            parameter.DbType = dbType;
+            if (template.Column != null) return CreateSingleParameter(parameterFactory, value, template.Name, template.Column);
+
+            var parameter = parameterFactory.CreateParameter(template.Name, template.DbType, template.MaxLength);
             parameter.Value = CommandHelper.FixObjectType(value);
             return parameter;
         }
 
-        internal static IDbCommand CreateCommand(ICommandBuilder[] commandBuilders, IDbConnection connection)
+        private static IDbDataParameter CreateSingleParameter(IDbParameterFactory parameterFactory, object value, string name, Column column)
+        {
+            var parameter = parameterFactory.CreateParameter(name, column);
+            parameter.Value = CommandHelper.FixObjectType(value);
+            return parameter;
+        }
+
+        internal static IDbCommand CreateCommand(IDbParameterFactory parameterFactory, ICommandBuilder[] commandBuilders, IDbConnection connection)
+        {
+            var command = connection.CreateCommand();
+            parameterFactory = parameterFactory ?? new GenericDbParameterFactory(command);
+            for (int i = 0; i < commandBuilders.Length; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(command.CommandText)) command.CommandText += "; ";
+                command.CommandText += commandBuilders[i].Text;
+                SetParameters(parameterFactory, command, commandBuilders[i].Parameters);
+            }
+            return command;
+        }
+
+        internal IDbCommand CreateCommand(ICommandBuilder[] commandBuilders, IDbConnection connection)
         {
             var command = connection.CreateCommand();
             for (int i = 0; i < commandBuilders.Length; i++)

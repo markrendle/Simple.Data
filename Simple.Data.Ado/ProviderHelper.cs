@@ -10,6 +10,8 @@ using System.Text.RegularExpressions;
 
 namespace Simple.Data.Ado
 {
+    using Schema;
+
     public class ProviderHelper
 	{
         private readonly ConcurrentDictionary<ConnectionToken, IConnectionProvider> _connectionProviderCache = new ConcurrentDictionary<ConnectionToken,IConnectionProvider>();
@@ -116,6 +118,22 @@ namespace Simple.Data.Ado
         private static T GetCustomProviderExport<T>(IConnectionProvider connectionProvider)
         {
             using (var assemblyCatalog = new AssemblyCatalog(connectionProvider.GetType().Assembly))
+            {
+                using (var container = new CompositionContainer(assemblyCatalog))
+                {
+                    return container.GetExportedValueOrDefault<T>();
+                }
+            }
+        }
+
+        public T GetCustomProvider<T>(ISchemaProvider schemaProvider)
+        {
+            return (T)_customProviderCache.GetOrAdd(typeof(T), t => GetCustomProviderExport<T>(schemaProvider));
+        }
+
+        private static T GetCustomProviderExport<T>(ISchemaProvider schemaProvider)
+        {
+            using (var assemblyCatalog = new AssemblyCatalog(schemaProvider.GetType().Assembly))
             {
                 using (var container = new CompositionContainer(assemblyCatalog))
                 {

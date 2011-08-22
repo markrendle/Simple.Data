@@ -76,12 +76,14 @@
     <Compile Include="ExpressionHasher.cs" />
     <Compile Include="FindHelper.cs" />
     <Compile Include="FunctionNameConverter.cs" />
+    <Compile Include="GenericDbParameterFactory.cs" />
     <Compile Include="HomogenizedDictionaryIndex.cs" />
     <Compile Include="IBulkInserter.cs" />
     <Compile Include="IBulkUpdater.cs" />
     <Compile Include="ICommandBuilder.cs" />
     <Compile Include="IConnectionProvider.cs" />
     <Compile Include="ICustomInserter.cs" />
+    <Compile Include="IDbParameterFactory.cs" />
     <Compile Include="IExpressionFormatter.cs" />
     <Compile Include="IFunctionNameConverter.cs" />
     <Compile Include="IObservableQueryRunner.cs" />

@@ -17,7 +17,7 @@ namespace Simple.Data.Ado
 
         public override IEnumerable<IDictionary<string, object>> InsertRowsWithSeparateStatements(string insertSql, string selectSql)
         {
-            var insertCommand = new CommandHelper(Adapter.SchemaProvider).Create(_transaction.Connection, insertSql);
+            var insertCommand = new CommandHelper(Adapter).Create(_transaction.Connection, insertSql);
             var selectCommand = _transaction.Connection.CreateCommand();
             selectCommand.CommandText = selectSql;
             insertCommand.Transaction = _transaction;
@@ -28,14 +28,14 @@ namespace Simple.Data.Ado
         public override IEnumerable<IDictionary<string, object>> InsertRowsWithCompoundStatement(string insertSql, string selectSql)
         {
             insertSql += "; " + selectSql;
-            var command = new CommandHelper(Adapter.SchemaProvider).Create(_transaction.Connection, insertSql);
+            var command = new CommandHelper(Adapter).Create(_transaction.Connection, insertSql);
             command.Transaction = _transaction;
             return Data.Select(row => InsertRowAndSelect(row, command)).ToList();
         }
 
         public override void InsertRowsWithoutFetchBack(string insertSql)
         {
-            using (var insertCommand = new CommandHelper(Adapter.SchemaProvider).Create(_transaction.Connection, insertSql))
+            using (var insertCommand = new CommandHelper(Adapter).Create(_transaction.Connection, insertSql))
             {
                 insertCommand.Transaction = _transaction;
                 foreach (var row in Data)

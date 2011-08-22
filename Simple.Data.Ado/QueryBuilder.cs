@@ -32,7 +32,7 @@ namespace Simple.Data.Ado
             _adoAdapter = adoAdapter;
             _bulkIndex = bulkIndex;
             _schema = _adoAdapter.GetSchema();
-            _commandBuilder = new CommandBuilder(_schema.SchemaProvider, _bulkIndex);
+            _commandBuilder = new CommandBuilder(_schema, _bulkIndex);
             _simpleReferenceFormatter = new SimpleReferenceFormatter(_schema, _commandBuilder);
         }
 

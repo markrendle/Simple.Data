@@ -15,7 +15,7 @@ namespace Simple.Data.Ado
         public DeleteHelper(DatabaseSchema schema)
         {
             _schema = schema;
-            _commandBuilder = new CommandBuilder(schema.SchemaProvider);
+            _commandBuilder = new CommandBuilder(schema);
             _expressionFormatter = new ExpressionFormatter(_commandBuilder, _schema);
         }
 
