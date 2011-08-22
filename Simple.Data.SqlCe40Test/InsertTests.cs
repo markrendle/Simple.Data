@@ -119,5 +119,16 @@ namespace Simple.Data.SqlCe40Test
             Assert.AreEqual("tea", actuals[1].Password);
             Assert.AreEqual(1, actuals[1].Age);
         }
+
+        [Test]
+        public void InsertBigStringIntoNTextColumn()
+        {
+            var bigString = new string('X', 8192);
+            var db = Database.Opener.OpenFile(DatabasePath);
+            var row = db.TextTest.Insert(Text: bigString);
+            Assert.NotNull(row);
+            Assert.AreNotEqual(0, row.Id);
+            Assert.AreEqual(bigString, row.Text);
+        }
     }
 }
