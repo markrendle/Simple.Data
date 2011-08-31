@@ -6,6 +6,7 @@ using System.Text;
 namespace Simple.Data.UnitTest
 {
     using NUnit.Framework;
+    using QueryPolyfills;
 
     [TestFixture]
     public class DictionaryQueryRunnerTest
@@ -70,6 +71,28 @@ namespace Simple.Data.UnitTest
             Assert.AreEqual(1, actual[0]["Row"]);
         }
 
+        [Test]
+        public void SelectShouldRestrictColumnList()
+        {
+            var tableRef = new ObjectReference("FooTable");
+            var selectClause = new SelectClause(new SimpleReference[] { new ObjectReference("Id", tableRef), new ObjectReference("Name", tableRef) });
+            var runner = new DictionaryQueryRunner(SelectSource(), selectClause);
+            var actual = runner.Run().ToList();
+            Assert.AreEqual(4, actual.Count);
+            Assert.AreEqual(2, actual[0].Count);
+            Assert.AreEqual(1, actual[0]["Id"]);
+            Assert.AreEqual("Alice", actual[0]["Name"]);
+            Assert.AreEqual(2, actual[1].Count);
+            Assert.AreEqual(2, actual[1]["Id"]);
+            Assert.AreEqual("Bob", actual[1]["Name"]);
+            Assert.AreEqual(2, actual[2].Count);
+            Assert.AreEqual(3, actual[2]["Id"]);
+            Assert.AreEqual("Charlie", actual[2]["Name"]);
+            Assert.AreEqual(2, actual[3].Count);
+            Assert.AreEqual(4, actual[3]["Id"]);
+            Assert.AreEqual("David", actual[3]["Name"]);
+        }
+
         #region Distinct sources
 
         private static IEnumerable<IDictionary<string, object>> DuplicatingSource()
@@ -121,5 +144,25 @@ namespace Simple.Data.UnitTest
         }
 
         #endregion
+
+        private static IEnumerable<IDictionary<string,object>> SelectSource()
+        {
+            yield return new Dictionary<string, object>
+                             {
+                                {"Id", 1}, { "Type", "A"}, {"Name","Alice"}, {"Weight", 100M}
+                             };
+            yield return new Dictionary<string, object>
+                             {
+                                {"Id", 2}, { "Type", "A"}, {"Name","Bob"}, {"Weight", 150M}
+                             };
+            yield return new Dictionary<string, object>
+                             {
+                                {"Id", 3}, { "Type", "B"}, {"Name","Charlie"}, {"Weight", 200M}
+                             };
+            yield return new Dictionary<string, object>
+                             {
+                                {"Id", 4}, { "Type", "B"}, {"Name","David"}, {"Weight", 250M}
+                             };
+        }
     }
 }
