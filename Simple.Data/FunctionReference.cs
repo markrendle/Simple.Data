@@ -55,6 +55,15 @@ namespace Simple.Data
             get { return _alias; }
         }
 
+        /// <summary>
+        /// Gets the name of the referenced object.
+        /// </summary>
+        /// <returns>The name.</returns>
+        public string GetAliasOrName()
+        {
+            return _alias ?? _name;
+        }
+
         public bool IsAggregate
         {
             get { return _isAggregate; }

@@ -9,4 +9,12 @@ namespace Simple.Data
             return null;
         }
     }
+
+    public static class SimpleReferenceEx
+    {
+        public static bool IsNull(this SimpleReference reference)
+        {
+            return ReferenceEquals(reference, null);
+        }
+    }
 }

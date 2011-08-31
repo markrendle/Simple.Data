@@ -59,7 +59,7 @@ namespace Simple.Data
 
         protected internal override DataStrategy FindDataStrategyInHierarchy()
         {
-            return _dataStrategy ?? (_owner == null ? null : _owner.FindDataStrategyInHierarchy());
+            return _dataStrategy ?? (ReferenceEquals(_owner, null) ? null : _owner.FindDataStrategyInHierarchy());
         }
 
         /// <summary>
@@ -69,6 +69,15 @@ namespace Simple.Data
         public string GetName()
         {
             return _name;
+        }
+
+        /// <summary>
+        /// Gets the name of the referenced object.
+        /// </summary>
+        /// <returns>The name.</returns>
+        public string GetAliasOrName()
+        {
+            return _alias ?? _name;
         }
 
         public ObjectReference As(string alias)

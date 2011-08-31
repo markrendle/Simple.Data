@@ -93,6 +93,29 @@ namespace Simple.Data.UnitTest
             Assert.AreEqual("David", actual[3]["Name"]);
         }
 
+        [Test]
+        public void SelectLengthShouldUseLengthFunction()
+        {
+            var tableRef = new ObjectReference("FooTable");
+            var function = new FunctionReference("Length", new ObjectReference("Name", tableRef)).As("NameLength");
+            var selectClause = new SelectClause(new SimpleReference[] { new ObjectReference("Name", tableRef), function });
+            var runner = new DictionaryQueryRunner(SelectSource(), selectClause);
+            var actual = runner.Run().ToList();
+            Assert.AreEqual(4, actual.Count);
+            Assert.AreEqual(2, actual[0].Count);
+            Assert.AreEqual("Alice", actual[0]["Name"]);
+            Assert.AreEqual(5, actual[0]["NameLength"]);
+            Assert.AreEqual(2, actual[1].Count);
+            Assert.AreEqual("Bob", actual[1]["Name"]);
+            Assert.AreEqual(3, actual[1]["NameLength"]);
+            Assert.AreEqual(2, actual[2].Count);
+            Assert.AreEqual("Charlie", actual[2]["Name"]);
+            Assert.AreEqual(7, actual[2]["NameLength"]);
+            Assert.AreEqual(2, actual[3].Count);
+            Assert.AreEqual("David", actual[3]["Name"]);
+            Assert.AreEqual(5, actual[3]["NameLength"]);
+        }
+
         #region Distinct sources
 
         private static IEnumerable<IDictionary<string, object>> DuplicatingSource()
