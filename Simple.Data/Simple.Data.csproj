@@ -78,6 +78,7 @@
     <Compile Include="Database.Open.cs" />
     <Compile Include="DatabaseOpenerMethods.cs" />
     <Compile Include="DictionaryCloner.cs" />
+    <Compile Include="DictionaryQueryRunner.cs" />
     <Compile Include="DistinctClause.cs" />
     <Compile Include="EnumerableEx.cs" />
     <Compile Include="ExistsSpecialReference.cs" />
