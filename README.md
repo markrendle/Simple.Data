@@ -47,15 +47,21 @@ Currently, Simple.Data has adapters for:
 * ADO-based access to relational databases, with providers for:
 	* SQL Server 2005 and later
 	* SQL Server Compact Edition 4.0
+    * Oracle
 	* MySQL 4.0 and later
 	* SQLite
 * MongoDB
 
-We are expecting more ADO Providers to support Oracle, PostgreSQL and more, and Adapters for CouchDB, Redis, Azure Table Storage, Amazon SimpleDB...
+Work is in progress to support PostgreSQL and Azure Table Storage. I'm also ensuring that Simple.Data works on Mono by the 1.0 release.
+
+If you'd like to create an adapter or provider and need some help to get started, drop in on the mailing list (see below).
 
 ## Resources
 * Simple.Data can be installed from [NuGet](http://nuget.org/)
 * Find more information in [the wiki](http://github.com/markrendle/Simple.Data/wiki/Getting-started)
+* [Documentation!](http://simplefx.org/simpledata/docs/)
 * Ask questions or report issues on [the mailing list](http://groups.google.com/group/simpledata)
 * Follow [@markrendle on Twitter](http://twitter.com/markrendle) for updates
 * Check out [my blog](http://blog.markrendle.net/) for the latest news
+
+<a href='http://www.pledgie.com/campaigns/15965'><img alt='Click here to lend your support to: Simple.Data and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/15965.png?skin_name=chrome' border='0' /></a>
