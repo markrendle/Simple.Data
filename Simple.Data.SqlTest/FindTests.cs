@@ -23,21 +23,6 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
-        public void TestProviderIsSqlProvider()
-        {
-            var provider = new ProviderHelper().GetProviderByConnectionString(Properties.Settings.Default.ConnectionString);
-            Assert.IsInstanceOf(typeof(SqlConnectionProvider), provider);
-        }
-
-        [Test]
-        public void TestProviderIsSqlProviderFromOpen()
-        {
-            Database db = DatabaseHelper.Open();
-            Assert.IsInstanceOf(typeof(AdoAdapter), db.GetAdapter());
-            Assert.IsInstanceOf(typeof(SqlConnectionProvider), ((AdoAdapter)db.GetAdapter()).ConnectionProvider);
-        }
-
-        [Test]
         public void TestFindById()
         {
             var db = DatabaseHelper.Open();
