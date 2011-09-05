@@ -284,6 +284,17 @@ namespace Simple.Data
         }
 
         /// <summary>
+        /// Creates a single-set <see cref="SimpleResultSet"/> from the specified source.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        public static SimpleResultSet Create(IEnumerable<IDictionary<string, object>> source, string tableName, DataStrategy dataStrategy)
+        {
+            var q = from dict in source
+                    select new SimpleRecord(dict, tableName, dataStrategy);
+            return new SimpleResultSet(q);
+        }
+
+        /// <summary>
         /// Creates a multi-set <see cref="SimpleResultSet"/> from the specified sources.
         /// </summary>
         /// <param name="sources">The sources.</param>

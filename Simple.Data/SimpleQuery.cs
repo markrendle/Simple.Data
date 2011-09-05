@@ -85,6 +85,16 @@
             return true;
         }
 
+        public override bool TryConvert(ConvertBinder binder, out object result)
+        {
+            if (binder.Type == typeof(IEnumerable<dynamic>))
+            {
+                result = Cast<dynamic>();
+                return true;
+            }
+            return base.TryConvert(binder, out result);
+        }
+
         /// <summary>
         /// Selects only the specified columns.
         /// </summary>
@@ -210,23 +220,8 @@
 
         protected IEnumerable<dynamic> Run()
         {
-            //if (_clauses.OfType<WithCountClause>().Any())
-            //{
-            //    return RunWithCount();
-            //}
             IEnumerable<SimpleQueryClauseBase> unhandledClauses;
-            return
-                _adapter.RunQuery(this, out unhandledClauses).Select(d => new SimpleRecord(d, _tableName, _dataStrategy));
-        }
-
-        private IEnumerable<dynamic> RunWithCount()
-        {
-            var withCountClause = _clauses.OfType<WithCountClause>().Single();
-            var countQuery = ClearSkip().ClearTake().Select(new CountSpecialReference());
-            var unhandledClausesList = new List<IEnumerable<SimpleQueryClauseBase>>();
-            var results = _adapter.RunQueries(new[] { countQuery, this }, unhandledClausesList).ToList();
-            withCountClause.SetCount((int) results[0].Single().First().Value);
-            return results[1].Select(d => new SimpleRecord(d, _tableName, _dataStrategy));
+            return SimpleResultSet.Create(_adapter.RunQuery(this, out unhandledClauses), _tableName, _dataStrategy).Cast<dynamic>();
         }
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)

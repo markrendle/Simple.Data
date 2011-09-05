@@ -13,7 +13,7 @@ namespace Simple.Data.Ado
     using Schema;
 
     public class ProviderHelper
-	{
+    {
         private readonly ConcurrentDictionary<ConnectionToken, IConnectionProvider> _connectionProviderCache = new ConcurrentDictionary<ConnectionToken,IConnectionProvider>();
         private readonly ConcurrentDictionary<Type, object> _customProviderCache = new ConcurrentDictionary<Type, object>();
 
@@ -31,7 +31,7 @@ namespace Simple.Data.Ado
 
         private IConnectionProvider LoadProviderByConnectionString(ConnectionToken token)
         {
-			var dataSource = GetDataSourceName(token.ConnectionString);
+            var dataSource = GetDataSourceName(token.ConnectionString);
             if (dataSource.EndsWith("sdf", StringComparison.CurrentCultureIgnoreCase) && File.Exists(dataSource))
             {
                 return GetProviderByFilename(dataSource);
@@ -41,16 +41,16 @@ namespace Simple.Data.Ado
             provider.SetConnectionString(token.ConnectionString);
             return provider;
         }
-			
-		internal static string GetDataSourceName(string connectionString)
-		{
-			var match = Regex.Match(connectionString, @"data source=(.*?)(;|\z)");
-			if (match != null && match.Groups.Count > 1)
-			{
-				return match.Groups[1].Value;
-			}
-			return string.Empty;
-		}
+            
+        internal static string GetDataSourceName(string connectionString)
+        {
+            var match = Regex.Match(connectionString, @"data source=(.*?)(;|\z)");
+            if (match != null && match.Groups.Count > 1)
+            {
+                return match.Groups[1].Value;
+            }
+            return string.Empty;
+        }
 
         private static IConnectionProvider LoadProviderByFilename(ConnectionToken token)
         {
@@ -218,5 +218,5 @@ namespace Simple.Data.Ado
                 get { return _providerName; }
             }
         }
-	}
+    }
 }

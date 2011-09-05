@@ -12,6 +12,7 @@ namespace Simple.Data.SqlCe40
     [Export(typeof(IConnectionProvider))]
     [Export("sdf", typeof(IConnectionProvider))]
     [Export("System.Data.SqlServerCe", typeof(IConnectionProvider))]
+    [Export("System.Data.SqlServerCe.4.0", typeof(IConnectionProvider))]
     public class SqlCe40ConnectionProvider : IConnectionProvider
     {
         private string _connectionString;

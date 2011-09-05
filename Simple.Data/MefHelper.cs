@@ -29,9 +29,10 @@ namespace Simple.Data
             {
                 using (var container = CreateContainer())
                 {
-                    var export = container.GetExport<T>(contractName);
-                    if (export == null) throw new ArgumentException("Unrecognised file.");
-                    return export.Value;
+                    var exports = container.GetExports<T>(contractName).ToList();
+                    if (exports.Count == 0) throw new SimpleDataException("No ADO Provider found.");
+                    if (exports.Count > 1) throw new SimpleDataException("Multiple ADO Providers found; specify provider name or remove unwanted assemblies.");
+                    return exports.Single().Value;
                 }
             }
             catch (ReflectionTypeLoadException ex)

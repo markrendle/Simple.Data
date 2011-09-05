@@ -23,21 +23,6 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
-        public void TestProviderIsSqlProvider()
-        {
-            var provider = new ProviderHelper().GetProviderByConnectionString(Properties.Settings.Default.ConnectionString);
-            Assert.IsInstanceOf(typeof(SqlConnectionProvider), provider);
-        }
-
-        [Test]
-        public void TestProviderIsSqlProviderFromOpen()
-        {
-            Database db = DatabaseHelper.Open();
-            Assert.IsInstanceOf(typeof(AdoAdapter), db.GetAdapter());
-            Assert.IsInstanceOf(typeof(SqlConnectionProvider), ((AdoAdapter)db.GetAdapter()).ConnectionProvider);
-        }
-
-        [Test]
         public void TestFindById()
         {
             var db = DatabaseHelper.Open();
@@ -66,6 +51,14 @@ namespace Simple.Data.SqlTest
         {
             var db = DatabaseHelper.Open();
             IEnumerable<User> users = db.Users.FindAllByName("Bob").Cast<User>();
+            Assert.AreEqual(1, users.Count());
+        }
+
+        [Test]
+        public void TestFindAllByNameAsIEnumerableOfDynamic()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<dynamic> users = db.Users.FindAllByName("Bob");
             Assert.AreEqual(1, users.Count());
         }
 
