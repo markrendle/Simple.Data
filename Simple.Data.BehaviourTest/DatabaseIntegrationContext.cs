@@ -8,7 +8,7 @@ namespace Simple.Data.IntegrationTest
 {
     public abstract class DatabaseIntegrationContext
     {
-        private MockDatabase _mockDatabase;
+        protected MockDatabase _mockDatabase;
         protected dynamic _db;
 
         protected abstract void SetSchema(MockSchemaProvider schemaProvider);

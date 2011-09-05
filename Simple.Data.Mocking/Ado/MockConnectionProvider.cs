@@ -58,9 +58,11 @@ namespace Simple.Data.Mocking.Ado
             return new ProcedureExecutor(adapter, procedureName);
         }
 
+        private bool _supportsCompoundStatements = true;
         public bool SupportsCompoundStatements
         {
-            get { return true; }
+            get { return _supportsCompoundStatements; }
+            set { _supportsCompoundStatements = value; }
         }
     }
 }

@@ -42,5 +42,10 @@ namespace Simple.Data
             return adapterName +
                        string.Join("#", settings.Select(kvp => kvp.Key + "=" + kvp.Value));
         }
+
+        public void Reset()
+        {
+            _cache.Clear();
+        }
     }
 }

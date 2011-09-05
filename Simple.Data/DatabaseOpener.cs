@@ -43,6 +43,11 @@
             return OpenMethods.OpenNamedConnectionImpl(connectionName);
         }
 
+        public void ClearAdapterCache()
+        {
+            ((CachingAdapterFactory) AdapterFactory).Reset();
+        }
+
         public static void UseMockDatabase(Database database)
         {
             OpenMethods.UseMockDatabase(database);

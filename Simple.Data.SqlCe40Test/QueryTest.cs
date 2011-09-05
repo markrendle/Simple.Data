@@ -25,6 +25,22 @@ namespace Simple.Data.SqlCe40Test
         }
 
         [Test]
+        public void ShouldSelectFromOneToTenWithCount()
+        {
+            var db = Database.Opener.OpenFile(DatabasePath);
+            Promise<int> count;
+            var query = db.PagingTest.QueryById(1.to(100)).WithTotalCount(out count).Take(10);
+            int index = 1;
+            foreach (var row in query)
+            {
+                Assert.AreEqual(index, row.Id);
+                index++;
+            }
+            Assert.IsTrue(count.HasValue);
+            Assert.AreEqual(100, count.Value);
+        }
+
+        [Test]
         public void ShouldSelectFromElevenToTwenty()
         {
             var db = Database.Opener.OpenFile(DatabasePath);

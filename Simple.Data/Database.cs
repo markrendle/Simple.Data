@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -16,7 +15,6 @@ namespace Simple.Data
     {
         private static readonly IDatabaseOpener DatabaseOpener;
         private static IPluralizer _pluralizer;
-        private readonly ConcurrentDictionary<string, dynamic> _members = new ConcurrentDictionary<string, dynamic>();
         private readonly Adapter _adapter;
 
         static Database()
@@ -163,6 +161,11 @@ namespace Simple.Data
         {
             _pluralizer = pluralizer;
             Extensions.StringExtensions.SetPluralizer(pluralizer);
+        }
+
+        public static void ClearAdapterCache()
+        {
+            DatabaseOpener.ClearAdapterCache();
         }
     }
 }

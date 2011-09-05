@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -60,6 +61,30 @@ namespace Simple.Data.SqlTest.SchemaTests
         {
             var column = Schema.FindTable("Customers").FindColumn("Name");
             Assert.IsFalse(column.IsIdentity);
+        }
+
+        [Test]
+        public void TestNewTableIsAddedToSchemaAfterReset()
+        {
+            dynamic db = GetDatabase();
+            db.Users.FindById(1); // Forces population of schema...
+
+            using (var cn = new SqlConnection(Properties.Settings.Default.ConnectionString))
+            using (var cmd = cn.CreateCommand())
+            {
+                cn.Open();
+
+                cmd.CommandText = @"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[RuntimeTable]') AND type in (N'U'))
+DROP TABLE [dbo].[RuntimeTable]";
+                cmd.ExecuteNonQuery();
+                cmd.CommandText = "CREATE TABLE [dbo].[RuntimeTable] ([Id] int)";
+                cmd.ExecuteNonQuery();
+            }
+
+            db.GetAdapter().Reset();
+            db.RuntimeTable.Insert(Id: 1);
+            var row = db.RuntimeTable.FindById(1);
+            Assert.AreEqual(1, row.Id);
         }
     }
 }

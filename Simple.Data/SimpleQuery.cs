@@ -203,6 +203,11 @@
             return new SimpleQuery(this, _clauses.Where(c => !(c is TakeClause)).ToArray());
         }
 
+        public SimpleQuery ClearWithTotalCount()
+        {
+            return new SimpleQuery(this, _clauses.Where(c => !(c is WithCountClause)).ToArray());
+        }
+
         protected IEnumerable<dynamic> Run()
         {
             //if (_clauses.OfType<WithCountClause>().Any())

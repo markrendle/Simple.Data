@@ -116,8 +116,14 @@ namespace Simple.Data.Ado
                 throw new InvalidOperationException("No WithCountClause specified.");
             }
 
+            query = query.ClearWithTotalCount();
             var countQuery = query.ClearSkip().ClearTake().ReplaceSelect(new CountSpecialReference());
-            var unhandledClausesList = new List<IEnumerable<SimpleQueryClauseBase>> { Enumerable.Empty<SimpleQueryClauseBase>(), Enumerable.Empty<SimpleQueryClauseBase>() };
+            var unhandledClausesList = new List<IEnumerable<SimpleQueryClauseBase>>
+                                           {
+                                               Enumerable.Empty<SimpleQueryClauseBase>(),
+                                               Enumerable.Empty<SimpleQueryClauseBase>()
+                                           };
+
             using (var enumerator = RunQueries(new[] { countQuery, query }, unhandledClausesList).GetEnumerator())
             {
                 unhandledClauses = unhandledClausesList[1];
@@ -307,7 +313,7 @@ namespace Simple.Data.Ado
 
         internal DatabaseSchema GetSchema()
         {
-            return DatabaseSchema.Get(_connectionProvider, _providerHelper);
+            return _schema ?? (_schema = DatabaseSchema.Get(_connectionProvider, _providerHelper));
         }
 
         /// <summary>
@@ -409,6 +415,12 @@ namespace Simple.Data.Ado
         public ISchemaProvider SchemaProvider
         {
             get { return _connectionProvider.GetSchemaProvider(); }
+        }
+
+        protected override void OnReset()
+        {
+            DatabaseSchema.ClearCache();
+            _schema = DatabaseSchema.Get(_connectionProvider, _providerHelper);
         }
     }
 }

@@ -278,5 +278,14 @@
             }
             return ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteria);
         }
+
+        public void Reset()
+        {
+            OnReset();
+        }
+
+        protected virtual void OnReset()
+        {
+        }
     }
 }

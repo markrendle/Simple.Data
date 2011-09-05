@@ -8,5 +8,6 @@ namespace Simple.Data
         dynamic OpenConnection(string connectionString, string providerName);
         dynamic Open(string adapterName, object settings);
         dynamic OpenNamedConnection(string connectionName);
+        void ClearAdapterCache();
     }
 }
