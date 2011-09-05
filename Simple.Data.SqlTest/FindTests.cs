@@ -55,6 +55,14 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void TestFindAllByNameAsIEnumerableOfDynamic()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<dynamic> users = db.Users.FindAllByName("Bob");
+            Assert.AreEqual(1, users.Count());
+        }
+
+        [Test]
         public void TestFindAllByPartialName()
         {
             var db = DatabaseHelper.Open();

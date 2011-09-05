@@ -124,8 +124,8 @@ namespace Simple.Data.SqlTest
             Promise<int> count;
             var db = DatabaseHelper.Open();
             var list = db.PagingTest.QueryById(1.to(50))
-                .WithTotalCount(out count)
                 .Take(10)
+                .WithTotalCount(out count)
                 .ToList();
 
             Assert.AreEqual(10, list.Count);

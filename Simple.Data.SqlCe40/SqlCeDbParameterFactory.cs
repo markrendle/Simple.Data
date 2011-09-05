@@ -12,7 +12,8 @@
         public IDbDataParameter CreateParameter(string name, Column column)
         {
             var sqlCeColumn = (SqlCeColumn) column;
-            return new SqlCeParameter(name, sqlCeColumn.SqlDbType, column.MaxLength, column.ActualName);
+
+            return new SqlCeParameter(name, sqlCeColumn.SqlDbType, 0, column.ActualName);
         }
 
         public IDbDataParameter CreateParameter(string name, DbType dbType, int maxLength)
