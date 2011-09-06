@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -14,14 +15,25 @@ namespace Simple.Data.IntegrationTest.Query
         protected override void SetSchema(MockSchemaProvider schemaProvider)
         {
             schemaProvider.SetTables(new[] { "dbo", "Employee", "BASE TABLE" },
-                                     new[] { "dbo", "Department", "BASE TABLE" });
+                                     new[] { "dbo", "Department", "BASE TABLE" },
+                                     new[] { "dbo", "Activity", "BASE TABLE"},
+                                     new[] { "dbo", "Activity_Join", "BASE TABLE" },
+                                     new[] { "dbo", "Location", "BASE_TABLE"});
 
             schemaProvider.SetColumns(new[] { "dbo", "Employee", "Id" },
                                       new[] { "dbo", "Employee", "Name" },
                                       new[] { "dbo", "Employee", "ManagerId" },
                                       new[] { "dbo", "Employee", "DepartmentId" },
                                       new[] { "dbo", "Department", "Id" },
-                                      new[] { "dbo", "Department", "Name" });
+                                      new[] { "dbo", "Department", "Name" },
+                                      new[] { "dbo", "Activity", "ID_Activity"},
+                                      new[] { "dbo", "Activity", "ID_Trip" },
+                                      new[] { "dbo", "Activity", "Activity_Time" },
+                                      new[] { "dbo", "Activity", "Is_Public" },
+                                      new[] { "dbo", "Activity_Join", "ID_Activity" },
+                                      new[] { "dbo", "Activity_Join", "ID_Location"},
+                                      new[] { "dbo", "Location", "ID_Location"}
+                                      );
         }
 
         [Test]
@@ -138,6 +150,33 @@ namespace Simple.Data.IntegrationTest.Query
 
             GeneratedSqlIs("select [dbo].[employee].[name],[manager].[name] as [Manager] from [dbo].[employee]" +
                 " join [dbo].[employee] [manager] on ([manager].[id] = [dbo].[employee].[managerid])");
+        }
+
+        [Test]
+        public void TwoJoins()
+        {
+            _db.Activity.Query()
+                .Join(_db.Activity_Join).On(_db.Activity.ID_Activity == _db.Activity_Join.ID_Activity)
+                .Join(_db.Location).On(_db.Activity_Join.ID_Location == _db.Location.ID_Location)
+                .Where(_db.Activity.ID_trip == 1 &&
+                       _db.Activity.Activity_Time == 'D' &&
+                       _db.Activity.Is_Public == true)
+                .Select(
+                    _db.Activity.ID_Activity
+                    , _db.Activity.ID_Trip
+                    , _db.Activity.Activity_Time
+                    , _db.Activity.Is_Public)
+                .ToList<Activity>();
+
+            GeneratedSqlIs("select [dbo].[Activity].[ID_Activity],[dbo].[Activity].[ID_Trip],[dbo].[Activity].[Activity_Time],[dbo].[Activity].[Is_Public] " +
+                "from [dbo].[Activity] JOIN [dbo].[Activity_Join] ON ([dbo].[Activity].[ID_Activity] = [dbo].[Activity_Join].[ID_Activity]) " +
+                "JOIN [dbo].[Location] ON ([dbo].[Activity_Join].[ID_Location] = [dbo].[Location].[ID_Location]) " +
+                "WHERE (([dbo].[Activity].[ID_Trip] = @p1 AND [dbo].[Activity].[Activity_Time] = @p2) AND [dbo].[Activity].[Is_Public] = @p3)");
+        }
+
+        class Activity
+        {
+            public int ID_Activity { get; set; }
         }
     }
 }
