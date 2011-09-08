@@ -3,6 +3,8 @@ using NUnit.Framework;
 
 namespace Simple.Data.SqlTest
 {
+    using System.Data;
+
     [TestFixture]
     public class ProcedureTest
     {
@@ -71,6 +73,24 @@ namespace Simple.Data.SqlTest
             var db = DatabaseHelper.Open();
             var results = db.VarcharAndReturnInt("The answer to everything");
             Assert.AreEqual(42, results.ReturnValue);
+        }
+
+        [Test]
+        public void CallProcedureWithDataTable()
+        {
+            var db = DatabaseHelper.Open();
+            var dataTable = new DataTable();
+            dataTable.Columns.Add("Value");
+            dataTable.Rows.Add("One");
+            dataTable.Rows.Add("Two");
+            dataTable.Rows.Add("Three");
+
+            var actual = db.ReturnStrings(dataTable).ToScalarList<string>();
+
+            Assert.AreEqual(3, actual.Count);
+            Assert.Contains("One", actual);
+            Assert.Contains("Two", actual);
+            Assert.Contains("Three", actual);
         }
     }
 }

@@ -52,6 +52,10 @@ namespace Simple.Data
                         continue;
                 }
 
+                if (value != null && propertyInfo.PropertyType != value.GetType() && !propertyInfo.PropertyType.IsEnum)
+                {
+                    value = Convert.ChangeType(value, propertyInfo.PropertyType);
+                }
                 propertyInfo.SetValue(obj, value, null);
                 anyPropertiesSet = true;
             }

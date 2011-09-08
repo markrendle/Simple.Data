@@ -101,6 +101,31 @@ namespace Simple.Data
             return Cast<T>().ToArray();
         }
 
+        public IList ToScalarList()
+        {
+            return ToScalarEnumerable().ToList();
+        }
+
+        public dynamic[] ToScalarArray()
+        {
+            return ToScalarEnumerable().ToArray();
+        }
+
+        public IList<T> ToScalarList<T>()
+        {
+            return ToScalarEnumerable().Cast<T>().ToList();
+        }
+
+        public T[] ToScalarArray<T>()
+        {
+            return ToScalarEnumerable().Cast<T>().ToArray();
+        }
+
+        private IEnumerable<dynamic> ToScalarEnumerable()
+        {
+            return _sourceEnumerator.Current.OfType<IDictionary<string, object>>().Select(dict => dict.Values.FirstOrDefault());
+        }
+
         public dynamic First()
         {
             return _sourceEnumerator.Current.First();

@@ -69,6 +69,7 @@
     <Compile Include="BufferedEnumerableTest.cs" />
     <Compile Include="ComposerTest.cs" />
     <Compile Include="ConcreteCollectionTypeCreatorTest.cs" />
+    <Compile Include="ConcreteTypeCreatorTest.cs" />
     <Compile Include="DatabaseOpenerTest.cs" />
     <Compile Include="DictionaryClonerTest.cs" />
     <Compile Include="DynamicEnumerableTest.cs" />
