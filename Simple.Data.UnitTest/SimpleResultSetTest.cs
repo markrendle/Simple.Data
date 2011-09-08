@@ -382,6 +382,16 @@
             Assert.AreEqual("0", converted[0].Data);
         }
 
+        [Test]
+        public void CastToGenericCreatesTypedList()
+        {
+            dynamic list = new SimpleResultSet(Records(1));
+            IEnumerable<TestType> converted = list.Cast<TestType>();
+
+            Assert.IsNotNull(converted);
+            Assert.AreEqual(1, converted.Count());
+            Assert.AreEqual("0", converted.First().Data);
+        }
     }
 
     class TestType

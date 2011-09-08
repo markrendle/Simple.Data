@@ -52,7 +52,7 @@ namespace Simple.Data
                         continue;
                 }
 
-                if (value != null && propertyInfo.PropertyType != value.GetType() && !propertyInfo.PropertyType.IsEnum)
+                if (value != null && IsTypeConversionRequired(value.GetType(), propertyInfo.PropertyType))
                 {
                     value = Convert.ChangeType(value, propertyInfo.PropertyType);
                 }
@@ -63,6 +63,12 @@ namespace Simple.Data
             result = anyPropertiesSet ? obj : null;
 
             return anyPropertiesSet;
+        }
+
+        private static bool IsTypeConversionRequired(Type source, Type target)
+        {
+            if (target.IsEnum) return !target.GetEnumUnderlyingType().IsAssignableFrom(source);
+            return !target.IsAssignableFrom(source);
         }
 
         private static bool CanSetProperty(PropertyInfo propertyInfo, IDictionary<string, object> data)
