@@ -72,7 +72,7 @@ namespace Simple.Data.Ado.Schema
             get { return _databaseSchema.QuoteObjectName(_name); }
         }
 
-        internal string QualifiedName
+        public string QualifiedName
         {
             get { return string.IsNullOrWhiteSpace(_schema) ? QuotedName : string.Format("{0}.{1}", _databaseSchema.QuoteObjectName(_schema), _databaseSchema.QuoteObjectName(_name)); }
         }
