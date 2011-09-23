@@ -76,7 +76,7 @@ namespace Simple.Data.SqlServer
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = storedProcedure.SpecificName;
+                    command.CommandText = storedProcedure.QualifiedName;
 
                     connection.Open();
                     SqlCommandBuilder.DeriveParameters(command);
