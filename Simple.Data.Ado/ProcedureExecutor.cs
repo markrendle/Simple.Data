@@ -107,7 +107,8 @@ namespace Simple.Data.Ado
                 {
                     suppliedParameters.TryGetValue("_" + i, out value);
                 }
-                cmd.AddParameter(parameter.Name, value);
+                var cmdParameter = cmd.AddParameter(parameter.Name, value);
+                cmdParameter.Direction = parameter.Direction;
                 i++;
             }
         }
