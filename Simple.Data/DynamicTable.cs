@@ -55,7 +55,7 @@ namespace Simple.Data
         /// </returns>
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
-            var func = _delegates.GetOrAdd(binder.Name, name => CreateMemberDelegate(name,binder,args));
+            var func = _delegates.GetOrAdd(CreateDelegateName(binder), name => CreateMemberDelegate(name, binder, args));
             if (func != null)
             {
                 result = func(args);
@@ -70,6 +70,12 @@ namespace Simple.Data
             }
 
             return base.TryInvokeMember(binder, args, out result);
+        }
+
+        private static string CreateDelegateName(InvokeMemberBinder binder)
+        {
+            // Construct the name from the method name and any named arguments, so that "FindBy(Id:1)" and "FindBy(Age:42)" have separate delegates.
+            return binder.Name + " " + string.Join(" ", binder.CallInfo.ArgumentNames);
         }
 
         private Func<object[],object> CreateMemberDelegate(string name, InvokeMemberBinder binder, object[] args)
