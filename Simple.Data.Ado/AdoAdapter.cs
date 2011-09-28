@@ -287,8 +287,10 @@ namespace Simple.Data.Ado
 
         private static int Execute(ICommandBuilder commandBuilder, IAdapterTransaction transaction)
         {
-            using (var command = commandBuilder.GetCommand(((AdoAdapterTransaction)transaction).Transaction.Connection))
+            var dbTransaction = ((AdoAdapterTransaction) transaction).Transaction;
+            using (var command = commandBuilder.GetCommand(dbTransaction.Connection))
             {
+                command.Transaction = dbTransaction;
                 return TryExecute(command);
             }
         }

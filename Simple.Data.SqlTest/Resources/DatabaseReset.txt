@@ -52,6 +52,8 @@ BEGIN
 	DROP TABLE [dbo].[Blobs]
 	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EnumTest]') AND type in (N'U'))
 	DROP TABLE [dbo].[EnumTest]
+	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[DeleteTest]') AND type in (N'U'))
+	DROP TABLE [dbo].[DeleteTest]
 
 	CREATE TABLE [dbo].[Users] (
 		[Id]       INT            IDENTITY (1, 1) NOT NULL,
@@ -126,6 +128,13 @@ BEGIN
 
 	ALTER TABLE [dbo].[EnumTest]
 		ADD CONSTRAINT [PK_EnumTest] PRIMARY KEY CLUSTERED ([Id] ASC)	
+
+	CREATE TABLE [dbo].[DeleteTest](
+		[Id] [int] NOT NULL
+	)
+
+	ALTER TABLE [dbo].[DeleteTest]
+		ADD CONSTRAINT [PK_DeleteTest] PRIMARY KEY CLUSTERED ([Id] ASC)	
 
 	BEGIN TRANSACTION
 	SET IDENTITY_INSERT [dbo].[Customers] ON
