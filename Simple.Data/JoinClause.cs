@@ -16,6 +16,7 @@ namespace Simple.Data
 
         public JoinClause(ObjectReference table, SimpleExpression joinExpression)
         {
+            if (table == null) throw new ArgumentNullException("table");
             _table = table;
             _joinExpression = joinExpression;
         }

@@ -242,7 +242,7 @@
             }
             if (binder.Name.Equals("join", StringComparison.OrdinalIgnoreCase))
             {
-                result = args.Length == 1 ? Join(args[0] as ObjectReference) : ParseJoin(binder, args);
+                result = args.Length == 1 ? Join(ObjectAsObjectReference(args[0])) : ParseJoin(binder, args);
                 return true;
             }
             if (binder.Name.Equals("on", StringComparison.OrdinalIgnoreCase))
@@ -263,8 +263,20 @@
             return false;
         }
 
+        private ObjectReference ObjectAsObjectReference(object o)
+        {
+            var objectReference = o as ObjectReference;
+            if (!ReferenceEquals(objectReference, null)) return objectReference;
+
+            var dynamicTable = o as DynamicTable;
+            if (dynamicTable != null) return new ObjectReference(dynamicTable.GetName(), _dataStrategy);
+
+            throw new InvalidOperationException("Could not convert parameter to ObjectReference.");
+        }
+
         public SimpleQuery Join(ObjectReference objectReference)
         {
+            if (ReferenceEquals(objectReference, null)) throw new ArgumentNullException("objectReference");
             _tempJoinWaitingForOn = new JoinClause(objectReference, null);
 
             return this;

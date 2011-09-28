@@ -6,6 +6,8 @@ using System.Linq;
 
 namespace Simple.Data.Commands
 {
+    using Extensions;
+
     class FindByCommand : ICommand
     {
         public bool IsCommandFor(string method)
@@ -17,15 +19,10 @@ namespace Simple.Data.Commands
         {
             if (dataStrategy is SimpleTransaction) return null;
 
-            SimpleExpression criteriaExpression;
-            if (binder.Name.Equals("FindBy") || binder.Name.Equals("find_by"))
-            {
-                criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), binder.NamedArgumentsToDictionary(args));
-            }
-            else
-            {
-                criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
-            }
+            var criteriaDictionary = CreateCriteriaDictionary(binder, args);
+            if (criteriaDictionary == null) return null;
+
+            var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), criteriaDictionary);
             try
             {
                 var func = dataStrategy.GetAdapter().CreateFindOneDelegate(table.GetQualifiedName(), criteriaExpression);
@@ -41,6 +38,23 @@ namespace Simple.Data.Commands
             {
                 return null;
             }
+        }
+
+        private static IDictionary<string, object> CreateCriteriaDictionary(InvokeMemberBinder binder, IList<object> args)
+        {
+            IDictionary<string, object> criteriaDictionary = null;
+            if (binder.Name.Equals("FindBy") || binder.Name.Equals("find_by"))
+            {
+                if (binder.CallInfo.ArgumentNames != null && binder.CallInfo.ArgumentNames.Count > 0)
+                {
+                    criteriaDictionary = binder.NamedArgumentsToDictionary(args);
+                }
+            }
+            else
+            {
+                criteriaDictionary = MethodNameParser.ParseFromBinder(binder, args);
+            }
+            return criteriaDictionary;
         }
 
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)

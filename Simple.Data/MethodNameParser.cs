@@ -16,6 +16,14 @@ namespace Simple.Data
             {
                 return ParseFromMethodName(binder.Name, binder.NamedArgumentsToDictionary(args));
             }
+            if (binder.Name.Equals("findby", StringComparison.OrdinalIgnoreCase) || binder.Name.Equals("find_by", StringComparison.OrdinalIgnoreCase))
+            {
+                if (args.Count == 1)
+                {
+                    return args[0].ObjectToDictionary();
+                }
+                throw new InvalidOperationException("Invalid criteria specification.");
+            }
             return ParseFromMethodName(binder.Name, args);
         }
 

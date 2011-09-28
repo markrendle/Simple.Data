@@ -164,6 +164,21 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestFindByWithAnonymousObject()
+        {
+            _db.MyTable.FindBy(new { Column1 = 1 });
+            GeneratedSqlIs("select [dbo].[MyTable].* from [dbo].[MyTable] where [dbo].[MyTable].[Column1] = @p1");
+            Parameter(0).Is(1);
+        }
+
+        [Test]
+        public void TestFindByWithAnonymousObjectNullValue()
+        {
+            _db.MyTable.FindBy(new { Column1 = (object)null });
+            GeneratedSqlIs("select [dbo].[MyTable].* from [dbo].[MyTable] where [dbo].[MyTable].[Column1] is null");
+        }
+
+        [Test]
         public void TestFindWithLike()
         {
             _db.Users.Find(_db.Users.Name.Like("Foo"));
