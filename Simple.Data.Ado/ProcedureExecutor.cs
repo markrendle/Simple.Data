@@ -96,6 +96,8 @@ namespace Simple.Data.Ado
 
         private static void SetParameters(Procedure procedure, IDbCommand cmd, IDictionary<string, object> suppliedParameters)
         {
+            suppliedParameters = suppliedParameters.ToDictionary(k => k.Key, e => e.Value, StringComparer.OrdinalIgnoreCase);
+
             if (procedure.Parameters.Any(p=>p.Direction == ParameterDirection.ReturnValue))
               AddReturnParameter(cmd);
 
