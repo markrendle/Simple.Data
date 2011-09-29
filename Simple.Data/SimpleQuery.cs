@@ -607,5 +607,10 @@
         {
             return Task.Factory.StartNew<IEnumerable<dynamic>>(Run);
         }
+
+        public SimpleQuery ClearOrderBy()
+        {
+            return new SimpleQuery(this, _clauses.Where(c => !(c is OrderByClause)).ToArray());
+        }
     }
 }

@@ -117,7 +117,7 @@ namespace Simple.Data.Ado
             }
 
             query = query.ClearWithTotalCount();
-            var countQuery = query.ClearSkip().ClearTake().ReplaceSelect(new CountSpecialReference());
+            var countQuery = query.ClearSkip().ClearTake().ClearOrderBy().ReplaceSelect(new CountSpecialReference());
             var unhandledClausesList = new List<IEnumerable<SimpleQueryClauseBase>>
                                            {
                                                Enumerable.Empty<SimpleQueryClauseBase>(),
