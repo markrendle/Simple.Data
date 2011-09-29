@@ -48,7 +48,7 @@ namespace Simple.Data.Ado
                 {
                     var result = _executeImpl(command);
                     if (command.Parameters.Contains(SimpleReturnParameterName))
-                      suppliedParameters["__ReturnValue"] = command.Parameters.GetValue(SimpleReturnParameterName);
+                        suppliedParameters["__ReturnValue"] = command.Parameters.GetValue(SimpleReturnParameterName);
                     RetrieveOutputParameterValues(procedure, command, suppliedParameters);
                     return result;
                 }
@@ -96,19 +96,24 @@ namespace Simple.Data.Ado
 
         private static void SetParameters(Procedure procedure, IDbCommand cmd, IDictionary<string, object> suppliedParameters)
         {
-            if (procedure.Parameters.Any(p=>p.Direction == ParameterDirection.ReturnValue))
-              AddReturnParameter(cmd);
+            if (procedure.Parameters.Any(p => p.Direction == ParameterDirection.ReturnValue))
+                AddReturnParameter(cmd);
 
             int i = 0;
-            foreach (var parameter in procedure.Parameters.Where(p=>p.Direction != ParameterDirection.ReturnValue))
+            foreach (var parameter in procedure.Parameters.Where(p => p.Direction != ParameterDirection.ReturnValue))
             {
                 object value;
                 if (!suppliedParameters.TryGetValue(parameter.Name.Replace("@", ""), out value))
                 {
                     suppliedParameters.TryGetValue("_" + i, out value);
                 }
+
                 var cmdParameter = cmd.AddParameter(parameter.Name, value);
                 cmdParameter.Direction = parameter.Direction;
+                //Tim Cartwright: I added size and dbtype so inout/out params would function properly.
+                //not setting the proper dbtype and size with out put parameters causes the exception: "Size property has an invalid size of 0"
+                cmdParameter.DbType = parameter.Dbtype;
+                cmdParameter.Size = parameter.Size;
                 i++;
             }
         }
@@ -120,5 +125,6 @@ namespace Simple.Data.Ado
             returnParameter.Direction = ParameterDirection.ReturnValue;
             cmd.Parameters.Add(returnParameter);
         }
+
     }
 }
