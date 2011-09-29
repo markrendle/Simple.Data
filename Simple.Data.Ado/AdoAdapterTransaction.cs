@@ -11,6 +11,7 @@ namespace Simple.Data.Ado
     {
         private readonly string _name;
         private readonly IDbTransaction _dbTransaction;
+        private readonly IDbConnection _dbConnection;
 
         public AdoAdapterTransaction(IDbTransaction dbTransaction) : this(dbTransaction, null)
         {
@@ -20,6 +21,7 @@ namespace Simple.Data.Ado
         {
             _name = name;
             _dbTransaction = dbTransaction;
+            _dbConnection = _dbTransaction.Connection;
         }
 
         internal IDbTransaction Transaction
@@ -30,6 +32,7 @@ namespace Simple.Data.Ado
         public void Dispose()
         {
             _dbTransaction.Dispose();
+            _dbConnection.Dispose();
         }
 
         public void Commit()
