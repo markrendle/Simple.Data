@@ -9,6 +9,7 @@
     using System.Threading.Tasks;
     using Extensions;
     using Microsoft.CSharp.RuntimeBinder;
+    using QueryPolyfills;
 
     public class SimpleQuery : DynamicObject, IEnumerable
     {
@@ -205,23 +206,14 @@
 
         protected IEnumerable<dynamic> Run()
         {
-            //if (_clauses.OfType<WithCountClause>().Any())
-            //{
-            //    return RunWithCount();
-            //}
             IEnumerable<SimpleQueryClauseBase> unhandledClauses;
-            return
-                _adapter.RunQuery(this, out unhandledClauses).Select(d => new SimpleRecord(d, _tableName, _dataStrategy));
-        }
-
-        private IEnumerable<dynamic> RunWithCount()
-        {
-            var withCountClause = _clauses.OfType<WithCountClause>().Single();
-            var countQuery = ClearSkip().ClearTake().Select(new CountSpecialReference());
-            var unhandledClausesList = new List<IEnumerable<SimpleQueryClauseBase>>();
-            var results = _adapter.RunQueries(new[] { countQuery, this }, unhandledClausesList).ToList();
-            withCountClause.SetCount((int) results[0].Single().First().Value);
-            return results[1].Select(d => new SimpleRecord(d, _tableName, _dataStrategy));
+            var result = _adapter.RunQuery(this, out unhandledClauses);
+            var unhandledClausesList = unhandledClauses.ToList();
+            if (unhandledClausesList.Count > 0)
+            {
+                result = new DictionaryQueryRunner(result, unhandledClausesList).Run();
+            }
+            return result.Select(d => new SimpleRecord(d, _tableName, _dataStrategy));
         }
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)

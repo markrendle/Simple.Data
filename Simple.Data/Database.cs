@@ -164,5 +164,15 @@ namespace Simple.Data
             _pluralizer = pluralizer;
             Extensions.StringExtensions.SetPluralizer(pluralizer);
         }
+
+        public static void UseMockAdapter(Adapter mockAdapter)
+        {
+            Data.DatabaseOpener.UseMockAdapter(mockAdapter);
+        }
+
+        public static void UseMockAdapter(Func<Adapter> mockAdapterCreator)
+        {
+            Data.DatabaseOpener.UseMockAdapter(mockAdapterCreator());
+        }
     }
 }
