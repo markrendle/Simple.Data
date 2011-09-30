@@ -44,7 +44,7 @@ namespace Simple.Data
 
         private static CompositionContainer CreateContainer()
         {
-            var path = Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "");
+            var path = Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "").Replace("file://","//");
             path = Path.GetDirectoryName(path);
             if (path == null) throw new ArgumentException("Unrecognised file.");
 
