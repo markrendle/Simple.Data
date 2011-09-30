@@ -116,6 +116,16 @@ namespace Simple.Data.UnitTest
             Assert.AreEqual(5, actual[3]["NameLength"]);
         }
 
+        [Test]
+        public void BasicWhereShouldWork()
+        {
+            var tableRef = new ObjectReference("FooTable");
+            var whereClause = new WhereClause(new ObjectReference("Name", tableRef) == "Alice");
+            var runner = new DictionaryQueryRunner(SelectSource(), whereClause);
+            var actual = runner.Run().ToList();
+            Assert.AreEqual(1, actual.Count);
+        }
+
         #region Distinct sources
 
         private static IEnumerable<IDictionary<string, object>> DuplicatingSource()

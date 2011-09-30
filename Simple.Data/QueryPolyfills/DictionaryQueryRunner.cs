@@ -14,6 +14,7 @@
                         { typeof(SkipClause), (c,d) => d.Skip(((SkipClause)c).Count) },
                         { typeof(TakeClause), (c,d) => d.Take(((TakeClause)c).Count) },
                         { typeof(SelectClause), (c,d) => new SelectClauseHandler((SelectClause)c).Run(d) },
+                        { typeof(WhereClause), (c,d) => new WhereClauseHandler((WhereClause)c).Run(d) }
                     };
 
         private readonly IEnumerable<IDictionary<string, object>> _source;
