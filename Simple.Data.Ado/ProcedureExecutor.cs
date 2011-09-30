@@ -100,21 +100,27 @@ namespace Simple.Data.Ado
                 AddReturnParameter(cmd);
 
             int i = 0;
+            
             foreach (var parameter in procedure.Parameters.Where(p => p.Direction != ParameterDirection.ReturnValue))
             {
-                object value;
-                if (!suppliedParameters.TryGetValue(parameter.Name.Replace("@", ""), out value))
-                {
-                    suppliedParameters.TryGetValue("_" + i, out value);
-                }
-
-                var cmdParameter = cmd.AddParameter(parameter.Name, value);
+                //Tim Cartwright: Allows for case insensive parameters
+                var value = suppliedParameters.FirstOrDefault(sp => 
+                    sp.Key.Equals(parameter.Name.Replace("@", ""), StringComparison.InvariantCultureIgnoreCase)
+                    || sp.Key.Equals("_" + i++)
+                );
+                var cmdParameter = cmd.CreateParameter();
+                //Tim Cartwright: Using AddParameter does not allow for the "default" keyword to ever be passed into 
+                //  parameters in stored procedures with defualt values. Null is always sent in. This will allow for default 
+                //  values to work properly. Not sure why this is so, in both cases the value gets set. Just is.
+                //var cmdParameter = cmd.AddParameter(parameter.Name, value);
+                cmdParameter.ParameterName = parameter.Name;
+                cmdParameter.Value = value.Value; 
                 cmdParameter.Direction = parameter.Direction;
                 //Tim Cartwright: I added size and dbtype so inout/out params would function properly.
                 //not setting the proper dbtype and size with out put parameters causes the exception: "Size property has an invalid size of 0"
                 cmdParameter.DbType = parameter.Dbtype;
                 cmdParameter.Size = parameter.Size;
-                i++;
+                cmd.Parameters.Add(cmdParameter);
             }
         }
 
