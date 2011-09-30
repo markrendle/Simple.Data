@@ -117,13 +117,192 @@ namespace Simple.Data.UnitTest
         }
 
         [Test]
-        public void BasicWhereShouldWork()
+        public void BasicWhereEqualShouldWork()
         {
             var tableRef = new ObjectReference("FooTable");
             var whereClause = new WhereClause(new ObjectReference("Name", tableRef) == "Alice");
             var runner = new DictionaryQueryRunner(SelectSource(), whereClause);
             var actual = runner.Run().ToList();
             Assert.AreEqual(1, actual.Count);
+            Assert.AreEqual("Alice", actual[0]["Name"]);
+        }
+
+        [Test]
+        public void WhereNullShouldWorkWhenValueExistsAndIsNull()
+        {
+            var tableRef = new ObjectReference("FooTable");
+            var whereClause = new WhereClause(new ObjectReference("Value", tableRef) == null);
+            var data = new List<IDictionary<string, object>>
+                           {
+                               new Dictionary<string, object>
+                                   {
+                                       {"Name", "Steve"}, { "Value", null }
+                                   },
+                               new Dictionary<string, object>
+                                   {
+                                       {"Name", "Dave"}, { "Value", 42 }
+                                   },
+                           };
+            var runner = new DictionaryQueryRunner(data, whereClause);
+            var actual = runner.Run().ToList();
+            Assert.AreEqual(1, actual.Count);
+            Assert.AreEqual("Steve", actual[0]["Name"]);
+        }
+
+        [Test]
+        public void WhereNullShouldWorkWhenValueDoesNotExist()
+        {
+            var tableRef = new ObjectReference("FooTable");
+            var whereClause = new WhereClause(new ObjectReference("Value", tableRef) == null);
+            var data = new List<IDictionary<string, object>>
+                           {
+                               new Dictionary<string, object>
+                                   {
+                                       {"Name", "Steve"}
+                                   },
+                               new Dictionary<string, object>
+                                   {
+                                       {"Name", "Dave"}, { "Value", 42 }
+                                   },
+                           };
+            var runner = new DictionaryQueryRunner(data, whereClause);
+            var actual = runner.Run().ToList();
+            Assert.AreEqual(1, actual.Count);
+            Assert.AreEqual("Steve", actual[0]["Name"]);
+        }
+
+        [Test]
+        public void WhereEqualWithByteArrayShouldWork()
+        {
+            var tableRef = new ObjectReference("FooTable");
+            var whereClause = new WhereClause(new ObjectReference("Array", tableRef) == new byte[] { 1, 2, 3, 4});
+            var data = new List<IDictionary<string, object>>
+                           {
+                               new Dictionary<string, object>
+                                   {
+                                       {"Name", "Steve"}, { "Array", new byte[] { 1, 2, 3, 4}}
+                                   },
+                               new Dictionary<string, object>
+                                   {
+                                       {"Name", "Dave"}, { "Array", new byte[] { 2, 3, 4}}
+                                   },
+                           };
+            var runner = new DictionaryQueryRunner(data, whereClause);
+            var actual = runner.Run().ToList();
+            Assert.AreEqual(1, actual.Count);
+            Assert.AreEqual("Steve", actual[0]["Name"]);
+        }
+
+        [Test]
+        public void BasicWhereNotEqualShouldWork()
+        {
+            var tableRef = new ObjectReference("FooTable");
+            var whereClause = new WhereClause(new ObjectReference("Name", tableRef) != "Alice");
+            var runner = new DictionaryQueryRunner(SelectSource(), whereClause);
+            var actual = runner.Run().ToList();
+            Assert.AreEqual(3, actual.Count);
+            Assert.False(actual.Any(a => (string)a["Name"] == "Alice"));
+        }
+
+        [Test]
+        public void WhereNotNullShouldWork()
+        {
+            var tableRef = new ObjectReference("FooTable");
+            var whereClause = new WhereClause(new ObjectReference("Value", tableRef) != null);
+            var data = new List<IDictionary<string, object>>
+                           {
+                               new Dictionary<string, object>
+                                   {
+                                       {"Name", "Steve"}, { "Value", null }
+                                   },
+                               new Dictionary<string, object>
+                                   {
+                                       {"Name", "Dave"}, { "Value", 42 }
+                                   },
+                           };
+            var runner = new DictionaryQueryRunner(data, whereClause);
+            var actual = runner.Run().ToList();
+            Assert.AreEqual(1, actual.Count);
+            Assert.AreEqual("Dave", actual[0]["Name"]);
+        }
+
+        [Test]
+        public void WhereNotEqualWithByteArrayShouldWork()
+        {
+            var tableRef = new ObjectReference("FooTable");
+            var whereClause = new WhereClause(new ObjectReference("Array", tableRef) != new byte[] { 1, 2, 3, 4 });
+            var data = new List<IDictionary<string, object>>
+                           {
+                               new Dictionary<string, object>
+                                   {
+                                       {"Name", "Steve"}, { "Array", new byte[] { 1, 2, 3, 4}}
+                                   },
+                               new Dictionary<string, object>
+                                   {
+                                       {"Name", "Dave"}, { "Array", new byte[] { 2, 3, 4}}
+                                   },
+                           };
+            var runner = new DictionaryQueryRunner(data, whereClause);
+            var actual = runner.Run().ToList();
+            Assert.AreEqual(1, actual.Count);
+            Assert.AreEqual("Dave", actual[0]["Name"]);
+        }
+
+        [Test]
+        public void BasicWhereGreaterThanShouldWork()
+        {
+            var tableRef = new ObjectReference("FooTable");
+            var whereClause = new WhereClause(new ObjectReference("Weight", tableRef) > 200M);
+            var runner = new DictionaryQueryRunner(SelectSource(), whereClause);
+            var actual = runner.Run().ToList();
+            Assert.AreEqual(1, actual.Count);
+            Assert.AreEqual("David", actual[0]["Name"]);
+        }
+
+        [Test]
+        public void BasicWhereLessThanShouldWork()
+        {
+            var tableRef = new ObjectReference("FooTable");
+            var whereClause = new WhereClause(new ObjectReference("Weight", tableRef) < 150M);
+            var runner = new DictionaryQueryRunner(SelectSource(), whereClause);
+            var actual = runner.Run().ToList();
+            Assert.AreEqual(1, actual.Count);
+            Assert.AreEqual("Alice", actual[0]["Name"]);
+        }
+
+        [Test]
+        public void BasicWhereGreaterThanOrEqualShouldWork()
+        {
+            var tableRef = new ObjectReference("FooTable");
+            var whereClause = new WhereClause(new ObjectReference("Weight", tableRef) >= 250M);
+            var runner = new DictionaryQueryRunner(SelectSource(), whereClause);
+            var actual = runner.Run().ToList();
+            Assert.AreEqual(1, actual.Count);
+            Assert.AreEqual("David", actual[0]["Name"]);
+        }
+
+        [Test]
+        public void BasicWhereLessThanOrEqualShouldWork()
+        {
+            var tableRef = new ObjectReference("FooTable");
+            var whereClause = new WhereClause(new ObjectReference("Weight", tableRef) <= 100M);
+            var runner = new DictionaryQueryRunner(SelectSource(), whereClause);
+            var actual = runner.Run().ToList();
+            Assert.AreEqual(1, actual.Count);
+            Assert.AreEqual("Alice", actual[0]["Name"]);
+        }
+
+        [Test]
+        public void BasicLikeShouldWork()
+        {
+            var tableRef = new ObjectReference("FooTable");
+            dynamic objRef = new ObjectReference("Name", tableRef);
+            var expression = new SimpleExpression(objRef, new SimpleFunction("like", new[] {"A%"}), SimpleExpressionType.Function);
+            var whereClause = new WhereClause(expression);
+            var runner = new DictionaryQueryRunner(SelectSource(), whereClause);
+            var actual = runner.Run().ToList();
+            Assert.AreEqual(1, actual.Count);
+            Assert.AreEqual("Alice", actual[0]["Name"]);
         }
 
         #region Distinct sources

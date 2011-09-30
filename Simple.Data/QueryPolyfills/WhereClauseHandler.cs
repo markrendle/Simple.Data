@@ -4,6 +4,7 @@ namespace Simple.Data.QueryPolyfills
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.RegularExpressions;
 
     internal class WhereClauseHandler
     {
@@ -19,27 +20,92 @@ namespace Simple.Data.QueryPolyfills
                                             {SimpleExpressionType.And, LogicalExpressionToWhereClause},
                                             {SimpleExpressionType.Or, LogicalExpressionToWhereClause},
                                             {SimpleExpressionType.Equal, EqualExpressionToWhereClause},
-                                            //{SimpleExpressionType.NotEqual, NotEqualExpressionToWhereClause},
-                                            //{SimpleExpressionType.Function, FunctionExpressionToWhereClause},
-                                            //{SimpleExpressionType.GreaterThan, expr => BinaryExpressionToWhereClause(expr, ">")},
-                                            //{SimpleExpressionType.GreaterThanOrEqual, expr => BinaryExpressionToWhereClause(expr, ">=")},
-                                            //{SimpleExpressionType.LessThan, expr => BinaryExpressionToWhereClause(expr, "<")},
-                                            //{SimpleExpressionType.LessThanOrEqual, expr => BinaryExpressionToWhereClause(expr, "<=")},
+                                            {SimpleExpressionType.NotEqual, NotEqualExpressionToWhereClause},
+                                            {SimpleExpressionType.Function, FunctionExpressionToWhereClause},
+                                            {SimpleExpressionType.GreaterThan, GreaterThanToWhereClause},
+                                            {SimpleExpressionType.LessThan, LessThanToWhereClause},
+                                            {SimpleExpressionType.GreaterThanOrEqual, GreaterThanOrEqualToWhereClause},
+                                            {SimpleExpressionType.LessThanOrEqual, LessThanOrEqualToWhereClause},
                                             {SimpleExpressionType.Empty, expr => _ => true },
                                         };
         }
 
-        private Func<IDictionary<string, object>, bool> EqualExpressionToWhereClause(SimpleExpression arg)
+        private Func<IDictionary<string, object>, bool> FunctionExpressionToWhereClause(SimpleExpression arg)
         {
-            var reference = arg.LeftOperand as ObjectReference;
+            var key = GetKeyFromLeftOperand(arg);
+            var function = arg.RightOperand as SimpleFunction;
+            if (ReferenceEquals(function, null)) throw new InvalidOperationException("Expression type of function but no function supplied.");
+            if (function.Name.Equals("like", StringComparison.OrdinalIgnoreCase))
+            {
+                var pattern = function.Args[0].ToString();
+                if (pattern.Contains("%") || pattern.Contains("_")) // SQL Server LIKE
+                {
+                    pattern = pattern.Replace("%", ".*").Replace('_', '.');
+                }
 
-            if (reference.IsNull()) throw new NotSupportedException("Only ObjectReference types are supported.");
+                var regex = new Regex("^" + pattern + "$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
-            var key = reference.GetName();
+                return d => d.ContainsKey(key) && (!ReferenceEquals(d[key], null)) && regex.IsMatch(d[key].ToString());
+            }
+
+            throw new NotSupportedException("Expression Function not supported.");
+        }
+
+        private Func<IDictionary<string, object>, bool> GreaterThanToWhereClause(SimpleExpression arg)
+        {
+            var key = GetKeyFromLeftOperand(arg);
+
+            return d => d.ContainsKey(key) && !ReferenceEquals(d[key], null) && ((IComparable)d[key]).CompareTo(arg.RightOperand) > 0;
+        }
+
+        private Func<IDictionary<string, object>, bool> LessThanToWhereClause(SimpleExpression arg)
+        {
+            var key = GetKeyFromLeftOperand(arg);
+
+            return d => d.ContainsKey(key) && !ReferenceEquals(d[key], null) && ((IComparable)d[key]).CompareTo(arg.RightOperand) < 0;
+        }
+
+        private Func<IDictionary<string, object>, bool> GreaterThanOrEqualToWhereClause(SimpleExpression arg)
+        {
+            var key = GetKeyFromLeftOperand(arg);
+
+            return d => d.ContainsKey(key) && !ReferenceEquals(d[key], null) && ((IComparable)d[key]).CompareTo(arg.RightOperand) >= 0;
+        }
+
+        private Func<IDictionary<string, object>, bool> LessThanOrEqualToWhereClause(SimpleExpression arg)
+        {
+            var key = GetKeyFromLeftOperand(arg);
+
+            return d => d.ContainsKey(key) && !ReferenceEquals(d[key], null) && ((IComparable)d[key]).CompareTo(arg.RightOperand) <= 0;
+        }
+
+        private Func<IDictionary<string, object>, bool> NotEqualExpressionToWhereClause(SimpleExpression arg)
+        {
+            var key = GetKeyFromLeftOperand(arg);
 
             if (ReferenceEquals(arg.RightOperand, null))
             {
-                return d => d.ContainsKey(key) && d[key] == null;
+                return d => d.ContainsKey(key) && d[key] != null;
+            }
+
+            if (arg.RightOperand.GetType().IsArray)
+            {
+                return
+                    d =>
+                    d.ContainsKey(key) &&
+                    !((IEnumerable)d[key]).Cast<object>().SequenceEqual(((IEnumerable)arg.RightOperand).Cast<object>());
+            }
+
+            return d => d.ContainsKey(key) && !Equals(d[key], arg.RightOperand);
+        }
+
+        private Func<IDictionary<string, object>, bool> EqualExpressionToWhereClause(SimpleExpression arg)
+        {
+            var key = GetKeyFromLeftOperand(arg);
+
+            if (ReferenceEquals(arg.RightOperand, null))
+            {
+                return d => (!d.ContainsKey(key)) || d[key] == null;
             }
 
             if (arg.RightOperand.GetType().IsArray)
@@ -51,6 +117,16 @@ namespace Simple.Data.QueryPolyfills
             }
 
             return d => d.ContainsKey(key) && Equals(d[key], arg.RightOperand);
+        }
+
+        private static string GetKeyFromLeftOperand(SimpleExpression arg)
+        {
+            var reference = arg.LeftOperand as ObjectReference;
+
+            if (reference.IsNull()) throw new NotSupportedException("Only ObjectReference types are supported.");
+
+            var key = reference.GetName();
+            return key;
         }
 
         private Func<IDictionary<string,object>, bool> Format(SimpleExpression expression)
