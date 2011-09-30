@@ -106,7 +106,7 @@ namespace Simple.Data.Ado
                 //Tim Cartwright: Allows for case insensive parameters
                 var value = suppliedParameters.FirstOrDefault(sp => 
                     sp.Key.Equals(parameter.Name.Replace("@", ""), StringComparison.InvariantCultureIgnoreCase)
-                    || sp.Key.Equals("_" + i++)
+                    || sp.Key.Equals("_" + i)
                 );
                 var cmdParameter = cmd.CreateParameter();
                 //Tim Cartwright: Using AddParameter does not allow for the "default" keyword to ever be passed into 
@@ -121,6 +121,7 @@ namespace Simple.Data.Ado
                 cmdParameter.DbType = parameter.Dbtype;
                 cmdParameter.Size = parameter.Size;
                 cmd.Parameters.Add(cmdParameter);
+                i++;
             }
         }
 
