@@ -14,7 +14,8 @@
                         { typeof(SkipClause), (c,d) => d.Skip(((SkipClause)c).Count) },
                         { typeof(TakeClause), (c,d) => d.Take(((TakeClause)c).Count) },
                         { typeof(SelectClause), (c,d) => new SelectClauseHandler((SelectClause)c).Run(d) },
-                        { typeof(WhereClause), (c,d) => new WhereClauseHandler((WhereClause)c).Run(d) }
+                        { typeof(WhereClause), (c,d) => new WhereClauseHandler((WhereClause)c).Run(d) },
+                        { typeof(OrderByClause), (c, d) => new OrderByClauseHandler((OrderByClause)c).Run(d) }
                     };
 
         private readonly IEnumerable<IDictionary<string, object>> _source;
@@ -57,6 +58,23 @@
             }
 
             return source;
+        }
+    }
+
+    internal class OrderByClauseHandler
+    {
+        private readonly OrderByClause _orderByClause;
+
+        public OrderByClauseHandler(OrderByClause orderByClause)
+        {
+            _orderByClause = orderByClause;
+        }
+
+        public IEnumerable<IDictionary<string, object>> Run(IEnumerable<IDictionary<string, object>> source)
+        {
+            return _orderByClause.Direction == OrderByDirection.Ascending
+                       ? source.OrderBy(d => d[_orderByClause.Reference.GetName()])
+                       : source.OrderByDescending(d => d[_orderByClause.Reference.GetName()]);
         }
     }
 }

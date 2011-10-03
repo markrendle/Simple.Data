@@ -76,6 +76,7 @@
     <Compile Include="DynamicReferenceTest.cs" />
     <Compile Include="DynamicTableTest.cs" />
     <Compile Include="ExpressionHelperTest.cs" />
+    <Compile Include="GroupingHandlerTest.cs" />
     <Compile Include="PromiseTest.cs" />
     <Compile Include="ListHelper.cs" />
     <Compile Include="MathReferenceTest.cs" />

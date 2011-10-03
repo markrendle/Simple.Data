@@ -49,6 +49,37 @@ namespace Simple.Data.InMemoryTest
         }
 
         [Test]
+        public void SelectShouldReturnSubsetOfColumns()
+        {
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            db.Test.Insert(Id: 1, Name: "Alice");
+            db.Test.Insert(Id: 2, Name: "Bob");
+            List<IDictionary<string,object>> records = db.Test.All().Select(db.Test.Name).ToList<IDictionary<string,object>>();
+            Assert.IsNotNull(records);
+            Assert.AreEqual(2, records.Count);
+            Assert.False(records[0].ContainsKey("Id"));
+            Assert.True(records[0].ContainsKey("Name"));
+            Assert.False(records[1].ContainsKey("Id"));
+            Assert.True(records[1].ContainsKey("Name"));
+        }
+
+        [Test]
+        public void SelectWithAggregateShouldReturnAggregates()
+        {
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            db.Test.Insert(Id: 1, Name: "Alice", Age: 20);
+            db.Test.Insert(Id: 2, Name: "Alice", Age: 30);
+            db.Test.Insert(Id: 3, Name: "Bob", Age: 40);
+            db.Test.Insert(Id: 4, Name: "Bob", Age: 50);
+            var records = db.Test.All().Select(db.Test.Name, db.Test.Age.Average().As("AverageAge")).ToList();
+            Assert.AreEqual(2, records.Count);
+            Assert.AreEqual(25, records[0].AverageAge);
+            Assert.AreEqual(45, records[1].AverageAge);
+        }
+
+        [Test]
         public void ShouldWorkWithByteArrays()
         {
             Database.UseMockAdapter(new InMemoryAdapter());
@@ -81,6 +112,63 @@ namespace Simple.Data.InMemoryTest
             Assert.AreEqual(1, deleted);
             var record = db.Test.FindById(1);
             Assert.IsNull(record);
+        }
+
+        [Test]
+        public void TestOrderBy()
+        {
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            for (int i = 0; i < 10; i++)
+            {
+                db.Test.Insert(Id: i, Name: "Alice");
+            }
+
+            var records = db.Test.All().OrderByIdDescending().ToList();
+            Assert.AreEqual(9, records[0].Id);
+        }
+
+        [Test]
+        public void TestSkip()
+        {
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            for (int i = 0; i < 10; i++)
+            {
+                db.Test.Insert(Id: i, Name: "Alice");
+            }
+
+            var records = db.Test.All().Skip(5).ToList();
+            Assert.AreEqual(5, records.Count);
+        }
+
+        [Test]
+        public void TestTake()
+        {
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            for (int i = 0; i < 10; i++)
+            {
+                db.Test.Insert(Id: i, Name: "Alice");
+            }
+
+            var records = db.Test.All().Take(5).ToList();
+            Assert.AreEqual(5, records.Count);
+        }
+
+        [Test]
+        public void TestSkipAndTake()
+        {
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            for (int i = 0; i < 10; i++)
+            {
+                db.Test.Insert(Id: i, Name: "Alice");
+            }
+
+            var records = db.Test.All().OrderByIdDescending().Skip(1).Take(1).ToList();
+            Assert.AreEqual(1, records.Count);
+            Assert.AreEqual(8, records[0].Id);
         }
 
         /// <summary>

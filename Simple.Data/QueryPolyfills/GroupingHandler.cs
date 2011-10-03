@@ -19,6 +19,7 @@ namespace Simple.Data.QueryPolyfills
         public IEnumerable<IGrouping<IDictionary<string, object>, IDictionary<string, object>>> Group(IEnumerable<IDictionary<string,object>> source)
         {
             return source.GroupBy(d => d.Where(kvp => _groupColumns.Contains(kvp.Key)).ToDictionary(),
+                                  d => d.Where(kvp => !_groupColumns.Contains(kvp.Key)).ToDictionary(),
                                   new DictionaryEqualityComparer());
         }
     }

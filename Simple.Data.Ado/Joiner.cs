@@ -68,7 +68,7 @@ namespace Simple.Data.Ado
                 var builder = new StringBuilder(JoinKeyword);
                 builder.AppendFormat(" JOIN {0}{1} ON ({2})",
                     _schema.FindTable(ObjectName.Parse(join.Table.ToString())).QualifiedName,
-                    string.IsNullOrWhiteSpace(join.Table.Alias) ? string.Empty : " " + _schema.QuoteObjectName(join.Table.Alias),
+                    string.IsNullOrWhiteSpace(join.Table.GetAlias()) ? string.Empty : " " + _schema.QuoteObjectName(join.Table.GetAlias()),
                     expressionFormatter.Format(join.JoinExpression));
                 yield return builder.ToString().Trim();
             }

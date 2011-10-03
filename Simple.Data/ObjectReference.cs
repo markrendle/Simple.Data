@@ -16,7 +16,6 @@ namespace Simple.Data
         private readonly string _name;
         private readonly ObjectReference _owner;
         private readonly DataStrategy _dataStrategy;
-        private readonly string _alias;
 
         internal ObjectReference(string name) : this(name, null, null, null)
         {
@@ -30,17 +29,11 @@ namespace Simple.Data
         {
         }
 
-        internal ObjectReference(string name, ObjectReference owner, DataStrategy dataStrategy, string alias)
+        internal ObjectReference(string name, ObjectReference owner, DataStrategy dataStrategy, string alias) : base(alias)
         {
             _name = name;
             _owner = owner;
             _dataStrategy = dataStrategy;
-            _alias = alias;
-        }
-
-        public string Alias
-        {
-            get { return _alias; }
         }
 
         /// <summary>
@@ -71,18 +64,14 @@ namespace Simple.Data
             return _name;
         }
 
-        /// <summary>
-        /// Gets the name of the referenced object.
-        /// </summary>
-        /// <returns>The name.</returns>
-        public string GetAliasOrName()
-        {
-            return _alias ?? _name;
-        }
-
         public ObjectReference As(string alias)
         {
             return new ObjectReference(_name, _owner, _dataStrategy, alias);
+        }
+
+        public override string GetAliasOrName()
+        {
+            return GetAlias() ?? _name;
         }
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
@@ -320,6 +309,11 @@ namespace Simple.Data
         public static MathReference operator %(ObjectReference column, object value)
         {
             return new MathReference(column, value, MathOperator.Modulo);
+        }
+
+        public bool HasOwner()
+        {
+            return !ReferenceEquals(null, _owner);
         }
     }
 }

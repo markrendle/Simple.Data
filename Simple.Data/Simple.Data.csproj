@@ -78,6 +78,8 @@
     <Compile Include="Database.Open.cs" />
     <Compile Include="DatabaseOpenerMethods.cs" />
     <Compile Include="DictionaryCloner.cs" />
+    <Compile Include="QueryPolyfills\AggregateValueResolver.cs" />
+    <Compile Include="QueryPolyfills\DictionaryCreatorFactory.cs" />
     <Compile Include="QueryPolyfills\DictionaryEqualityComparer.cs" />
     <Compile Include="QueryPolyfills\DictionaryQueryRunner.cs" />
     <Compile Include="DistinctClause.cs" />
@@ -99,9 +101,12 @@
     <Compile Include="OrderByDirection.cs" />
     <Compile Include="Promise.cs" />
     <Compile Include="QueryPolyfills\FunctionHandlers.cs" />
+    <Compile Include="QueryPolyfills\FunctionValueResolver.cs" />
     <Compile Include="QueryPolyfills\GroupingHandler.cs" />
     <Compile Include="QueryPolyfills\ObjectMaths.cs" />
+    <Compile Include="QueryPolyfills\ObjectValueResolver.cs" />
     <Compile Include="QueryPolyfills\SelectClauseHandler.cs" />
+    <Compile Include="QueryPolyfills\ValueResolver.cs" />
     <Compile Include="QueryPolyfills\WhereClauseHandler.cs" />
     <Compile Include="Range.cs" />
     <Compile Include="Range1.cs" />
