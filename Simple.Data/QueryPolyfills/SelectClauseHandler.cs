@@ -9,7 +9,7 @@ namespace Simple.Data.QueryPolyfills
     {
         private readonly IList<SimpleReference> _references;
         private readonly IList<ObjectReference> _objectReferences;
-        private readonly IList<FunctionReference> _functionReferences; 
+        private readonly IList<FunctionReference> _functionReferences;
         private Func<int, IDictionary<string, object>> _creator;
 
         public SelectClauseHandler(SelectClause clause)

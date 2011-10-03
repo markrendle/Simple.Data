@@ -11,7 +11,7 @@ namespace Simple.Data.InMemory
     {
         private readonly Dictionary<string, List<IDictionary<string,object>>> _tables = new Dictionary<string, List<IDictionary<string, object>>>();
         private readonly Dictionary<string,string> _autoIncrementColumns = new Dictionary<string, string>();
-        private readonly Dictionary<string, string[]> _keyColumns = new Dictionary<string, string[]>(); 
+        private readonly Dictionary<string, string[]> _keyColumns = new Dictionary<string, string[]>();
 
         private List<IDictionary<string,object>> GetTable(string tableName)
         {
@@ -76,8 +76,9 @@ namespace Simple.Data.InMemory
             else
             {
                 IEnumerable<IDictionary<string, object>> rows = GetTable(tableName);
-                rows = _keyColumns[tableName].Aggregate(rows, (current, keyColumn) => current.Where(d => d[keyColumn] == data[keyColumn]));
-                row = rows.Single();
+                row = _keyColumns[tableName]
+                    .Aggregate(rows, (current, keyColumn) => current.Where(d => d[keyColumn] == data[keyColumn]))
+                    .Single();
             }
             UpdateRecord(data, row);
             return 1;
@@ -85,13 +86,12 @@ namespace Simple.Data.InMemory
 
         public override int Delete(string tableName, SimpleExpression criteria)
         {
-            int count = 0;
-            foreach (var record in Find(tableName, criteria))
+            var deletions = Find(tableName, criteria).ToList();
+            foreach (var record in deletions)
             {
                 GetTable(tableName).Remove(record);
-                ++count;
             }
-            return count;
+            return deletions.Count;
         }
 
         public override bool IsExpressionFunction(string functionName, params object[] args)

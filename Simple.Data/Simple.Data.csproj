@@ -98,6 +98,9 @@
     <Compile Include="OrderByClause.cs" />
     <Compile Include="OrderByDirection.cs" />
     <Compile Include="Promise.cs" />
+    <Compile Include="QueryPolyfills\FunctionHandlers.cs" />
+    <Compile Include="QueryPolyfills\GroupingHandler.cs" />
+    <Compile Include="QueryPolyfills\ObjectMaths.cs" />
     <Compile Include="QueryPolyfills\SelectClauseHandler.cs" />
     <Compile Include="QueryPolyfills\WhereClauseHandler.cs" />
     <Compile Include="Range.cs" />

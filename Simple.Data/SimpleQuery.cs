@@ -208,11 +208,16 @@
         {
             IEnumerable<SimpleQueryClauseBase> unhandledClauses;
             var result = _adapter.RunQuery(this, out unhandledClauses);
-            var unhandledClausesList = unhandledClauses.ToList();
-            if (unhandledClausesList.Count > 0)
+
+            if (unhandledClauses != null)
             {
-                result = new DictionaryQueryRunner(result, unhandledClausesList).Run();
+                var unhandledClausesList = unhandledClauses.ToList();
+                if (unhandledClausesList.Count > 0)
+                {
+                    result = new DictionaryQueryRunner(result, unhandledClausesList).Run();
+                }
             }
+
             return result.Select(d => new SimpleRecord(d, _tableName, _dataStrategy));
         }
 
