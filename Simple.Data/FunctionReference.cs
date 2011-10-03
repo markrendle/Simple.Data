@@ -50,7 +50,7 @@ namespace Simple.Data
 
         public override string GetAliasOrName()
         {
-            return GetAlias() ?? _name;
+            return GetAlias() ?? _name + "_" + _argument.GetAliasOrName();
         }
 
         public bool IsAggregate

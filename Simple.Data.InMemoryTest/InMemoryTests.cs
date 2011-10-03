@@ -65,7 +65,46 @@ namespace Simple.Data.InMemoryTest
         }
 
         [Test]
-        public void SelectWithAggregateShouldReturnAggregates()
+        public void SelectWithAverageShouldReturnAverage()
+        {
+            var db = CreateAggregateTestDb();
+            var records = db.Test.All().Select(db.Test.Name, db.Test.Age.Average().As("AverageAge")).ToList();
+            Assert.AreEqual(2, records.Count);
+            Assert.AreEqual(25, records[0].AverageAge);
+            Assert.AreEqual(45, records[1].AverageAge);
+        }
+
+        [Test]
+        public void SelectWithSumShouldReturnSum()
+        {
+            var db = CreateAggregateTestDb();
+            var records = db.Test.All().Select(db.Test.Name, db.Test.Age.Sum().As("SumAge")).ToList();
+            Assert.AreEqual(2, records.Count);
+            Assert.AreEqual(50, records[0].SumAge);
+            Assert.AreEqual(90, records[1].SumAge);
+        }
+
+        [Test]
+        public void SelectWithMinShouldReturnMin()
+        {
+            var db = CreateAggregateTestDb();
+            var records = db.Test.All().Select(db.Test.Name, db.Test.Age.Min().As("MinAge")).ToList();
+            Assert.AreEqual(2, records.Count);
+            Assert.AreEqual(20, records[0].MinAge);
+            Assert.AreEqual(40, records[1].MinAge);
+        }
+
+        [Test]
+        public void SelectWithMaxShouldReturnMax()
+        {
+            var db = CreateAggregateTestDb();
+            var records = db.Test.All().Select(db.Test.Name, db.Test.Age.Max().As("MaxAge")).ToList();
+            Assert.AreEqual(2, records.Count);
+            Assert.AreEqual(30, records[0].MaxAge);
+            Assert.AreEqual(50, records[1].MaxAge);
+        }
+
+        private static dynamic CreateAggregateTestDb()
         {
             Database.UseMockAdapter(new InMemoryAdapter());
             var db = Database.Open();
@@ -73,10 +112,7 @@ namespace Simple.Data.InMemoryTest
             db.Test.Insert(Id: 2, Name: "Alice", Age: 30);
             db.Test.Insert(Id: 3, Name: "Bob", Age: 40);
             db.Test.Insert(Id: 4, Name: "Bob", Age: 50);
-            var records = db.Test.All().Select(db.Test.Name, db.Test.Age.Average().As("AverageAge")).ToList();
-            Assert.AreEqual(2, records.Count);
-            Assert.AreEqual(25, records[0].AverageAge);
-            Assert.AreEqual(45, records[1].AverageAge);
+            return db;
         }
 
         [Test]
