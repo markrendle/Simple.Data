@@ -153,9 +153,9 @@
             return new SimpleQuery(this, _clauses.Append(new WhereClause(criteria)));
         }
 
-        public SimpleQuery OrderBy(ObjectReference reference)
+        public SimpleQuery OrderBy(ObjectReference reference, OrderByDirection? direction = null)
         {
-            return new SimpleQuery(this, _clauses.Append(new OrderByClause(reference)));
+            return new SimpleQuery(this, _clauses.Append(new OrderByClause(reference, direction)));
         }
 
         public SimpleQuery OrderByDescending(ObjectReference reference)
@@ -163,11 +163,11 @@
             return new SimpleQuery(this, _clauses.Append(new OrderByClause(reference, OrderByDirection.Descending)));
         }
 
-        public SimpleQuery ThenBy(ObjectReference reference)
+        public SimpleQuery ThenBy(ObjectReference reference, OrderByDirection? direction = null)
         {
             ThrowIfNoOrderByClause("ThenBy requires an existing OrderBy");
 
-            return new SimpleQuery(this, _clauses.Append(new OrderByClause(reference)));
+            return new SimpleQuery(this, _clauses.Append(new OrderByClause(reference, direction)));
         }
 
         private void ThrowIfNoOrderByClause(string message)
