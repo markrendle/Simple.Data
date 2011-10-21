@@ -54,6 +54,13 @@ namespace Simple.Data.SqlServer
             else
             {
                 orderBy = "ORDER BY " + columns.Split(',').First().Trim();
+
+                var aliasIndex = orderBy.IndexOf(" AS [", StringComparison.InvariantCultureIgnoreCase);
+
+                if (aliasIndex > -1)
+                {
+                    orderBy = orderBy.Substring(0, aliasIndex);
+                }
             }
             return orderBy;
         }

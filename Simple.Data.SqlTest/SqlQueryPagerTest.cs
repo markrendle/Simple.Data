@@ -54,5 +54,19 @@ namespace Simple.Data.SqlTest
 
             Assert.AreEqual(expected, modified);
         }
+
+        [Test]
+        public void ShouldCopeWithAliasedDefaultSortColumn()
+        {
+            const string sql = "select [a] as [foo],[b],[c] from [d] where [a] = 1";
+            const string expected =
+                "with __data as (select [a] as [foo],[b],[c], row_number() over(order by [a]) as [_#_] from [d] where [a] = 1)"
+                + " select [foo],[b],[c] from __data where [_#_] between @skip + 1 and @skip + @take";
+
+            var modified = new SqlQueryPager().ApplyPaging(sql, "@skip", "@take");
+            modified = Normalize.Replace(modified, " ").ToLowerInvariant();
+
+            Assert.AreEqual(expected, modified);
+        }
     }
 }
