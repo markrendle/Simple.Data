@@ -21,7 +21,11 @@ namespace Simple.Data
 
         public static IDictionary<string, object> ArgumentsToDictionary(this InvokeMemberBinder binder, IEnumerable<object> args)
         {
-            return args.Reverse()
+            var argsArray = args.ToArray();
+            if (argsArray.Length == 1 && argsArray[0] is IDictionary<string, object>)
+                return (IDictionary<string, object>)argsArray[0];
+
+            return argsArray.Reverse()
                 .Zip(binder.CallInfo.ArgumentNames.Reverse().ExtendInfinite(), (v, k) => new KeyValuePair<string, object>(k, v))
                 .Reverse()
                 .Select((kvp, i) => kvp.Key == null ? new KeyValuePair<string, object>("_" + i.ToString(), kvp.Value) : kvp)

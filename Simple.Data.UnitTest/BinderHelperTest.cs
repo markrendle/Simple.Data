@@ -26,6 +26,15 @@ namespace Simple.Data.UnitTest
             var actual = binder.ArgumentsToDictionary(new object[] { 1, 2 });
             Assert.AreEqual("_0", actual.First().Key);
         }
+
+        [Test]
+        public void ArgumentsToDictionaryShouldReturnInputParameterWhenInputParameterIsDictionary()
+        {
+            var binder = new TestInvokeMemberBinder("Test", false, new CallInfo(1, "Foo"));
+            var input = new Dictionary<string, object> { { "Test1", 1 }, { "Test2", 2 } };
+            var actual = binder.ArgumentsToDictionary(new object[] { input });
+            Assert.AreEqual(input["Test2"], actual["Test2"]);
+        }
     }
 
     class TestInvokeMemberBinder : InvokeMemberBinder
