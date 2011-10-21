@@ -46,6 +46,15 @@ namespace Simple.Data.UnitTest
         }
 
         [Test]
+        public void OrderByWithDescendingDirectionShouldSetOrderDescending()
+        {
+            var query = new SimpleQuery(null, "foo");
+            query = query.OrderBy(new ObjectReference("bar"), OrderByDirection.Descending);
+            Assert.AreEqual("bar", query.Clauses.OfType<OrderByClause>().Single().Reference.GetName());
+            Assert.AreEqual(OrderByDirection.Descending, query.Clauses.OfType<OrderByClause>().Single().Direction);
+        }
+
+        [Test]
         public void OrderByBarShouldSetOrderAscending()
         {
             dynamic query = new SimpleQuery(null, "foo");
@@ -63,6 +72,18 @@ namespace Simple.Data.UnitTest
             Assert.AreEqual("quux", actual.Clauses.OfType<OrderByClause>().Skip(1).First().Reference.GetName().ToLowerInvariant());
             Assert.AreEqual(OrderByDirection.Ascending, actual.Clauses.OfType<OrderByClause>().First().Direction);
             Assert.AreEqual(OrderByDirection.Ascending, actual.Clauses.OfType<OrderByClause>().Skip(1).First().Direction);
+        }
+
+        [Test]
+        public void OrderByBarThenQuxxShouldBeAbleToMixOrdering()
+        {
+            var query = new SimpleQuery(null, "foo");
+            query = query.OrderBy(new ObjectReference("bar"), OrderByDirection.Ascending)
+                         .ThenBy(new ObjectReference("quux"), OrderByDirection.Descending);
+            Assert.AreEqual("bar", query.Clauses.OfType<OrderByClause>().First().Reference.GetName());
+            Assert.AreEqual("quux", query.Clauses.OfType<OrderByClause>().Skip(1).First().Reference.GetName());
+            Assert.AreEqual(OrderByDirection.Ascending, query.Clauses.OfType<OrderByClause>().First().Direction);
+            Assert.AreEqual(OrderByDirection.Descending, query.Clauses.OfType<OrderByClause>().Skip(1).First().Direction);
         }
         
         [Test]
