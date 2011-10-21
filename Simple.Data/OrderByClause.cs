@@ -9,14 +9,10 @@ namespace Simple.Data
         private readonly ObjectReference _reference;
         private readonly OrderByDirection _direction;
 
-        public OrderByClause(ObjectReference reference) : this(reference, OrderByDirection.Ascending)
-        {
-        }
-
-        public OrderByClause(ObjectReference reference, OrderByDirection direction)
+        public OrderByClause(ObjectReference reference, OrderByDirection? direction = null)
         {
             _reference = reference;
-            _direction = direction;
+            _direction = direction.HasValue ? direction.Value : OrderByDirection.Ascending;
         }
 
         public OrderByDirection Direction

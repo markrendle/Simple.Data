@@ -46,6 +46,22 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void SortOrderIsCorrectlyResolvedInOrderByExpression()
+        {
+            _db.Customers.FindAll(_db.Customers.CustomerName == "Arthur").OrderBy(_db.Customers.CustomerName, OrderByDirection.Descending).ToList<dynamic>();
+            GeneratedSqlIs("select [dbo].[customers].[customerid],[dbo].[customers].[customer_name] from [dbo].[customers] where [dbo].[customers].[customer_name] = @p1 order by [customer_name] desc");
+            Parameter(0).Is("Arthur");
+        }
+
+        [Test]
+        public void SortOrderIsCorrectlyResolvedInOrderByThenByExpression()
+        {
+            _db.Customers.FindAll(_db.Customers.CustomerName == "Arthur").OrderBy(_db.Customers.CustomerName, OrderByDirection.Descending).ThenBy(_db.Customers.CustomerId, OrderByDirection.Ascending).ToList<dynamic>();
+            GeneratedSqlIs("select [dbo].[customers].[customerid],[dbo].[customers].[customer_name] from [dbo].[customers] where [dbo].[customers].[customer_name] = @p1 order by [customer_name] desc, [customerid]");
+            Parameter(0).Is("Arthur");
+        }
+
+        [Test]
         public void DotNetNamingInComplexQuery()
         {
             _db.CustomerOrders.FindAll(_db.CustomerOrders.CustomerId.Like("123%") || (_db.CustomerOrders.CustomerId == null)).ToList<dynamic>();
