@@ -59,6 +59,11 @@ namespace Simple.Data.Ado.Schema
             get { return _table.DatabaseSchema.QuoteObjectName(_actualName); }
         }
 
+        public string QualifiedName
+        {
+            get { return _table.QualifiedName + "." + QuotedName; }
+        }
+
         public bool IsIdentity
         {
             get { return _isIdentity; }

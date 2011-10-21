@@ -33,7 +33,7 @@ namespace Simple.Data.IntegrationTest
         public void DotNetNamingIsCorrectlyResolvedInOrderBy()
         {
             _db.Customers.FindAll(_db.Customers.CustomerName == "Arthur").OrderByCustomerName().ToList<dynamic>();
-            GeneratedSqlIs("select [dbo].[customers].[customerid],[dbo].[customers].[customer_name] from [dbo].[customers] where [dbo].[customers].[customer_name] = @p1 order by [customer_name]");
+            GeneratedSqlIs("select [dbo].[customers].[customerid],[dbo].[customers].[customer_name] from [dbo].[customers] where [dbo].[customers].[customer_name] = @p1 order by [dbo].[customers].[customer_name]");
             Parameter(0).Is("Arthur");
         }
 
@@ -41,7 +41,7 @@ namespace Simple.Data.IntegrationTest
         public void DotNetNamingIsCorrectlyResolvedInOrderByExpression()
         {
             _db.Customers.FindAll(_db.Customers.CustomerName == "Arthur").OrderBy(_db.Customers.CustomerName).ToList<dynamic>();
-            GeneratedSqlIs("select [dbo].[customers].[customerid],[dbo].[customers].[customer_name] from [dbo].[customers] where [dbo].[customers].[customer_name] = @p1 order by [customer_name]");
+            GeneratedSqlIs("select [dbo].[customers].[customerid],[dbo].[customers].[customer_name] from [dbo].[customers] where [dbo].[customers].[customer_name] = @p1 order by [dbo].[customers].[customer_name]");
             Parameter(0).Is("Arthur");
         }
 
@@ -49,7 +49,7 @@ namespace Simple.Data.IntegrationTest
         public void SortOrderIsCorrectlyResolvedInOrderByExpression()
         {
             _db.Customers.FindAll(_db.Customers.CustomerName == "Arthur").OrderBy(_db.Customers.CustomerName, OrderByDirection.Descending).ToList<dynamic>();
-            GeneratedSqlIs("select [dbo].[customers].[customerid],[dbo].[customers].[customer_name] from [dbo].[customers] where [dbo].[customers].[customer_name] = @p1 order by [customer_name] desc");
+            GeneratedSqlIs("select [dbo].[customers].[customerid],[dbo].[customers].[customer_name] from [dbo].[customers] where [dbo].[customers].[customer_name] = @p1 order by [dbo].[customers].[customer_name] desc");
             Parameter(0).Is("Arthur");
         }
 
@@ -57,7 +57,7 @@ namespace Simple.Data.IntegrationTest
         public void SortOrderIsCorrectlyResolvedInOrderByThenByExpression()
         {
             _db.Customers.FindAll(_db.Customers.CustomerName == "Arthur").OrderBy(_db.Customers.CustomerName, OrderByDirection.Descending).ThenBy(_db.Customers.CustomerId, OrderByDirection.Ascending).ToList<dynamic>();
-            GeneratedSqlIs("select [dbo].[customers].[customerid],[dbo].[customers].[customer_name] from [dbo].[customers] where [dbo].[customers].[customer_name] = @p1 order by [customer_name] desc, [customerid]");
+            GeneratedSqlIs("select [dbo].[customers].[customerid],[dbo].[customers].[customer_name] from [dbo].[customers] where [dbo].[customers].[customer_name] = @p1 order by [dbo].[customers].[customer_name] desc, [dbo].[customers].[customerid]");
             Parameter(0).Is("Arthur");
         }
 

@@ -118,7 +118,12 @@ namespace Simple.Data.Ado
                 cmdParameter.Direction = parameter.Direction;
                 //Tim Cartwright: I added size and dbtype so inout/out params would function properly.
                 //not setting the proper dbtype and size with out put parameters causes the exception: "Size property has an invalid size of 0"
-                cmdParameter.DbType = parameter.Dbtype;
+                // Mark: Just adding a quick check here so that if the Provider-specific type has been set by setting the value, this will not
+                // override that.
+                if (cmdParameter.DbType != parameter.Dbtype)
+                {
+                    cmdParameter.DbType = parameter.Dbtype;
+                }
                 cmdParameter.Size = parameter.Size;
                 cmd.Parameters.Add(cmdParameter);
                 i++;
