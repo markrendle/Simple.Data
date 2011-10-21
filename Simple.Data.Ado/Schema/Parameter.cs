@@ -22,7 +22,8 @@ namespace Simple.Data.Ado.Schema
         }
 
         public Parameter(string name, Type type, ParameterDirection direction, DbType dbtype, int size)
-            : this(name, type, direction) {
+            : this(name, type, direction)
+        {
             _dbtype = dbtype;
             _size = size;
         }
@@ -42,11 +43,13 @@ namespace Simple.Data.Ado.Schema
             get { return _name; }
         }
         //Tim Cartwright: I added size and dbtype so inout/out params would function properly.
-        public int Size {
+        public int Size
+        {
             get { return _size; }
         }
 
-        public DbType Dbtype {
+        public DbType Dbtype
+        {
             get { return _dbtype; }
         }
 
