@@ -14,7 +14,8 @@ namespace Simple.Data.IntegrationTest
         {
             schemaProvider.SetTables(new[] {"dbo", "Users", "BASE TABLE"},
                                      new[] {"dbo", "UserBio", "BASE TABLE"},
-                                     new[] {"dbo", "Employee", "BASE TABLE"});
+                                     new[] { "dbo", "UserPayment", "BASE TABLE" },
+                                     new[] { "dbo", "Employee", "BASE TABLE" });
 
             schemaProvider.SetColumns(new object[] {"dbo", "Users", "Id", true},
                                       new[] {"dbo", "Users", "Name"},
@@ -22,12 +23,15 @@ namespace Simple.Data.IntegrationTest
                                       new[] {"dbo", "Users", "Age"},
                                       new[] {"dbo", "UserBio", "UserId"},
                                       new[] {"dbo", "UserBio", "Text"},
-                                      new[] {"dbo", "Employee", "Id"},
+                                      new[] { "dbo", "UserPayment", "UserId" },
+                                      new[] { "dbo", "UserPayment", "Amount" },
+                                      new[] { "dbo", "Employee", "Id" },
                                       new[] {"dbo", "Employee", "Name"},
                                       new[] {"dbo", "Employee", "ManagerId"});
 
             schemaProvider.SetPrimaryKeys(new object[] { "dbo", "Users", "Id", 0 });
-            schemaProvider.SetForeignKeys(new object[] { "FK_Users_UserBio", "dbo", "UserBio", "UserId", "dbo", "Users", "Id", 0 });
+            schemaProvider.SetForeignKeys(new object[] { "FK_Users_UserBio", "dbo", "UserBio", "UserId", "dbo", "Users", "Id", 0 },
+                                          new object[] { "FK_Users_UserPayment", "dbo", "UserPayment", "UserId", "dbo", "Users", "Id", 0 });
         }
 
         [Test]
@@ -59,6 +63,20 @@ namespace Simple.Data.IntegrationTest
                 " left join [dbo].[userbio] on ([dbo].[users].[id] = [dbo].[userbio].[userid])");
         }
 
+        [Test]
+        public void SpecifyingColumnsAndAggregatesFromOtherTablesShouldAddJoins()
+        {
+            _db.Users.All()
+                .Select(_db.Users.Name, _db.Users.Password, _db.Users.UserBio.Text, _db.Users.UserPayments.Amount.Sum())
+                .ToList();
+            GeneratedSqlIs(
+                "select [dbo].[users].[name],[dbo].[users].[password],[dbo].[userbio].[text],sum([dbo].[userpayment].[amount]) from [dbo].[users]" +
+                " left join [dbo].[userbio] on ([dbo].[users].[id] = [dbo].[userbio].[userid])" +
+                " left join [dbo].[userpayment] on ([dbo].[users].[id] = [dbo].[userpayment].[userid])" +
+                " group by [dbo].[users].[name],[dbo].[users].[password],[dbo].[userbio].[text]"
+                );
+        }
+        
         [Test]
         public void SpecifyingCountShouldSelectCount()
         {

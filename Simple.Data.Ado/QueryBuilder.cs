@@ -96,7 +96,7 @@ namespace Simple.Data.Ado
             var fromHavingCriteria = joiner.GetJoinClauses(_tableName, _havingCriteria);
 
             var fromColumnList = _columns.Any(r => !(r is SpecialReference))
-                                     ? joiner.GetJoinClauses(_tableName, _columns.OfType<ObjectReference>(), JoinType.Outer)
+                                     ? joiner.GetJoinClauses(_tableName, GetObjectReferences(_columns), JoinType.Outer)
                                      : Enumerable.Empty<string>();
 
             var joins = string.Join(" ", fromTable.Concat(fromJoins)
@@ -108,6 +108,20 @@ namespace Simple.Data.Ado
             if (!string.IsNullOrWhiteSpace(joins))
             {
                 _commandBuilder.Append(" " + joins);
+            }
+        }
+
+        private IEnumerable<ObjectReference> GetObjectReferences(IEnumerable<SimpleReference> source)
+        {
+            var list = source.ToList();
+            foreach (var objectReference in list.OfType<ObjectReference>())
+            {
+                yield return objectReference;
+            }
+
+            foreach (var objectReference in list.OfType<FunctionReference>().Select(fr => fr.Argument).OfType<ObjectReference>())
+            {
+                yield return objectReference;
             }
         }
 
