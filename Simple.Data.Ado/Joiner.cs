@@ -26,7 +26,7 @@ namespace Simple.Data.Ado
             _schema = schema;
         }
 
-        public IEnumerable<string> GetJoinClauses(ObjectName mainTableName, IEnumerable<string> tableList)
+        public IEnumerable<string> GetJoinClauses(ObjectName mainTableName, IEnumerable<string> tableList, JoinType joinType = JoinType.Inner)
         {
             var tablePairs = tableList.Select(t => new ObjectName(mainTableName.Schema, t)).ToTuplePairs().ToList();
             foreach (var tablePair in tablePairs)
@@ -49,13 +49,13 @@ namespace Simple.Data.Ado
             return tablePairs.Select(tp => _done[tp.Item2]).Distinct();
         }
 
-        public IEnumerable<string> GetJoinClauses(ObjectName mainTableName, IEnumerable<ObjectReference> references)
+        public IEnumerable<string> GetJoinClauses(ObjectName mainTableName, IEnumerable<ObjectReference> references, JoinType joinType = JoinType.Inner)
         {
             _done.AddOrUpdate(mainTableName, string.Empty, (s, o) => string.Empty);
             var tablePairs = GetTableNames(references, mainTableName.Schema).Distinct().ToList();
             foreach (var tablePair in tablePairs)
             {
-                AddJoin(tablePair.Item1, tablePair.Item2);
+                AddJoin(tablePair.Item1, tablePair.Item2, joinType);
             }
             return tablePairs.Select(tp => _done[tp.Item2]).Distinct();
         }
@@ -74,7 +74,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        private void AddJoin(ObjectName table1Name, ObjectName table2Name)
+        private void AddJoin(ObjectName table1Name, ObjectName table2Name, JoinType joinType = JoinType.Inner)
         {
             _done.GetOrAdd(table2Name, _ =>
                                            {
@@ -89,13 +89,13 @@ namespace Simple.Data.Ado
                                                if (foreignKey == null) throw new SchemaResolutionException(
                                                    string.Format("Could not join '{0}' and '{1}'", table1.ActualName, table2.ActualName));
 
-                                               return MakeJoinText(table2, foreignKey);
+                                               return MakeJoinText(table2, foreignKey, joinType);
                                            });
         }
 
-        private string MakeJoinText(Table rightTable, ForeignKey foreignKey)
+        private string MakeJoinText(Table rightTable, ForeignKey foreignKey, JoinType joinType)
         {
-            var builder = new StringBuilder(JoinKeyword);
+            var builder = new StringBuilder(JoinKeywordFor(joinType));
             builder.AppendFormat(" JOIN {0} ON (", rightTable.QualifiedName);
             builder.Append(FormatJoinExpression(foreignKey, 0));
 
@@ -106,6 +106,11 @@ namespace Simple.Data.Ado
             }
             builder.Append(")");
             return builder.ToString();
+        }
+
+        private string JoinKeywordFor(JoinType joinType)
+        {
+            return joinType == JoinType.Inner ? string.Empty : "LEFT";
         }
 
         private string FormatJoinExpression(ForeignKey foreignKey, int columnIndex)

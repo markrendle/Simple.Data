@@ -52,7 +52,11 @@ namespace Simple.Data
                         continue;
                 }
 
-                if (value != null && IsTypeConversionRequired(value.GetType(), propertyInfo.PropertyType))
+                if (value != null && propertyInfo.PropertyType.IsEnum && value is string)
+                {
+                    value = Enum.Parse(propertyInfo.PropertyType, value.ToString());
+                }
+                else if (value != null && IsTypeConversionRequired(value.GetType(), propertyInfo.PropertyType))
                 {
                     value = Convert.ChangeType(value, propertyInfo.PropertyType);
                 }

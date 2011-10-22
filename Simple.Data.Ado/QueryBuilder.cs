@@ -96,7 +96,7 @@ namespace Simple.Data.Ado
             var fromHavingCriteria = joiner.GetJoinClauses(_tableName, _havingCriteria);
 
             var fromColumnList = _columns.Any(r => !(r is SpecialReference))
-                                     ? joiner.GetJoinClauses(_tableName, _columns.OfType<ObjectReference>())
+                                     ? joiner.GetJoinClauses(_tableName, _columns.OfType<ObjectReference>(), JoinType.Outer)
                                      : Enumerable.Empty<string>();
 
             var joins = string.Join(" ", fromTable.Concat(fromJoins)

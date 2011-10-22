@@ -46,6 +46,18 @@ namespace Simple.Data.UnitTest
             Assert.AreEqual(expected, ((Int32ToEnum)actual).Value);
         }
 
+        [Test]
+        public void CanConvertStringToEnum()
+        {
+            var expected = Int32ToEnum.Numbers.One;
+            var source = new Dictionary<string, object> { { "Value", expected.ToString() } };
+            var target = ConcreteTypeCreator.Get(typeof(Int32ToEnum));
+            object actual;
+            Assert.IsTrue(target.TryCreate(source, out actual));
+            Assert.IsInstanceOf<Int32ToEnum>(actual);
+            Assert.AreEqual(expected, ((Int32ToEnum)actual).Value);
+        }
+        
         public class DecimalToDouble
         {
             public double Value { get; set; }

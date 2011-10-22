@@ -56,7 +56,7 @@ namespace Simple.Data.IntegrationTest
                 .ToList();
             GeneratedSqlIs(
                 "select [dbo].[users].[name],[dbo].[users].[password],[dbo].[userbio].[text] from [dbo].[users]" +
-                " join [dbo].[userbio] on ([dbo].[users].[id] = [dbo].[userbio].[userid])");
+                " left join [dbo].[userbio] on ([dbo].[users].[id] = [dbo].[userbio].[userid])");
         }
 
         [Test]

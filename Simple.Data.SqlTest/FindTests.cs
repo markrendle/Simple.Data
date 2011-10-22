@@ -145,5 +145,14 @@ namespace Simple.Data.SqlTest
             var users = userQuery.ToList();
             Assert.AreNotEqual(0, users.Count);
         }
+
+        [Test]
+        public void FindByWithNamedParameter()
+        {
+            var db = DatabaseHelper.Open();
+            var user = db.Users.FindBy(Name: "Bob");
+            Assert.IsNotNull(user);
+
+        }
     }
 }
