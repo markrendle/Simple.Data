@@ -74,7 +74,7 @@ namespace Simple.Data.Ado
             get
             {
                 if (!_lastRead) throw new InvalidOperationException();
-                return _reader.ToDictionary();
+                return _reader.ToDictionary(_index);
             }
         }
 
