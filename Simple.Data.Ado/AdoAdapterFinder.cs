@@ -122,13 +122,13 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static IDictionary<string, object> TryExecuteSingletonQuery(IDbConnection connection, IDbCommand command, IDictionary<string,int> index)
+        private static IDictionary<string, object> TryExecuteSingletonQuery(IDbConnection connection, IDbCommand command, IDictionary<string, int> index)
         {
             command.WriteTrace();
-            try
+            using (connection)
+            using (command)
             {
-                using (connection)
-                using (command)
+                try
                 {
                     if (connection.State != ConnectionState.Open)
                         connection.Open();
@@ -140,10 +140,10 @@ namespace Simple.Data.Ado
                         }
                     }
                 }
-            }
-            catch (DbException ex)
-            {
-                throw new AdoAdapterException(ex.Message, command);
+                catch (DbException ex)
+                {
+                    throw new AdoAdapterException(ex.Message, command);
+                }
             }
             return null;
         }
