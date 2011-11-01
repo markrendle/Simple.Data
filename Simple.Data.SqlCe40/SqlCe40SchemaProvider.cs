@@ -165,5 +165,10 @@ namespace Simple.Data.SqlCe40
 
             return dataTable;
         }
+
+        public String GetDefaultSchema()
+        {
+            return "dbo";
+        }
     }
 }

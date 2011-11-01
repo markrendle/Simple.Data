@@ -16,6 +16,14 @@
             return new SqlCeParameter(name, sqlCeColumn.SqlDbType, 0, column.ActualName);
         }
 
+        public IDbDataParameter CreateParameter(string name)
+        {
+            return new SqlCeParameter
+                {
+                    ParameterName = name
+                };
+        }
+
         public IDbDataParameter CreateParameter(string name, DbType dbType, int maxLength)
         {
             IDbDataParameter parameter = new SqlCeParameter

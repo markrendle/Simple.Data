@@ -27,7 +27,7 @@ namespace Simple.Data.Ado
             _column = column;
             if (column == null)
             {
-                _type = ParameterType.Other;
+                _type = ParameterType.NameOnly;
                 return;
             }
             _type = ParameterType.Column;
@@ -116,6 +116,7 @@ namespace Simple.Data.Ado
     {
         Column,
         FixedValue,
-        Other
+        Other,
+        NameOnly
     }
 }
