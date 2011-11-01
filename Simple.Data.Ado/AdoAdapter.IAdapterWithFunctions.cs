@@ -18,7 +18,7 @@ namespace Simple.Data.Ado
 
 	    public IEnumerable<ResultSet> Execute(string functionName, IDictionary<string, object> parameters)
 	    {
-	        var executor = _executors.GetOrAdd(functionName, f => _connectionProvider.GetProcedureExecutor(this, ObjectName.Parse(f)));
+	        var executor = _executors.GetOrAdd(functionName, f => _connectionProvider.GetProcedureExecutor(this, _schema.BuildObjectName(f)));
 	        return executor.Execute(parameters);
 	    }
 	}

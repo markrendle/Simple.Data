@@ -189,5 +189,10 @@ namespace Simple.Data.SqlServer
         {
             return DbTypeLookup.GetSqlDbType(informationSchemaTypeName);
         }
+
+        public String GetDefaultSchema()
+        {
+            return "dbo";
+        }
     }
 }
