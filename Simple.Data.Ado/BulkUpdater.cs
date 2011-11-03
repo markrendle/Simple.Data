@@ -18,12 +18,12 @@ namespace Simple.Data.Ado
         public int Update(AdoAdapter adapter, string tableName, IList<IDictionary<string, object>> data, IEnumerable<string> criteriaFieldNames, IDbTransaction transaction)
         {
             int count = 0;
-            if (data == null) throw new ArgumentNullException("data");
-            if (data.Count < 2) throw new ArgumentException("UpdateMany requires more than one record.");
+            if (data == null || !data.Any()) 
+                return count;
 
             var criteriaFieldNameList = criteriaFieldNames.ToList();
-    
             if (criteriaFieldNameList.Count == 0) throw new NotSupportedException("Adapter does not support key-based update for this object.");
+
             if (!AllRowsHaveSameKeys(data)) throw new SimpleDataException("Records have different structures. Bulk updates are only valid on consistent records.");
             var table = adapter.GetSchema().FindTable(tableName);
 
