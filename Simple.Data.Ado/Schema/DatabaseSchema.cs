@@ -63,6 +63,11 @@ namespace Simple.Data.Ado.Schema
             return _lazyProcedures.Value.Find(procedureName);
         }
 
+        private String GetDefaultSchema()
+        {
+            return _schemaProvider.GetDefaultSchema();
+        }
+        
         private TableCollection CreateTableCollection()
         {
             return new TableCollection(_schemaProvider.GetTables()
@@ -100,6 +105,15 @@ namespace Simple.Data.Ado.Schema
         public static void ClearCache()
         {
             Instances.Clear();
+        }
+
+        public ObjectName BuildObjectName(String text)
+        {
+            if (text == null) throw new ArgumentNullException("text");
+            if (!text.Contains('.')) return new ObjectName(this.GetDefaultSchema(), text);
+            var schemaDotTable = text.Split('.');
+            if (schemaDotTable.Length != 2) throw new InvalidOperationException("Could not parse table name.");
+            return new ObjectName(schemaDotTable[0], schemaDotTable[1]);
         }
     }
 }

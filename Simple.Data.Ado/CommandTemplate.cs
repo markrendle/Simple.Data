@@ -120,11 +120,21 @@ namespace Simple.Data.Ado
         private IDbDataParameter CreateParameter(IDbCommand command, ParameterTemplate parameterTemplate, object value, string suffix = "")
         {
             var factory = _createGetParameterFactoryFunc(command);
-            var parameter = parameterTemplate.Column != null
-                                ? factory.CreateParameter(parameterTemplate.Name + suffix,
-                                                          parameterTemplate.Column)
-                                : factory.CreateParameter(parameterTemplate.Name, parameterTemplate.DbType,
-                                                          parameterTemplate.MaxLength);
+            var parameter = default(IDbDataParameter);
+            if(parameterTemplate.Column != null)
+            {
+                parameter = factory.CreateParameter(parameterTemplate.Name + suffix,
+                                                    parameterTemplate.Column);
+            }
+            else if (parameterTemplate.Type == ParameterType.NameOnly)
+            {
+                parameter = factory.CreateParameter(parameterTemplate.Name);
+            }
+            else
+            {
+                parameter = factory.CreateParameter(parameterTemplate.Name, parameterTemplate.DbType,
+                                                    parameterTemplate.MaxLength);
+            }
             parameter.Value = FixObjectType(value);
             return parameter;
         }

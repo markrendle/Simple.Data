@@ -13,5 +13,6 @@ namespace Simple.Data.Ado.Schema
         IEnumerable<ForeignKey> GetForeignKeys(Table table);
         string QuoteObjectName(string unquotedName);
         string NameParameter(string baseName);
+        string GetDefaultSchema();
     }
 }

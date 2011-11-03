@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
+using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
@@ -15,6 +16,7 @@ namespace Simple.Data.Ado
         private readonly AdoAdapter _adapter;
         private readonly IDbTransaction _transaction;
         private readonly IDbConnection _connection;
+        private readonly DatabaseSchema _schema;
 
         public AdoAdapterFinder(AdoAdapter adapter) : this(adapter, null)
         {
@@ -34,7 +36,7 @@ namespace Simple.Data.Ado
 
         public IDictionary<string, object> FindOne(string tableName, SimpleExpression criteria)
         {
-            if (criteria == null) return FindAll(ObjectName.Parse(tableName)).FirstOrDefault();
+            if (criteria == null) return FindAll(_adapter.GetSchema().BuildObjectName(tableName)).FirstOrDefault();
             var commandTemplate = GetCommandTemplate(tableName, criteria);
             return ExecuteSingletonQuery(commandTemplate, criteria.GetValues());
         }
@@ -43,7 +45,7 @@ namespace Simple.Data.Ado
         {
             if (criteria == null)
             {
-                return _ => FindAll(ObjectName.Parse(tableName)).FirstOrDefault();
+                return _ => FindAll(_adapter.GetSchema().BuildObjectName(tableName)).FirstOrDefault();
             }
             var commandTemplate = GetCommandTemplate(tableName, criteria);
             return args => ExecuteSingletonQuery(commandTemplate, args);
@@ -51,7 +53,7 @@ namespace Simple.Data.Ado
 
         public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
-            if (criteria == null) return FindAll(ObjectName.Parse(tableName));
+            if (criteria == null) return FindAll(_adapter.GetSchema().BuildObjectName(tableName));
             var commandTemplate = GetCommandTemplate(tableName, criteria);
             return ExecuteQuery(commandTemplate, criteria.GetValues());
         }
@@ -65,8 +67,8 @@ namespace Simple.Data.Ado
             return tableCommandCache.GetOrAdd(hash,
                                               _ =>
                                               new FindHelper(_adapter.GetSchema())
-                                                  .GetFindByCommand(ObjectName.Parse(tableName), criteria)
-                                                  .GetCommandTemplate(_adapter.GetSchema().FindTable(ObjectName.Parse(tableName))));
+                                                  .GetFindByCommand(_adapter.GetSchema().BuildObjectName(tableName), criteria)
+                                                  .GetCommandTemplate(_adapter.GetSchema().FindTable(_adapter.GetSchema().BuildObjectName(tableName))));
         }
 
         private IEnumerable<IDictionary<string, object>> FindAll(ObjectName tableName)

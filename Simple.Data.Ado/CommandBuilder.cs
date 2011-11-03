@@ -255,9 +255,20 @@ namespace Simple.Data.Ado
 
         private static IDbDataParameter CreateSingleParameter(IDbParameterFactory parameterFactory, object value, ParameterTemplate template)    
         {
-            if (template.Column != null) return CreateSingleParameter(parameterFactory, value, template.Name, template.Column);
+            if (template.Column != null)
+            {
+                return CreateSingleParameter(parameterFactory, value, template.Name, template.Column);
+            }
 
-            var parameter = parameterFactory.CreateParameter(template.Name, template.DbType, template.MaxLength);
+            var parameter = default(IDbDataParameter);
+            if (template.Type == ParameterType.NameOnly)
+            {
+                parameter = parameterFactory.CreateParameter(template.Name);
+            }
+            else
+            {
+                parameter = parameterFactory.CreateParameter(template.Name, template.DbType, template.MaxLength);
+            }
             parameter.Value = CommandHelper.FixObjectType(value);
             return parameter;
         }

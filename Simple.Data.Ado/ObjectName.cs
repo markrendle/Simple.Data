@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
@@ -22,15 +23,6 @@ namespace Simple.Data.Ado
             if (name == null) throw new ArgumentNullException("name");
             _schema = schema;
             _name = name;
-        }
-
-        public static ObjectName Parse(string text)
-        {
-            if (text == null) throw new ArgumentNullException("text");
-            if (!text.Contains('.')) return new ObjectName(Properties.Settings.Default.DefaultSchema ?? "dbo", text);
-            var schemaDotTable = text.Split('.');
-            if (schemaDotTable.Length != 2) throw new InvalidOperationException("Could not parse table name.");
-            return new ObjectName(schemaDotTable[0], schemaDotTable[1]);
         }
 
         public string Name

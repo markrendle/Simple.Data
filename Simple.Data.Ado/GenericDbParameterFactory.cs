@@ -14,6 +14,14 @@ namespace Simple.Data.Ado
             _command = command;
         }
 
+        public IDbDataParameter CreateParameter(string name)
+        {
+            if (name == null) throw new ArgumentNullException("name");
+            var parameter = _command.CreateParameter();
+            parameter.ParameterName = name;
+            return parameter;
+        }
+        
         public IDbDataParameter CreateParameter(string name, Column column)
         {
             if (name == null) throw new ArgumentNullException("name");

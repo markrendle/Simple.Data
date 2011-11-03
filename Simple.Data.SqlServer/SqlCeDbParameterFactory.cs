@@ -9,9 +9,17 @@
     [Export(typeof(IDbParameterFactory))]
     public class SqlDbParameterFactory : IDbParameterFactory
     {
+        public IDbDataParameter CreateParameter(string name)
+        {
+            return new SqlParameter
+                {
+                    ParameterName = name
+                };
+        }
+
         public IDbDataParameter CreateParameter(string name, Column column)
         {
-            var sqlColumn = (SqlColumn) column;
+            var sqlColumn = (SqlColumn)column;
             return new SqlParameter(name, sqlColumn.SqlDbType, column.MaxLength, column.ActualName);
         }
 

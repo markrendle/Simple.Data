@@ -154,6 +154,9 @@ namespace Simple.Data.Mocking.Ado
             _tables.Clear();
         }
 
-        
+        public String GetDefaultSchema()
+        {
+            return "dbo";
+        }
     }
 }

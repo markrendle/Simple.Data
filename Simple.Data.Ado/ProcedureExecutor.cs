@@ -74,7 +74,8 @@ namespace Simple.Data.Ado
             command.Connection.Open();
             using (var reader = command.ExecuteReader())
             {
-                if (reader.FieldCount > 0)
+                // Reader isn't always returned - added check to stop NullReferenceException
+                if ((reader != null) && (reader.FieldCount > 0))
                 {
                     return reader.ToMultipleDictionaries();
                 }
