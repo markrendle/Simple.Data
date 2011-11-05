@@ -51,13 +51,11 @@ namespace Simple.Data.Ado
                 return customInserter.Insert(_adapter, tableName, data.ToDictionary(), _transaction);
             }
 
-            var dataDictionary = data.Where(kvp => table.HasColumn(kvp.Key) && !table.FindColumn(kvp.Key).IsIdentity).ToDictionary();
+            var dataDictionary = data.Where(kvp => table.HasColumn(kvp.Key) && !table.FindColumn(kvp.Key).IsIdentity)
+                                     .ToDictionary(kvp => table.FindColumn(kvp.Key), kvp => kvp.Value);
 
-            string columnList =
-                dataDictionary.Keys.Select(table.FindColumn)
-                .Select(c => c.QuotedName)
-                .Aggregate((agg, next) => agg + "," + next);
-            string valueList = columnList.Split(',').Select(s => "?").Aggregate((agg, next) => agg + "," + next);
+            string columnList = dataDictionary.Keys.Select(c => c.QuotedName).Aggregate((agg, next) => agg + "," + next);
+            string valueList = dataDictionary.Keys.Select(s => "?").Aggregate((agg, next) => agg + "," + next);
 
             string insertSql = "insert into " + table.QualifiedName + " (" + columnList + ") values (" + valueList + ")";
 
@@ -73,16 +71,16 @@ namespace Simple.Data.Ado
                     if (_adapter.ProviderSupportsCompoundStatements)
                     {
                         insertSql += "; " + selectSql;
-                        return ExecuteSingletonQuery(insertSql, dataDictionary.Values.ToArray());
+                        return ExecuteSingletonQuery(insertSql, dataDictionary.Keys, dataDictionary.Values);
                     }
                     else
                     {
-                        return ExecuteSingletonQuery(insertSql, selectSql, dataDictionary.Values.ToArray());
+                        return ExecuteSingletonQuery(insertSql, selectSql, dataDictionary.Keys, dataDictionary.Values);
                     }
                 }
             }
 
-            Execute(insertSql, dataDictionary.Values.ToArray());
+            Execute(insertSql, dataDictionary.Keys, dataDictionary.Values);
             return null;
         }
 
@@ -96,18 +94,18 @@ namespace Simple.Data.Ado
             }
         }
 
-        internal IDictionary<string, object> ExecuteSingletonQuery(string sql, params object[] values)
+        internal IDictionary<string, object> ExecuteSingletonQuery(string sql, IEnumerable<Column> columns, IEnumerable<Object> values)
         {
             if (_transaction != null)
             {
-                var command = new CommandHelper(_adapter).Create(_transaction.Connection, sql, values.ToArray());
+                var command = new CommandHelper(_adapter).CreateInsert(_transaction.Connection, sql, columns, values.ToArray());
                 command.Transaction = _transaction;
                 return TryExecuteSingletonQuery(command);
             }
 
             using (var connection = _adapter.CreateConnection())
             {
-                using (var command = new CommandHelper(_adapter).Create(connection, sql, values.ToArray()))
+                using (var command = new CommandHelper(_adapter).CreateInsert(connection, sql, columns, values.ToArray()))
                 {
                     connection.Open();
                     return TryExecuteSingletonQuery(command);
@@ -115,11 +113,11 @@ namespace Simple.Data.Ado
             }
         }
 
-        internal IDictionary<string, object> ExecuteSingletonQuery(string insertSql, string selectSql, params object[] values)
+        internal IDictionary<string, object> ExecuteSingletonQuery(string insertSql, string selectSql, IEnumerable<Column> columns, IEnumerable<Object> values)
         {
             if (_transaction != null)
             {
-                var command = new CommandHelper(_adapter).Create(_transaction.Connection, insertSql, values.ToArray());
+                var command = new CommandHelper(_adapter).CreateInsert(_transaction.Connection, insertSql, columns, values.ToArray());
                 command.Transaction = _transaction;
                 TryExecute(command);
                 command.CommandText = selectSql;
@@ -129,7 +127,7 @@ namespace Simple.Data.Ado
 
             using (var connection = _adapter.CreateConnection())
             {
-                using (var command = new CommandHelper(_adapter).Create(connection, insertSql, values.ToArray()))
+                using (var command = new CommandHelper(_adapter).CreateInsert(connection, insertSql, columns, values.ToArray()))
                 {
                     connection.Open();
                     TryExecute(command);
@@ -161,17 +159,17 @@ namespace Simple.Data.Ado
             return null;
         }
 
-        internal int Execute(string sql, params object[] values)
+        internal int Execute(string sql, IEnumerable<Column> columns, IEnumerable<Object> values)
         {
             if (_transaction != null)
             {
-                var command = new CommandHelper(_adapter).Create(_transaction.Connection, sql, values.ToArray());
+                var command = new CommandHelper(_adapter).CreateInsert(_transaction.Connection, sql, columns, values.ToArray());
                 command.Transaction = _transaction;
                 return TryExecute(command);
             }
             using (var connection = _adapter.CreateConnection())
             {
-                using (var command = new CommandHelper(_adapter).Create(connection, sql, values.ToArray()))
+                using (var command = new CommandHelper(_adapter).CreateInsert(connection, sql, columns, values.ToArray()))
                 {
                     connection.Open();
                     return TryExecute(command);
