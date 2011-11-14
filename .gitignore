@@ -20,3 +20,5 @@ apply_config.bat
 NDependOut
 *.dotCover
 *_mm_cache.bin
+*.idc
+Simple.Data.sln.DotSettings.user

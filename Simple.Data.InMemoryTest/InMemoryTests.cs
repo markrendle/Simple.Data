@@ -104,6 +104,15 @@ namespace Simple.Data.InMemoryTest
             Assert.AreEqual(50, records[1].MaxAge);
         }
 
+        [Test]
+        public void SelectWithHavingSumShouldReturnOnlyMatchingRows()
+        {
+            var db = CreateAggregateTestDb();
+            var records = db.Test.All().Select(db.Test.Name).Having(db.Test.Age.Sum() > 50).ToList();
+            Assert.AreEqual(1, records.Count);
+            Assert.AreEqual("Bob", records[0].Name);
+        }
+
         private static dynamic CreateAggregateTestDb()
         {
             Database.UseMockAdapter(new InMemoryAdapter());

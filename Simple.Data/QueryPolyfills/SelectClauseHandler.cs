@@ -10,7 +10,7 @@ namespace Simple.Data.QueryPolyfills
         private readonly IList<SimpleReference> _references;
         private readonly IList<ValueResolver> _resolvers; 
         private Func<int, IDictionary<string, object>> _creator;
-        private GroupingHandler _groupingHandler;
+        private readonly GroupingHandler _groupingHandler;
 
         public SelectClauseHandler(SelectClause clause)
         {

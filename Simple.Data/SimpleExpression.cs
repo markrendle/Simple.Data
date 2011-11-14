@@ -57,6 +57,26 @@ namespace Simple.Data
             return GetValues(_leftOperand).Concat(GetValues(_rightOperand));
         }
 
+        public IEnumerable<T> GetOperandsOfType<T>()
+        {
+            return GetOperandsOfType<T>(_leftOperand).Concat(GetOperandsOfType<T>(_rightOperand));
+        }
+
+        private IEnumerable<T> GetOperandsOfType<T>(object operand)
+        {
+            var expression = operand as SimpleExpression;
+            if (expression != null)
+            {
+                return expression.GetOperandsOfType<T>();
+            }
+
+            if (operand is T)
+            {
+                return Yield(operand).Cast<T>();
+            }
+            return Enumerable.Empty<T>();
+        }
+
         private static IEnumerable<object> GetValues(object operand)
         {
             if (ReferenceEquals(operand, null)) return Yield(null);
