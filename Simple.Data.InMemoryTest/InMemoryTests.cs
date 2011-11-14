@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-
-namespace Simple.Data.InMemoryTest
+﻿namespace Simple.Data.InMemoryTest
 {
-    using InMemory;
+    using System;
+    using System.Collections.Generic;
+    using System.Threading;
     using NUnit.Framework;
 
     [TestFixture]
@@ -216,11 +212,28 @@ namespace Simple.Data.InMemoryTest
             Assert.AreEqual(8, records[0].Id);
         }
 
+        [Test]
+        public void TestJoin()
+        {
+            var adapter = new InMemoryAdapter();
+            adapter.ConfigureJoin("Customer", "ID", "Orders", "Order", "CustomerID", "Customer");
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            db.Customer.Insert(ID: 1, Name: "NASA");
+            db.Customer.Insert(ID: 2, Name: "ACME");
+            db.Order.Insert(ID: 1, CustomerID: 1, Date: new DateTime(1997, 1, 12));
+            db.Order.Insert(ID: 2, CustomerID: 2, Date: new DateTime(2001, 1, 1));
+
+            var customers = db.Customer.FindAll(db.Customer.Orders.Date < new DateTime(1999, 12, 31)).ToList();
+            Assert.IsNotNull(customers);
+            Assert.AreEqual(1, customers.Count);
+        }
+
         /// <summary>
         ///A test for Find
         ///</summary>
         [Test]
-        public void SeparateThreads_Should_SeeDifferentMocks()
+        public void SeparateThreadsShouldSeeDifferentMocks()
         {
             int r1 = 0;
             int r2 = 0;

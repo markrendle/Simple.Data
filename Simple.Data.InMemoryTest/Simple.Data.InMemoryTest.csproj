@@ -56,10 +56,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Simple.Data.InMemory\Simple.Data.InMemory.csproj">
-      <Project>{976ED1B4-04B7-489F-93B6-F99F587D49CB}</Project>
-      <Name>Simple.Data.InMemory</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Simple.Data\Simple.Data.csproj">
       <Project>{148CEE80-2E84-4ABD-B5AB-20415B2BBD21}</Project>
       <Name>Simple.Data</Name>

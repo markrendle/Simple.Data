@@ -45,7 +45,7 @@ namespace Simple.Data.QueryPolyfills
 
                 var regex = new Regex("^" + pattern + "$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
-                return d => d.ContainsKey(key) && (!ReferenceEquals(d[key], null)) && regex.IsMatch(d[key].ToString());
+                return d => Resolve(d, arg.LeftOperand).Count > 0 && Resolve(d, arg.LeftOperand).OfType<string>().Any(regex.IsMatch);
             }
 
             throw new NotSupportedException("Expression Function not supported.");
@@ -53,70 +53,46 @@ namespace Simple.Data.QueryPolyfills
 
         private Func<IDictionary<string, object>, bool> GreaterThanToWhereClause(SimpleExpression arg)
         {
-            var key = GetKeyFromLeftOperand(arg);
-
-            return d => d.ContainsKey(key) && !ReferenceEquals(d[key], null) && ((IComparable)d[key]).CompareTo(arg.RightOperand) > 0;
+            return d => Resolve(d, arg.LeftOperand).OfType<IComparable>().Any(o => o.CompareTo(arg.RightOperand) > 0);
         }
 
         private Func<IDictionary<string, object>, bool> LessThanToWhereClause(SimpleExpression arg)
         {
-            var key = GetKeyFromLeftOperand(arg);
-
-            return d => d.ContainsKey(key) && !ReferenceEquals(d[key], null) && ((IComparable)d[key]).CompareTo(arg.RightOperand) < 0;
+            return d => Resolve(d, arg.LeftOperand).OfType<IComparable>().Any(o => o.CompareTo(arg.RightOperand) < 0);
         }
 
         private Func<IDictionary<string, object>, bool> GreaterThanOrEqualToWhereClause(SimpleExpression arg)
         {
-            var key = GetKeyFromLeftOperand(arg);
-
-            return d => d.ContainsKey(key) && !ReferenceEquals(d[key], null) && ((IComparable)d[key]).CompareTo(arg.RightOperand) >= 0;
+            return d => Resolve(d, arg.LeftOperand).OfType<IComparable>().Any(o => o.CompareTo(arg.RightOperand) >= 0);
         }
 
         private Func<IDictionary<string, object>, bool> LessThanOrEqualToWhereClause(SimpleExpression arg)
         {
-            var key = GetKeyFromLeftOperand(arg);
-
-            return d => d.ContainsKey(key) && !ReferenceEquals(d[key], null) && ((IComparable)d[key]).CompareTo(arg.RightOperand) <= 0;
+            return d => Resolve(d, arg.LeftOperand).OfType<IComparable>().Any(o => o.CompareTo(arg.RightOperand) <= 0);
         }
 
         private Func<IDictionary<string, object>, bool> NotEqualExpressionToWhereClause(SimpleExpression arg)
         {
-            var key = GetKeyFromLeftOperand(arg);
-
-            if (ReferenceEquals(arg.RightOperand, null))
-            {
-                return d => d.ContainsKey(key) && d[key] != null;
-            }
-
-            if (arg.RightOperand.GetType().IsArray)
-            {
-                return
-                    d =>
-                    d.ContainsKey(key) &&
-                    !((IEnumerable)d[key]).Cast<object>().SequenceEqual(((IEnumerable)arg.RightOperand).Cast<object>());
-            }
-
-            return d => d.ContainsKey(key) && !Equals(d[key], arg.RightOperand);
+            var equal = EqualExpressionToWhereClause(arg);
+            return d => !equal(d);
         }
 
         private Func<IDictionary<string, object>, bool> EqualExpressionToWhereClause(SimpleExpression arg)
         {
-            var key = GetKeyFromLeftOperand(arg);
-
             if (ReferenceEquals(arg.RightOperand, null))
             {
-                return d => (!d.ContainsKey(key)) || d[key] == null;
+                return d => Resolve(d, arg.LeftOperand).Count == 0 || Resolve(d, arg.LeftOperand).Any(o => ReferenceEquals(o, null));
             }
 
             if (arg.RightOperand.GetType().IsArray)
             {
                 return
                     d =>
-                    d.ContainsKey(key) &&
-                    ((IEnumerable) d[key]).Cast<object>().SequenceEqual(((IEnumerable) arg.RightOperand).Cast<object>());
+                    Resolve(d, arg.LeftOperand).OfType<IEnumerable>().Any(
+                        o => o.Cast<object>().SequenceEqual(((IEnumerable) arg.RightOperand).Cast<object>()));
             }
 
-            return d => d.ContainsKey(key) && Equals(d[key], arg.RightOperand);
+            return d => Resolve(d, arg.LeftOperand).Contains(arg.RightOperand);
         }
 
         private static string GetKeyFromLeftOperand(SimpleExpression arg)
@@ -151,6 +127,42 @@ namespace Simple.Data.QueryPolyfills
                 return d => (left(d) || right(d));
             }
             return d => (left(d) && right(d));
+        }
+
+        private IList<object> Resolve(IDictionary<string, object> dict, object operand, string key = null)
+        {
+            var objectReference = operand as ObjectReference;
+            if (objectReference.IsNull()) return new object[0];
+            key = key ?? objectReference.GetAliasOrName();
+            if (dict.ContainsKey(key))
+                return new[] {dict[key]};
+            var subs = ResolveSubs(dict, objectReference.GetOwner(), key).ToList();
+            return subs;
+        }
+
+        private IEnumerable<object> ResolveSubs(IDictionary<string, object> dict, ObjectReference objectReference, string key)
+        {
+            if (objectReference.IsNull()) return Enumerable.Empty<object>();
+
+            if (dict.ContainsKey(objectReference.GetName()))
+            {
+                var master = dict[objectReference.GetName()] as IDictionary<string,object>;
+                if (master != null)
+                {
+                    if (master.ContainsKey(key))
+                    {
+                        return new[] {master[key]};
+                    }
+                }
+
+                var detail = dict[objectReference.GetName()] as IEnumerable<IDictionary<string, object>>;
+                if (detail != null)
+                {
+                    return detail.SelectMany(d => Resolve(d, objectReference, key));
+                }
+            }
+
+            return ResolveSubs(dict, objectReference.GetOwner(), key);
         }
 
         public IEnumerable<IDictionary<string, object>> Run(IEnumerable<IDictionary<string, object>> source)

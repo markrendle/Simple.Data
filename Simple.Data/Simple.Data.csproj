@@ -79,6 +79,7 @@
     <Compile Include="Database.Open.cs" />
     <Compile Include="DatabaseOpenerMethods.cs" />
     <Compile Include="DictionaryCloner.cs" />
+    <Compile Include="InMemoryAdapter.cs" />
     <Compile Include="QueryPolyfills\AggregateValueResolver.cs" />
     <Compile Include="QueryPolyfills\DictionaryCreatorFactory.cs" />
     <Compile Include="QueryPolyfills\DictionaryEqualityComparer.cs" />
