@@ -145,7 +145,7 @@ namespace Simple.Data.Ado
 
         }
 
-        internal IDbCommand CreateInsert(IDbConnection connection, string sql, IEnumerable<Column> columns, Object[] values)
+        internal IDbCommand CreateInsert(IDbConnection connection, string sql, IEnumerable<Column> columns, IList<object> values)
         {
             var command = connection.CreateCommand();
 
