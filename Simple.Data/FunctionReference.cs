@@ -21,7 +21,6 @@ namespace Simple.Data
         private readonly SimpleReference _argument;
         private readonly object[] _additionalArguments;
         private readonly bool _isAggregate;
-        private readonly string _alias;
 
         internal FunctionReference(string name, SimpleReference argument, params object[] additionalArguments)
         {
@@ -31,12 +30,11 @@ namespace Simple.Data
             _isAggregate = AggregateFunctionNames.Contains(name.ToLowerInvariant());
         }
 
-        private FunctionReference(string name, SimpleReference argument, bool isAggregate, string alias, params object[] additionalArguments)
+        private FunctionReference(string name, SimpleReference argument, bool isAggregate, string alias, params object[] additionalArguments) : base(alias)
         {
             _name = name;
             _argument = argument;
             _isAggregate = isAggregate;
-            _alias = alias;
             _additionalArguments = additionalArguments;
         }
 
@@ -50,9 +48,9 @@ namespace Simple.Data
             return new FunctionReference(_name, _argument, _isAggregate, alias);
         }
 
-        public string Alias
+        public override string GetAliasOrName()
         {
-            get { return _alias; }
+            return GetAlias() ?? _name + "_" + _argument.GetAliasOrName();
         }
 
         public bool IsAggregate
@@ -152,7 +150,7 @@ namespace Simple.Data
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(other._name, _name) && Equals(other._argument, _argument) && other._isAggregate.Equals(_isAggregate) && Equals(other._alias, _alias);
+            return Equals(other._name, _name) && Equals(other._argument, _argument) && other._isAggregate.Equals(_isAggregate) && Equals(other.GetAlias(), GetAlias());
         }
 
         public override bool Equals(object obj)
@@ -170,7 +168,7 @@ namespace Simple.Data
                 int result = (_name != null ? _name.GetHashCode() : 0);
                 result = (result*397) ^ (_argument != null ? _argument.GetHashCode() : 0);
                 result = (result*397) ^ _isAggregate.GetHashCode();
-                result = (result*397) ^ (_alias != null ? _alias.GetHashCode() : 0);
+                result = (result*397) ^ (GetAlias() != null ? GetAlias().GetHashCode() : 0);
                 return result;
             }
         }

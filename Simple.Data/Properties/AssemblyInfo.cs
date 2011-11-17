@@ -22,3 +22,4 @@ using System.Security.Permissions;
 
 [assembly: SecurityRules(SecurityRuleSet.Level2, SkipVerificationInFullTrust = true)]
 [assembly: AllowPartiallyTrustedCallers]
+[assembly: InternalsVisibleTo("Simple.Data.InMemory")]

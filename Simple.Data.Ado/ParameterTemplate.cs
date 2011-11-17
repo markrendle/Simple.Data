@@ -14,7 +14,8 @@ namespace Simple.Data.Ado
         private readonly Column _column;
         private readonly ParameterType _type;
 
-        public ParameterTemplate(string name, object fixedValue) : this(name, null)
+        public ParameterTemplate(string name, object fixedValue)
+            : this(name, null)
         {
             _fixedValue = fixedValue;
             _type = ParameterType.FixedValue;
@@ -71,9 +72,7 @@ namespace Simple.Data.Ado
 
         public object FixedValue
         {
-            get {
-                return _fixedValue;
-            }
+            get { return _fixedValue; }
         }
 
         public ParameterTemplate Rename(string newName)
@@ -112,7 +111,7 @@ namespace Simple.Data.Ado
         }
     }
 
-    enum ParameterType
+    internal enum ParameterType
     {
         Column,
         FixedValue,

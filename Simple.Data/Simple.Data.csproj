@@ -54,6 +54,7 @@
     <Compile Include="AdapterException.cs" />
     <Compile Include="AdapterFactory.cs" />
     <Compile Include="AdapterWithFunctionsExtensions.cs" />
+    <Compile Include="AllColumnsSpecialReference.cs" />
     <Compile Include="BinderHelper.cs" />
     <Compile Include="BufferedEnumerable.cs" />
     <Compile Include="BufferedEnumerable1.cs" />
@@ -78,6 +79,11 @@
     <Compile Include="Database.Open.cs" />
     <Compile Include="DatabaseOpenerMethods.cs" />
     <Compile Include="DictionaryCloner.cs" />
+    <Compile Include="InMemoryAdapter.cs" />
+    <Compile Include="QueryPolyfills\AggregateValueResolver.cs" />
+    <Compile Include="QueryPolyfills\DictionaryCreatorFactory.cs" />
+    <Compile Include="QueryPolyfills\DictionaryEqualityComparer.cs" />
+    <Compile Include="QueryPolyfills\DictionaryQueryRunner.cs" />
     <Compile Include="DistinctClause.cs" />
     <Compile Include="EnumerableEx.cs" />
     <Compile Include="ExistsSpecialReference.cs" />
@@ -96,6 +102,16 @@
     <Compile Include="OrderByClause.cs" />
     <Compile Include="OrderByDirection.cs" />
     <Compile Include="Promise.cs" />
+    <Compile Include="QueryPolyfills\FunctionHandlers.cs" />
+    <Compile Include="QueryPolyfills\FunctionValueResolver.cs" />
+    <Compile Include="QueryPolyfills\GroupingHandler.cs" />
+    <Compile Include="QueryPolyfills\HavingClauseHandler.cs" />
+    <Compile Include="QueryPolyfills\ObjectMaths.cs" />
+    <Compile Include="QueryPolyfills\ObjectValueResolver.cs" />
+    <Compile Include="QueryPolyfills\OrderByClauseHandler.cs" />
+    <Compile Include="QueryPolyfills\SelectClauseHandler.cs" />
+    <Compile Include="QueryPolyfills\ValueResolver.cs" />
+    <Compile Include="QueryPolyfills\WhereClauseHandler.cs" />
     <Compile Include="Range.cs" />
     <Compile Include="Range1.cs" />
     <Compile Include="SelectClause.cs" />

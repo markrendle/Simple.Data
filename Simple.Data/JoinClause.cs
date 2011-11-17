@@ -33,7 +33,7 @@ namespace Simple.Data
 
         public string Name
         {
-            get { return _table.Alias ?? _table.GetName(); }
+            get { return _table.GetAlias() ?? _table.GetName(); }
         }
     }
 }

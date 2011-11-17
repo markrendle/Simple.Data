@@ -9,6 +9,7 @@
     using System.Threading.Tasks;
     using Extensions;
     using Microsoft.CSharp.RuntimeBinder;
+    using QueryPolyfills;
 
     public class SimpleQuery : DynamicObject, IEnumerable
     {
@@ -221,7 +222,18 @@
         protected IEnumerable<dynamic> Run()
         {
             IEnumerable<SimpleQueryClauseBase> unhandledClauses;
-            return SimpleResultSet.Create(_adapter.RunQuery(this, out unhandledClauses), _tableName, _dataStrategy).Cast<dynamic>();
+            var result = _adapter.RunQuery(this, out unhandledClauses);
+
+            if (unhandledClauses != null)
+            {
+                var unhandledClausesList = unhandledClauses.ToList();
+                if (unhandledClausesList.Count > 0)
+                {
+                    result = new DictionaryQueryRunner(result, unhandledClausesList).Run();
+                }
+            }
+
+            return SimpleResultSet.Create(result, _tableName, _dataStrategy).Cast<dynamic>();
         }
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)

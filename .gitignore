@@ -20,5 +20,10 @@ apply_config.bat
 NDependOut
 *.dotCover
 *_mm_cache.bin
+<<<<<<< HEAD
 Simple.Data.sln.DotSettings.user
 Simple.Data/Simple.Data.idc
+=======
+*.idc
+Simple.Data.sln.DotSettings.user
+>>>>>>> dict-query

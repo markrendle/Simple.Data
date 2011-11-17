@@ -68,13 +68,13 @@ namespace Simple.Data.Ado
             if (ReferenceEquals(functionReference, null)) return null;
 
             var sqlName = _functionNameConverter.ConvertToSqlName(functionReference.Name);
-            return functionReference.Alias == null
+            return functionReference.GetAlias() == null
                        ? string.Format("{0}({1}{2})", sqlName,
                                        FormatColumnClause(functionReference.Argument),
                                        FormatAdditionalArguments(functionReference.AdditionalArguments))
                        : string.Format("{0}({1}) AS {2}", sqlName,
                                        FormatColumnClause(functionReference.Argument),
-                                       _schema.QuoteObjectName(functionReference.Alias));
+                                       _schema.QuoteObjectName(functionReference.GetAlias()));
         }
 
         private string FormatAdditionalArguments(IEnumerable<object> additionalArguments)
@@ -93,15 +93,15 @@ namespace Simple.Data.Ado
             if (ReferenceEquals(objectReference, null)) return null;
 
             var table = _schema.FindTable(objectReference.GetOwner().GetAllObjectNamesDotted());
-            var tableName = string.IsNullOrWhiteSpace(objectReference.GetOwner().Alias)
+            var tableName = string.IsNullOrWhiteSpace(objectReference.GetOwner().GetAlias())
                                 ? table.QualifiedName
-                                : _schema.QuoteObjectName(objectReference.GetOwner().Alias);
+                                : _schema.QuoteObjectName(objectReference.GetOwner().GetAlias());
             var column = table.FindColumn(objectReference.GetName());
-            if (objectReference.Alias == null)
+            if (objectReference.GetAlias() == null)
                 return string.Format("{0}.{1}", tableName, column.QuotedName);
             else
                 return string.Format("{0}.{1} AS {2}", tableName, column.QuotedName,
-                                     _schema.QuoteObjectName(objectReference.Alias));
+                                     _schema.QuoteObjectName(objectReference.GetAlias()));
         }
 
     }

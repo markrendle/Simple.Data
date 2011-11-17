@@ -21,7 +21,7 @@ namespace Simple.Data.Ado
             parameter.ParameterName = name;
             return parameter;
         }
-        
+
         public IDbDataParameter CreateParameter(string name, Column column)
         {
             if (name == null) throw new ArgumentNullException("name");

@@ -58,7 +58,11 @@ If you'd like to create an adapter or provider and need some help to get started
 
 ## Resources
 * Simple.Data can be installed from [NuGet](http://nuget.org/)
+<<<<<<< HEAD
 * Find more information in [the wiki](https://github.com/markrendle/Simple.Data/wiki)
+=======
+* Find more information in [the wiki](http://github.com/markrendle/Simple.Data/wiki/Getting-started)
+>>>>>>> dict-query
 * [Documentation!](http://simplefx.org/simpledata/docs/)
 * Ask questions or report issues on [the mailing list](http://groups.google.com/group/simpledata)
 * Follow [@markrendle on Twitter](http://twitter.com/markrendle) for updates

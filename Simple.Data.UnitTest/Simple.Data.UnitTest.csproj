@@ -70,12 +70,14 @@
     <Compile Include="ConcreteTypeCreatorTest.cs" />
     <Compile Include="DatabaseOpenerTest.cs" />
     <Compile Include="DictionaryClonerTest.cs" />
+    <Compile Include="DictionaryQueryRunnerTest.cs" />
     <Compile Include="DynamicEnumerableTest.cs" />
     <Compile Include="DynamicRecordTest.cs" />
     <Compile Include="DynamicStringExtensionsTest.cs" />
     <Compile Include="DynamicReferenceTest.cs" />
     <Compile Include="DynamicTableTest.cs" />
     <Compile Include="ExpressionHelperTest.cs" />
+    <Compile Include="GroupingHandlerTest.cs" />
     <Compile Include="PromiseTest.cs" />
     <Compile Include="ListHelper.cs" />
     <Compile Include="MathReferenceTest.cs" />
