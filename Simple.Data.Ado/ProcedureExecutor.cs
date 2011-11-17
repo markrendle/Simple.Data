@@ -97,8 +97,16 @@ namespace Simple.Data.Ado
 
         private static void SetParameters(Procedure procedure, IDbCommand cmd, IDictionary<string, object> suppliedParameters)
         {
-            if (procedure.Parameters.Any(p => p.Direction == ParameterDirection.ReturnValue))
-                AddReturnParameter(cmd);
+            var returnParameter = procedure.Parameters.FirstOrDefault(p => p.Direction == ParameterDirection.ReturnValue);
+            if (returnParameter!=null)
+            {
+                var cmdParameter = cmd.CreateParameter();
+                cmdParameter.ParameterName = SimpleReturnParameterName;
+                cmdParameter.Size = returnParameter.Size;
+                cmdParameter.Direction = ParameterDirection.ReturnValue;
+                cmdParameter.DbType = returnParameter.Dbtype;
+                cmd.Parameters.Add(cmdParameter);
+            }
 
             int i = 0;
             
@@ -129,14 +137,6 @@ namespace Simple.Data.Ado
                 cmd.Parameters.Add(cmdParameter);
                 i++;
             }
-        }
-
-        private static void AddReturnParameter(IDbCommand cmd)
-        {
-            var returnParameter = cmd.CreateParameter();
-            returnParameter.ParameterName = SimpleReturnParameterName;
-            returnParameter.Direction = ParameterDirection.ReturnValue;
-            cmd.Parameters.Add(returnParameter);
         }
 
     }

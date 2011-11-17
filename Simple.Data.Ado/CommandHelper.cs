@@ -21,7 +21,7 @@ namespace Simple.Data.Ado
             _schemaProvider = adapter.SchemaProvider;
         }
 
-        internal IDbCommand Create(IDbConnection connection, string sql, IList<object> values)
+        internal IDbCommand Create(IDbConnection connection, string sql, Object[] values)
         {
             var command = connection.CreateCommand();
 
@@ -96,7 +96,7 @@ namespace Simple.Data.Ado
             return sqlBuilder.ToString();
         }
 
-        public static void SetParameterValues(IDbCommand command, IList<object> values)
+        public static void SetParameterValues(IDbCommand command, Object[] values)
         {
             int index = 0;
             foreach (var parameter in command.Parameters.Cast<IDbDataParameter>())
@@ -144,5 +144,15 @@ namespace Simple.Data.Ado
             return command;
 
         }
+
+        internal IDbCommand CreateInsert(IDbConnection connection, string sql, IEnumerable<Column> columns, Object[] values)
+        {
+            var command = connection.CreateCommand();
+
+            command.CommandText = PrepareInsertCommand(sql, command, columns);
+            SetParameterValues(command, values);
+
+            return command;
+        }       
     }
 }

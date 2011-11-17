@@ -41,10 +41,26 @@ namespace Simple.Data.SqlServer
             return cols.AsEnumerable().Select(row => SchemaRowToColumn(table, row));
         }
 
+
+
         private static Column SchemaRowToColumn(Table table, DataRow row)
         {
-            return new SqlColumn(row["name"].ToString(), table, (bool) row["is_identity"],
-                              DbTypeFromInformationSchemaTypeName((string) row["type_name"]), (short) row["max_length"]);
+            var sqlDbType = DbTypeFromInformationSchemaTypeName((string)row["type_name"]);
+            var size = (short)row["max_length"];
+            switch (sqlDbType)
+            {
+                case SqlDbType.Image:
+                case SqlDbType.NText:
+                case SqlDbType.Text:
+                    size = -1;
+                    break;
+                case SqlDbType.NChar:
+                case SqlDbType.NVarChar:
+                    size = (short)(size / 2);
+                    break;
+            }
+
+            return new SqlColumn(row["name"].ToString(), table, (bool)row["is_identity"], sqlDbType, size);
         }
 
         public IEnumerable<Procedure> GetStoredProcedures()
