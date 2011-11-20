@@ -315,6 +315,7 @@ namespace Simple.Data
         public static SimpleResultSet Create(IEnumerable<IDictionary<string, object>> source, string tableName, DataStrategy dataStrategy)
         {
             var q = from dict in source
+                    where dict != null
                     select new SimpleRecord(dict, tableName, dataStrategy);
             return new SimpleResultSet(q);
         }

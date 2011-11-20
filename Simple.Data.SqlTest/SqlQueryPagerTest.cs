@@ -16,57 +16,57 @@ namespace Simple.Data.SqlTest
         [Test]
         public void ShouldApplyPagingUsingOrderBy()
         {
-            const string sql = "select a,b,c from d where a = 1 order by c";
-            const string expected =
+            var sql = "select a,b,c from d where a = 1 order by c";
+            var expected = new[]{
                 "with __data as (select a,b,c, row_number() over(order by c) as [_#_] from d where a = 1)"
-                + " select a,b,c from __data where [_#_] between @skip + 1 and @skip + @take";
+                + " select a,b,c from __data where [_#_] between 6 and 15"};
 
-            var modified = new SqlQueryPager().ApplyPaging(sql, "@skip", "@take");
-            modified = Normalize.Replace(modified, " ").ToLowerInvariant();
+            var pagedSql = new SqlQueryPager().ApplyPaging(sql, 5, 10);
+            var modified = pagedSql.Select(x => Normalize.Replace(x, " ").ToLowerInvariant());
 
-            Assert.AreEqual(expected, modified);
+            Assert.IsTrue(expected.SequenceEqual(modified));
         }
 
         [Test]
         public void ShouldApplyPagingUsingOrderByFirstColumnIfNotAlreadyOrdered()
         {
-            const string sql = "select a,b,c from d where a = 1";
-            const string expected =
+            var sql = "select a,b,c from d where a = 1";
+            var expected = new[]{
                 "with __data as (select a,b,c, row_number() over(order by a) as [_#_] from d where a = 1)"
-                + " select a,b,c from __data where [_#_] between @skip + 1 and @skip + @take";
+                + " select a,b,c from __data where [_#_] between 11 and 30"};
 
-            var modified = new SqlQueryPager().ApplyPaging(sql, "@skip", "@take");
-            modified = Normalize.Replace(modified, " ").ToLowerInvariant();
+            var pagedSql = new SqlQueryPager().ApplyPaging(sql, 10, 20);
+            var modified = pagedSql.Select(x => Normalize.Replace(x, " ").ToLowerInvariant());
 
-            Assert.AreEqual(expected, modified);
+            Assert.IsTrue(expected.SequenceEqual(modified));
         }
 
         [Test]
         public void ShouldCopeWithAliasedColumns()
         {
-            const string sql = "select [a],[b] as [foo],[c] from [d] where [a] = 1";
-            const string expected =
+            var sql = "select [a],[b] as [foo],[c] from [d] where [a] = 1";
+            var expected =new[]{
                 "with __data as (select [a],[b] as [foo],[c], row_number() over(order by [a]) as [_#_] from [d] where [a] = 1)"
-                + " select [a],[foo],[c] from __data where [_#_] between @skip + 1 and @skip + @take";
+                + " select [a],[foo],[c] from __data where [_#_] between 21 and 25"};
 
-            var modified = new SqlQueryPager().ApplyPaging(sql, "@skip", "@take");
-            modified = Normalize.Replace(modified, " ").ToLowerInvariant();
+            var pagedSql = new SqlQueryPager().ApplyPaging(sql, 20, 5);
+            var modified = pagedSql.Select(x => Normalize.Replace(x, " ").ToLowerInvariant());
 
-            Assert.AreEqual(expected, modified);
+            Assert.IsTrue(expected.SequenceEqual(modified));
         }
 
         [Test]
         public void ShouldCopeWithAliasedDefaultSortColumn()
         {
-            const string sql = "select [a] as [foo],[b],[c] from [d] where [a] = 1";
-            const string expected =
+            var sql = "select [a] as [foo],[b],[c] from [d] where [a] = 1";
+            var expected = new[]{
                 "with __data as (select [a] as [foo],[b],[c], row_number() over(order by [a]) as [_#_] from [d] where [a] = 1)"
-                + " select [foo],[b],[c] from __data where [_#_] between @skip + 1 and @skip + @take";
+                + " select [foo],[b],[c] from __data where [_#_] between 31 and 40"};
 
-            var modified = new SqlQueryPager().ApplyPaging(sql, "@skip", "@take");
-            modified = Normalize.Replace(modified, " ").ToLowerInvariant();
+            var pagedSql = new SqlQueryPager().ApplyPaging(sql, 30, 10);
+            var modified = pagedSql.Select(x => Normalize.Replace(x, " ").ToLowerInvariant());
 
-            Assert.AreEqual(expected, modified);
+            Assert.IsTrue(expected.SequenceEqual(modified));
         }
     }
 }

@@ -112,18 +112,28 @@ namespace Simple.Data.Ado
 
         public T GetCustomProvider<T>(IConnectionProvider connectionProvider)
         {
-            return (T)_customProviderCache.GetOrAdd(typeof (T), t => GetCustomProviderExport<T>(connectionProvider));
+            return (T)_customProviderCache.GetOrAdd(typeof (T), t => GetCustomProviderExport<T>(connectionProvider.GetType().Assembly) ??
+                                                                     GetCustomProviderServiceProvider(connectionProvider as IServiceProvider, t));
         }
 
-        private static T GetCustomProviderExport<T>(IConnectionProvider connectionProvider)
+        private static Object GetCustomProviderExport<T>(Assembly assembly)
         {
-            using (var assemblyCatalog = new AssemblyCatalog(connectionProvider.GetType().Assembly))
+            using (var assemblyCatalog = new AssemblyCatalog(assembly))
             {
                 using (var container = new CompositionContainer(assemblyCatalog))
                 {
                     return container.GetExportedValueOrDefault<T>();
                 }
             }
+        }
+
+        private static Object GetCustomProviderServiceProvider(IServiceProvider serviceProvider, Type type)
+        {
+            if (serviceProvider != null)
+            {
+                return serviceProvider.GetService(type);
+            }
+            return null;
         }
 
         public T GetCustomProvider<T>(ISchemaProvider schemaProvider)

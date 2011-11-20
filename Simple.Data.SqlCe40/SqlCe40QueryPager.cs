@@ -13,7 +13,7 @@ namespace Simple.Data.SqlCe40
     {
         private static readonly Regex ColumnExtract = new Regex(@"SELECT\s*(.*)\s*(FROM.*)", RegexOptions.Multiline | RegexOptions.IgnoreCase);
         
-        public string ApplyPaging(string sql, string skipParameterName, string takeParameterName)
+        public IEnumerable<string> ApplyPaging(string sql, int skip, int take)
         {
             if (sql.IndexOf("order by", StringComparison.InvariantCultureIgnoreCase) < 0)
             {
@@ -22,7 +22,7 @@ namespace Simple.Data.SqlCe40
                 sql += " ORDER BY " + columns.Split(',').First().Trim();
             }
 
-            return string.Format("{0} OFFSET {1} ROWS FETCH NEXT {2} ROWS ONLY", sql, skipParameterName, takeParameterName);
+            yield return string.Format("{0} OFFSET {1} ROWS FETCH NEXT {2} ROWS ONLY", sql, skip, take);
         }
     }
 }

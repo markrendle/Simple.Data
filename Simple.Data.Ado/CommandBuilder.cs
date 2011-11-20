@@ -41,6 +41,15 @@ namespace Simple.Data.Ado
             _parameterSuffix = (bulkIndex >= 0) ? "_c" + bulkIndex : string.Empty;
         }
 
+        public CommandBuilder(string text, DatabaseSchema schema, IEnumerable<KeyValuePair<ParameterTemplate, Object>> parameters)
+            : this(text, schema, -1)
+        {
+            foreach (var kvp in parameters)
+            {
+                _parameters.Add(kvp.Key, kvp.Value);
+            }
+        }
+
         public ParameterTemplate AddParameter(object value)
         {
             string name = _schemaProvider.NameParameter("p" + Interlocked.Increment(ref _number) + _parameterSuffix);

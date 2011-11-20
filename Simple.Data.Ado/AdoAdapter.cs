@@ -97,10 +97,16 @@ namespace Simple.Data.Ado
         {
             if (query.Clauses.OfType<WithCountClause>().Any()) return RunQueryWithCount(query, out unhandledClauses);
 
+            var commandBuilders = this.GetQueryCommandBuilders(query, out unhandledClauses);
             var connection = _connectionProvider.CreateConnection();
-            return new QueryBuilder(this).Build(query, out unhandledClauses)
-                .GetCommand(connection)
-                .ToEnumerable(connection);
+            if (ProviderSupportsCompoundStatements || commandBuilders.Length == 1)
+            {
+                return CommandBuilder.CreateCommand(_providerHelper.GetCustomProvider<IDbParameterFactory>(_schema.SchemaProvider), commandBuilders, connection).ToEnumerable(connection);
+            }
+            else
+            {
+                return commandBuilders.SelectMany(cb => cb.GetCommand(connection).ToEnumerable(connection));
+            }
         }
 
         private IEnumerable<IDictionary<string, object>> RunQueryWithCount(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
@@ -141,19 +147,83 @@ namespace Simple.Data.Ado
             }
         }
 
-        public override IEnumerable<IEnumerable<IDictionary<string,object>>> RunQueries(SimpleQuery[] queries, List<IEnumerable<SimpleQueryClauseBase>> unhandledClauses)
+        private ICommandBuilder[] GetPagedQueryCommandBuilders(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
+        {
+            return this.GetPagedQueryCommandBuilders(query, -1, out unhandledClauses);
+        }
+
+        private ICommandBuilder[] GetPagedQueryCommandBuilders(SimpleQuery query, Int32 bulkIndex, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
+        {
+            var commandBuilders = new List<ICommandBuilder>();
+            var unhandledClausesList = new List<SimpleQueryClauseBase>();
+            unhandledClauses = unhandledClausesList;
+
+            IEnumerable<SimpleQueryClauseBase> unhandledClausesForPagedQuery;
+            var mainCommandBuilder = new QueryBuilder(this, bulkIndex).Build(query, out unhandledClausesForPagedQuery);
+            unhandledClausesList.AddRange(unhandledClausesForPagedQuery);
+
+            const int maxInt = 2147483646;
+
+            var skipClause = query.Clauses.OfType<SkipClause>().FirstOrDefault() ?? new SkipClause(0);
+            var takeClause = query.Clauses.OfType<TakeClause>().FirstOrDefault() ?? new TakeClause(maxInt);
+
+            if (skipClause.Count != 0 || takeClause.Count != maxInt)
+            {
+                var queryPager = this.ProviderHelper.GetCustomProvider<IQueryPager>(this.ConnectionProvider);
+                if (queryPager == null)
+                {
+                    unhandledClausesList.AddRange(query.OfType<SkipClause>());
+                    unhandledClausesList.AddRange(query.OfType<TakeClause>());
+                }
+
+                var commandTexts = queryPager.ApplyPaging(mainCommandBuilder.Text, skipClause.Count, takeClause.Count);
+
+                foreach (var commandText in commandTexts)
+                {
+                    var commandBuilder = new CommandBuilder(commandText, this._schema, mainCommandBuilder.Parameters);
+                    commandBuilders.Add(commandBuilder);
+                }
+            }
+            return commandBuilders.ToArray();
+        }
+
+        private ICommandBuilder[] GetQueryCommandBuilders(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
+        {
+            if (query.Clauses.OfType<TakeClause>().Any() || query.Clauses.OfType<SkipClause>().Any())
+            {
+                return this.GetPagedQueryCommandBuilders(query, out unhandledClauses);
+            }
+            else
+            {
+                return new[] { new QueryBuilder(this).Build(query, out unhandledClauses) };
+            }
+        }
+
+        private ICommandBuilder[] GetQueryCommandBuilders(SimpleQuery query, Int32 bulkIndex, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
+        {
+            if (query.Clauses.OfType<TakeClause>().Any() || query.Clauses.OfType<SkipClause>().Any())
+            {
+                return this.GetPagedQueryCommandBuilders(query, bulkIndex, out unhandledClauses);
+            }
+            else
+            {
+                return new[] { new QueryBuilder(this, bulkIndex).Build(query, out unhandledClauses) };
+            }
+        }
+
+        public override IEnumerable<IEnumerable<IDictionary<string, object>>> RunQueries(SimpleQuery[] queries, List<IEnumerable<SimpleQueryClauseBase>> unhandledClauses)
         {
             if (ProviderSupportsCompoundStatements && queries.Length > 1)
             {
-                var commandBuilders = new ICommandBuilder[queries.Length];
+                var commandBuilders = new List<ICommandBuilder>();
                 for (int i = 0; i < queries.Length; i++)
                 {
                     IEnumerable<SimpleQueryClauseBase> unhandledClausesForThisQuery;
-                    commandBuilders[i] = new QueryBuilder(this, i).Build(queries[i], out unhandledClausesForThisQuery);
+                    commandBuilders.AddRange(GetQueryCommandBuilders(queries[i], i, out unhandledClausesForThisQuery));
                     unhandledClauses.Add(unhandledClausesForThisQuery);
                 }
                 var connection = _connectionProvider.CreateConnection();
-                var command = CommandBuilder.CreateCommand(_providerHelper.GetCustomProvider<IDbParameterFactory>(_schema.SchemaProvider), commandBuilders, connection);
+                var command = CommandBuilder.CreateCommand(_providerHelper.GetCustomProvider<IDbParameterFactory>(_schema.SchemaProvider), commandBuilders.ToArray(), connection);
                 foreach (var item in command.ToEnumerables(connection))
                 {
                     yield return item.ToList();
