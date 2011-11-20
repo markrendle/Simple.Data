@@ -149,7 +149,7 @@ namespace Simple.Data.Ado
             if (expression.Type == SimpleExpressionType.And || expression.Type == SimpleExpressionType.Or)
             {
                 return GetReferencesFromExpression((SimpleExpression)expression.LeftOperand)
-                    .Concat(GetReferencesFromExpression((SimpleExpression)expression.LeftOperand));
+                    .Concat(GetReferencesFromExpression((SimpleExpression)expression.RightOperand));
             }
 
             return Enumerable.Empty<ObjectReference>()
