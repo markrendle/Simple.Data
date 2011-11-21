@@ -46,7 +46,6 @@ namespace Simple.Data.Ado
             HandleGrouping();
             HandleHavingCriteria();
             HandleOrderBy();
-            HandlePaging();
 
             unhandledClauses = _unhandledClauses;
             return _commandBuilder;
@@ -162,27 +161,6 @@ namespace Simple.Data.Ado
 
             var orderNames = _query.Clauses.OfType<OrderByClause>().Select(ToOrderByDirective);
             _commandBuilder.Append(" ORDER BY " + string.Join(", ", orderNames));
-        }
-
-        private void HandlePaging()
-        {
-            const int maxInt = 2147483646;
-
-            var skipClause = _query.Clauses.OfType<SkipClause>().FirstOrDefault() ?? new SkipClause(0);
-            var takeClause = _query.Clauses.OfType<TakeClause>().FirstOrDefault() ?? new TakeClause(maxInt);
-            if (skipClause.Count != 0 || takeClause.Count != maxInt)
-            {
-                var queryPager = _adoAdapter.ProviderHelper.GetCustomProvider<IQueryPager>(_adoAdapter.ConnectionProvider);
-                if (queryPager == null)
-                {
-                    _unhandledClauses.AddRange(_query.OfType<SkipClause>());
-                    _unhandledClauses.AddRange(_query.OfType<TakeClause>());
-                }
-
-                var skipTemplate = _commandBuilder.AddParameter("skip", DbType.Int32, skipClause.Count);
-                var takeTemplate = _commandBuilder.AddParameter("take", DbType.Int32, takeClause.Count);
-                _commandBuilder.SetText(queryPager.ApplyPaging(_commandBuilder.Text, skipTemplate.Name, takeTemplate.Name));
-            }
         }
 
         private string ToOrderByDirective(OrderByClause item)

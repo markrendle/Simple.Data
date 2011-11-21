@@ -1,7 +1,9 @@
+using System.Collections.Generic;
+
 namespace Simple.Data.Ado
 {
     public interface IQueryPager
     {
-        string ApplyPaging(string sql, string skipParameterName, string takeParameterName);
+        IEnumerable<string> ApplyPaging(string sql, int skip, int take);
     }
 }

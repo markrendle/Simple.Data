@@ -45,7 +45,7 @@ namespace Simple.Data.Ado
             {
                 ExecuteReader();
             }
-            return _lastRead = _reader.Read();
+            return _lastRead = (_reader != null && _reader.Read());
         }
 
         private void ExecuteReader()
@@ -55,7 +55,10 @@ namespace Simple.Data.Ado
                 if (_connection.State == ConnectionState.Closed)
                     _connection.Open();
                 _reader = _command.ExecuteReader();
-                _index = _index ?? _reader.CreateDictionaryIndex();
+                if (_reader != null)
+                {
+                    _index = _index ?? _reader.CreateDictionaryIndex();
+                }
             }
             catch (DbException ex)
             {
@@ -73,6 +76,10 @@ namespace Simple.Data.Ado
         {
             get
             {
+                if (_reader == null)
+                {
+                    return null;
+                }
                 if (!_lastRead) throw new InvalidOperationException();
                 return _reader.ToDictionary(_index);
             }

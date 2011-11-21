@@ -13,7 +13,7 @@ namespace Simple.Data.SqlServer
     {
         private static readonly Regex ColumnExtract = new Regex(@"SELECT\s*(.*)\s*(FROM.*)", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
-        public string ApplyPaging(string sql, string skipParameterName, string takeParameterName)
+        public IEnumerable<string> ApplyPaging(string sql, int skip, int take)
         {
             var builder = new StringBuilder("WITH __Data AS (SELECT ");
 
@@ -29,10 +29,10 @@ namespace Simple.Data.SqlServer
             builder.AppendLine();
             builder.Append(fromEtc);
             builder.AppendLine(")");
-            builder.AppendFormat("SELECT {0} FROM __Data WHERE [_#_] BETWEEN {1} + 1 AND {1} + {2}", DequalifyColumns(columns),
-                                 skipParameterName, takeParameterName);
+            builder.AppendFormat("SELECT {0} FROM __Data WHERE [_#_] BETWEEN {1} AND {2}", DequalifyColumns(columns),
+                                 skip + 1, skip + take);
 
-            return builder.ToString();
+            yield return builder.ToString();
         }
 
         private static string DequalifyColumns(string original)
