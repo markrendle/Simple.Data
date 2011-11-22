@@ -19,6 +19,6 @@ using System.Runtime.InteropServices;
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-[assembly: AssemblyVersion("0.10.1.1")]
-[assembly: AssemblyFileVersion("0.10.1.1")]
+[assembly: AssemblyVersion("0.10.2.1")]
+[assembly: AssemblyFileVersion("0.10.2.1")]
 
