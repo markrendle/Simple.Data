@@ -15,8 +15,8 @@ namespace Simple.Data
     /// </summary>
     public class DynamicTable : DynamicObject
     {
-        private readonly ConcurrentDictionary<string, Func<object[], object>> _delegates =
-            new ConcurrentDictionary<string, Func<object[], object>>();
+        private readonly ConcurrentDictionary<FunctionSignature, Func<object[], object>> _delegates =
+            new ConcurrentDictionary<FunctionSignature, Func<object[], object>>();
         private readonly string _tableName;
         private readonly DynamicSchema _schema;
         private readonly DataStrategy _dataStrategy;
@@ -55,7 +55,7 @@ namespace Simple.Data
         /// </returns>
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
-            var func = _delegates.GetOrAdd(CreateDelegateName(binder), name => CreateMemberDelegate(name, binder, args));
+            var func = _delegates.GetOrAdd(FunctionSignature.FromBinder(binder, args), signature => CreateMemberDelegate(signature, binder, args));
             if (func != null)
             {
                 result = func(args);
@@ -78,11 +78,11 @@ namespace Simple.Data
             return binder.Name + " " + string.Join(" ", binder.CallInfo.ArgumentNames);
         }
 
-        private Func<object[],object> CreateMemberDelegate(string name, InvokeMemberBinder binder, object[] args)
+        private Func<object[],object> CreateMemberDelegate(FunctionSignature signature, InvokeMemberBinder binder, object[] args)
         {
             try
             {
-                var command = CommandFactory.GetCommandFor(name);
+                var command = CommandFactory.GetCommandFor(binder.Name);
                 if (command == null) return null;
                 return command.CreateDelegate(_dataStrategy, this, binder, args);
             }
