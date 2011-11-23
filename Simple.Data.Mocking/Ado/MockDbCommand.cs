@@ -5,7 +5,7 @@ using System.Data;
 
 namespace Simple.Data.Mocking.Ado
 {
-    class MockDbCommand : DbCommand
+    class MockDbCommand : DbCommand, ICloneable
     {
         private readonly MockDbConnection _connection;
 
@@ -139,5 +139,15 @@ namespace Simple.Data.Mocking.Ado
         /// </returns>
         /// <filterpriority>2</filterpriority>
         public override int CommandTimeout { get; set; }
+
+        public object Clone()
+        {
+            var clone = new MockDbCommand(_connection) {CommandText = CommandText};
+            foreach (var p in Parameters.Cast<IDbDataParameter>())
+            {
+                clone.Parameters.Add(new MockDataParameter {DbType = p.DbType, ParameterName = p.ParameterName});
+            }
+            return clone;
+        }
     }
 }

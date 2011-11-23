@@ -81,7 +81,7 @@
     <Compile Include="DictionaryCloner.cs" />
     <Compile Include="FunctionSignature.cs" />
     <Compile Include="InMemoryAdapter.cs" />
-    <Compile Include="OptimizingDelegateFactoryBase.cs" />
+    <Compile Include="OptimizingDelegateFactory.cs" />
     <Compile Include="QueryPolyfills\AggregateValueResolver.cs" />
     <Compile Include="QueryPolyfills\DictionaryCreatorFactory.cs" />
     <Compile Include="QueryPolyfills\DictionaryEqualityComparer.cs" />

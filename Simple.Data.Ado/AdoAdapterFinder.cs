@@ -9,6 +9,9 @@ using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
+    using System.Data.SqlClient;
+    using System.Dynamic;
+
     class AdoAdapterFinder
     {
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, CommandTemplate>> _commandCaches =
@@ -47,8 +50,34 @@ namespace Simple.Data.Ado
             {
                 return _ => FindAll(_adapter.GetSchema().BuildObjectName(tableName)).FirstOrDefault();
             }
-            var commandTemplate = GetCommandTemplate(tableName, criteria);
-            return args => ExecuteSingletonQuery(commandTemplate, args);
+            var commandBuilder = new FindHelper(_adapter.GetSchema())
+                .GetFindByCommand(_adapter.GetSchema().BuildObjectName(tableName), criteria);
+
+            var command = commandBuilder.GetCommand(_adapter.CreateConnection());
+
+            var commandTemplate =
+                commandBuilder.GetCommandTemplate(
+                    _adapter.GetSchema().FindTable(_adapter.GetSchema().BuildObjectName(tableName)));
+
+            var cloneable = command as ICloneable;
+            if (cloneable != null)
+            {
+                return args => ExecuteSingletonQuery((IDbCommand)cloneable.Clone(), args, commandTemplate.Index);
+            }
+            else
+            {
+                return args => ExecuteSingletonQuery(commandTemplate, args);
+            }
+        }
+
+        private IDictionary<string, object> ExecuteSingletonQuery(IDbCommand command, object[] parameterValues, IDictionary<string,int> index)
+        {
+            for (int i = 0; i < command.Parameters.Count; i++)
+            {
+                ((IDbDataParameter) command.Parameters[i]).Value = FixObjectType(parameterValues[i]);
+            }
+            command.Connection = _adapter.CreateConnection();
+            return TryExecuteSingletonQuery(command.Connection, command, index);
         }
 
         public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
@@ -148,6 +177,18 @@ namespace Simple.Data.Ado
                 }
             }
             return null;
+        }
+
+        private static object FixObjectType(object value)
+        {
+            if (value == null) return DBNull.Value;
+            if (TypeHelper.IsKnownType(value.GetType())) return value;
+            var dynamicObject = value as DynamicObject;
+            if (dynamicObject != null)
+            {
+                return dynamicObject.ToString();
+            }
+            return value;
         }
     }
 }

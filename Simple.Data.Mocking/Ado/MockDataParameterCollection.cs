@@ -137,7 +137,7 @@ namespace Simple.Data.Mocking.Ado
         /// <param name="index">The index of the <see cref="T:System.Data.Common.DbParameter"/> in the collection.</param>
         protected override DbParameter GetParameter(int index)
         {
-            throw new NotImplementedException();
+            return _collection[index];
         }
 
         /// <summary>

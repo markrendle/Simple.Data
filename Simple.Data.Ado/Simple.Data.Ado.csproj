@@ -94,6 +94,7 @@
     <Compile Include="OptimizedDictionary.cs" />
     <Compile Include="OptimizedDictionaryIndex.cs" />
     <Compile Include="OptimizedDictionary2.cs" />
+    <Compile Include="AdoOptimizingDelegateFactory.cs" />
     <Compile Include="ParameterTemplate.cs" />
     <Compile Include="ProcedureExecutor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
