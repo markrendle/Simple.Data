@@ -42,6 +42,17 @@ namespace Simple.Data
             }
         }
 
+        public static T GetAdjacentComponent<T>(Type knownSiblingType)
+        {
+            using (var assemblyCatalog = new AssemblyCatalog(knownSiblingType.Assembly))
+            {
+                using (var container = new CompositionContainer(assemblyCatalog))
+                {
+                    return container.GetExportedValueOrDefault<T>();
+                }
+            }
+        }
+
         private static CompositionContainer CreateContainer()
         {
             var path = Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "").Replace("file://","//");

@@ -37,6 +37,11 @@ namespace Simple.Data.Ado
             get { return _connectionProvider; }
         }
 
+        internal AdoAdapterFinder Finder
+        {
+            get { return _finder; }
+        }
+
         private DatabaseSchema _schema;
         private Lazy<AdoAdapterRelatedFinder> _relatedFinder;
         private IDbConnection _sharedConnection;
@@ -87,6 +92,11 @@ namespace Simple.Data.Ado
         private AdoAdapterRelatedFinder CreateRelatedFinder()
         {
             return new AdoAdapterRelatedFinder(this);
+        }
+
+        public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
+        {
+            throw new NotImplementedException();
         }
 
         public override IDictionary<string, object> FindOne(string tableName, SimpleExpression criteria)

@@ -27,6 +27,11 @@ namespace Simple.Data.Mocking
             get { return _data.Value; }
         }
 
+        public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
+        {
+            throw new NotImplementedException();
+        }
+
         public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
             if (criteria == null) return FindAll(tableName);

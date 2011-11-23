@@ -58,6 +58,14 @@
         }
 
         /// <summary>
+        /// Gets a single record from the specified "table" using its default key.
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="keyValues">The values to search with.</param>
+        /// <returns>The record matching the supplied key. If no record is found, return <c>null</c>.</returns>
+        public abstract IDictionary<string, object> Get(string tableName, params object[] keyValues); 
+
+        /// <summary>
         /// Finds data from the specified "table".
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
@@ -286,6 +294,18 @@
 
         protected virtual void OnReset()
         {
+        }
+
+        private OptimizingDelegateFactory _optimizingDelegateFactory;
+
+        public OptimizingDelegateFactory OptimizingDelegateFactory
+        {
+            get { return _optimizingDelegateFactory ?? (_optimizingDelegateFactory = CreateOptimizingDelegateFactory()); }
+        }
+
+        private OptimizingDelegateFactory CreateOptimizingDelegateFactory()
+        {
+            return MefHelper.GetAdjacentComponent<OptimizingDelegateFactory>(this.GetType()) ?? new DefaultOptimizingDelegateFactory();
         }
     }
 }

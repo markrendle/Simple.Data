@@ -97,12 +97,6 @@ namespace Simple.Data
             return base.TryInvokeMember(binder, args, out result);
         }
 
-        private static string CreateDelegateName(InvokeMemberBinder binder)
-        {
-            // Construct the name from the method name and any named arguments, so that "FindBy(Id:1)" and "FindBy(Age:42)" have separate delegates.
-            return binder.Name + " " + string.Join(" ", binder.CallInfo.ArgumentNames);
-        }
-
         private Func<object[],object> CreateMemberDelegate(string signature, InvokeMemberBinder binder, object[] args)
         {
             try

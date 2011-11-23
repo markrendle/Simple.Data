@@ -25,7 +25,8 @@ namespace Simple.Data.Commands
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), criteriaDictionary);
             try
             {
-                var func = dataStrategy.GetAdapter().CreateFindOneDelegate(table.GetQualifiedName(), criteriaExpression);
+                var adapter = dataStrategy.GetAdapter();
+                var func = adapter.OptimizingDelegateFactory.CreateFindOneDelegate(adapter, table.GetQualifiedName(), criteriaExpression);
                 return a =>
                            {
                                var data = func(a);

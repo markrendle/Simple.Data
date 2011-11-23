@@ -47,6 +47,11 @@
 
     class StubAdapter : Adapter
     {
+        public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
+        {
+            throw new NotImplementedException();
+        }
+
         public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
             throw new NotImplementedException();

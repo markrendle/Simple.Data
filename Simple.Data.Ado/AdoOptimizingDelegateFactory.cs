@@ -12,7 +12,12 @@ namespace Simple.Data.Ado
     {
         public override Func<object[], IDictionary<string, object>> CreateFindOneDelegate(Adapter adapter, string tableName, SimpleExpression criteria)
         {
-            return base.CreateFindOneDelegate(adapter, tableName, criteria);
+            return new AdoAdapterFinder((AdoAdapter)adapter).CreateFindOneDelegate(tableName, criteria);
+        }
+
+        public override Func<object[], IDictionary<string, object>> CreateGetDelegate(Adapter adapter, string tableName, object[] keyValues)
+        {
+            return new AdoAdapterGetter((AdoAdapter) adapter).CreateGetDelegate(tableName, keyValues);
         }
     }
 }

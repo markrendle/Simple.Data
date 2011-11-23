@@ -49,6 +49,7 @@
     <Compile Include="AdoAdapter.cs" />
     <Compile Include="AdoAdapterException.cs" />
     <Compile Include="AdoAdapterFinder.cs" />
+    <Compile Include="AdoAdapterGetter.cs" />
     <Compile Include="AdoAdapterInserter.cs" />
     <Compile Include="AdoAdapterRelatedFinder.cs" />
     <Compile Include="AdoAdapterTransaction.cs" />

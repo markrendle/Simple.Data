@@ -10,5 +10,15 @@ namespace Simple.Data
         {
             return adapter.CreateFindOneDelegate(tableName, criteria);
         }
+
+        public virtual Func<object[], IDictionary<string,object>> CreateGetDelegate(Adapter adapter, string tableName, object[] keyValues)
+        {
+            return args => adapter.Get(tableName, args);
+        }
+    }
+
+    internal class DefaultOptimizingDelegateFactory : OptimizingDelegateFactory
+    {
+        
     }
 }

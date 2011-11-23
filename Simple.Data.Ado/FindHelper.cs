@@ -41,4 +41,35 @@ namespace Simple.Data.Ado
             return string.Format("select {0} from {1}", string.Join(", ", table.Columns.Select(c => c.QualifiedName)), table.QualifiedName);
         }
     }
+
+    internal class GetHelper
+    {
+        private readonly DatabaseSchema _schema;
+        private readonly ICommandBuilder _commandBuilder;
+
+        public GetHelper(DatabaseSchema schema)
+        {
+            _schema = schema;
+            _commandBuilder = new CommandBuilder(schema);
+        }
+
+        public ICommandBuilder GetCommand(Table table, params object[] keyValues)
+        {
+            _commandBuilder.Append(GetSelectClause(table));
+            var param = _commandBuilder.AddParameter(keyValues[0], table.FindColumn(table.PrimaryKey[0]));
+            _commandBuilder.Append(string.Format(" where {0} = {1}", _schema.QuoteObjectName(table.PrimaryKey[0]), param.Name));
+            for (int i = 1; i < table.PrimaryKey.Length; i++)
+            {
+                param = _commandBuilder.AddParameter(keyValues[i], table.FindColumn(table.PrimaryKey[i]));
+                _commandBuilder.Append(string.Format(" and {0} = {1}", _schema.QuoteObjectName(table.PrimaryKey[i]), param.Name));
+            }
+
+            return _commandBuilder;
+        }
+
+        private string GetSelectClause(Table table)
+        {
+            return string.Format("select {0} from {1}", string.Join(", ", table.Columns.Select(c => c.QualifiedName)), table.QualifiedName);
+        }
+    }
 }

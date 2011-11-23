@@ -15,12 +15,27 @@
             new Dictionary<string, List<IDictionary<string, object>>>();
 
         private readonly ICollection<Join> _joins = new Collection<Join>();
+        private readonly IDictionary<string, IList<string>> _keys = new Dictionary<string, IList<string>>();
 
         private List<IDictionary<string, object>> GetTable(string tableName)
         {
             tableName = tableName.ToLowerInvariant();
             if (!_tables.ContainsKey(tableName)) _tables.Add(tableName, new List<IDictionary<string, object>>());
             return _tables[tableName];
+        }
+
+        public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
+        {
+            if (!_keys.ContainsKey(tableName)) throw new InvalidOperationException("No key specified for In-Memory table.");
+            var keys = _keys[tableName];
+            if (keys.Count != keyValues.Length) throw new ArgumentException("Incorrect number of values for key.");
+            var expression = new ObjectReference(keys[0]) == keyValues[0];
+            for (int i = 1; i < keyValues.Length; i++)
+            {
+                expression = expression && new ObjectReference(keys[i]) == keyValues[i];
+            }
+
+            return Find(tableName, expression).FirstOrDefault();
         }
 
         public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
