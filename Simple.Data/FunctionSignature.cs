@@ -6,10 +6,13 @@ using System.Dynamic;
 
 namespace Simple.Data
 {
+    using System.Text;
+
     internal sealed class FunctionSignature : IEquatable<FunctionSignature>
     {
         private readonly string _name;
         private readonly IList<Parameter> _parameters;
+        private static readonly object obj = new object();
 
         private FunctionSignature(string name, IList<Parameter> parameters)
         {
@@ -17,9 +20,30 @@ namespace Simple.Data
             _parameters = parameters;
         }
 
-        public static FunctionSignature FromBinder(InvokeMemberBinder binder, object[] args)
+        public static string FromBinder(InvokeMemberBinder binder, object[] args)
         {
-            return new FunctionSignature(binder.Name, GetParameters(binder, args));
+            if (args.Length == 1 && !(args[0] is IList))
+                return string.Format("{0}({1})", binder.Name, (args[0] ?? obj).GetType());
+
+            var builder = new StringBuilder(binder.Name);
+            builder.Append("(");
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (binder.CallInfo.ArgumentNames.Count > i && !string.IsNullOrWhiteSpace(binder.CallInfo.ArgumentNames[i]))
+                {
+                    builder.Append(binder.CallInfo.ArgumentNames[i]);
+                    builder.Append(":");
+                }
+                var type = (args[i] ?? obj).GetType();
+                builder.Append(type.FullName);
+                var list = args[i] as IList;
+                if (list != null)
+                {
+                    builder.AppendFormat("[{0}]", list.Count);
+                }
+            }
+            builder.Append(")");
+            return builder.ToString();
         }
 
         private static IList<Parameter> GetParameters(InvokeMemberBinder binder, object[] args)

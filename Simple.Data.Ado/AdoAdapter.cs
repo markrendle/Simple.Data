@@ -39,6 +39,7 @@ namespace Simple.Data.Ado
 
         private DatabaseSchema _schema;
         private Lazy<AdoAdapterRelatedFinder> _relatedFinder;
+        private IDbConnection _sharedConnection;
 
         public AdoAdapter()
         {
@@ -355,7 +356,8 @@ namespace Simple.Data.Ado
 
         private int Execute(ICommandBuilder commandBuilder)
         {
-            using (var connection = CreateConnection())
+            var connection = CreateConnection();
+            using (connection.MaybeDisposable())
             {
                 using (var command = commandBuilder.GetCommand(connection))
                 {
@@ -388,9 +390,19 @@ namespace Simple.Data.Ado
             }
         }
 
+        public void UseSharedConnection(IDbConnection connection)
+        {
+            _sharedConnection = connection;
+        }
+
+        public void StopUsingSharedConnection()
+        {
+            _sharedConnection = null;
+        }
+
         internal IDbConnection CreateConnection()
         {
-            return _connectionProvider.CreateConnection();
+            return _sharedConnection ?? _connectionProvider.CreateConnection();
         }
 
         internal DatabaseSchema GetSchema()

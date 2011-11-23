@@ -8,6 +8,8 @@ using System.Text;
 
 namespace PerformanceTestConsole
 {
+    using Simple.Data.Ado;
+
     class Post
     {
         public int Id { get; set; }
@@ -29,11 +31,11 @@ namespace PerformanceTestConsole
     class Program
     {
 
-        public static readonly string connectionString = "Data Source=SQL2008;Initial Catalog=tempdb;User ID=sa;Password=SAPassword01";
+        public static readonly string ConnectionString = "Data Source=.;Initial Catalog=tempdb;Integrated Security=true";
 
         public static SqlConnection GetOpenConnection()
         {
-            var connection = new SqlConnection(connectionString);
+            var connection = new SqlConnection(ConnectionString);
             connection.Open();
             return connection;
         }
@@ -166,7 +168,8 @@ end
         public void Run(int iterations)
         {
             var tests = new Tests();
-            var simpleDb = Simple.Data.Database.OpenConnection(Program.connectionString);
+            var simpleDb = Simple.Data.Database.OpenConnection(Program.ConnectionString);
+            ((AdoAdapter)simpleDb.GetAdapter()).UseSharedConnection(Program.GetOpenConnection());
             simpleDb.Posts.FindById(1);
             tests.Add(id => simpleDb.Posts.FindById(id), "Dynamic Simple.Data Query");
 
@@ -176,7 +179,7 @@ end
 
             var postCommand = new SqlCommand();
             postCommand.Connection = connection;
-            postCommand.CommandText = @"select Id, [Text], [CreationDate], LastChangeDate, 
+            postCommand.CommandText = @"select top 1 Id, [Text], [CreationDate], LastChangeDate, 
                 Counter1,Counter2,Counter3,Counter4,Counter5,Counter6,Counter7,Counter8,Counter9 from Posts where Id = @Id";
             var idParam = postCommand.Parameters.Add("@Id", System.Data.SqlDbType.Int);
 

@@ -19,6 +19,8 @@ namespace Simple.Data.IntegrationTest.Query
                                       new[] { "dbo", "Users", "Password" });
         }
 
+        private const string usersColumns = "[dbo].[Users].[Name], [dbo].[Users].[Password]";
+
         [Test]
         public void SubstringIsEnteredCorrectlyInFindAll()
         {
@@ -36,7 +38,7 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void SubstringIsEnteredCorrectlyInFindOne()
         {
-            const string expected = @"select [dbo].[users].* from [dbo].[users] where substring([dbo].[users].[name],@p1,@p2) = @p3";
+            const string expected = @"select " + usersColumns + " from [dbo].[users] where substring([dbo].[users].[name],@p1,@p2) = @p3";
 
             _db.Users.Find(_db.Users.Name.Substring(0, 1) == "A");
 

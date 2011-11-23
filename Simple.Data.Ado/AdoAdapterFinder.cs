@@ -5,7 +5,6 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
-using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
@@ -19,7 +18,6 @@ namespace Simple.Data.Ado
         private readonly AdoAdapter _adapter;
         private readonly IDbTransaction _transaction;
         private readonly IDbConnection _connection;
-        private readonly DatabaseSchema _schema;
 
         public AdoAdapterFinder(AdoAdapter adapter) : this(adapter, null)
         {
@@ -157,7 +155,7 @@ namespace Simple.Data.Ado
         private static IDictionary<string, object> TryExecuteSingletonQuery(IDbConnection connection, IDbCommand command, IDictionary<string, int> index)
         {
             command.WriteTrace();
-            using (connection)
+            using (connection.MaybeDisposable())
             using (command)
             {
                 try
@@ -178,6 +176,16 @@ namespace Simple.Data.Ado
                 }
             }
             return null;
+        }
+
+        private static IDisposable DisposeWrap(IDbConnection connection)
+        {
+            if (connection.State == ConnectionState.Open)
+            {
+                return ActionDisposable.NoOp;
+            }
+
+            return new ActionDisposable(connection.Dispose);
         }
 
         private static object FixObjectType(object value)

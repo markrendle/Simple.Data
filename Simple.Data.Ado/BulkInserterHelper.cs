@@ -25,7 +25,8 @@ namespace Simple.Data.Ado
 
         public virtual void InsertRowsWithoutFetchBack(string insertSql)
         {
-            using (var connection = Adapter.CreateConnection())
+            var connection = Adapter.CreateConnection();
+            using (connection.MaybeDisposable())
             {
                 using (var insertCommand = new CommandHelper(Adapter).CreateInsert(connection, insertSql, _columns))
                 {
@@ -42,7 +43,8 @@ namespace Simple.Data.Ado
 
         public virtual IEnumerable<IDictionary<string, object>> InsertRowsWithSeparateStatements(string insertSql, string selectSql)
         {
-            using (var connection = Adapter.CreateConnection())
+            var connection = Adapter.CreateConnection();
+            using (connection.MaybeDisposable())
             {
                 using (var insertCommand = new CommandHelper(Adapter).CreateInsert(connection, insertSql, _columns))
                 using (var selectCommand = connection.CreateCommand())
@@ -59,7 +61,8 @@ namespace Simple.Data.Ado
         {
             insertSql += "; " + selectSql;
 
-            using (var connection = Adapter.CreateConnection())
+            var connection = Adapter.CreateConnection();
+            using (connection.MaybeDisposable())
             {
                 using (var command = new CommandHelper(Adapter).CreateInsert(connection, insertSql, _columns))
                 {

@@ -103,7 +103,8 @@ namespace Simple.Data.Ado
                 return TryExecuteSingletonQuery(command);
             }
 
-            using (var connection = _adapter.CreateConnection())
+            var connection = _adapter.CreateConnection();
+            using (connection.MaybeDisposable())
             {
                 using (var command = new CommandHelper(_adapter).CreateInsert(connection, sql, columns, values.ToArray()))
                 {
@@ -125,7 +126,8 @@ namespace Simple.Data.Ado
                 return TryExecuteSingletonQuery(command);
             }
 
-            using (var connection = _adapter.CreateConnection())
+            var connection = _adapter.CreateConnection();
+            using (connection.MaybeDisposable())
             {
                 using (var command = new CommandHelper(_adapter).CreateInsert(connection, insertSql, columns, values.ToArray()))
                 {
@@ -167,7 +169,8 @@ namespace Simple.Data.Ado
                 command.Transaction = _transaction;
                 return TryExecute(command);
             }
-            using (var connection = _adapter.CreateConnection())
+            var connection = _adapter.CreateConnection();
+            using (connection.MaybeDisposable())
             {
                 using (var command = new CommandHelper(_adapter).CreateInsert(connection, sql, columns, values.ToArray()))
                 {

@@ -9,6 +9,7 @@ namespace ProfilingApp
 
     class FindByTask : IProfileTask
     {
+        private readonly dynamic _db = Database.OpenConnection(Properties.Settings.Default.ConnectionString);
         public void Run()
         {
             for (int i = 1; i < 101; i++)
@@ -17,9 +18,9 @@ namespace ProfilingApp
             }
         }
 
-        private static void GetPostAndPrintTitle(int i)
+        private void GetPostAndPrintTitle(int i)
         {
-            var post = Database.OpenConnection(Properties.Settings.Default.ConnectionString).Posts.FindById(i);
+            var post = _db.Posts.FindById(i);
             Console.WriteLine(post.Title);
         }
     }

@@ -8,6 +8,7 @@ namespace Simple.Data.Ado
 
     class DataReaderMultipleEnumerator : IEnumerator<IEnumerable<IDictionary<string, object>>>
     {
+        private readonly IDisposable _connectionDisposable;
         private readonly IDbConnection _connection;
         private IDictionary<string, int> _index;
         private readonly IDbCommand _command;
@@ -22,12 +23,13 @@ namespace Simple.Data.Ado
         {
             _command = command;
             _connection = connection;
+            _connectionDisposable = _connection.MaybeDisposable();
             _index = index;
         }
 
         public void Dispose()
         {
-            using (_connection)
+            using (_connectionDisposable)
             using (_command)
             using (_reader)
             {

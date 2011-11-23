@@ -30,7 +30,7 @@ namespace Simple.Data.IntegrationTest
             var orderDate = new DateTime(2010, 1, 1);
             _db["Customer"].Find(_db["Customers"]["Orders"]["OrderDate"] == orderDate);
             
-            GeneratedSqlIs("select [dbo].[Customer].* from [dbo].[Customer] join [dbo].[Orders] on ([dbo].[Customer].[CustomerId] = [dbo].[Orders].[CustomerId]) where [dbo].[Orders].[OrderDate] = @p1");
+            GeneratedSqlIs("select [dbo].[Customer].[CustomerId] from [dbo].[Customer] join [dbo].[Orders] on ([dbo].[Customer].[CustomerId] = [dbo].[Orders].[CustomerId]) where [dbo].[Orders].[OrderDate] = @p1");
             Parameter(0).Is(orderDate);
         }
     }
@@ -138,7 +138,7 @@ namespace Simple.Data.IntegrationTest
         {
             var orderDate = new DateTime(2010, 1, 1);
             _db.Customer.Find(_db.Customers.Orders.OrderDate == orderDate);
-            const string expectedSql = "select [dbo].[CUSTOMER].* from [dbo].[CUSTOMER] join [dbo].[ORDER] on " + 
+            const string expectedSql = "select [dbo].[CUSTOMER].[CUSTOMER_ID] from [dbo].[CUSTOMER] join [dbo].[ORDER] on " + 
                                        "([dbo].[CUSTOMER].[CUSTOMER_ID] = [dbo].[ORDER].[CUSTOMER_ID])"
                                      + " where [dbo].[ORDER].[ORDER_DATE] = @p1";
 

@@ -10,13 +10,16 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data
 {
+    using System.Collections;
+
     /// <summary>
     /// Represents a table in a database, or the nearest equivalent in other data stores.
     /// </summary>
     public class DynamicTable : DynamicObject
     {
-        private readonly ConcurrentDictionary<FunctionSignature, Func<object[], object>> _delegates =
-            new ConcurrentDictionary<FunctionSignature, Func<object[], object>>();
+        private readonly Dictionary<string, Func<object[], object>> _delegates;
+
+        private readonly ICollection _delegatesAsCollection; 
         private readonly string _tableName;
         private readonly DynamicSchema _schema;
         private readonly DataStrategy _dataStrategy;
@@ -39,6 +42,8 @@ namespace Simple.Data
         /// <param name="schema">The schema to which the table belongs.</param>
         internal DynamicTable(string tableName, DataStrategy dataStrategy, DynamicSchema schema)
         {
+            _delegates = new Dictionary<string, Func<object[], object>>();
+            _delegatesAsCollection = _delegates;
             _tableName = tableName;
             _schema = schema;
             _dataStrategy = dataStrategy;
@@ -55,7 +60,27 @@ namespace Simple.Data
         /// </returns>
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
-            var func = _delegates.GetOrAdd(FunctionSignature.FromBinder(binder, args), signature => CreateMemberDelegate(signature, binder, args));
+            var signature = FunctionSignature.FromBinder(binder, args);
+            Func<object[], object> func;
+            if (_delegatesAsCollection.IsSynchronized && _delegates.ContainsKey(signature))
+            {
+                func = _delegates[signature];
+            }
+            else
+            {
+                lock (_delegatesAsCollection.SyncRoot)
+                {
+                    if (!_delegates.ContainsKey(signature))
+                    {
+                        func = CreateMemberDelegate(signature, binder, args);
+                        _delegates.Add(signature, func);
+                    }
+                    else
+                    {
+                        func = _delegates[signature];
+                    }
+                }
+            }
             if (func != null)
             {
                 result = func(args);
@@ -78,7 +103,7 @@ namespace Simple.Data
             return binder.Name + " " + string.Join(" ", binder.CallInfo.ArgumentNames);
         }
 
-        private Func<object[],object> CreateMemberDelegate(FunctionSignature signature, InvokeMemberBinder binder, object[] args)
+        private Func<object[],object> CreateMemberDelegate(string signature, InvokeMemberBinder binder, object[] args)
         {
             try
             {

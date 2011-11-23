@@ -26,6 +26,8 @@ namespace Simple.Data.IntegrationTest
             return new Database(new AdoAdapter(new MockConnectionProvider(new MockDbConnection(mockDatabase), mockSchemaProvider)));
         }
 
+        private const string usersColumns = "[dbo].[Users].[Id], [dbo].[Users].[Name], [dbo].[Users].[Password], [dbo].[Users].[Age]";
+
         [Test]
         public void TestFindEqualWithInt32()
         {
@@ -35,7 +37,7 @@ namespace Simple.Data.IntegrationTest
             {
                 transaction.Users.Find(database.Users.Id == 1);
             }
-            Assert.AreEqual("select [dbo].[users].* from [dbo].[users] where [dbo].[users].[id] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual(("select " + usersColumns + " from [dbo].[users] where [dbo].[users].[id] = @p1").ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual(1, mockDatabase.Parameters[0]);
         }
 
@@ -48,7 +50,7 @@ namespace Simple.Data.IntegrationTest
             {
                 transaction.Users.FindByName("Foo");
             }
-            Assert.AreEqual("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[name] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual(("select " + usersColumns + " from [dbo].[Users] where [dbo].[Users].[name] = @p1").ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Foo", mockDatabase.Parameters[0]);
         }
 

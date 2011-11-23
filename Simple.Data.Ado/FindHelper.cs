@@ -5,6 +5,8 @@ using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
+    using System.Linq;
+
     internal class FindHelper
     {
         private readonly DatabaseSchema _schema;
@@ -35,7 +37,8 @@ namespace Simple.Data.Ado
 
         private string GetSelectClause(ObjectName tableName)
         {
-            return string.Format("select {0}.* from {0}", _schema.FindTable(tableName).QualifiedName);
+            var table = _schema.FindTable(tableName);
+            return string.Format("select {0} from {1}", string.Join(", ", table.Columns.Select(c => c.QualifiedName)), table.QualifiedName);
         }
     }
 }

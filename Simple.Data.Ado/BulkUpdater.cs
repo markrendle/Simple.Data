@@ -33,8 +33,9 @@ namespace Simple.Data.Ado
                                                                     ExpressionHelper.CriteriaDictionaryToExpression(
                                                                         tableName, GetCriteria(criteriaFieldNameList, exampleRow)));
 
-            using (var connectionScope = ConnectionScope.Create(transaction, adapter.CreateConnection))
-            using (var command = commandBuilder.GetRepeatableCommand(connectionScope.Connection))
+            var connection = adapter.CreateConnection();
+            using (connection.MaybeDisposable())
+            using (var command = commandBuilder.GetRepeatableCommand(connection))
             {
                 var propertyToParameterMap = CreatePropertyToParameterMap(data, table, command);
 

@@ -20,11 +20,12 @@ namespace Simple.Data.IntegrationTest
             schemaProvider.SetPrimaryKeys(new object[] { "dbo", "Users", "Id", 0 });
         }
 
+        private const string usersColumns = "[dbo].[Users].[Id], [dbo].[Users].[Name], [dbo].[Users].[Password], [dbo].[Users].[Age]";
         [Test]
         public void TestFindEqualWithInt32()
         {
             _db.Users.Find(_db.Users.Id == 1);
-            GeneratedSqlIs("select [dbo].[users].* from [dbo].[users] where [dbo].[users].[id] = @p1");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[users] where [dbo].[users].[id] = @p1");
             Parameter(0).Is(1);
         }
 
@@ -32,14 +33,14 @@ namespace Simple.Data.IntegrationTest
         public void TestFindWithNull()
         {
             _db.Users.Find(_db.Users.Id == null);
-            GeneratedSqlIs("select [dbo].[users].* from [dbo].[users] where [dbo].[users].[id] IS NULL");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[users] where [dbo].[users].[id] IS NULL");
         }
 
         [Test]
         public void TestFindWithTwoCriteriasOneBeingNull()
         {
             _db.Users.Find(_db.Users.Id == 1 || _db.Users.Id == null);
-            GeneratedSqlIs("select [dbo].[users].* from [dbo].[users] where ([dbo].[users].[id] = @p1 OR [dbo].[users].[id] IS NULL)");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[users] where ([dbo].[users].[id] = @p1 OR [dbo].[users].[id] IS NULL)");
             Parameter(0).Is(1);
             Parameter(1).DoesNotExist();
         }
@@ -48,7 +49,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindNotEqualWithInt32()
         {
             _db.Users.Find(_db.Users.Id != 1);
-            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] != @p1");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[Users] where [dbo].[Users].[Id] != @p1");
             Parameter(0).Is(1);
         }
 
@@ -56,7 +57,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindGreaterThanWithInt32()
         {
             _db.Users.Find(_db.Users.Id > 1);
-            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] > @p1");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[Users] where [dbo].[Users].[Id] > @p1");
             Parameter(0).Is(1);
         }
 
@@ -64,7 +65,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindGreaterThanOrEqualWithInt32()
         {
             _db.Users.Find(_db.Users.Id >= 1);
-            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] >= @p1");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[Users] where [dbo].[Users].[Id] >= @p1");
             Parameter(0).Is(1);
         }
 
@@ -72,7 +73,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindLessThanWithInt32()
         {
             _db.Users.Find(_db.Users.Id < 1);
-            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] < @p1");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[Users] where [dbo].[Users].[Id] < @p1");
             Parameter(0).Is(1);
         }
 
@@ -80,7 +81,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindLessThanOrEqualWithInt32()
         {
             _db.Users.Find(_db.Users.Id <= 1);
-            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] <= @p1");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[Users] where [dbo].[Users].[Id] <= @p1");
             Parameter(0).Is(1);
         }
 
@@ -88,7 +89,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindModulo()
         {
             _db.Users.Find(_db.Users.Id % 2 == 1);
-            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] % 2 = @p1");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[Users] where [dbo].[Users].[Id] % 2 = @p1");
             Parameter(0).Is(1);
         }
 
@@ -96,7 +97,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindWithAdd()
         {
             _db.Users.Find(_db.Users.Id + _db.Users.Age == 42);
-            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] + [dbo].[Users].[Age] = @p1");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[Users] where [dbo].[Users].[Id] + [dbo].[Users].[Age] = @p1");
             Parameter(0).Is(42);
         }
 
@@ -104,7 +105,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindWithSubtract()
         {
             _db.Users.Find(_db.Users.Id - _db.Users.Age == 42);
-            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] - [dbo].[Users].[Age] = @p1");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[Users] where [dbo].[Users].[Id] - [dbo].[Users].[Age] = @p1");
             Parameter(0).Is(42);
         }
 
@@ -112,7 +113,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindWithMultiply()
         {
             _db.Users.Find(_db.Users.Id * _db.Users.Age == 42);
-            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] * [dbo].[Users].[Age] = @p1");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[Users] where [dbo].[Users].[Id] * [dbo].[Users].[Age] = @p1");
             Parameter(0).Is(42);
         }
 
@@ -120,7 +121,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindWithDivide()
         {
             _db.Users.Find(_db.Users.Id / _db.Users.Age == 42);
-            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[Id] / [dbo].[Users].[Age] = @p1");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[Users] where [dbo].[Users].[Id] / [dbo].[Users].[Age] = @p1");
             Parameter(0).Is(42);
         }
         
@@ -128,7 +129,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindByNamedParameterSingleColumn()
         {
             _db.Users.FindBy(Name: "Foo");
-            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[name] = @p1");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[Users] where [dbo].[Users].[name] = @p1");
             Parameter(0).Is("Foo");
         }
 
@@ -136,7 +137,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindByNamedParameterTwoColumns()
         {
             _db.Users.FindBy(Name: "Foo", Password: "password");
-            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where ([dbo].[Users].[name] = @p1 and [dbo].[Users].[password] = @p2)");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[Users] where ([dbo].[Users].[name] = @p1 and [dbo].[Users].[password] = @p2)");
             Parameter(0).Is("Foo");
             Parameter(1).Is("password");
         }
@@ -145,7 +146,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindByDynamicSingleColumn()
         {
             _db.Users.FindByName("Foo");
-            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[name] = @p1");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[Users] where [dbo].[Users].[name] = @p1");
             Parameter(0).Is("Foo");
         }
 
@@ -153,7 +154,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindByDynamicSingleColumnNull()
         {
             _db.MyTable.FindByColumn1(null);
-            GeneratedSqlIs("select [dbo].[MyTable].* from [dbo].[MyTable] where [dbo].[MyTable].[Column1] is null");
+            GeneratedSqlIs("select [dbo].[MyTable].[Column1] from [dbo].[MyTable] where [dbo].[MyTable].[Column1] is null");
         }
 
         [Test]
@@ -167,7 +168,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindByWithAnonymousObject()
         {
             _db.MyTable.FindBy(new { Column1 = 1 });
-            GeneratedSqlIs("select [dbo].[MyTable].* from [dbo].[MyTable] where [dbo].[MyTable].[Column1] = @p1");
+            GeneratedSqlIs("select [dbo].[MyTable].[Column1] from [dbo].[MyTable] where [dbo].[MyTable].[Column1] = @p1");
             Parameter(0).Is(1);
         }
 
@@ -175,14 +176,14 @@ namespace Simple.Data.IntegrationTest
         public void TestFindByWithAnonymousObjectNullValue()
         {
             _db.MyTable.FindBy(new { Column1 = (object)null });
-            GeneratedSqlIs("select [dbo].[MyTable].* from [dbo].[MyTable] where [dbo].[MyTable].[Column1] is null");
+            GeneratedSqlIs("select [dbo].[MyTable].[Column1] from [dbo].[MyTable] where [dbo].[MyTable].[Column1] is null");
         }
 
         [Test]
         public void TestFindWithLike()
         {
             _db.Users.Find(_db.Users.Name.Like("Foo"));
-            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where [dbo].[Users].[name] like @p1");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[Users] where [dbo].[Users].[name] like @p1");
             Parameter(0).Is("Foo");
         }
 
@@ -216,7 +217,7 @@ namespace Simple.Data.IntegrationTest
         public void TestFindByDynamicTwoColumns()
         {
             _db.Users.FindByNameAndPassword("Foo", "secret");
-            GeneratedSqlIs("select [dbo].[Users].* from [dbo].[Users] where ([dbo].[Users].[name] = @p1 and [dbo].[Users].[password] = @p2)");
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[Users] where ([dbo].[Users].[name] = @p1 and [dbo].[Users].[password] = @p2)");
             Parameter(0).Is("Foo");
             Parameter(1).Is("secret");
         }

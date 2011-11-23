@@ -14,7 +14,7 @@ namespace ProfilingApp
         {
             ResetDatabase();
 
-            new QueryWithCountTask().Run();
+            new FindByTask().Run();
         }
 
         private static void ResetDatabase()

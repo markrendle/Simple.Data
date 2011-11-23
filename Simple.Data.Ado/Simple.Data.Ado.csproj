@@ -59,6 +59,7 @@
     <Compile Include="CommandBuilder.cs" />
     <Compile Include="CommandHelper.cs" />
     <Compile Include="CommandTemplate.cs" />
+    <Compile Include="ConnectionEx.cs" />
     <Compile Include="ConnectionScope.cs" />
     <Compile Include="DatabaseObservable.cs" />
     <Compile Include="DataParameterCollectionEx.cs" />
