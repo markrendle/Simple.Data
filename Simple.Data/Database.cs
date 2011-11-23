@@ -7,12 +7,17 @@ using System.Threading;
 
 namespace Simple.Data
 {
+    using System.Configuration;
+    using System.Diagnostics;
+
     /// <summary>
     /// The entry class for Simple.Data. Provides static methods for opening databases,
     /// and implements runtime dynamic functionality for resolving database-level objects.
     /// </summary>
     public partial class Database : DataStrategy
     {
+        private static readonly SimpleDataConfigurationSection Configuration;
+
         private static readonly IDatabaseOpener DatabaseOpener;
         private static IPluralizer _pluralizer;
         private readonly Adapter _adapter;
@@ -20,6 +25,10 @@ namespace Simple.Data
         static Database()
         {
             DatabaseOpener = new DatabaseOpener();
+            Configuration =
+                (SimpleDataConfigurationSection) ConfigurationManager.GetSection("simpleData/simpleDataConfiguration")
+                ?? new SimpleDataConfigurationSection();
+            TraceLevel = Configuration.TraceLevel;
         }
 
         /// <summary>
@@ -176,6 +185,13 @@ namespace Simple.Data
         public static void UseMockAdapter(Func<Adapter> mockAdapterCreator)
         {
             Data.DatabaseOpener.UseMockAdapter(mockAdapterCreator());
+        }
+
+        private static TraceLevel? _traceLevel;
+        public static TraceLevel? TraceLevel
+        {
+            get { return _traceLevel ?? Configuration.TraceLevel; }
+            set { _traceLevel = value; }
         }
     }
 }

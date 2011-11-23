@@ -249,6 +249,42 @@
             Assert.AreEqual(2, r2);
         }
 
+        [Test]
+        public void find_all_when_using_Name_property_should_work()
+        {
+            var adapter = new InMemoryAdapter();
+            adapter.ConfigureJoin("Users", "Id", "Categories", "Categories", "UserId", "User");
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+
+            db.Users.Insert(Id: 1, Name: "Marcus");
+            db.Users.Insert(Id: 2, Name: "Per");
+            db.Categories.Insert(Id: 1, UserId: 1, Name: "Category 1");
+            db.Categories.Insert(Id: 2, UserId: 2, Name: "Category 2");
+
+            var categories = db.Users.FindAll(db.User.Categories.Name == "Category 1").ToList();
+            Assert.NotNull(categories);
+            Assert.AreEqual(1, categories.Count); // FAILS - Count == 0
+        }
+
+        [Test]
+        public void find_all_when_using_CategoryName_property_should_work()
+        {
+            var adapter = new InMemoryAdapter();
+            adapter.ConfigureJoin("Users", "Id", "Categories", "Categories", "UserId", "User");
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+
+            db.Users.Insert(Id: 1, UserName: "Marcus");
+            db.Users.Insert(Id: 2, UserName: "Per");
+            db.Categories.Insert(Id: 1, UserId: 1, CategoryName: "Category 1");
+            db.Categories.Insert(Id: 2, UserId: 2, CategoryName: "Category 2");
+
+            var categories = db.Users.FindAll(db.User.Categories.CategoryName == "Category 1").ToList();
+            Assert.NotNull(categories);
+            Assert.AreEqual(1, categories.Count); // Works find  - Count == 1
+        }
+
         private static int ThreadTestHelper(int userId)
         {
             var mockAdapter = new InMemoryAdapter();

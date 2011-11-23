@@ -54,6 +54,7 @@ namespace Simple.Data.Ado
                 .GetFindByCommand(_adapter.GetSchema().BuildObjectName(tableName), criteria);
 
             var command = commandBuilder.GetCommand(_adapter.CreateConnection());
+            command = _adapter.CommandOptimizer.OptimizeFindOne(command);
 
             var commandTemplate =
                 commandBuilder.GetCommandTemplate(

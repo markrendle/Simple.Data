@@ -16,8 +16,14 @@ namespace Simple.Data.Ado
     [Export("Ado", typeof(Adapter))]
     public partial class AdoAdapter : Adapter, IAdapterWithRelation, IAdapterWithTransactions
     {
+        private CommandOptimizer _commandOptimizer = new CommandOptimizer();
         private readonly AdoAdapterFinder _finder;
         private readonly ProviderHelper _providerHelper = new ProviderHelper();
+
+        public CommandOptimizer CommandOptimizer
+        {
+            get { return _commandOptimizer; }
+        }
 
         public ProviderHelper ProviderHelper
         {
@@ -44,6 +50,8 @@ namespace Simple.Data.Ado
             _connectionProvider = connectionProvider;
             _schema = DatabaseSchema.Get(_connectionProvider, _providerHelper);
             _relatedFinder = new Lazy<AdoAdapterRelatedFinder>(CreateRelatedFinder);
+            _commandOptimizer = ProviderHelper.GetCustomProvider<CommandOptimizer>(_connectionProvider) ??
+                                new CommandOptimizer();
         }
 
         protected override void OnSetup()
@@ -71,6 +79,8 @@ namespace Simple.Data.Ado
             }
             _schema = DatabaseSchema.Get(_connectionProvider, _providerHelper);
             _relatedFinder = new Lazy<AdoAdapterRelatedFinder>(CreateRelatedFinder);
+            _commandOptimizer = ProviderHelper.GetCustomProvider<CommandOptimizer>(_connectionProvider) ??
+                                new CommandOptimizer();
         }
 
         private AdoAdapterRelatedFinder CreateRelatedFinder()

@@ -53,6 +53,7 @@
     </Compile>
     <Compile Include="SqlCeDbParameterFactory.cs" />
     <Compile Include="SqlColumn.cs" />
+    <Compile Include="SqlCommandOptimizer.cs" />
     <Compile Include="SqlConnectionProvider.cs" />
     <Compile Include="SqlObservableQueryRunner.cs" />
     <Compile Include="SqlQueryPager.cs" />

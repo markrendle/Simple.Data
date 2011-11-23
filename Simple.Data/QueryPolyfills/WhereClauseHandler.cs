@@ -32,7 +32,6 @@ namespace Simple.Data.QueryPolyfills
 
         private Func<IDictionary<string, object>, bool> FunctionExpressionToWhereClause(SimpleExpression arg)
         {
-            var key = GetKeyFromLeftOperand(arg);
             var function = arg.RightOperand as SimpleFunction;
             if (ReferenceEquals(function, null)) throw new InvalidOperationException("Expression type of function but no function supplied.");
             if (function.Name.Equals("like", StringComparison.OrdinalIgnoreCase))
@@ -95,16 +94,6 @@ namespace Simple.Data.QueryPolyfills
             return d => Resolve(d, arg.LeftOperand).Contains(arg.RightOperand);
         }
 
-        private static string GetKeyFromLeftOperand(SimpleExpression arg)
-        {
-            var reference = arg.LeftOperand as ObjectReference;
-
-            if (reference.IsNull()) throw new NotSupportedException("Only ObjectReference types are supported.");
-
-            var key = reference.GetName();
-            return key;
-        }
-
         private Func<IDictionary<string,object>, bool> Format(SimpleExpression expression)
         {
             Func<SimpleExpression, Func<IDictionary<string,object>,bool>> formatter;
@@ -133,11 +122,19 @@ namespace Simple.Data.QueryPolyfills
         {
             var objectReference = operand as ObjectReference;
             if (objectReference.IsNull()) return new object[0];
+
             key = key ?? objectReference.GetAliasOrName();
+            var keys = objectReference.GetAllObjectNames();
+
+            if (keys.Length > 2)
+            {
+                return ResolveSubs(dict, objectReference.GetOwner(), key).ToList();
+            }
+
             if (dict.ContainsKey(key))
                 return new[] {dict[key]};
-            var subs = ResolveSubs(dict, objectReference.GetOwner(), key).ToList();
-            return subs;
+
+            return new object[0];
         }
 
         private IEnumerable<object> ResolveSubs(IDictionary<string, object> dict, ObjectReference objectReference, string key)

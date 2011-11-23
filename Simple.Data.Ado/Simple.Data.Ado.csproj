@@ -89,6 +89,7 @@
     <Compile Include="IObservableQueryRunner.cs" />
     <Compile Include="IQueryPager.cs" />
     <Compile Include="ISchemaGetter.cs" />
+    <Compile Include="ISqlOptimizer.cs" />
     <Compile Include="Joiner.cs" />
     <Compile Include="JoinType.cs" />
     <Compile Include="OptimizedDictionary.cs" />
