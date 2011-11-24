@@ -188,7 +188,7 @@ namespace Simple.Data
         }
 
         private static TraceLevel? _traceLevel;
-        public static TraceLevel? TraceLevel
+        public static TraceLevel TraceLevel
         {
             get { return _traceLevel ?? Configuration.TraceLevel; }
             set { _traceLevel = value; }

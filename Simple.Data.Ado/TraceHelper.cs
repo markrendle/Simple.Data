@@ -14,7 +14,6 @@ namespace Simple.Data.Ado
     {
         public static void WriteTrace(this IDbCommand command)
         {
-//            if (Trace.Listeners.Count == 0) return;
             if (Database.TraceLevel < TraceLevel.Info) return;
             try
             {

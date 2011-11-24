@@ -72,6 +72,7 @@
     <Compile Include="Query\QueryTest.cs" />
     <Compile Include="Query\WithCountTest.cs" />
     <Compile Include="RangeAndArrayFindTest.cs" />
+    <Compile Include="TraceSettingsTest.cs" />
     <Compile Include="TransactionTest.cs" />
     <Compile Include="UpdateTest.cs" />
     <Compile Include="NameResolutionTests.cs" />
@@ -97,6 +98,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
