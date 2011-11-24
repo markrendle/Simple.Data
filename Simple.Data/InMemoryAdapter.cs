@@ -56,10 +56,24 @@
         {
             if (_autoIncrementColumns.ContainsKey(tableName))
             {
-                object nextVal = GetTable(tableName).Select(d => d[_autoIncrementColumns[tableName]]).Max();
+                var table = GetTable(tableName);
+                var autoIncrementColumn = _autoIncrementColumns[tableName];
+
+                if(!data.ContainsKey(autoIncrementColumn))
+                {
+                    data.Add(autoIncrementColumn, 0);
+                }
+
+                object nextVal = 0;
+                if(table.Count > 0)
+                {
+                    nextVal = table.Select(d => d[autoIncrementColumn]).Max(); ;
+                }
+                
                 nextVal = ObjectMaths.Increment(nextVal);
-                data[_autoIncrementColumns[tableName]] = nextVal;
+                data[autoIncrementColumn] = nextVal;
             }
+
             GetTable(tableName).Add(data);
 
             AddAsDetail(tableName, data);
