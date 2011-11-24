@@ -8,6 +8,7 @@ using System.Text;
 
 namespace PerformanceTestConsole
 {
+    using System.Data;
     using Simple.Data.Ado;
 
     class Post
@@ -169,13 +170,13 @@ end
         {
             var tests = new Tests();
             var simpleDb = Simple.Data.Database.OpenConnection(Program.ConnectionString);
-            ((AdoAdapter)simpleDb.GetAdapter()).UseSharedConnection(Program.GetOpenConnection());
+            SqlConnection connection = Program.GetOpenConnection();
+            ((AdoAdapter) simpleDb.GetAdapter()).UseSharedConnection(connection);
             simpleDb.Posts.FindById(1);
             tests.Add(id => simpleDb.Posts.FindById(id), "Dynamic Simple.Data Query");
 
             // HAND CODED 
 
-            var connection = Program.GetOpenConnection();
 
             var postCommand = new SqlCommand();
             postCommand.Connection = connection;

@@ -9,6 +9,20 @@
     public class InMemoryTests
     {
         [Test]
+        public void InsertAndGetShouldWork()
+        {
+var adapter = new InMemoryAdapter();
+adapter.SetKeyColumn("Test", "Id");
+Database.UseMockAdapter(adapter);
+var db = Database.Open();
+db.Test.Insert(Id: 1, Name: "Alice");
+var record = db.Test.Get(1);
+Assert.IsNotNull(record);
+Assert.AreEqual(1, record.Id);
+Assert.AreEqual("Alice", record.Name);
+        }
+
+        [Test]
         public void InsertAndFindShouldWork()
         {
             Database.UseMockAdapter(new InMemoryAdapter());
@@ -215,18 +229,18 @@
         [Test]
         public void TestJoin()
         {
-            var adapter = new InMemoryAdapter();
-            adapter.ConfigureJoin("Customer", "ID", "Orders", "Order", "CustomerID", "Customer");
-            Database.UseMockAdapter(adapter);
-            var db = Database.Open();
-            db.Customer.Insert(ID: 1, Name: "NASA");
-            db.Customer.Insert(ID: 2, Name: "ACME");
-            db.Order.Insert(ID: 1, CustomerID: 1, Date: new DateTime(1997, 1, 12));
-            db.Order.Insert(ID: 2, CustomerID: 2, Date: new DateTime(2001, 1, 1));
-
-            var customers = db.Customer.FindAll(db.Customer.Orders.Date < new DateTime(1999, 12, 31)).ToList();
-            Assert.IsNotNull(customers);
-            Assert.AreEqual(1, customers.Count);
+    var adapter = new InMemoryAdapter();
+    adapter.ConfigureJoin("Customer", "ID", "Orders", "Order", "CustomerID", "Customer");
+    Database.UseMockAdapter(adapter);
+    var db = Database.Open();
+    db.Customer.Insert(ID: 1, Name: "NASA");
+    db.Customer.Insert(ID: 2, Name: "ACME");
+    db.Order.Insert(ID: 1, CustomerID: 1, Date: new DateTime(1997, 1, 12));
+    db.Order.Insert(ID: 2, CustomerID: 2, Date: new DateTime(2001, 1, 1));
+    
+    var customers = db.Customer.FindAll(db.Customer.Orders.Date < new DateTime(1999, 12, 31)).ToList();
+    Assert.IsNotNull(customers);
+    Assert.AreEqual(1, customers.Count);
         }
 
         /// <summary>

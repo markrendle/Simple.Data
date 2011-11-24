@@ -14,9 +14,9 @@ namespace Simple.Data.SqlTest
         [Test]
         public void TestGet()
         {
-            var db = DatabaseHelper.Open();
-            var user = db.Users.Get(1);
-            Assert.AreEqual(1, user.Id);
+var db = DatabaseHelper.Open();
+var user = db.Users.Get(1);
+Assert.AreEqual(1, user.Id);
         }
     }
 }
