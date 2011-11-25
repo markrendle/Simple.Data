@@ -31,7 +31,7 @@ namespace Simple.Data.Ado
                 return new ConnectionScope(transaction.Connection, false);
             }
             var connection = creator();
-            connection.Open();
+            connection.OpenIfClosed();
             return new ConnectionScope(connection, true);
         }
 

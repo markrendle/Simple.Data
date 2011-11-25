@@ -19,8 +19,7 @@ namespace Simple.Data.Ado
         {
             try
             {
-                if (connection.State == ConnectionState.Closed)
-                    connection.Open();
+                connection.OpenIfClosed();
             }
             catch (DbException ex)
             {

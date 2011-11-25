@@ -157,8 +157,7 @@ namespace Simple.Data.Ado
             {
                 try
                 {
-                    if (connection.State != ConnectionState.Open)
-                        connection.Open();
+                    connection.OpenIfClosed();
                     using (var reader = command.ExecuteReader())
                     {
                         if (reader.Read())

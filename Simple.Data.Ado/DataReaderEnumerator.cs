@@ -52,8 +52,7 @@ namespace Simple.Data.Ado
         {
             try
             {
-                if (_connection.State == ConnectionState.Closed)
-                    _connection.Open();
+                _connection.OpenIfClosed();
                 _reader = _command.ExecuteReader();
                 if (_reader != null)
                 {

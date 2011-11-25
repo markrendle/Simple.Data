@@ -371,7 +371,7 @@ namespace Simple.Data.Ado
             {
                 using (var command = commandBuilder.GetCommand(connection))
                 {
-                    connection.Open();
+                    connection.OpenIfClosed();
                     return TryExecute(command);
                 }
             }
@@ -449,7 +449,7 @@ namespace Simple.Data.Ado
         public IAdapterTransaction BeginTransaction()
         {
             var connection = CreateConnection();
-            connection.Open();
+            connection.OpenIfClosed();
             var transaction = connection.BeginTransaction();
             return new AdoAdapterTransaction(transaction);
         }
@@ -457,7 +457,7 @@ namespace Simple.Data.Ado
         public IAdapterTransaction BeginTransaction(IsolationLevel isolationLevel)
         {
             var connection = CreateConnection();
-            connection.Open();
+            connection.OpenIfClosed();
             var transaction = connection.BeginTransaction(isolationLevel);
             return new AdoAdapterTransaction(transaction);
         }
@@ -465,7 +465,7 @@ namespace Simple.Data.Ado
         public IAdapterTransaction BeginTransaction(string name)
         {
             var connection = CreateConnection();
-            connection.Open();
+            connection.OpenIfClosed();
             var sqlConnection = connection as SqlConnection;
             var transaction = sqlConnection != null ? sqlConnection.BeginTransaction(name) : connection.BeginTransaction();
 
@@ -475,7 +475,7 @@ namespace Simple.Data.Ado
         public IAdapterTransaction BeginTransaction(IsolationLevel isolationLevel, string name)
         {
             var connection = CreateConnection();
-            connection.Open();
+            connection.OpenIfClosed();
             var sqlConnection = connection as SqlConnection;
             var transaction = sqlConnection != null
                                   ? sqlConnection.BeginTransaction(isolationLevel, name)

@@ -69,6 +69,7 @@
     <Compile Include="DataReaderMultipleEnumerator.cs" />
     <Compile Include="DataRecordExtensions.cs" />
     <Compile Include="DbCommandExtensions.cs" />
+    <Compile Include="DbConnectionEx.cs" />
     <Compile Include="DbConnectionExtensions.cs" />
     <Compile Include="DelegatingConnectionBase1.cs" />
     <Compile Include="DeleteHelper.cs" />

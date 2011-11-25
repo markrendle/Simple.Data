@@ -30,7 +30,7 @@ namespace Simple.Data.Ado
             {
                 using (var insertCommand = new CommandHelper(Adapter).CreateInsert(connection, insertSql, _columns))
                 {
-                    connection.Open();
+                    connection.OpenIfClosed();
                     TryPrepare(insertCommand);
                     insertCommand.Prepare();
                     foreach (var row in Data)
@@ -50,7 +50,7 @@ namespace Simple.Data.Ado
                 using (var selectCommand = connection.CreateCommand())
                 {
                     selectCommand.CommandText = selectSql;
-                    connection.Open();
+                    connection.OpenIfClosed();
                     TryPrepare(insertCommand, selectCommand);
                     return Data.Select(row => InsertRow(row, insertCommand, selectCommand)).ToList();
                 }
@@ -66,7 +66,7 @@ namespace Simple.Data.Ado
             {
                 using (var command = new CommandHelper(Adapter).CreateInsert(connection, insertSql, _columns))
                 {
-                    connection.Open();
+                    connection.OpenIfClosed();
                     TryPrepare(command);
                     return Data.Select(row => InsertRowAndSelect(row, command)).ToList();
                 }
