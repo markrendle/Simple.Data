@@ -149,18 +149,18 @@
         public override int Update(string tableName, IDictionary<string, object> data)
         {
             if (!_keyColumns.ContainsKey(tableName)) throw new InvalidOperationException("No key column(s) specified.");
-            IDictionary<string, object> row = null;
+            IDictionary<string, object> row;
             if (_keyColumns[tableName].Length == 1)
             {
                 row =
                     GetTable(tableName).Single(
-                        d => d[_keyColumns[tableName][0]] == data[_keyColumns[tableName][0]]);
+                        d => Equals(d[_keyColumns[tableName][0]], data[_keyColumns[tableName][0]]));
             }
             else
             {
                 IEnumerable<IDictionary<string, object>> rows = GetTable(tableName);
                 row = _keyColumns[tableName]
-                    .Aggregate(rows, (current, keyColumn) => current.Where(d => d[keyColumn] == data[keyColumn]))
+                    .Aggregate(rows, (current, keyColumn) => current.Where(d => Equals(d[keyColumn], data[keyColumn])))
                     .Single();
             }
             UpdateRecord(data, row);

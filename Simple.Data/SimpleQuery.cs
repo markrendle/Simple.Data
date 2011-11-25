@@ -565,7 +565,7 @@
 
         public int Count()
         {
-            return Select(new CountSpecialReference()).ToScalar();
+            return (int)Select(new CountSpecialReference()).ToScalar();
         }
 
         /// <summary>

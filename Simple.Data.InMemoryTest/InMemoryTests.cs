@@ -11,15 +11,15 @@
         [Test]
         public void InsertAndGetShouldWork()
         {
-var adapter = new InMemoryAdapter();
-adapter.SetKeyColumn("Test", "Id");
-Database.UseMockAdapter(adapter);
-var db = Database.Open();
-db.Test.Insert(Id: 1, Name: "Alice");
-var record = db.Test.Get(1);
-Assert.IsNotNull(record);
-Assert.AreEqual(1, record.Id);
-Assert.AreEqual("Alice", record.Name);
+            var adapter = new InMemoryAdapter();
+            adapter.SetKeyColumn("Test", "Id");
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            db.Test.Insert(Id: 1, Name: "Alice");
+            var record = db.Test.Get(1);
+            Assert.IsNotNull(record);
+            Assert.AreEqual(1, record.Id);
+            Assert.AreEqual("Alice", record.Name);
         }
 
         [Test]
@@ -151,6 +151,21 @@ Assert.AreEqual("Alice", record.Name);
             var db = Database.Open();
             db.Test.Insert(Id: 1, Name: "Alice");
             int updated = db.Test.UpdateById(Id: 1, Name: "Allyce");
+            Assert.AreEqual(1, updated);
+            var record = db.Test.FindById(1);
+            Assert.AreEqual("Allyce", record.Name);
+        }
+
+        [Test]
+        public void TestUpdate()
+        {
+            var adapter = new InMemoryAdapter();
+            adapter.SetKeyColumn("Test", "Id");
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            var alice = db.Test.Insert(Id: 1, Name: "Alice");
+            var allyce = new {Id = 1, Name = "Allyce"};
+            int updated = db.Test.Update(allyce);
             Assert.AreEqual(1, updated);
             var record = db.Test.FindById(1);
             Assert.AreEqual("Allyce", record.Name);
