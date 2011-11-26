@@ -1,6 +1,7 @@
 ﻿namespace Simple.Data.InMemoryTest
 {
     using System;
+	using System.Linq;
     using System.Collections.Generic;
     using System.Threading;
     using NUnit.Framework;
@@ -65,7 +66,7 @@
             var db = Database.Open();
             db.Test.Insert(Id: 1, Name: "Alice");
             db.Test.Insert(Id: 2, Name: "Bob");
-            List<IDictionary<string, object>> records = db.Test.All().Select(db.Test.Name).ToList<IDictionary<string, object>>();
+            List<IDictionary<string,object>> records = db.Test.All().Select(db.Test.Name).ToList<IDictionary<string,object>>();
             Assert.IsNotNull(records);
             Assert.AreEqual(2, records.Count);
             Assert.False(records[0].ContainsKey("Id"));

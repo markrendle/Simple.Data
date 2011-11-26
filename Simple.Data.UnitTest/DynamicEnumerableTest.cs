@@ -17,14 +17,14 @@ namespace Simple.Data.UnitTest
             Assert.AreEqual(2, strings.Count());
         }
 
-        [Test]
-        public void TestOfType()
-        {
-            dynamic test = new SimpleResultSet(new dynamic[] { "Hello", 1 });
-            IEnumerable<int> ints = test.OfType<int>();
-            Assert.AreEqual(1, ints.Count());
-            Assert.AreEqual(1, ints.Single());
-        }
+//        [Test]
+//        public void TestOfType()
+//        {
+//            dynamic test = new SimpleResultSet(new dynamic[] { "Hello", 1 });
+//            IEnumerable<int> ints = test.OfType<int>();
+//            Assert.AreEqual(1, ints.Count());
+//            Assert.AreEqual(1, ints.Single());
+//        }
 
         [Test]
         public void TestCastWithClass()

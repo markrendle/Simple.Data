@@ -1,0 +1,38 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Simple.Data.Ado/AdoAdapter.cs">
+    <Files>
+      <File FileName="Simple.Data/SimpleResultSet.cs" Line="52" Column="40" />
+      <File FileName="Simple.Data.UnitTest/AdapterFactoryTest.cs" Line="30" Column="38" />
+      <File FileName="Simple.Data/Composer.cs" Line="1" Column="1" />
+      <File FileName="Simple.Data.Ado/AdoAdapter.cs" Line="11" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Tests" expanded="True">
+            <Node name="Simple.Data.UnitTest" expanded="True">
+              <Node name="References" expanded="True" />
+            </Node>
+          </Node>
+          <Node name="Simple.Data" expanded="True" selected="True" />
+          <Node name="Simple.Data.Ado" expanded="True" />
+          <Node name="Simple.Data.SqlServer" expanded="True" />
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
+      <Pad Id="MonoDevelop.NUnit.TestPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

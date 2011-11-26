@@ -387,29 +387,12 @@
 
         public IEnumerable<T> Cast<T>()
         {
-            return Run().Select(item => (T) item);
+            return new CastEnumerable<T>(Run());
         }
 
         public IEnumerable<T> OfType<T>()
         {
-            foreach (var item in Run())
-            {
-                bool success = true;
-                T cast;
-                try
-                {
-                    cast = (T) (object) item;
-                }
-                catch (RuntimeBinderException)
-                {
-                    cast = default(T);
-                    success = false;
-                }
-                if (success)
-                {
-                    yield return cast;
-                }
-            }
+			return new OfTypeEnumerable<T>(Run());
         }
 
         public IList<dynamic> ToList()
