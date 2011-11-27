@@ -11,11 +11,13 @@ namespace Simple.Data.SqlServer
                                                                                         {"uniqueidentifier", SqlDbType.UniqueIdentifier},
                                                                                         {"date", SqlDbType.Date},
                                                                                         {"time", SqlDbType.Time},
-//                                                                                        {"datetime2", SqlDbType.DateTime2},
-//                                                                                        {
-//                                                                                            "datetimeoffset",
-//                                                                                            SqlDbType.DateTimeOffset
-//                                                                                            },
+#if(!MONO)
+                                                                                        {"datetime2", SqlDbType.DateTime2},
+                                                                                        {
+                                                                                            "datetimeoffset",
+                                                                                            SqlDbType.DateTimeOffset
+                                                                                        },
+#endif
                                                                                         {"tinyint", SqlDbType.TinyInt},
                                                                                         {"smallint", SqlDbType.SmallInt},
                                                                                         {"int", SqlDbType.Int},

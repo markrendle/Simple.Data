@@ -53,15 +53,25 @@ namespace Simple.Data
             }
         }
 
-        private static CompositionContainer CreateContainer()
+        static string GetThisAssemblyPath()
         {
-            var path = Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "").Replace("file://","//");
+            var path = Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "").Replace("file://", "//");
             path = Path.GetDirectoryName(path);
             if (path == null) throw new ArgumentException("Unrecognised file.");
+            if (!Path.IsPathRooted(path))
+            {
+                path = Path.DirectorySeparatorChar + path;
+            }
+            return path;
+        }
+
+        private static CompositionContainer CreateContainer()
+        {
+			var path = GetThisAssemblyPath ();
 
             var assemblyCatalog = new AssemblyCatalog(Assembly.GetExecutingAssembly());
 			var aggregateCatalog = new AggregateCatalog(assemblyCatalog);
-			foreach (string file in System.IO.Directory.GetFiles("/" + path, "Simple.Data.*.dll"))
+			foreach (string file in System.IO.Directory.GetFiles(path, "Simple.Data.*.dll"))
 			{
 				var catalog = new AssemblyCatalog(file);
 				aggregateCatalog.Catalogs.Add(catalog);

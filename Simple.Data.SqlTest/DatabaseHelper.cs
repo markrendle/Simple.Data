@@ -10,8 +10,12 @@ namespace Simple.Data.SqlTest
 {
     internal static class DatabaseHelper
     {
-		public static readonly string ConnectionString =
+        public static readonly string ConnectionString =
+#if(MONO)
 			"Data Source=10.37.129.4;Initial Catalog=SimpleTest;User ID=SimpleUser;Password=SimplePassword";
+#else
+            Properties.Settings.Default.ConnectionString;
+#endif
 		
         public static dynamic Open()
         {
