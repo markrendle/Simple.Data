@@ -60,8 +60,14 @@ namespace Simple.Data
             if (path == null) throw new ArgumentException("Unrecognised file.");
 
             var assemblyCatalog = new AssemblyCatalog(Assembly.GetExecutingAssembly());
-            var folderCatalog = new DirectoryCatalog(path, "Simple.Data.*.dll");
-            return new CompositionContainer(new AggregateCatalog(assemblyCatalog, folderCatalog));
+			var aggregateCatalog = new AggregateCatalog(assemblyCatalog);
+			foreach (string file in System.IO.Directory.GetFiles("/" + path, "Simple.Data.*.dll"))
+			{
+				var catalog = new AssemblyCatalog(file);
+				aggregateCatalog.Catalogs.Add(catalog);
+			}
+//            var folderCatalog = new DirectoryCatalog(path, "Simple.Data.*.dll");
+            return new CompositionContainer(aggregateCatalog);
         }
     }
 }
