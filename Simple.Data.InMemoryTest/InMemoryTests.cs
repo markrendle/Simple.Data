@@ -264,7 +264,7 @@
 
             var categories = db.Users.FindAll(db.User.Categories.Name == "Category 1").ToList();
             Assert.NotNull(categories);
-            Assert.AreEqual(1, categories.Count); 
+            Assert.AreEqual(1, categories.Count);
         }
 
         [Test]
@@ -282,7 +282,7 @@
 
             var categories = db.Users.FindAll(db.User.Categories.CategoryName == "Category 1").ToList();
             Assert.NotNull(categories);
-            Assert.AreEqual(1, categories.Count); 
+            Assert.AreEqual(1, categories.Count);
         }
 
         [Test]
@@ -318,6 +318,22 @@
 
             // Assert
             Assert.AreEqual(2, newId);
+        }
+
+        [Test]
+        public void ShouldBeAbleToSetAutoIncrementWhenSettingKeyColumn()
+        {
+            // Arrange
+            var adapter = new InMemoryAdapter();
+
+            // Act
+            adapter.SetKeyColumn("Users", "Id", true);
+
+            // Assert
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            var firstId = db.Users.Insert(Name: "Marcus").Id;
+            Assert.AreEqual(1, firstId);
         }
 
         private static int ThreadTestHelper(int userId)
