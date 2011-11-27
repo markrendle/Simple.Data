@@ -15,5 +15,13 @@ namespace Simple.Data.IntegrationTest
         {
             Assert.AreEqual(TraceLevel.Error, Database.TraceLevel);
         }
+
+        [Test]
+        public void TraceLevelShouldBeSettableFromCode()
+        {
+            Database.TraceLevel = TraceLevel.Off;
+            Assert.AreEqual(TraceLevel.Off, Database.TraceLevel);
+
+        }
     }
 }

@@ -1,0 +1,56 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release-Mono" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Simple.Data.SqlServer/DbTypeLookup.cs">
+    <Files>
+      <File FileName="Simple.Data.SqlTest/DatabaseHelper.cs" Line="13" Column="10" />
+      <File FileName="Simple.Data.SqlTest/ConversionTests.cs" Line="17" Column="1" />
+      <File FileName="Disassembly" />
+      <File FileName="Simple.Data.SqlServer/SqlSchemaProvider.cs" Line="75" Column="1" />
+      <File FileName="Simple.Data.Ado/Schema/DatabaseSchema.cs" Line="73" Column="52" />
+      <File FileName="Simple.Data.SqlTest/SchemaTests/DatabaseSchemaTests.cs" Line="73" Column="61" />
+      <File FileName="Simple.Data/MefHelper.cs" Line="53" Column="14" />
+      <File FileName="CommonAssemblyInfo.cs" Line="1" Column="1" />
+      <File FileName="Simple.Data.SqlServer/DbTypeLookup.cs" Line="13" Column="44" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Solution Items" expanded="True" />
+          <Node name="Tests" expanded="True">
+            <Node name="Simple.Data.SqlTest" selected="True" />
+          </Node>
+          <Node name="Simple.Data.SqlServer" expanded="True" />
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
+      <Pad Id="MonoDevelop.NUnit.TestPad">
+        <State expanded="True">
+          <Node name="Tests" expanded="True">
+            <Node name="Simple.Data.SqlTest" expanded="True" selected="True">
+              <Node name="Simple" expanded="True">
+                <Node name="Data" expanded="True">
+                  <Node name="SqlTest" expanded="True" />
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/Users/mark/Code/Simple.Data/Simple.Data.SqlServer/SqlSchemaProvider.cs" line="75" />
+      <Breakpoint file="/Users/mark/Code/Simple.Data/Simple.Data.SqlTest/FindTests.cs" line="22" />
+      <Breakpoint file="/Users/mark/Code/Simple.Data/Simple.Data.SqlTest/DatabaseHelper.cs" line="18" />
+      <Breakpoint file="/Users/mark/Code/Simple.Data/Simple.Data.SqlTest/DatabaseHelper.cs" line="23" />
+      <Breakpoint file="/Users/mark/Code/Simple.Data/Simple.Data.Ado/Schema/DatabaseSchema.cs" line="73" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

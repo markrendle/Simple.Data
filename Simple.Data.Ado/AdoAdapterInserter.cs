@@ -108,7 +108,7 @@ namespace Simple.Data.Ado
             {
                 using (var command = new CommandHelper(_adapter).CreateInsert(connection, sql, columns, values.ToArray()))
                 {
-                    connection.Open();
+                    connection.OpenIfClosed();
                     return TryExecuteSingletonQuery(command);
                 }
             }
@@ -131,7 +131,7 @@ namespace Simple.Data.Ado
             {
                 using (var command = new CommandHelper(_adapter).CreateInsert(connection, insertSql, columns, values.ToArray()))
                 {
-                    connection.Open();
+                    connection.OpenIfClosed();
                     TryExecute(command);
                     command.CommandText = selectSql;
                     command.Parameters.Clear();
@@ -174,7 +174,7 @@ namespace Simple.Data.Ado
             {
                 using (var command = new CommandHelper(_adapter).CreateInsert(connection, sql, columns, values.ToArray()))
                 {
-                    connection.Open();
+                    connection.OpenIfClosed();
                     return TryExecute(command);
                 }
             }

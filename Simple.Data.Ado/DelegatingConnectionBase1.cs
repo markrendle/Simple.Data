@@ -99,7 +99,7 @@ namespace Simple.Data.Ado
         /// <filterpriority>2</filterpriority>
         public virtual void Open()
         {
-            _delegatedConnection.Open();
+            _delegatedConnection.OpenIfClosed();
         }
 
         /// <summary>

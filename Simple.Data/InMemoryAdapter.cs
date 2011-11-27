@@ -15,7 +15,6 @@
             new Dictionary<string, List<IDictionary<string, object>>>();
 
         private readonly ICollection<Join> _joins = new Collection<Join>();
-        private readonly IDictionary<string, IList<string>> _keys = new Dictionary<string, IList<string>>();
 
         private List<IDictionary<string, object>> GetTable(string tableName)
         {
@@ -26,9 +25,9 @@
 
         public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
         {
-            if (!_keys.ContainsKey(tableName)) throw new InvalidOperationException("No key specified for In-Memory table.");
-            var keys = _keys[tableName];
-            if (keys.Count != keyValues.Length) throw new ArgumentException("Incorrect number of values for key.");
+            if (!_keyColumns.ContainsKey(tableName)) throw new InvalidOperationException("No key specified for In-Memory table.");
+            var keys = _keyColumns[tableName];
+            if (keys.Length != keyValues.Length) throw new ArgumentException("Incorrect number of values for key.");
             var expression = new ObjectReference(keys[0]) == keyValues[0];
             for (int i = 1; i < keyValues.Length; i++)
             {
@@ -150,18 +149,18 @@
         public override int Update(string tableName, IDictionary<string, object> data)
         {
             if (!_keyColumns.ContainsKey(tableName)) throw new InvalidOperationException("No key column(s) specified.");
-            IDictionary<string, object> row = null;
+            IDictionary<string, object> row;
             if (_keyColumns[tableName].Length == 1)
             {
                 row =
                     GetTable(tableName).Single(
-                        d => d[_keyColumns[tableName][0]] == data[_keyColumns[tableName][0]]);
+                        d => Equals(d[_keyColumns[tableName][0]], data[_keyColumns[tableName][0]]));
             }
             else
             {
                 IEnumerable<IDictionary<string, object>> rows = GetTable(tableName);
                 row = _keyColumns[tableName]
-                    .Aggregate(rows, (current, keyColumn) => current.Where(d => d[keyColumn] == data[keyColumn]))
+                    .Aggregate(rows, (current, keyColumn) => current.Where(d => Equals(d[keyColumn], data[keyColumn])))
                     .Single();
             }
             UpdateRecord(data, row);
@@ -201,6 +200,15 @@
             _keyColumns[tableName] = columnNames;
         }
 
+        /// <summary>
+        /// Set up an implicit join between two tables.
+        /// </summary>
+        /// <param name="masterTableName">The name of the 'master' table</param>
+        /// <param name="masterKey">The 'primary key'</param>
+        /// <param name="masterPropertyName">The name to give the lookup property in the detail objects</param>
+        /// <param name="detailTableName">The name of the 'master' table</param>
+        /// <param name="detailKey">The 'foreign key'</param>
+        /// <param name="detailPropertyName">The name to give the collection property in the master object</param>
         public void ConfigureJoin(string masterTableName, string masterKey, string masterPropertyName, string detailTableName, string detailKey, string detailPropertyName)
         {
             var join = new Join(masterTableName, masterKey, masterPropertyName, detailTableName, detailKey,

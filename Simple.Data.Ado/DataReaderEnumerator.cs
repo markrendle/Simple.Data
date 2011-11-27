@@ -11,6 +11,7 @@ namespace Simple.Data.Ado
 
     internal class DataReaderEnumerator : IEnumerator<IDictionary<string, object>>
     {
+        private readonly IDisposable _connectionDisposable;
         private readonly IDbConnection _connection;
         private IDictionary<string, int> _index;
         private readonly IDbCommand _command;
@@ -26,12 +27,13 @@ namespace Simple.Data.Ado
         {
             _command = command;
             _connection = connection;
+            _connectionDisposable = _connection.MaybeDisposable();
             _index = index;
         }
 
         public void Dispose()
         {
-            using (_connection)
+            using (_connectionDisposable)
             using (_command)
             using (_reader)
             {
@@ -52,8 +54,7 @@ namespace Simple.Data.Ado
         {
             try
             {
-                if (_connection.State == ConnectionState.Closed)
-                    _connection.Open();
+                _connection.OpenIfClosed();
                 _reader = _command.ExecuteReader();
                 if (_reader != null)
                 {

@@ -71,7 +71,7 @@ namespace Simple.Data.Ado
         public IEnumerable<ResultSet> ExecuteReader(IDbCommand command)
         {
             command.WriteTrace();
-            command.Connection.Open();
+            command.Connection.OpenIfClosed();
             using (var reader = command.ExecuteReader())
             {
                 // Reader isn't always returned - added check to stop NullReferenceException
@@ -90,7 +90,7 @@ namespace Simple.Data.Ado
         {
             command.WriteTrace();
             Trace.TraceInformation("ExecuteNonQuery", "Simple.Data.SqlTest");
-            command.Connection.Open();
+            command.Connection.OpenIfClosed();
             command.ExecuteNonQuery();
             return Enumerable.Empty<ResultSet>();
         }

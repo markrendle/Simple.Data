@@ -13,9 +13,10 @@ namespace Simple.Data.SqlTest.SchemaTests
     [TestFixture]
     public class DatabaseSchemaTests : DatabaseSchemaTestsBase
     {
+		
         protected override Database GetDatabase()
         {
-            return Database.OpenConnection(Properties.Settings.Default.ConnectionString);
+            return Database.OpenConnection(DatabaseHelper.ConnectionString);
         }
 
         [Test]
@@ -69,7 +70,7 @@ namespace Simple.Data.SqlTest.SchemaTests
             dynamic db = GetDatabase();
             db.Users.FindById(1); // Forces population of schema...
 
-            using (var cn = new SqlConnection(Properties.Settings.Default.ConnectionString))
+            using (var cn = new SqlConnection(DatabaseHelper.ConnectionString))
             using (var cmd = cn.CreateCommand())
             {
                 cn.Open();

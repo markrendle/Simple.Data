@@ -19,6 +19,7 @@ namespace Simple.Data
         }
 
         private readonly ConcurrentDictionary<string, Adapter> _cache = new ConcurrentDictionary<string, Adapter>();
+
         public override Adapter Create(string adapterName, IEnumerable<KeyValuePair<string, object>> settings)
         {
             List<KeyValuePair<string, object>> mat;
@@ -34,7 +35,10 @@ namespace Simple.Data
                 hash = HashSettings(adapterName, mat);
             }
             
-            return _cache.GetOrAdd(hash, _ => DoCreate(adapterName, mat));
+            var adapter = _cache.GetOrAdd(hash, _ => DoCreate(adapterName, mat));
+            var cloneable = adapter as ICloneable;
+            if (cloneable != null) return (Adapter)cloneable.Clone();
+            return adapter;
         }
 
         private static string HashSettings(string adapterName, IEnumerable<KeyValuePair<string, object>> settings)
