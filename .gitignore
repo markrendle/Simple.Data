@@ -23,3 +23,4 @@ NDependOut
 Simple.Data.sln.DotSettings.user
 Simple.Data/Simple.Data.idc
 .DS_Store
+mono-release-*
