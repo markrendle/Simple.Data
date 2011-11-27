@@ -76,7 +76,6 @@ namespace Simple.Data
 				var catalog = new AssemblyCatalog(file);
 				aggregateCatalog.Catalogs.Add(catalog);
 			}
-//            var folderCatalog = new DirectoryCatalog(path, "Simple.Data.*.dll");
             return new CompositionContainer(aggregateCatalog);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Entity.Design.PluralizationServices;
 using NUnit.Framework;
 using Simple.Data.Ado;
 using Simple.Data.Mocking.Ado;
@@ -65,6 +66,43 @@ namespace Simple.Data.IntegrationTest
             GeneratedSqlIs("select [dbo].[Customers].[CustomerId] from [dbo].[Customers]");
         }
 
+#if(!MONO)
+        [Test]
+        public void CompaniesPluralizationIsResolved()
+        {
+            Database.SetPluralizer(new EntityPluralizer());
+            _db.Companies.All().ToList();
+            GeneratedSqlIs("select [dbo].[Company].[Id] from [dbo].[Company]");
+        }
+
+        class EntityPluralizer : IPluralizer
+        {
+            private readonly PluralizationService _pluralizationService =
+                PluralizationService.CreateService(CultureInfo.CurrentCulture);
+
+            public bool IsPlural(string word)
+            {
+                return _pluralizationService.IsPlural(word);
+            }
+
+            public bool IsSingular(string word)
+            {
+                return _pluralizationService.IsSingular(word);
+            }
+
+            public string Pluralize(string word)
+            {
+                bool upper = (word.IsAllUpperCase());
+                word = _pluralizationService.Pluralize(word);
+                return upper ? word.ToUpper(_pluralizationService.Culture) : word;
+            }
+
+            public string Singularize(string word)
+            {
+                return _pluralizationService.Singularize(word);
+            }
+        }
+#endif
     }
 
     [TestFixture]
