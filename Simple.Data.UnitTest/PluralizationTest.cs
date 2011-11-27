@@ -1,5 +1,7 @@
-﻿namespace Simple.Data.UnitTest
+﻿#if(!MONO)
+namespace Simple.Data.UnitTest
 {
+    using System.Data.Entity.Design.PluralizationServices;
     using System.Globalization;
     using Extensions;
     using NUnit.Framework;
@@ -62,9 +64,9 @@
         ///A test for Pluralize
         ///</summary>
         [Test()]
-// ReSharper disable InconsistentNaming
+        // ReSharper disable InconsistentNaming
         public void PluralizeUSERShouldReturnUSERS()
-// ReSharper restore InconsistentNaming
+        // ReSharper restore InconsistentNaming
         {
             Assert.AreEqual("USERS", "USER".Pluralize());
         }
@@ -91,9 +93,9 @@
         ///A test for Singularize
         ///</summary>
         [Test()]
-// ReSharper disable InconsistentNaming
+        // ReSharper disable InconsistentNaming
         public void SingularizeUSERSShouldReturnUSER()
-// ReSharper restore InconsistentNaming
+        // ReSharper restore InconsistentNaming
         {
             Assert.AreEqual("USER", "USERS".Singularize());
         }
@@ -110,4 +112,33 @@
             Assert.AreEqual("Company", "Companies".Singularize());
         }
     }
+
+    class EntityPluralizer : IPluralizer
+    {
+        private readonly PluralizationService _pluralizationService =
+            PluralizationService.CreateService(CultureInfo.CurrentCulture);
+
+        public bool IsPlural(string word)
+        {
+            return _pluralizationService.IsPlural(word);
+        }
+
+        public bool IsSingular(string word)
+        {
+            return _pluralizationService.IsSingular(word);
+        }
+
+        public string Pluralize(string word)
+        {
+            bool upper = (word.IsAllUpperCase());
+            word = _pluralizationService.Pluralize(word);
+            return upper ? word.ToUpper(_pluralizationService.Culture) : word;
+        }
+
+        public string Singularize(string word)
+        {
+            return _pluralizationService.Singularize(word);
+        }
+    }
 }
+#endif

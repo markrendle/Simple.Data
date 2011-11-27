@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -47,6 +47,7 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Entity.Design" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Trespasser">
@@ -84,6 +85,7 @@
     <Compile Include="DynamicTableTest.cs" />
     <Compile Include="ExpressionHelperTest.cs" />
     <Compile Include="GroupingHandlerTest.cs" />
+    <Compile Include="PluralizationTest.cs" />
     <Compile Include="PromiseTest.cs" />
     <Compile Include="ListHelper.cs" />
     <Compile Include="MathReferenceTest.cs" />
