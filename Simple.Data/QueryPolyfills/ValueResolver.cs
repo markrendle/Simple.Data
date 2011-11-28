@@ -17,6 +17,7 @@ namespace Simple.Data.QueryPolyfills
                 if (FunctionHandlers.Exists(functionReference.Name)) return new AggregateValueResolver(functionReference);
                 return new FunctionValueResolver(functionReference);
             }
+
             throw new InvalidOperationException("Unresolvable Reference type.");
         }
 

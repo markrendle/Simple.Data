@@ -15,12 +15,15 @@ namespace Simple.Data.QueryPolyfills
         public SelectClauseHandler(SelectClause clause)
         {
             _references = clause.Columns.ToList();
-            _resolvers = _references.Select(ValueResolver.Create).ToList();
-            if (_resolvers.OfType<AggregateValueResolver>().Any())
+            if (!(_references.Count == 1 && _references[0] is SpecialReference))
             {
-                _groupingHandler =
-                    new GroupingHandler(
-                        _references.Where(ReferenceIsNotAggregateFunction).Select(r => r.GetAliasOrName()).ToArray());
+                _resolvers = _references.Select(ValueResolver.Create).ToList();
+                if (_resolvers.OfType<AggregateValueResolver>().Any())
+                {
+                    _groupingHandler =
+                        new GroupingHandler(
+                            _references.Where(ReferenceIsNotAggregateFunction).Select(r => r.GetAliasOrName()).ToArray());
+                }
             }
         }
 
@@ -31,10 +34,24 @@ namespace Simple.Data.QueryPolyfills
                 var groupedSource = _groupingHandler.Group(source);
                 return groupedSource.Select(Run);
             }
-            else
+
+            if (_references.Count == 1)
             {
-                return source.Select(Run);
+                if (_references[0] is CountSpecialReference)
+                {
+                    return new[] {new Dictionary<string, object> {{"", source.Count()}}};
+                }
+
+                if (_references[0] is ExistsSpecialReference)
+                {
+                    if (source.Any())
+                    {
+                        return new[] {new Dictionary<string, object> {{"", 1}}};
+                    }
+                    return Enumerable.Empty<IDictionary<string, object>>();
+                }
             }
+            return source.Select(Run);
         }
 
         public IDictionary<string, object> Run(IGrouping<IDictionary<string, object>, IDictionary<string, object>> grouping)

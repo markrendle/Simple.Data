@@ -350,6 +350,38 @@
             Assert.AreEqual(2, newId);
         }
 
+        [Test]
+        public void SelectCountShouldReturnCount()
+        {
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            db.Test.Insert(Id: 1, Name: "Alice");
+            db.Test.Insert(Id: 2, Name: "Bob");
+
+            var count = db.Test.All().Count();
+            Assert.AreEqual(2, count);
+        }
+
+        [Test]
+        public void SelectExistsShouldReturnTrueForAnyRows()
+        {
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            db.Test.Insert(Id: 1, Name: "Alice");
+            db.Test.Insert(Id: 2, Name: "Bob");
+
+            Assert.IsTrue(db.Test.All().Exists());
+        }
+
+        [Test]
+        public void SelectExistsShouldReturnFalseForNoRows()
+        {
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+
+            Assert.IsFalse(db.Test.All().Exists());
+        }
+
         private static int ThreadTestHelper(int userId)
         {
             var mockAdapter = new InMemoryAdapter();
