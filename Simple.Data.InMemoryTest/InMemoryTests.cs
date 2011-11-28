@@ -382,6 +382,54 @@
             Assert.IsFalse(db.Test.All().Exists());
         }
 
+        [Test]
+        public void ShouldBeAbleToUseCountOnTable()
+        {
+            // Arrange
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            db.Users.Insert(Id: 1, Name: "Bob", Age: 30);
+            db.Users.Insert(Id: 2, Name: "Alice", Age: 18);
+            db.Users.Insert(Id: 3, Name: "Maria", Age: 12);
+            db.Users.Insert(Id: 4, Name: "John", Age: 8);
+
+            // Act
+            var adults = db.Users.GetCount(db.Users.Age >= 18);
+
+            // Assert
+            Assert.AreEqual(2, adults);
+        }
+
+        [Test]
+        public void ExistsByNameShouldReturnTrueForExistingData()
+        {
+            // Arrange
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            db.Users.Insert(Id: 1, Name: "Bob", Age: 30);
+
+            // Act
+            var bobExists = db.Users.ExistsByName("Bob");
+
+            // Assert
+            Assert.AreEqual(true, bobExists);
+        }
+
+        [Test]
+        public void ExistsByNameShouldReturnFalseForNonExistingData()
+        {
+            // Arrange
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            db.Users.Insert(Id: 1, Name: "Alice", Age: 30);
+
+            // Act
+            var bobExists = db.Users.ExistsByName("Bob");
+
+            // Assert
+            Assert.AreEqual(false, bobExists);
+        }
+
         private static int ThreadTestHelper(int userId)
         {
             var mockAdapter = new InMemoryAdapter();
