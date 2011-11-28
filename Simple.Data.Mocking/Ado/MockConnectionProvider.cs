@@ -10,11 +10,13 @@ namespace Simple.Data.Mocking.Ado
     {
         private readonly DbConnection _connection;
         private readonly MockSchemaProvider _mockSchemaProvider;
+        private string _identityFunction;
 
-        public MockConnectionProvider(DbConnection connection, MockSchemaProvider mockSchemaProvider)
+        public MockConnectionProvider(DbConnection connection, MockSchemaProvider mockSchemaProvider, string identityFunction = null)
         {
             _connection = connection;
             _mockSchemaProvider = mockSchemaProvider;
+            _identityFunction = identityFunction;
         }
 
         public void SetConnectionString(string connectionString)
@@ -39,7 +41,12 @@ namespace Simple.Data.Mocking.Ado
 
         public string GetIdentityFunction()
         {
-            return null;
+            return _identityFunction;
+        }
+
+        public void SetIdentityFunction(string identityFunction)
+        {
+            _identityFunction = identityFunction;
         }
 
         public bool TryGetNewRowSelect(Table table, out string selectSql)

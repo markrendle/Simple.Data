@@ -36,27 +36,36 @@ namespace Simple.Data.Commands
 
         private static object DoInsert(InvokeMemberBinder binder, object[] args, DataStrategy dataStrategy, string tableName)
         {
-            return binder.HasSingleUnnamedArgument()
-                ?
-                InsertEntity(args[0], dataStrategy, tableName)
-                :
-                InsertDictionary(binder, args, dataStrategy, tableName);
+            if (binder.HasSingleUnnamedArgument())
+            {
+                return InsertEntity(args[0], dataStrategy, tableName, (r,e) => false, !binder.IsResultDiscarded());
+            }
+
+            if (args.Length == 2)
+            {
+                var onError = args[1] as Func<dynamic, Exception, bool>;
+                if (onError != null)
+                {
+                    return InsertEntity(args[0], dataStrategy, tableName, onError, !binder.IsResultDiscarded());
+                }
+            }
+            return InsertDictionary(binder, args, dataStrategy, tableName);
         }
 
         private static object InsertDictionary(InvokeMemberBinder binder, object[] args, DataStrategy dataStrategy, string tableName)
         {
-            return dataStrategy.Insert(tableName, binder.NamedArgumentsToDictionary(args));
+            return dataStrategy.Insert(tableName, binder.NamedArgumentsToDictionary(args), !binder.IsResultDiscarded());
         }
 
-        private static object InsertEntity(object entity, DataStrategy dataStrategy, string tableName)
+        private static object InsertEntity(object entity, DataStrategy dataStrategy, string tableName, Func<dynamic,Exception,bool> onError, bool resultRequired)
         {
             var dictionary = entity as IDictionary<string, object>;
             if (dictionary != null)
-                return dataStrategy.Insert(tableName, dictionary);
+                return dataStrategy.Insert(tableName, dictionary, resultRequired);
 
             var list = entity as IEnumerable<IDictionary<string, object>>;
             if (list != null)
-                return dataStrategy.Insert(tableName, list);
+                return dataStrategy.Insert(tableName, list, onError, resultRequired);
 
             var entityList = entity as IEnumerable;
             if (entityList != null)
@@ -73,13 +82,13 @@ namespace Simple.Data.Commands
                     rows.Add(dictionary);
                 }
 
-                return dataStrategy.Insert(tableName, rows);
+                return dataStrategy.Insert(tableName, rows, onError, resultRequired);
             }
 
             dictionary = entity.ObjectToDictionary();
             if (dictionary.Count == 0)
                 throw new SimpleDataException("Could not discover data in object.");
-            return dataStrategy.Insert(tableName, dictionary);
+            return dataStrategy.Insert(tableName, dictionary, resultRequired);
         }
     }
 }

@@ -88,7 +88,7 @@
         ///  </summary><param name="tableName">Name of the table.</param>
         /// <param name="data">The values to insert.</param>
         /// <returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
-        public abstract IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data);
+        public abstract IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, bool resultRequired);
 
         /// <summary>
         /// Updates the specified "table" according to specified criteria.
@@ -141,15 +141,35 @@
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
         /// <param name="dataList">The data.</param>
+        /// <param name="onError">A Func to call when there is an error. It this func returns true, carry on, otherwise abort.</param>
         /// <returns>If possible, return the newly inserted rows, including any automatically-set values such as primary keys or timestamps.</returns>
         /// <remarks>This method has a default implementation based on the <see cref="Insert(string,IDictionary{string, object})"/> method.
         /// You should override this method if your adapter can optimize the operation.</remarks>
         public virtual IEnumerable<IDictionary<string, object>> InsertMany(string tableName,
-                                                                           IEnumerable<IDictionary<string, object>> dataList)
+                                                                           IEnumerable<IDictionary<string, object>> dataList,
+                                                                           Func<IDictionary<string, object>, Exception, bool> onError,
+            bool resultRequired)
         {
             foreach (var row in dataList)
             {
-                yield return Insert(tableName, row);
+                IDictionary<string, object> inserted;
+                try
+                {
+                    inserted = Insert(tableName, row, resultRequired);
+                }
+                catch (Exception ex)
+                {
+                    if (onError != null)
+                    {
+                        if (onError(row, ex))
+                        {
+                            continue;
+                        }
+                        break;
+                    }
+                    throw;
+                }
+                yield return inserted;
             }
         }
 

@@ -25,7 +25,7 @@ namespace Simple.Data.Ado
             _transaction = transaction;
         }
 
-        public IEnumerable<IDictionary<string, object>> InsertMany(string tableName, IEnumerable<IDictionary<string,object>> data)
+        public IEnumerable<IDictionary<string, object>> InsertMany(string tableName, IEnumerable<IDictionary<string, object>> data, Func<IDictionary<string,object>, Exception, bool> onError, bool resultRequired)
         {
             if (data == null) throw new ArgumentNullException("data");
             var list = data.ToList();
@@ -36,10 +36,10 @@ namespace Simple.Data.Ado
             }
 
             var bulkInserter = _adapter.ProviderHelper.GetCustomProvider<IBulkInserter>(_adapter.ConnectionProvider) ?? new BulkInserter();
-            return bulkInserter.Insert(_adapter, tableName, list, _transaction);
+            return bulkInserter.Insert(_adapter, tableName, list, _transaction, onError, resultRequired);
         }
 
-        public IDictionary<string, object> Insert(string tableName, IEnumerable<KeyValuePair<string, object>> data)
+        public IDictionary<string, object> Insert(string tableName, IEnumerable<KeyValuePair<string, object>> data, bool resultRequired)
         {
             var table = _adapter.GetSchema().FindTable(tableName);
 
@@ -59,23 +59,27 @@ namespace Simple.Data.Ado
 
             string insertSql = "insert into " + table.QualifiedName + " (" + columnList + ") values (" + valueList + ")";
 
-            var identityFunction = _adapter.GetIdentityFunction();
-            if (!string.IsNullOrWhiteSpace(identityFunction))
+            if (resultRequired)
             {
-                var identityColumn = table.Columns.FirstOrDefault(col => col.IsIdentity);
-
-                if (identityColumn != null)
+                var identityFunction = _adapter.GetIdentityFunction();
+                if (!string.IsNullOrWhiteSpace(identityFunction))
                 {
-                    var selectSql = "select * from " + table.QualifiedName + " where " + identityColumn.QuotedName +
-                                     " = " + identityFunction;
-                    if (_adapter.ProviderSupportsCompoundStatements)
+                    var identityColumn = table.Columns.FirstOrDefault(col => col.IsIdentity);
+
+                    if (identityColumn != null)
                     {
-                        insertSql += "; " + selectSql;
-                        return ExecuteSingletonQuery(insertSql, dataDictionary.Keys, dataDictionary.Values);
-                    }
-                    else
-                    {
-                        return ExecuteSingletonQuery(insertSql, selectSql, dataDictionary.Keys, dataDictionary.Values);
+                        var selectSql = "select * from " + table.QualifiedName + " where " + identityColumn.QuotedName +
+                                        " = " + identityFunction;
+                        if (_adapter.ProviderSupportsCompoundStatements)
+                        {
+                            insertSql += "; " + selectSql;
+                            return ExecuteSingletonQuery(insertSql, dataDictionary.Keys, dataDictionary.Values);
+                        }
+                        else
+                        {
+                            return ExecuteSingletonQuery(insertSql, selectSql, dataDictionary.Keys,
+                                                         dataDictionary.Values);
+                        }
                     }
                 }
             }

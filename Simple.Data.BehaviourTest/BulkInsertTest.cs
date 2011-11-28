@@ -35,6 +35,32 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestBulkInsertWithStaticTypeObjectAndIdentityColumnAndIdentityFunctionThatExpectsAValueSelects()
+        {
+            _MockConnectionProvider.SetIdentityFunction("@@IDENTITY");
+            var users = new[] { new User { Name = "Steve", Age = 50 },  new User { Name = "Phil", Age = 42 }};
+            var inserted = _db.Users.Insert(users);
+            GeneratedSqlIs("insert into [dbo].[Users] ([Name],[Password],[Age]) values (@p0,@p1,@p2); select * from [dbo].[users] where [id] = @@identity");
+            Parameter(0).Is("Phil");
+            Parameter(1).Is(DBNull.Value);
+            Parameter(2).Is(42);
+            _MockConnectionProvider.SetIdentityFunction(null);
+        }
+
+        [Test]
+        public void TestBulkInsertWithStaticTypeObjectAndIdentityColumnAndIdentityFunctionThatDoesNotExpectAValueDoesNotSelect()
+        {
+            _MockConnectionProvider.SetIdentityFunction("@@IDENTITY");
+            var users = new[] { new User { Name = "Steve", Age = 50 },  new User { Name = "Phil", Age = 42 }};
+            _db.Users.Insert(users);
+            GeneratedSqlIs("insert into [dbo].[Users] ([Name],[Password],[Age]) values (@p0,@p1,@p2)");
+            Parameter(0).Is("Phil");
+            Parameter(1).Is(DBNull.Value);
+            Parameter(2).Is(42);
+            _MockConnectionProvider.SetIdentityFunction(null);
+        }
+
+        [Test]
         public void TestBulkInsertWithDynamicObjectAndIdentityColumn()
         {
             dynamic steve = new ExpandoObject();

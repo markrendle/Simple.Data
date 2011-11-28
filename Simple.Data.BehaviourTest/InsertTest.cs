@@ -28,6 +28,28 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestInsertWithNamedArgumentsAndIdentityFunctionSelects()
+        {
+            _MockConnectionProvider.SetIdentityFunction("@@IDENTITY");
+            var u = _db.Users.Insert(Name: "Steve", Age: 50);
+            GeneratedSqlIs("insert into [dbo].[Users] ([Name],[Age]) values (@p0,@p1); select * from [dbo].[users] where [id] = @@identity");
+            Parameter(0).Is("Steve");
+            Parameter(1).Is(50);
+            _MockConnectionProvider.SetIdentityFunction(null);
+        }
+
+        [Test]
+        public void TestInsertWithNamedArgumentsAndIdentityFunctionThatExpectsNoReturnValueDoesNotSelect()
+        {
+            _MockConnectionProvider.SetIdentityFunction("@@IDENTITY");
+            _db.Users.Insert(Name: "Steve", Age: 50);
+            GeneratedSqlIs("insert into [dbo].[Users] ([Name],[Age]) values (@p0,@p1)");
+            Parameter(0).Is("Steve");
+            Parameter(1).Is(50);
+            _MockConnectionProvider.SetIdentityFunction(null);
+        }
+
+        [Test]
         public void TestInsertWithStaticTypeObject()
         {
             var user = new User { Name = "Steve", Age = 50 };

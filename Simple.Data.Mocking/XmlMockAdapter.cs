@@ -48,7 +48,7 @@ namespace Simple.Data.Mocking
             return Find(query.TableName, criteria);
         }
 
-        public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
+        public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, bool resultRequired)
         {
             var tableElement = GetTableElement(tableName);
             if (tableElement == null)

@@ -23,7 +23,7 @@ namespace Simple.Data.Ado
             _columns = columns;
         }
 
-        public virtual void InsertRowsWithoutFetchBack(string insertSql)
+        public virtual void InsertRowsWithoutFetchBack(string insertSql, Func<IDictionary<string, object>, Exception, bool> onError)
         {
             var connection = Adapter.CreateConnection();
             using (connection.MaybeDisposable())
@@ -35,13 +35,13 @@ namespace Simple.Data.Ado
                     insertCommand.Prepare();
                     foreach (var row in Data)
                     {
-                        InsertRow(row, insertCommand);
+                        InsertRow(row, insertCommand, onError);
                     }
                 }
             }
         }
 
-        public virtual IEnumerable<IDictionary<string, object>> InsertRowsWithSeparateStatements(string insertSql, string selectSql)
+        public virtual IEnumerable<IDictionary<string, object>> InsertRowsWithSeparateStatements(string insertSql, string selectSql, Func<IDictionary<string, object>, Exception, bool> onError)
         {
             var connection = Adapter.CreateConnection();
             using (connection.MaybeDisposable())
@@ -52,12 +52,12 @@ namespace Simple.Data.Ado
                     selectCommand.CommandText = selectSql;
                     connection.OpenIfClosed();
                     TryPrepare(insertCommand, selectCommand);
-                    return Data.Select(row => InsertRow(row, insertCommand, selectCommand)).ToList();
+                    return Data.Select(row => InsertRow(row, insertCommand, selectCommand, onError)).Where(r => r != null).ToList();
                 }
             }
         }
 
-        public virtual IEnumerable<IDictionary<string, object>> InsertRowsWithCompoundStatement(string insertSql, string selectSql)
+        public virtual IEnumerable<IDictionary<string, object>> InsertRowsWithCompoundStatement(string insertSql, string selectSql, Func<IDictionary<string, object>, Exception, bool> onError)
         {
             insertSql += "; " + selectSql;
 
@@ -68,12 +68,12 @@ namespace Simple.Data.Ado
                 {
                     connection.OpenIfClosed();
                     TryPrepare(command);
-                    return Data.Select(row => InsertRowAndSelect(row, command)).ToList();
+                    return Data.Select(row => InsertRowAndSelect(row, command, onError)).Where(r => r != null).ToList();
                 }
             }
         }
 
-        protected IDictionary<string, object> InsertRowAndSelect(IDictionary<string, object> row, IDbCommand command)
+        protected IDictionary<string, object> InsertRowAndSelect(IDictionary<string, object> row, IDbCommand command, Func<IDictionary<string,object>, Exception, bool> onError)
         {
             var values = new object[command.Parameters.Count];
             foreach (var kvp in row)
@@ -86,11 +86,19 @@ namespace Simple.Data.Ado
             }
 
             CommandHelper.SetParameterValues(command, values);
-            var insertedRow = TryExecuteSingletonQuery(command);
-            return insertedRow;
+            try
+            {
+                var insertedRow = TryExecuteSingletonQuery(command);
+                return insertedRow;
+            }
+            catch (Exception ex)
+            {
+                if (onError(row, ex)) return null;
+                throw;
+            }
         }
 
-        protected int InsertRow(IDictionary<string, object> row, IDbCommand command)
+        protected int InsertRow(IDictionary<string, object> row, IDbCommand command, Func<IDictionary<string, object>, Exception, bool> onError)
         {
             var values = new object[command.Parameters.Count];
             foreach (var kvp in row)
@@ -103,10 +111,18 @@ namespace Simple.Data.Ado
             }
 
             CommandHelper.SetParameterValues(command, values);
-            return TryExecute(command);
+            try
+            {
+                return TryExecute(command);
+            }
+            catch (Exception ex)
+            {
+                if (onError(row, ex)) return 0;
+                throw;
+            }
         }
 
-        protected IDictionary<string, object> InsertRow(IDictionary<string, object> row, IDbCommand insertCommand, IDbCommand selectCommand)
+        protected IDictionary<string, object> InsertRow(IDictionary<string, object> row, IDbCommand insertCommand, IDbCommand selectCommand, Func<IDictionary<string, object>, Exception, bool> onError)
         {
             var values = new object[insertCommand.Parameters.Count];
             foreach (var kvp in row)
@@ -119,8 +135,16 @@ namespace Simple.Data.Ado
             }
 
             CommandHelper.SetParameterValues(insertCommand, values);
-            if (TryExecute(insertCommand) == 1)
-                return TryExecuteSingletonQuery(selectCommand);
+            try
+            {
+                if (TryExecute(insertCommand) == 1)
+                    return TryExecuteSingletonQuery(selectCommand);
+            }
+            catch (Exception ex)
+            {
+                if (onError(row, ex)) return null;
+                throw;
+            }
             return null;
         }
 

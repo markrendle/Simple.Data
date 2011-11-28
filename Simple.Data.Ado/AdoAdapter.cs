@@ -110,10 +110,11 @@ namespace Simple.Data.Ado
 
         public IEnumerable<IDictionary<string, object>> InsertMany(string tableName,
                                                                    IEnumerable<IDictionary<string, object>> data,
-                                                                   IAdapterTransaction transaction)
+                                                                   IAdapterTransaction transaction,
+                                                                   Func<IDictionary<string,object>,Exception,bool> onError, bool resultRequired)
         {
             return new AdoAdapterInserter(this, ((AdoAdapterTransaction) transaction).Transaction).InsertMany(
-                tableName, data);
+                tableName, data, onError, resultRequired);
         }
 
         public int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data,
@@ -176,10 +177,10 @@ namespace Simple.Data.Ado
         }
 
         public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data,
-                                                  IAdapterTransaction transaction)
+                                                  IAdapterTransaction transaction, bool resultRequired)
         {
             return new AdoAdapterInserter(this, ((AdoAdapterTransaction) transaction).Transaction).Insert(tableName,
-                                                                                                          data);
+                                                                                                          data, resultRequired);
         }
 
         public int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria,
@@ -452,16 +453,16 @@ namespace Simple.Data.Ado
                 .ToObservable(connection, this);
         }
 
-        public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
+        public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, bool resultRequired)
         {
-            return new AdoAdapterInserter(this).Insert(tableName, data);
+            return new AdoAdapterInserter(this).Insert(tableName, data, resultRequired);
         }
 
         public override IEnumerable<IDictionary<string, object>> InsertMany(string tableName,
                                                                             IEnumerable<IDictionary<string, object>>
-                                                                                data)
+                                                                                data, Func<IDictionary<string,object>, Exception, bool> onError, bool resultRequired)
         {
-            return new AdoAdapterInserter(this).InsertMany(tableName, data);
+            return new AdoAdapterInserter(this).InsertMany(tableName, data, onError, resultRequired);
         }
 
         public override int Update(string tableName, IDictionary<string, object> data)

@@ -24,7 +24,7 @@ namespace Simple.Data
         /// <param name="tableName">Name of the table.</param><param name="data">The values to insert.</param>
         /// <param name="transaction">The transaction with which the operation is associated.</param>
         /// <returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
-        IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, IAdapterTransaction transaction);
+        IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, IAdapterTransaction transaction, bool resultRequired);
 
         /// <summary>
         ///  Inserts many records into the specified "table".
@@ -33,7 +33,7 @@ namespace Simple.Data
         /// <param name="data">The list of records to insert.</param>
         /// <param name="transaction">The transaction with which the operation is associated.</param>
         /// <returns>If possible, return the newly inserted rows, including any automatically-set values such as primary keys or timestamps.</returns>
-        IEnumerable<IDictionary<string, object>> InsertMany(string tableName, IEnumerable<IDictionary<string, object>> data, IAdapterTransaction transaction);
+        IEnumerable<IDictionary<string, object>> InsertMany(string tableName, IEnumerable<IDictionary<string, object>> data, IAdapterTransaction transaction, Func<IDictionary<string,object>,Exception,bool> onError, bool resultRequired);
 
         /// <summary>
         ///  Updates the specified "table" according to specified criteria.

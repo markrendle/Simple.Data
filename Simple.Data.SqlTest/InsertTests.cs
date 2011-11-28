@@ -8,6 +8,8 @@ using Simple.Data.SqlTest.Resources;
 
 namespace Simple.Data.SqlTest
 {
+    using System.Collections;
+
     [TestFixture]
     public class InsertTests
     {
@@ -107,6 +109,91 @@ namespace Simple.Data.SqlTest
 
             IList<dynamic> actuals = db.Users.Insert(users).ToList();
 
+            Assert.AreEqual(2, actuals.Count);
+            Assert.AreNotEqual(0, actuals[0].Id);
+            Assert.AreEqual("Slartibartfast", actuals[0].Name);
+            Assert.AreEqual("bistromathics", actuals[0].Password);
+            Assert.AreEqual(777, actuals[0].Age);
+
+            Assert.AreNotEqual(0, actuals[1].Id);
+            Assert.AreEqual("Wowbagger", actuals[1].Name);
+            Assert.AreEqual("teatime", actuals[1].Password);
+            Assert.AreEqual(int.MaxValue, actuals[1].Age);
+        }
+
+        [Test]
+        public void TestMultiInsertWithErrorCallback()
+        {
+            var db = DatabaseHelper.Open();
+
+            dynamic user1 = new ExpandoObject();
+            user1.Name = "Slartibartfast";
+            user1.Password = "bistromathics";
+            user1.Age = 777;
+
+            dynamic user2 = new ExpandoObject();
+            user2.Name = null;
+            user2.Password = null;
+            user2.Age = null;
+
+            dynamic user3 = new ExpandoObject();
+            user3.Name = "Wowbagger";
+            user3.Password = "teatime";
+            user3.Age = int.MaxValue;
+
+            var users = new[] { user1, user2, user3 };
+            bool passed = false;
+
+            Func<dynamic, Exception, bool> onError = (o, exception) => passed = true;
+
+            IList<dynamic> actuals = db.Users.Insert(users,onError).ToList();
+
+            Assert.IsTrue(passed, "Callback was not called.");
+            Assert.AreEqual(2, actuals.Count);
+            Assert.AreNotEqual(0, actuals[0].Id);
+            Assert.AreEqual("Slartibartfast", actuals[0].Name);
+            Assert.AreEqual("bistromathics", actuals[0].Password);
+            Assert.AreEqual(777, actuals[0].Age);
+
+            Assert.AreNotEqual(0, actuals[1].Id);
+            Assert.AreEqual("Wowbagger", actuals[1].Name);
+            Assert.AreEqual("teatime", actuals[1].Password);
+            Assert.AreEqual(int.MaxValue, actuals[1].Age);
+        }
+
+        [Test]
+        public void TestTransactionMultiInsertWithErrorCallback()
+        {
+            var db = DatabaseHelper.Open();
+            IList<dynamic> actuals;
+            bool passed = false;
+            using (var tx = db.BeginTransaction())
+            {
+                dynamic user1 = new ExpandoObject();
+                user1.Name = "Slartibartfast";
+                user1.Password = "bistromathics";
+                user1.Age = 777;
+
+                dynamic user2 = new ExpandoObject();
+                user2.Name = null;
+                user2.Password = null;
+                user2.Age = null;
+
+                dynamic user3 = new ExpandoObject();
+                user3.Name = "Wowbagger";
+                user3.Password = "teatime";
+                user3.Age = int.MaxValue;
+
+                var users = new[] {user1, user2, user3};
+
+                Func<dynamic, Exception, bool> onError = (o, exception) => passed = true;
+
+                actuals = db.Users.Insert(users, onError).ToList();
+
+                tx.Commit();
+            }
+
+            Assert.IsTrue(passed, "Callback was not called.");
             Assert.AreEqual(2, actuals.Count);
             Assert.AreNotEqual(0, actuals[0].Id);
             Assert.AreEqual("Slartibartfast", actuals[0].Name);

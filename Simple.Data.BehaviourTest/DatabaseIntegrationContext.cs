@@ -9,6 +9,7 @@ namespace Simple.Data.IntegrationTest
     public abstract class DatabaseIntegrationContext
     {
         protected MockDatabase _mockDatabase;
+        protected MockConnectionProvider _MockConnectionProvider;
         protected dynamic _db;
 
         protected abstract void SetSchema(MockSchemaProvider schemaProvider);
@@ -49,8 +50,8 @@ namespace Simple.Data.IntegrationTest
 
             SetSchema(mockSchemaProvider);
 
-            var adapter = MockHelper.CreateMockAdoAdapter(
-                new MockConnectionProvider(new MockDbConnection(mockDatabase), mockSchemaProvider));
+            _MockConnectionProvider = new MockConnectionProvider(new MockDbConnection(mockDatabase), mockSchemaProvider);
+            var adapter = MockHelper.CreateMockAdoAdapter(_MockConnectionProvider);
             MockHelper.UseMockAdapter(adapter);
             return Database.Open();
         }
