@@ -150,12 +150,22 @@
                                                                            Func<IDictionary<string, object>, Exception, bool> onError,
             bool resultRequired)
         {
+            if (resultRequired)
+            {
+                return InsertManyAndReturn(tableName, dataList, onError);
+            }
+            InsertManyWithoutReturn(tableName, dataList, onError);
+            return null;
+        }
+
+        private IEnumerable<IDictionary<string, object>> InsertManyAndReturn(string tableName, IEnumerable<IDictionary<string, object>> dataList, Func<IDictionary<string, object>, Exception, bool> onError)
+        {
             foreach (var row in dataList)
             {
                 IDictionary<string, object> inserted;
                 try
                 {
-                    inserted = Insert(tableName, row, resultRequired);
+                    inserted = Insert(tableName, row, true);
                 }
                 catch (Exception ex)
                 {
@@ -170,6 +180,30 @@
                     throw;
                 }
                 yield return inserted;
+            }
+        }
+
+        private void InsertManyWithoutReturn(string tableName, IEnumerable<IDictionary<string, object>> dataList, Func<IDictionary<string, object>, Exception, bool> onError)
+        {
+            foreach (var row in dataList)
+            {
+                IDictionary<string, object> inserted;
+                try
+                {
+                    Insert(tableName, row, false);
+                }
+                catch (Exception ex)
+                {
+                    if (onError != null)
+                    {
+                        if (onError(row, ex))
+                        {
+                            continue;
+                        }
+                        break;
+                    }
+                    throw;
+                }
             }
         }
 

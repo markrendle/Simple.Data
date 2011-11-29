@@ -114,7 +114,7 @@ namespace Simple.Data
         /// <summary>
         ///  Inserts a record into the specified "table".
         ///  </summary><param name="tableName">Name of the table.</param><param name="data">The values to insert.</param><returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
-        internal override IEnumerable<IDictionary<string, object>> Insert(string tableName, IEnumerable<IDictionary<string, object>> data, Func<dynamic, Exception, bool> onError, bool resultRequired)
+        internal override IEnumerable<IDictionary<string, object>> Insert(string tableName, IEnumerable<IDictionary<string, object>> data, ErrorCallback onError, bool resultRequired)
         {
             return _adapter.InsertMany(tableName, data, (dict, exception) => onError(new SimpleRecord(dict), exception), resultRequired);
         }

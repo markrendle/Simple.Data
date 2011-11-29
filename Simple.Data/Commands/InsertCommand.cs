@@ -43,7 +43,7 @@ namespace Simple.Data.Commands
 
             if (args.Length == 2)
             {
-                var onError = args[1] as Func<dynamic, Exception, bool>;
+                var onError = args[1] as ErrorCallback;
                 if (onError != null)
                 {
                     return InsertEntity(args[0], dataStrategy, tableName, onError, !binder.IsResultDiscarded());
@@ -57,7 +57,7 @@ namespace Simple.Data.Commands
             return dataStrategy.Insert(tableName, binder.NamedArgumentsToDictionary(args), !binder.IsResultDiscarded());
         }
 
-        private static object InsertEntity(object entity, DataStrategy dataStrategy, string tableName, Func<dynamic,Exception,bool> onError, bool resultRequired)
+        private static object InsertEntity(object entity, DataStrategy dataStrategy, string tableName, ErrorCallback onError, bool resultRequired)
         {
             var dictionary = entity as IDictionary<string, object>;
             if (dictionary != null)

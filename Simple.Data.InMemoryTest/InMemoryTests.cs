@@ -430,6 +430,28 @@
             Assert.AreEqual(false, bobExists);
         }
 
+        [Test]
+        public void BulkInsertWithCallbackShouldWork()
+        {
+            // Arrange
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            ErrorCallback callback = (o, e) => true; // Continue processing
+            db.Users.Insert(new[] { new {Id= 1, Name= "Alice", Age= 30},new {Id= 2, Name= "Bob", Age= 40}}, callback);
+            Assert.AreEqual(2, db.Users.GetCount());
+        }
+
+        [Test]
+        public void BulkInsertWithoutCallbackShouldWork()
+        {
+            // Arrange
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            ErrorCallback callback = (o, e) => true; // Continue processing
+            db.Users.Insert(new[] { new {Id= 1, Name= "Alice", Age= 30},new {Id= 2, Name= "Bob", Age= 40}});
+            Assert.AreEqual(2, db.Users.GetCount());
+        }
+
         private static int ThreadTestHelper(int userId)
         {
             var mockAdapter = new InMemoryAdapter();

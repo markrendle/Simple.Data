@@ -144,7 +144,7 @@ namespace Simple.Data.SqlTest
             var users = new[] { user1, user2, user3 };
             bool passed = false;
 
-            Func<dynamic, Exception, bool> onError = (o, exception) => passed = true;
+            ErrorCallback onError = (o, exception) => passed = true;
 
             IList<dynamic> actuals = db.Users.Insert(users,onError).ToList();
 
@@ -186,7 +186,7 @@ namespace Simple.Data.SqlTest
 
                 var users = new[] {user1, user2, user3};
 
-                Func<dynamic, Exception, bool> onError = (o, exception) => passed = true;
+                ErrorCallback onError = (o, exception) => passed = true;
 
                 actuals = db.Users.Insert(users, onError).ToList();
 

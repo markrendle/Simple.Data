@@ -81,6 +81,7 @@
     <Compile Include="Database.Open.cs" />
     <Compile Include="DatabaseOpenerMethods.cs" />
     <Compile Include="DictionaryCloner.cs" />
+    <Compile Include="ErrorCallback.cs" />
     <Compile Include="FunctionSignature.cs" />
     <Compile Include="InMemoryAdapter.cs" />
     <Compile Include="OfTypeEnumerable.cs" />
