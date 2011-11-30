@@ -7,7 +7,7 @@ namespace Simple.Data.Ado
 {
     using System.Data;
 
-    static class DbConnectionEx
+    public static class DbConnectionEx
     {
         public static void OpenIfClosed(this IDbConnection connection)
         {

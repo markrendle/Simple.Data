@@ -3,6 +3,7 @@ namespace Simple.Data.Ado
     using System;
     using System.Collections.Generic;
     using System.Data;
+    using Schema;
 
     public interface IBulkInserter
     {

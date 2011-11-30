@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Text;
 using NUnit.Framework;
 using Simple.Data.SqlTest.Resources;
 
 namespace Simple.Data.SqlTest
 {
-    using System.Collections;
-
     [TestFixture]
     public class InsertTests
     {
@@ -70,6 +66,35 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual("Wowbagger", actuals[1].Name);
             Assert.AreEqual("teatime", actuals[1].Password);
             Assert.AreEqual(int.MaxValue, actuals[1].Age);
+        }
+
+        [Test]
+        public void TestMultiInsertWithStaticTypeObjectsAndNoReturn()
+        {
+            var db = DatabaseHelper.Open();
+
+            var users = new[]
+                            {
+                                new User { Name = "Slartibartfast", Password = "bistromathics", Age = 777 },
+                                new User { Name = "Wowbagger", Password = "teatime", Age = int.MaxValue }
+                            };
+
+            db.Users.Insert(users);
+
+            var slartibartfast = db.Users.FindByName("Slartibartfast");
+            Assert.IsNotNull(slartibartfast);
+            Assert.AreNotEqual(0, slartibartfast.Id);
+            Assert.AreEqual("Slartibartfast", slartibartfast.Name);
+            Assert.AreEqual("bistromathics", slartibartfast.Password);
+            Assert.AreEqual(777, slartibartfast.Age);
+
+            var wowbagger = db.Users.FindByName("Wowbagger");
+            Assert.IsNotNull(wowbagger);
+
+            Assert.AreNotEqual(0, wowbagger.Id);
+            Assert.AreEqual("Wowbagger", wowbagger.Name);
+            Assert.AreEqual("teatime", wowbagger.Password);
+            Assert.AreEqual(int.MaxValue, wowbagger.Age);
         }
 
         [Test]

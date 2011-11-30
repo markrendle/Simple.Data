@@ -562,12 +562,12 @@ namespace Simple.Data.Ado
             _sharedConnection = null;
         }
 
-        internal IDbConnection CreateConnection()
+        public IDbConnection CreateConnection()
         {
             return _sharedConnection ?? _connectionProvider.CreateConnection();
         }
 
-        internal DatabaseSchema GetSchema()
+        public DatabaseSchema GetSchema()
         {
             return _schema ?? (_schema = DatabaseSchema.Get(_connectionProvider, _providerHelper));
         }
