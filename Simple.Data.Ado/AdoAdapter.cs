@@ -269,7 +269,7 @@ namespace Simple.Data.Ado
             if (query.Clauses.OfType<WithCountClause>().Any()) return RunQueryWithCount(query, out unhandledClauses);
 
             ICommandBuilder[] commandBuilders = GetQueryCommandBuilders(query, out unhandledClauses);
-            IDbConnection connection = _connectionProvider.CreateConnection();
+            IDbConnection connection = CreateConnection();
             if (ProviderSupportsCompoundStatements || commandBuilders.Length == 1)
             {
                 return
@@ -413,7 +413,7 @@ namespace Simple.Data.Ado
                     commandBuilders.AddRange(GetQueryCommandBuilders(queries[i], i, out unhandledClausesForThisQuery));
                     unhandledClauses.Add(unhandledClausesForThisQuery);
                 }
-                IDbConnection connection = _connectionProvider.CreateConnection();
+                IDbConnection connection = CreateConnection();
                 IDbCommand command =
                     CommandBuilder.CreateCommand(
                         _providerHelper.GetCustomProvider<IDbParameterFactory>(_schema.SchemaProvider),
@@ -447,7 +447,7 @@ namespace Simple.Data.Ado
                                                                                           <SimpleQueryClauseBase>
                                                                                           unhandledClauses)
         {
-            IDbConnection connection = _connectionProvider.CreateConnection();
+            IDbConnection connection = CreateConnection();
             return new QueryBuilder(this).Build(query, out unhandledClauses)
                 .GetCommand(connection)
                 .ToObservable(connection, this);
