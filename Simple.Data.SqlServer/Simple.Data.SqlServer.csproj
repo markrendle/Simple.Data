@@ -63,6 +63,7 @@
     <Compile Include="SqlColumn.cs" />
     <Compile Include="SqlCommandOptimizer.cs" />
     <Compile Include="SqlConnectionProvider.cs" />
+    <Compile Include="SqlDbTypeEx.cs" />
     <Compile Include="SqlObservableQueryRunner.cs" />
     <Compile Include="SqlQueryPager.cs" />
     <Compile Include="SqlSchemaProvider.cs" />

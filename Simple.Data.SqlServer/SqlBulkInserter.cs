@@ -76,8 +76,8 @@ namespace Simple.Data.SqlServer
             {
                 if (table.HasColumn(key))
                 {
-                    var column = table.FindColumn(key);
-                    dataTable.Columns.Add(column.ActualName, column.DbType.ToClrType());
+                    var column = (SqlColumn)table.FindColumn(key);
+                    dataTable.Columns.Add(column.ActualName, column.SqlDbType.ToClrType());
                     bulkCopy.ColumnMappings.Add(column.ActualName, column.ActualName);
                 }
                 else
