@@ -188,9 +188,11 @@
             _autoIncrementColumns.Add(tableName, columnName);
         }
 
-        public void SetKeyColumn(string tableName, string columnName)
+        public void SetKeyColumn(string tableName, string columnName, bool autoIncremented = false)
         {
             _keyColumns[tableName] = new[] {columnName};
+            if (autoIncremented)
+                SetAutoIncrementColumn(tableName, columnName);
         }
 
         public void SetKeyColumns(string tableName, params string[] columnNames)

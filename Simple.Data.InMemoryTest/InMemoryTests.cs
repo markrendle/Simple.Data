@@ -351,6 +351,22 @@
         }
 
         [Test]
+        public void ShouldBeAbleToSetAutoIncrementWhenSettingKeyColumn()
+        {
+            // Arrange
+            var adapter = new InMemoryAdapter();
+
+            // Act
+            adapter.SetKeyColumn("Users", "Id", true);
+
+            // Assert
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            var firstId = db.Users.Insert(Name: "Marcus").Id;
+            Assert.AreEqual(1, firstId);
+        }
+
+        [Test]
         public void SelectCountShouldReturnCount()
         {
             Database.UseMockAdapter(new InMemoryAdapter());
