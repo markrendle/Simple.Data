@@ -32,7 +32,6 @@ namespace Simple.Data.Ado
                 {
                     connection.OpenIfClosed();
                     TryPrepare(insertCommand);
-                    insertCommand.Prepare();
                     foreach (var row in Data)
                     {
                         InsertRow(row, insertCommand, onError);
