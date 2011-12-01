@@ -357,7 +357,7 @@
             var adapter = new InMemoryAdapter();
 
             // Act
-            adapter.SetKeyColumn("Users", "Id", true);
+            adapter.SetAutoIncrementKeyColumn("Users", "Id");
 
             // Assert
             Database.UseMockAdapter(adapter);
