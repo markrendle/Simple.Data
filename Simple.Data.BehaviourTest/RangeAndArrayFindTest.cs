@@ -48,6 +48,18 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestQueryWithNotEqualIntArray()
+        {
+            var mockDatabase = new MockDatabase();
+            dynamic database = CreateDatabase(mockDatabase);
+            database.Users.Query().Where(database.Users.Id != new[] { 1, 2, 3 }).ToList();
+            Assert.AreEqual("select [dbo].[users].[id],[dbo].[users].[name],[dbo].[users].[password],[dbo].[users].[age],[dbo].[users].[joindate] from [dbo].[users] where [dbo].[users].[id] not in (@p1_0,@p1_1,@p1_2)".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual(1, mockDatabase.Parameters[0]);
+            Assert.AreEqual(2, mockDatabase.Parameters[1]);
+            Assert.AreEqual(3, mockDatabase.Parameters[2]);
+        }
+
+        [Test]
         public void TestFindByWithDateRange()
         {
             var mockDatabase = new MockDatabase();
