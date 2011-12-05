@@ -79,6 +79,29 @@
             using (reader)
             { /* NoOp */ }
         }
+
+        public static void SetParameterValues(this IDbCommand command, IList<object> values)
+        {
+            int index = 0;
+            foreach (var parameter in command.Parameters.Cast<IDbDataParameter>())
+            {
+                parameter.Value = CommandHelper.FixObjectType(values[index]);
+                index++;
+            }
+        }
+
+        public static void ClearParameterValues(this IDbCommand command)
+        {
+            foreach (var parameter in command.Parameters.Cast<IDbDataParameter>())
+            {
+                parameter.Value = DBNull.Value;
+            }
+        }
+
+        public static void SetParameterValue(this IDbCommand command, int index, object value)
+        {
+            ((IDbDataParameter) command.Parameters[index]).Value = CommandHelper.FixObjectType(value);
+        }
     }
 
     class EnumerableShim<T> : IEnumerable<T>
@@ -98,6 +121,7 @@
         {
             return GetEnumerator();
         }
+
     }
 
     static class EnumerableShim
