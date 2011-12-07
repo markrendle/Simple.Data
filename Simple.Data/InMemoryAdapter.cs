@@ -179,8 +179,10 @@
 
         public override bool IsExpressionFunction(string functionName, params object[] args)
         {
-            return functionName.Equals("like", StringComparison.OrdinalIgnoreCase) && args.Length == 1 &&
-                   args[0] is string;
+            return (functionName.Equals("like", StringComparison.OrdinalIgnoreCase) ||
+                    functionName.Equals("notlike", StringComparison.OrdinalIgnoreCase))
+                   && args.Length == 1
+                   && args[0] is string;
         }
 
         public void SetAutoIncrementColumn(string tableName, string columnName)

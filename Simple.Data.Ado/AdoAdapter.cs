@@ -436,7 +436,8 @@ namespace Simple.Data.Ado
 
         public override bool IsExpressionFunction(string functionName, params object[] args)
         {
-            return functionName.Equals("like", StringComparison.OrdinalIgnoreCase)
+            return (functionName.Equals("like", StringComparison.OrdinalIgnoreCase) ||
+                    functionName.Equals("notlike", StringComparison.OrdinalIgnoreCase))
                    && args.Length == 1
                    && args[0] is string;
         }
