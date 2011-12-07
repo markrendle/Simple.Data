@@ -45,7 +45,7 @@ namespace Simple.Data
 
         public FunctionReference As(string alias)
         {
-            return new FunctionReference(_name, _argument, _isAggregate, alias);
+            return new FunctionReference(_name, _argument, _isAggregate, alias, _additionalArguments);
         }
 
         public override string GetAliasOrName()

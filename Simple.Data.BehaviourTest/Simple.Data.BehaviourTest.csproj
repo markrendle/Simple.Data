@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -78,6 +78,7 @@
     <Compile Include="Query\HavingTest.cs" />
     <Compile Include="Query\QueryTest.cs" />
     <Compile Include="Query\WithCountTest.cs" />
+    <Compile Include="Query\WithTest.cs" />
     <Compile Include="RangeAndArrayFindTest.cs" />
     <Compile Include="TraceSettingsTest.cs" />
     <Compile Include="TransactionTest.cs" />

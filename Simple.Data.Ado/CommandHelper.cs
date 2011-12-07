@@ -26,7 +26,8 @@ namespace Simple.Data.Ado
             var command = connection.CreateCommand();
 
             command.CommandText = PrepareCommand(sql, command);
-            SetParameterValues(command, values);
+            command.ClearParameterValues();
+            command.SetParameterValues(values);
 
             return command;
         }
@@ -96,16 +97,6 @@ namespace Simple.Data.Ado
             return sqlBuilder.ToString();
         }
 
-        public static void SetParameterValues(IDbCommand command, IList<object> values)
-        {
-            int index = 0;
-            foreach (var parameter in command.Parameters.Cast<IDbDataParameter>())
-            {
-                parameter.Value = FixObjectType(values[index]);
-                index++;
-            }
-        }
-
         private static void PrepareCommand(CommandBuilder commandBuilder, IDbCommand command)
         {
             foreach (var pair in commandBuilder.Parameters)
@@ -141,6 +132,7 @@ namespace Simple.Data.Ado
         {
             var command = connection.CreateCommand();
             command.CommandText = PrepareInsertCommand(insertSql, command, columns);
+            command.ClearParameterValues();
             return command;
 
         }
@@ -150,7 +142,8 @@ namespace Simple.Data.Ado
             var command = connection.CreateCommand();
 
             command.CommandText = PrepareInsertCommand(sql, command, columns);
-            SetParameterValues(command, values);
+            command.ClearParameterValues();
+            command.SetParameterValues(values);
 
             return command;
         }       

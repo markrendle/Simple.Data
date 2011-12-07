@@ -152,7 +152,7 @@ namespace Simple.Data.Ado
 
             if (groupColumns.Count == 0) return;
 
-            _commandBuilder.Append(" GROUP BY " + string.Join(",", groupColumns.Select(FormatGroupByColumnClause)));
+            _commandBuilder.Append(" GROUP BY " + string.Join(",", groupColumns.Select(_simpleReferenceFormatter.FormatColumnClauseWithoutAlias)));
         }
 
         private void HandleOrderBy()
@@ -165,9 +165,18 @@ namespace Simple.Data.Ado
 
         private string ToOrderByDirective(OrderByClause item)
         {
-            var col = _table.FindColumn(item.Reference.GetName());
+            string name;
+            if (_columns.Any(r => (!string.IsNullOrWhiteSpace(r.GetAlias())) && r.GetAlias().Equals(item.Reference.GetName())))
+            {
+                name = item.Reference.GetName();
+            }
+            else
+            {
+                name = _table.FindColumn(item.Reference.GetName()).QualifiedName;
+            }
+
             var direction = item.Direction == OrderByDirection.Descending ? " DESC" : string.Empty;
-            return col.QualifiedName + direction;
+            return name + direction;
         }
 
         private string GetSelectClause(ObjectName tableName)

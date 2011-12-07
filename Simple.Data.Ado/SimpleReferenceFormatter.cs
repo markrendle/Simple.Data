@@ -19,11 +19,21 @@ namespace Simple.Data.Ado
 
         public string FormatColumnClause(SimpleReference reference)
         {
-            var formatted = TryFormatAsObjectReference(reference as ObjectReference)
+            return FormatColumnClause(reference, false);
+        }
+
+        public string FormatColumnClauseWithoutAlias(SimpleReference reference)
+        {
+            return FormatColumnClause(reference, true);
+        }
+
+        private string FormatColumnClause(SimpleReference reference, bool excludeAlias)
+        {
+            var formatted = TryFormatAsObjectReference(reference as ObjectReference, excludeAlias)
                             ??
-                            TryFormatAsFunctionReference(reference as FunctionReference)
+                            TryFormatAsFunctionReference(reference as FunctionReference, excludeAlias)
                             ??
-                            TryFormatAsMathReference(reference as MathReference);
+                            TryFormatAsMathReference(reference as MathReference, excludeAlias);
 
             if (formatted != null) return formatted;
 
@@ -36,12 +46,22 @@ namespace Simple.Data.Ado
             return reference != null ? FormatColumnClause(reference) : obj.ToString();
         }
 
-        private string TryFormatAsMathReference(MathReference mathReference)
+        private string TryFormatAsMathReference(MathReference mathReference, bool excludeAlias)
         {
             if (ReferenceEquals(mathReference, null)) return null;
 
-            return string.Format("{0} {1} {2}", FormatObject(mathReference.LeftOperand),
-                                 MathOperatorToString(mathReference.Operator), FormatObject(mathReference.RightOperand));
+            if (excludeAlias || mathReference.GetAlias() == null)
+            {
+                return string.Format("{0} {1} {2}", FormatObject(mathReference.LeftOperand),
+                                     MathOperatorToString(mathReference.Operator),
+                                     FormatObject(mathReference.RightOperand));
+            }
+
+            return string.Format("{0} {1} {2} AS {3}", FormatObject(mathReference.LeftOperand),
+                                 MathOperatorToString(mathReference.Operator),
+                                 FormatObject(mathReference.RightOperand),
+                                 mathReference.GetAlias());
+
         }
 
         private static string MathOperatorToString(MathOperator @operator)
@@ -63,17 +83,20 @@ namespace Simple.Data.Ado
             }
         }
 
-        private string TryFormatAsFunctionReference(FunctionReference functionReference)
+        private string TryFormatAsFunctionReference(FunctionReference functionReference, bool excludeAlias)
         {
             if (ReferenceEquals(functionReference, null)) return null;
 
             var sqlName = _functionNameConverter.ConvertToSqlName(functionReference.Name);
-            return functionReference.GetAlias() == null
-                       ? string.Format("{0}({1}{2})", sqlName,
+            if (excludeAlias || functionReference.GetAlias() == null)
+            {
+                return string.Format("{0}({1}{2})", sqlName,
+                                     FormatColumnClause(functionReference.Argument),
+                                     FormatAdditionalArguments(functionReference.AdditionalArguments));
+            }
+            return string.Format("{0}({1}{2}) AS {3}", sqlName,
                                        FormatColumnClause(functionReference.Argument),
-                                       FormatAdditionalArguments(functionReference.AdditionalArguments))
-                       : string.Format("{0}({1}) AS {2}", sqlName,
-                                       FormatColumnClause(functionReference.Argument),
+                                       FormatAdditionalArguments(functionReference.AdditionalArguments),
                                        _schema.QuoteObjectName(functionReference.GetAlias()));
         }
 
@@ -88,7 +111,7 @@ namespace Simple.Data.Ado
             return builder != null ? builder.ToString() : string.Empty;
         }
 
-        private string TryFormatAsObjectReference(ObjectReference objectReference)
+        private string TryFormatAsObjectReference(ObjectReference objectReference, bool excludeAlias)
         {
             if (ReferenceEquals(objectReference, null)) return null;
 
@@ -97,7 +120,7 @@ namespace Simple.Data.Ado
                                 ? table.QualifiedName
                                 : _schema.QuoteObjectName(objectReference.GetOwner().GetAlias());
             var column = table.FindColumn(objectReference.GetName());
-            if (objectReference.GetAlias() == null)
+            if (excludeAlias || objectReference.GetAlias() == null)
                 return string.Format("{0}.{1}", tableName, column.QuotedName);
             else
                 return string.Format("{0}.{1} AS {2}", tableName, column.QuotedName,

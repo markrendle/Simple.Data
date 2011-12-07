@@ -47,5 +47,21 @@ namespace Simple.Data.IntegrationTest.Query
             Parameter(1).Is(1);
             Parameter(2).Is("A");
         }
+
+        [Test]
+        public void GroupingAndOrderingOnFunction()
+        {
+            const string expected =
+                @"select substring([dbo].[users].[name],@p1,@p2) as [foo],max(substring([dbo].[users].[name],@p3,@p4)) as [bar] from [dbo].[users] group by substring([dbo].[users].[name],@p5,@p6) order by bar desc";
+
+            var column1 = _db.Users.Name.Substring(0, 5).As("Foo");
+            var column2 = _db.Users.Name.Substring(5, 5).Max().As("Bar");
+            EatException<InvalidOperationException>( () => _db.Users.All()
+                                                               .Select(column1, column2)
+                                                               .OrderByBarDescending()
+                                                               .ToList());
+
+            GeneratedSqlIs(expected);
+        }
     }
 }

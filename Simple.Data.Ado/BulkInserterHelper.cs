@@ -14,6 +14,7 @@ namespace Simple.Data.Ado
         protected readonly IEnumerable<IDictionary<string, object>> Data;
         private readonly Table _table;
         private readonly List<Column> _columns;
+        private Action<IDictionary<string, object>, IDbCommand> _parameterSetter;
 
         public BulkInserterHelper(AdoAdapter adapter, IEnumerable<IDictionary<string, object>> data, Table table, List<Column> columns)
         {
@@ -74,17 +75,9 @@ namespace Simple.Data.Ado
 
         protected IDictionary<string, object> InsertRowAndSelect(IDictionary<string, object> row, IDbCommand command, Func<IDictionary<string,object>, Exception, bool> onError)
         {
-            var values = new object[command.Parameters.Count];
-            foreach (var kvp in row)
-            {
-                int index = _columns.IndexOf(_table.FindColumn(kvp.Key));
-                if (index > -1)
-                {
-                    values[index] = kvp.Value;
-                }
-            }
+            if (_parameterSetter == null) _parameterSetter = BuildParameterSettingAction(row);
+            _parameterSetter(row, command);
 
-            CommandHelper.SetParameterValues(command, values);
             try
             {
                 var insertedRow = TryExecuteSingletonQuery(command);
@@ -99,17 +92,9 @@ namespace Simple.Data.Ado
 
         protected int InsertRow(IDictionary<string, object> row, IDbCommand command, Func<IDictionary<string, object>, Exception, bool> onError)
         {
-            var values = new object[command.Parameters.Count];
-            foreach (var kvp in row)
-            {
-                int index = _columns.IndexOf(_table.FindColumn(kvp.Key));
-                if (index > -1)
-                {
-                    values[index] = kvp.Value;
-                }
-            }
+            if (_parameterSetter == null) _parameterSetter = BuildParameterSettingAction(row);
+            _parameterSetter(row, command);
 
-            CommandHelper.SetParameterValues(command, values);
             try
             {
                 return TryExecute(command);
@@ -123,17 +108,9 @@ namespace Simple.Data.Ado
 
         protected IDictionary<string, object> InsertRow(IDictionary<string, object> row, IDbCommand insertCommand, IDbCommand selectCommand, Func<IDictionary<string, object>, Exception, bool> onError)
         {
-            var values = new object[insertCommand.Parameters.Count];
-            foreach (var kvp in row)
-            {
-                int index = _columns.IndexOf(_table.FindColumn(kvp.Key));
-                if (index > -1)
-                {
-                    values[index] = kvp.Value;
-                }
-            }
+            if (_parameterSetter == null) _parameterSetter = BuildParameterSettingAction(row);
+            _parameterSetter(row, insertCommand);
 
-            CommandHelper.SetParameterValues(insertCommand, values);
             try
             {
                 if (TryExecute(insertCommand) == 1)
@@ -194,6 +171,28 @@ namespace Simple.Data.Ado
                     Trace.TraceWarning("Could not prepare command.");
                 }
             }
+        }
+
+        private Action<IDictionary<string,object>, IDbCommand> BuildParameterSettingAction(IDictionary<string,object> sample)
+        {
+            var actions =
+                _columns.Select<Column, Action<IDictionary<string,object>, IDbCommand>>((c, i) => (row, cmd) => cmd.SetParameterValue(i, null)).ToArray();
+
+            foreach (var key in sample.Keys)
+            {
+                int index = _columns.IndexOf(_table.FindColumn(key));
+                if (index >= 0)
+                    actions[index] = BuildIndividualFunction(key, index);
+
+                ++index;
+            }
+
+            return actions.Aggregate((working, next) => working + next) ?? ((row,cmd) => { });
+        }
+
+        private Action<IDictionary<string, object>, IDbCommand> BuildIndividualFunction(string key, int index)
+        {
+            return (dict, command) => command.SetParameterValue(index, dict[key]);
         }
     }
 }

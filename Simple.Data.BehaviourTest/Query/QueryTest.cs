@@ -168,7 +168,7 @@ namespace Simple.Data.IntegrationTest
                 // This won't work on Mock provider, but the SQL should be generated OK
             }
 
-            GeneratedSqlIs("select len([dbo].[users].[name]),min([dbo].[users].[age]) as [youngest] from [dbo].[users] group by [dbo].[users].[name]");
+            GeneratedSqlIs("select len([dbo].[users].[name]),min([dbo].[users].[age]) as [youngest] from [dbo].[users] group by len([dbo].[users].[name])");
         }
 
         [Test]
