@@ -10,9 +10,9 @@
 
     static class DbCommandExtensions
     {
-        public static IEnumerable<IDictionary<string, object>> ToEnumerable(this IDbCommand command, IDbConnection connection)
+        public static IEnumerable<IDictionary<string, object>> ToEnumerable(this IDbCommand command, Func<IDbConnection> createConnection)
         {
-            return ToEnumerable(command, connection, null);
+            return ToEnumerable(command, createConnection, null);
         }
 
         public static IEnumerable<IEnumerable<IDictionary<string, object>>> ToEnumerables(this IDbCommand command, IDbConnection connection)
@@ -20,9 +20,9 @@
             return new DataReaderMultipleEnumerator(command, connection).Wrap();
         }
 
-        public static IEnumerable<IDictionary<string, object>> ToEnumerable(this IDbCommand command, IDbConnection connection, IDictionary<string, int> index)
+        public static IEnumerable<IDictionary<string, object>> ToEnumerable(this IDbCommand command, Func<IDbConnection> createConnection, IDictionary<string, int> index)
         {
-            return new DataReaderEnumerator(command, connection, index).Wrap();
+            return new DataReaderEnumerable(command, createConnection, index);
         }
 
         public static IObservable<IDictionary<string, object>> ToObservable(this IDbCommand command, IDbConnection connection, AdoAdapter adapter)

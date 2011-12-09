@@ -14,7 +14,7 @@ namespace Simple.Data.Mocking.Ado
             _connection = connection;
         }
 
-        private readonly MockDataParameterCollection _parameters = new MockDataParameterCollection();
+        private MockDataParameterCollection _parameters = new MockDataParameterCollection();
 
         protected override DbParameter CreateDbParameter()
         {
@@ -142,11 +142,7 @@ namespace Simple.Data.Mocking.Ado
 
         public object Clone()
         {
-            var clone = new MockDbCommand(_connection) {CommandText = CommandText};
-            foreach (var p in Parameters.Cast<IDbDataParameter>())
-            {
-                clone.Parameters.Add(new MockDataParameter {DbType = p.DbType, ParameterName = p.ParameterName});
-            }
+            var clone = new MockDbCommand(_connection) {CommandText = CommandText, _parameters = _parameters};
             return clone;
         }
     }

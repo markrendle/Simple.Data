@@ -125,11 +125,11 @@ namespace Simple.Data.Ado
             return TryExecuteQuery(connection, command);
         }
 
-        private static IEnumerable<IDictionary<string, object>> TryExecuteQuery(IDbConnection connection, IDbCommand command)
+        private IEnumerable<IDictionary<string, object>> TryExecuteQuery(IDbConnection connection, IDbCommand command)
         {
             try
             {
-                return command.ToEnumerable(connection);
+                return command.ToEnumerable(ConnectionCreator);
             }
             catch (DbException ex)
             {
@@ -137,15 +137,27 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static IEnumerable<IDictionary<string, object>> TryExecuteQuery(IDbConnection connection, IDbCommand command, IDictionary<string, int> index)
+        private IEnumerable<IDictionary<string, object>> TryExecuteQuery(IDbConnection connection, IDbCommand command, IDictionary<string, int> index)
         {
             try
             {
-                return command.ToEnumerable(connection, index);
+                return command.ToEnumerable(ConnectionCreator, index);
             }
             catch (DbException ex)
             {
                 throw new AdoAdapterException(ex.Message, command);
+            }
+        }
+
+        private Func<IDbConnection> ConnectionCreator
+        {
+            get
+            {
+                if (_transaction != null)
+                {
+                    return () => _transaction.Connection;
+                }
+                return _adapter.CreateConnection;
             }
         }
 

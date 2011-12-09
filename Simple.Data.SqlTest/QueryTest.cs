@@ -19,14 +19,16 @@ namespace Simple.Data.SqlTest
         public void CountWithNoCriteriaShouldSelectThree()
         {
             var db = DatabaseHelper.Open();
-            Assert.AreEqual(3, db.Users.GetCount());
+            var count = db.Users.GetCount();
+            Assert.AreEqual(3, count);
         }
 
         [Test]
         public void CountWithCriteriaShouldSelectTwo()
         {
             var db = DatabaseHelper.Open();
-            Assert.AreEqual(2, db.Users.GetCount(db.Users.Age > 30));
+            int count = db.Users.GetCount(db.Users.Age > 30);
+            Assert.AreEqual(2, count);
         }
 
         [Test]

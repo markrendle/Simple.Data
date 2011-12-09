@@ -275,11 +275,11 @@ namespace Simple.Data.Ado
                 return
                     CommandBuilder.CreateCommand(
                         _providerHelper.GetCustomProvider<IDbParameterFactory>(_schema.SchemaProvider), commandBuilders,
-                        connection).ToEnumerable(connection);
+                        connection).ToEnumerable(this.CreateConnection);
             }
             else
             {
-                return commandBuilders.SelectMany(cb => cb.GetCommand(connection).ToEnumerable(connection));
+                return commandBuilders.SelectMany(cb => cb.GetCommand(connection).ToEnumerable(this.CreateConnection));
             }
         }
 
