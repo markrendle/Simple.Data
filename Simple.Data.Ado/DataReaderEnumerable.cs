@@ -108,13 +108,14 @@ namespace Simple.Data.Ado
             private bool SetCurrent()
             {
                 _current = _reader.ToDictionary(_index);
+
+                // We don't want to cache more than 100 rows, too much memory would be used.
                 if (_cache.Count < 100)
                 {
                     _cache.Add(_current);
                 }
                 else
                 {
-                    // We don't want to cache more than 100 rows, too much memory getting used.
                     _cache = null;
                 }
 
@@ -140,15 +141,20 @@ namespace Simple.Data.Ado
                 {
                     _command.Connection.OpenIfClosed();
                     _reader = _command.ExecuteReader();
-                    if (_reader != null && _index == null)
-                    {
-                        _index = _reader.CreateDictionaryIndex();
-                        _cacheIndexAction(_index);
-                    }
+                    CreateIndexIfNecessary();
                 }
                 catch (DbException ex)
                 {
                     throw new AdoAdapterException(ex.Message, ex);
+                }
+            }
+
+            private void CreateIndexIfNecessary()
+            {
+                if (_reader != null && _index == null)
+                {
+                    _index = _reader.CreateDictionaryIndex();
+                    _cacheIndexAction(_index);
                 }
             }
 
