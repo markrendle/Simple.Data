@@ -60,6 +60,32 @@
         }
 
         [Test]
+        public void TestFindAllByPartialName()
+        {
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            db.Test.Insert(Id: 1, Name: "Alice");
+            db.Test.Insert(Id: 2, Name: "Bob");
+            db.Test.Insert(Id: 2, Name: "Clive");
+            List<dynamic> records = db.Test.FindAll(db.Test.Name.Like("A%")).ToList();
+            Assert.IsNotNull(records);
+            Assert.AreEqual(1, records.Count);
+        }
+
+        [Test]
+        public void TestFindAllByExcludedPartialName()
+        {
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            db.Test.Insert(Id: 1, Name: "Alice");
+            db.Test.Insert(Id: 2, Name: "Bob");
+            db.Test.Insert(Id: 2, Name: "Clive");
+            List<dynamic> records = db.Test.FindAll(db.Test.Name.NotLike("A%")).ToList();
+            Assert.IsNotNull(records);
+            Assert.AreEqual(2, records.Count);
+        }
+        
+        [Test]
         public void SelectShouldReturnSubsetOfColumns()
         {
             Database.UseMockAdapter(new InMemoryAdapter());

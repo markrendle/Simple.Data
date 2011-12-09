@@ -71,6 +71,14 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void TestFindAllByExcludedPartialName()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<User> users = db.Users.FindAll(db.Users.Name.NotLike("Bob")).ToList<User>();
+            Assert.AreEqual(2, users.Count());
+        }
+
+        [Test]
         public void TestAllCount()
         {
             var db = DatabaseHelper.Open();

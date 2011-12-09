@@ -34,7 +34,8 @@ namespace Simple.Data.QueryPolyfills
         {
             var function = arg.RightOperand as SimpleFunction;
             if (ReferenceEquals(function, null)) throw new InvalidOperationException("Expression type of function but no function supplied.");
-            if (function.Name.Equals("like", StringComparison.OrdinalIgnoreCase))
+            if (function.Name.Equals("like", StringComparison.OrdinalIgnoreCase) ||
+                function.Name.Equals("notlike", StringComparison.OrdinalIgnoreCase))
             {
                 var pattern = function.Args[0].ToString();
                 if (pattern.Contains("%") || pattern.Contains("_")) // SQL Server LIKE
@@ -44,7 +45,14 @@ namespace Simple.Data.QueryPolyfills
 
                 var regex = new Regex("^" + pattern + "$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
-                return d => Resolve(d, arg.LeftOperand).Count > 0 && Resolve(d, arg.LeftOperand).OfType<string>().Any(regex.IsMatch);
+                if (function.Name.Equals("like", StringComparison.OrdinalIgnoreCase))
+                {
+                    return d => Resolve(d, arg.LeftOperand).Count > 0 && Resolve(d, arg.LeftOperand).OfType<string>().Any(regex.IsMatch);
+                }
+                if (function.Name.Equals("notlike", StringComparison.OrdinalIgnoreCase))
+                {
+                    return d => Resolve(d, arg.LeftOperand).Count > 0 && Resolve(d, arg.LeftOperand).OfType<string>().All(input => !regex.IsMatch(input));
+                }
             }
 
             throw new NotSupportedException("Expression Function not supported.");

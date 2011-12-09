@@ -188,10 +188,26 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestFindWithNotLike()
+        {
+            _db.Users.Find(_db.Users.Name.NotLike("Foo"));
+            GeneratedSqlIs("select " + usersColumns + " from [dbo].[Users] where [dbo].[Users].[name] not like @p1");
+            Parameter(0).Is("Foo");
+        }
+
+        [Test]
         public void TestFindAllWithLike()
         {
             _db.Users.FindAll(_db.Users.Name.Like("Foo")).ToList();
             GeneratedSqlIs("select [dbo].[Users].[id],[dbo].[Users].[name],[dbo].[Users].[password],[dbo].[Users].[age] from [dbo].[Users] where [dbo].[Users].[name] like @p1");
+            Parameter(0).Is("Foo");
+        }
+
+        [Test]
+        public void TestFindAllWithNotLike()
+        {
+            _db.Users.FindAll(_db.Users.Name.NotLike("Foo")).ToList();
+            GeneratedSqlIs("select [dbo].[Users].[id],[dbo].[Users].[name],[dbo].[Users].[password],[dbo].[Users].[age] from [dbo].[Users] where [dbo].[Users].[name] not like @p1");
             Parameter(0).Is("Foo");
         }
 
