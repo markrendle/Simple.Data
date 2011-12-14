@@ -10,26 +10,46 @@ namespace Simple.Data
 {
     static class BinderHelper
     {
-        internal static IDictionary<string, object> NamedArgumentsToDictionary(this InvokeMemberBinder binder, IEnumerable<object> args)
+        private static IDictionary<string, object> NamedArgumentsToDictionary(IEnumerable<string> argumentNames, IEnumerable<object> args)
         {
-            return binder.CallInfo.ArgumentNames
+            return argumentNames
                 .Reverse()
                 .Zip(args.Reverse(), (k, v) => new KeyValuePair<string, object>(k, v))
                 .Reverse()
                 .ToDictionary();
         }
 
-        public static IDictionary<string, object> ArgumentsToDictionary(this InvokeMemberBinder binder, IEnumerable<object> args)
+        private static IDictionary<string, object> ArgumentsToDictionary(IEnumerable<String> argumentNames, IEnumerable<object> args)
         {
             var argsArray = args.ToArray();
             if (argsArray.Length == 1 && argsArray[0] is IDictionary<string, object>)
                 return (IDictionary<string, object>)argsArray[0];
 
             return argsArray.Reverse()
-                .Zip(binder.CallInfo.ArgumentNames.Reverse().ExtendInfinite(), (v, k) => new KeyValuePair<string, object>(k, v))
+                .Zip(argumentNames.Reverse().ExtendInfinite(), (v, k) => new KeyValuePair<string, object>(k, v))
                 .Reverse()
                 .Select((kvp, i) => kvp.Key == null ? new KeyValuePair<string, object>("_" + i.ToString(), kvp.Value) : kvp)
                 .ToDictionary();
+        }
+
+        internal static IDictionary<string, object> NamedArgumentsToDictionary(this InvokeMemberBinder binder, IEnumerable<object> args)
+        {
+            return NamedArgumentsToDictionary(binder.CallInfo.ArgumentNames, args);
+        }
+
+        public static IDictionary<string, object> ArgumentsToDictionary(this InvokeMemberBinder binder, IEnumerable<object> args)
+        {
+            return ArgumentsToDictionary(binder.CallInfo.ArgumentNames, args);
+        }
+
+        internal static IDictionary<string, object> NamedArgumentsToDictionary(this InvokeBinder binder, IEnumerable<object> args)
+        {
+            return NamedArgumentsToDictionary(binder.CallInfo.ArgumentNames, args);
+        }
+
+        public static IDictionary<string, object> ArgumentsToDictionary(this InvokeBinder binder, IEnumerable<object> args)
+        {
+            return ArgumentsToDictionary(binder.CallInfo.ArgumentNames, args);
         }
     }
 }

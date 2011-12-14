@@ -41,18 +41,25 @@ namespace Simple.Data
             return _members.GetOrAdd(name, CreateDynamicReference);
         }
 
-        public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
+        internal bool TryInvokeFunction(String functionName, Func<IDictionary<String,Object>> getFunctionArguments, out object result)
         {
             var adapterWithFunctions = GetAdapter() as IAdapterWithFunctions;
-            if (adapterWithFunctions != null && adapterWithFunctions.IsValidFunction(binder.Name))
+            if (adapterWithFunctions != null && adapterWithFunctions.IsValidFunction(functionName))
             {
-                var command = new ExecuteFunctionCommand(GetDatabase(), adapterWithFunctions, binder.Name,
-                                                         binder.ArgumentsToDictionary(args));
+                var command = new ExecuteFunctionCommand(GetDatabase(), adapterWithFunctions, functionName, getFunctionArguments());
                 return command.Execute(out result);
             }
-            return base.TryInvokeMember(binder, args, out result);
+            result = null;
+            return false;
         }
 
+        public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
+        {
+            if (this.TryInvokeFunction(binder.Name, () => binder.ArgumentsToDictionary(args), out result)) return true;
+
+            return base.TryInvokeMember(binder, args, out result);
+        }
+        
         public dynamic this[string name]
         {
             get { return GetOrAddDynamicReference(name); }

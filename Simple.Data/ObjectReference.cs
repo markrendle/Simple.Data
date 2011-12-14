@@ -74,6 +74,15 @@ namespace Simple.Data
             return GetAlias() ?? _name;
         }
 
+        public override bool TryInvoke(InvokeBinder binder, object[] args, out object result)
+        {
+            if (_dataStrategy != null)
+            {
+                if (_dataStrategy.TryInvokeFunction(_name, () => binder.ArgumentsToDictionary(args), out result)) return true;
+            }
+            throw new InvalidOperationException();
+        }
+
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
             if (base.TryInvokeMember(binder, args, out result)) return true;

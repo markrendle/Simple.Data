@@ -26,6 +26,24 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void FindGetCustomerCountAndInvokeTest()
+        {
+            var db = DatabaseHelper.Open();
+            var getCustomerCount = db.GetCustomerCount;
+            var results = getCustomerCount();
+            Assert.AreEqual(1, results.ReturnValue);
+        }
+
+        [Test]
+        public void FindGetCustomerCountUsingIndexerAndInvokeTest()
+        {
+            var db = DatabaseHelper.Open();
+            var getCustomerCount = db["GetCustomerCount"];
+            var results = getCustomerCount();
+            Assert.AreEqual(1, results.ReturnValue);
+        }
+
+        [Test]
         public void GetCustomerCountSecondCallExecutesNonQueryTest()
         {
             var listener = new TestTraceListener();
