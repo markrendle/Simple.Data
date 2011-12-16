@@ -127,7 +127,7 @@ namespace Simple.Data
                 result = GetAll().ToList();
                 return true;
             }
-            result = new ObjectReference(binder.Name, new ObjectReference(_tableName, _dataStrategy));
+            result = new ObjectReference(binder.Name, new ObjectReference(_tableName, (_schema != null ? new ObjectReference(_schema.GetName()) : null), _dataStrategy));
             return true;
         }
 
@@ -138,7 +138,7 @@ namespace Simple.Data
 
         public ObjectReference this[string name]
         {
-            get { return new ObjectReference(name, new ObjectReference(_tableName, _dataStrategy)); }
+            get { return new ObjectReference(name, new ObjectReference(_tableName, (_schema != null ? new ObjectReference(_schema.GetName()) : null), _dataStrategy)); }
         }
 
         internal string GetName()

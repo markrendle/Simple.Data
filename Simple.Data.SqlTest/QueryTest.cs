@@ -38,7 +38,7 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, db.Users.GetCountByName("Bob"));
         }
 
-        [Test]
+       [Test]
         public void ExistsWithNoCriteriaShouldReturnTrue()
         {
             var db = DatabaseHelper.Open();
@@ -291,6 +291,30 @@ namespace Simple.Data.SqlTest
             var db = DatabaseHelper.Open();
             int max = db.Users.FindAllByName("ZXCVBNM").Select(db.Users.Age.Max()).ToScalarOrDefault<int>();
             Assert.AreEqual(0, max);
+        }
+
+        [Test]
+        public void QueryWithSchemaQualifiedTableName()
+        {
+            var db = DatabaseHelper.Open();
+            var result = db.test.SchemaTable.QueryById(2)
+                           .Select(db.test.SchemaTable.Id,
+                                   db.test.SchemaTable.Description)
+                           .Single();
+            Assert.AreEqual(2, result.Id);
+            Assert.AreEqual("Pass", result.Description);
+        }
+
+        [Test]
+        public void QueryWithSchemaQualifiedTableNameAndAliases()
+        {
+            var db = DatabaseHelper.Open();
+            var result = db.test.SchemaTable.QueryById(2)
+                           .Select(db.test.SchemaTable.Id.As("This"),
+                                   db.test.SchemaTable.Description.As("That"))
+                           .Single();
+            Assert.AreEqual(2, result.This);
+            Assert.AreEqual("Pass", result.That);
         }
     }
 }

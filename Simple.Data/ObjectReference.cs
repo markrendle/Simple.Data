@@ -29,6 +29,10 @@ namespace Simple.Data
         {
         }
 
+        internal ObjectReference(string name, ObjectReference owner, DataStrategy dataStrategy) : this(name, owner, dataStrategy, null)
+        {
+        }
+
         internal ObjectReference(string name, ObjectReference owner, DataStrategy dataStrategy, string alias) : base(alias)
         {
             _name = name;

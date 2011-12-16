@@ -197,6 +197,8 @@ GO
 
 CREATE TABLE [test].[SchemaTable] ([Id] int not null, [Description] nvarchar(100) not null);
 GO
+INSERT INTO [test].[SchemaTable] VALUES (2, 'Pass')
+GO
 
 CREATE PROCEDURE [dbo].[GetCustomers]
 AS

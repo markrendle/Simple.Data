@@ -69,7 +69,7 @@ namespace Simple.Data.Ado
             _havingCriteria = _query.Clauses.OfType<HavingClause>().Aggregate(SimpleExpression.Empty,
                                                                               (seed, having) => seed && having.Criteria);
 
-            _tableName = _schema.BuildObjectName(query.TableName.Split('.').Last());
+            _tableName = _schema.BuildObjectName(query.TableName);
             _table = _schema.FindTable(_tableName);
             _commandBuilder.SetText(GetSelectClause(_tableName));
         }
