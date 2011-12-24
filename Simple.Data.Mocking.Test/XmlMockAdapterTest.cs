@@ -215,7 +215,23 @@ namespace Simple.Data.Mocking.Test
             Assert.IsNotNull(associatedUser);
             Assert.AreEqual(new Guid("FF47BE0F-A6AE-4B52-B7CC-B2F3CA413838"), associatedUser.UserKey);
         }
+
+        [Test]
+        public void FindByUrlId_ShouldFindRecord()
+        {
+            var adapter = new XmlMockAdapter(@"<Root>
+                   <Urls _keys=""UrlId"" UrlId=""System.Int32"" >
+                       <Url UrlId=""1"" LongUrl=""http://www.somesite.tld/"" Hash=""Hm5zT89z""/>
+                   </Urls>
+                 </Root>");
+
+            dynamic db = new Database(adapter);
+
+            var url = db.Urls.FindByUrlId(1);
+            Assert.IsNotNull(url);
+            Assert.AreEqual("http://www.somesite.tld/", url.LongUrl);
+            Assert.AreEqual("Hm5zT89z", url.Hash);
+        }
     }
 }
-
 // ReSharper restore InconsistentNaming
