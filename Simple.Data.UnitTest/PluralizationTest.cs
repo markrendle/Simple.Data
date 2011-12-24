@@ -116,7 +116,7 @@ namespace Simple.Data.UnitTest
     class EntityPluralizer : IPluralizer
     {
         private readonly PluralizationService _pluralizationService =
-            PluralizationService.CreateService(new CultureInfo("en-US"));
+            PluralizationService.CreateService(new CultureInfo("en"));
 
         public bool IsPlural(string word)
         {
