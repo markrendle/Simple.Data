@@ -20,12 +20,12 @@ namespace Simple.Data.QueryPolyfills
         public override object GetValue(IDictionary<string, object> source, IEnumerable<IDictionary<string, object>> sourceAggregationValues = null)
         {
             if (source == null) return null;
-            if (source.ContainsKey(_reference.GetName())) return source[_reference.GetName()];
             if (_reference.HasOwner() && source.ContainsKey(_reference.GetOwner().GetName()))
             {
                 var childDictionary = source[_reference.GetOwner().GetName()] as IDictionary<string, object>;
                 return GetValue(childDictionary);
             }
+            if (source.ContainsKey(_reference.GetName())) return source[_reference.GetName()];
             return null;
         }
     }

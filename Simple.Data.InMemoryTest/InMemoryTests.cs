@@ -84,7 +84,7 @@
             Assert.IsNotNull(records);
             Assert.AreEqual(2, records.Count);
         }
-        
+
         [Test]
         public void SelectShouldReturnSubsetOfColumns()
         {
@@ -92,7 +92,7 @@
             var db = Database.Open();
             db.Test.Insert(Id: 1, Name: "Alice");
             db.Test.Insert(Id: 2, Name: "Bob");
-            List<IDictionary<string,object>> records = db.Test.All().Select(db.Test.Name).ToList<IDictionary<string,object>>();
+            List<IDictionary<string, object>> records = db.Test.All().Select(db.Test.Name).ToList<IDictionary<string, object>>();
             Assert.IsNotNull(records);
             Assert.AreEqual(2, records.Count);
             Assert.False(records[0].ContainsKey("Id"));
@@ -191,7 +191,7 @@
             Database.UseMockAdapter(adapter);
             var db = Database.Open();
             var alice = db.Test.Insert(Id: 1, Name: "Alice");
-            var allyce = new {Id = 1, Name = "Allyce"};
+            var allyce = new { Id = 1, Name = "Allyce" };
             int updated = db.Test.Update(allyce);
             Assert.AreEqual(1, updated);
             var record = db.Test.FindById(1);
@@ -271,18 +271,18 @@
         [Test]
         public void TestJoin()
         {
-    var adapter = new InMemoryAdapter();
-    adapter.ConfigureJoin("Customer", "ID", "Orders", "Order", "CustomerID", "Customer");
-    Database.UseMockAdapter(adapter);
-    var db = Database.Open();
-    db.Customer.Insert(ID: 1, Name: "NASA");
-    db.Customer.Insert(ID: 2, Name: "ACME");
-    db.Order.Insert(ID: 1, CustomerID: 1, Date: new DateTime(1997, 1, 12));
-    db.Order.Insert(ID: 2, CustomerID: 2, Date: new DateTime(2001, 1, 1));
-    
-    var customers = db.Customer.FindAll(db.Customer.Orders.Date < new DateTime(1999, 12, 31)).ToList();
-    Assert.IsNotNull(customers);
-    Assert.AreEqual(1, customers.Count);
+            var adapter = new InMemoryAdapter();
+            adapter.ConfigureJoin("Customer", "ID", "Orders", "Order", "CustomerID", "Customer");
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            db.Customer.Insert(ID: 1, Name: "NASA");
+            db.Customer.Insert(ID: 2, Name: "ACME");
+            db.Order.Insert(ID: 1, CustomerID: 1, Date: new DateTime(1997, 1, 12));
+            db.Order.Insert(ID: 2, CustomerID: 2, Date: new DateTime(2001, 1, 1));
+
+            var customers = db.Customer.FindAll(db.Customer.Orders.Date < new DateTime(1999, 12, 31)).ToList();
+            Assert.IsNotNull(customers);
+            Assert.AreEqual(1, customers.Count);
         }
 
         /// <summary>
@@ -320,7 +320,7 @@
 
             var categories = db.Users.FindAll(db.User.Categories.Name == "Category 1").ToList();
             Assert.NotNull(categories);
-            Assert.AreEqual(1, categories.Count); 
+            Assert.AreEqual(1, categories.Count);
         }
 
         [Test]
@@ -338,7 +338,7 @@
 
             var categories = db.Users.FindAll(db.User.Categories.CategoryName == "Category 1").ToList();
             Assert.NotNull(categories);
-            Assert.AreEqual(1, categories.Count); 
+            Assert.AreEqual(1, categories.Count);
         }
 
         [Test]
@@ -479,7 +479,7 @@
             Database.UseMockAdapter(new InMemoryAdapter());
             var db = Database.Open();
             ErrorCallback callback = (o, e) => true; // Continue processing
-            db.Users.Insert(new[] { new {Id= 1, Name= "Alice", Age= 30},new {Id= 2, Name= "Bob", Age= 40}}, callback);
+            db.Users.Insert(new[] { new { Id = 1, Name = "Alice", Age = 30 }, new { Id = 2, Name = "Bob", Age = 40 } }, callback);
             Assert.AreEqual(2, db.Users.GetCount());
         }
 
@@ -490,7 +490,7 @@
             Database.UseMockAdapter(new InMemoryAdapter());
             var db = Database.Open();
             ErrorCallback callback = (o, e) => true; // Continue processing
-            db.Users.Insert(new[] { new {Id= 1, Name= "Alice", Age= 30},new {Id= 2, Name= "Bob", Age= 40}});
+            db.Users.Insert(new[] { new { Id = 1, Name = "Alice", Age = 30 }, new { Id = 2, Name = "Bob", Age = 40 } });
             Assert.AreEqual(2, db.Users.GetCount());
         }
 
@@ -501,6 +501,29 @@
             var db = Database.Open();
             db.Users.Insert(Id: userId, Email: "foo");
             return Database.Default.Users.FindByEmail("foo").Id;
+        }
+
+        [Test]
+        public void TestJoinWithAlias()
+        {
+            var adapter = new InMemoryAdapter();
+            adapter.ConfigureJoin("Customer", "ID", "Customer", "Orders", "CustomerID", "Orders");
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            db.Customer.Insert(ID: 1, Name: "NASA");
+            db.Customer.Insert(ID: 2, Name: "ACME");
+            db.Orders.Insert(ID: 1, Name: "Order1", CustomerID: 1);
+            db.Orders.Insert(ID: 2, Name: "Order2", CustomerID: 2);
+            db.Orders.Insert(ID: 3, Name: "Order3", CustomerID: 2);
+
+            IEnumerable<dynamic> orders = db.Orders.Query()
+                .Where(db.Orders.Customer.Name == "ACME")
+                .Select(db.Orders.Name.As("OrderName"),
+                        db.Orders.Customer.Name.As("CustomerName"))
+                .ToList();
+            Assert.IsNotNull(orders);
+            Assert.AreEqual(2, orders.Count());
+            Assert.AreEqual(2, orders.Count(x => x.CustomerName == "ACME"));
         }
     }
 }
