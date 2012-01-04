@@ -272,7 +272,7 @@
         public void TestJoin()
         {
             var adapter = new InMemoryAdapter();
-            adapter.ConfigureJoin("Customer", "ID", "Orders", "Order", "CustomerID", "Customer");
+            adapter.ConfigureJoin("Customer", "ID", "Customer", "Order", "CustomerID", "Orders");
             Database.UseMockAdapter(adapter);
             var db = Database.Open();
             db.Customer.Insert(ID: 1, Name: "NASA");
@@ -309,7 +309,7 @@
         public void FindAllWhenUsingNamePropertyShouldWork()
         {
             var adapter = new InMemoryAdapter();
-            adapter.ConfigureJoin("Users", "Id", "Categories", "Categories", "UserId", "User");
+            adapter.ConfigureJoin("Users", "Id", "User", "Categories", "UserId", "Categories");
             Database.UseMockAdapter(adapter);
             var db = Database.Open();
 
@@ -327,7 +327,7 @@
         public void FindAllWhenUsingAnyOldPropertyNameShouldWork()
         {
             var adapter = new InMemoryAdapter();
-            adapter.ConfigureJoin("Users", "Id", "Categories", "Categories", "UserId", "User");
+            adapter.ConfigureJoin("Users", "Id", "User", "Categories", "UserId", "Categories");
             Database.UseMockAdapter(adapter);
             var db = Database.Open();
 
