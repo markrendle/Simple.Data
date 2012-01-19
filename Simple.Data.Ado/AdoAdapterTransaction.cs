@@ -12,16 +12,18 @@ namespace Simple.Data.Ado
         private readonly string _name;
         private readonly IDbTransaction _dbTransaction;
         private readonly IDbConnection _dbConnection;
+        private readonly bool _sharedConnection;
 
-        public AdoAdapterTransaction(IDbTransaction dbTransaction) : this(dbTransaction, null)
+        public AdoAdapterTransaction(IDbTransaction dbTransaction, bool sharedConnection = false) : this(dbTransaction, null, sharedConnection)
         {
         }
 
-        public AdoAdapterTransaction(IDbTransaction dbTransaction, string name)
+        public AdoAdapterTransaction(IDbTransaction dbTransaction, string name, bool sharedConnection = false)
         {
             _name = name;
             _dbTransaction = dbTransaction;
             _dbConnection = _dbTransaction.Connection;
+            _sharedConnection = sharedConnection;
         }
 
         internal IDbTransaction Transaction
@@ -32,7 +34,8 @@ namespace Simple.Data.Ado
         public void Dispose()
         {
             _dbTransaction.Dispose();
-            _dbConnection.Dispose();
+            if (!_sharedConnection)
+                _dbConnection.Dispose();
         }
 
         public void Commit()
