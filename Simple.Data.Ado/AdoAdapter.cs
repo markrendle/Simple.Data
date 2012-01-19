@@ -154,7 +154,7 @@ namespace Simple.Data.Ado
             IDbConnection connection = CreateConnection();
             connection.OpenIfClosed();
             IDbTransaction transaction = connection.BeginTransaction();
-            return new AdoAdapterTransaction(transaction);
+            return new AdoAdapterTransaction(transaction, _sharedConnection != null);
         }
 
         public IAdapterTransaction BeginTransaction(string name)
@@ -166,7 +166,7 @@ namespace Simple.Data.Ado
                                              ? sqlConnection.BeginTransaction(name)
                                              : connection.BeginTransaction();
 
-            return new AdoAdapterTransaction(transaction, name);
+            return new AdoAdapterTransaction(transaction, name, _sharedConnection != null);
         }
 
         public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria,
@@ -578,7 +578,7 @@ namespace Simple.Data.Ado
             IDbConnection connection = CreateConnection();
             connection.OpenIfClosed();
             IDbTransaction transaction = connection.BeginTransaction(isolationLevel);
-            return new AdoAdapterTransaction(transaction);
+            return new AdoAdapterTransaction(transaction, _sharedConnection != null);
         }
 
         public IAdapterTransaction BeginTransaction(IsolationLevel isolationLevel, string name)
@@ -590,7 +590,7 @@ namespace Simple.Data.Ado
                                              ? sqlConnection.BeginTransaction(isolationLevel, name)
                                              : connection.BeginTransaction(isolationLevel);
 
-            return new AdoAdapterTransaction(transaction, name);
+            return new AdoAdapterTransaction(transaction, name, _sharedConnection != null);
         }
 
         public string GetIdentityFunction()
