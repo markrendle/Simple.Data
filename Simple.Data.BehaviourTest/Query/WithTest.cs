@@ -39,10 +39,10 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void SingleWithClauseShouldUseJoin()
         {
-            const string expectedSql = "select [employee].[id] as [__with__employee__id],[employee].[name] as [__with__employee__name],"+
-                "[employee].[managerid] as [__with__employee__managerid],[employee].[departmentid] as [__with__employee__departmentid],"+
-                "[department].[id] as [__with__department__id],[department].[name] as [__with__department__name]"+
-                "from [employee] left join [department] on [employee].[departmentid] = [department].[id]";
+            const string expectedSql = "select [dbo].[employee].[id] as [__with__employee__id],[dbo].[employee].[name] as [__with__employee__name],"+
+                "[dbo].[employee].[managerid] as [__with__employee__managerid],[dbo].[employee].[departmentid] as [__with__employee__departmentid],"+
+                "[dbo].[department].[id] as [__with__department__id],[dbo].[department].[name] as [__with__department__name]"+
+                " from [dbo].[employee] left join [dbo].[department] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])";
 
             var q = _db.Employees.All().WithDepartment();
 

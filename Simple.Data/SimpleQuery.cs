@@ -271,8 +271,30 @@
                     return true;
                 }
             }
+            if (binder.Name.StartsWith("with", StringComparison.OrdinalIgnoreCase))
+            {
+                result = ParseWith(binder, args);
+                return true;
+            }
 
             return false;
+        }
+
+        private SimpleQuery ParseWith(InvokeMemberBinder binder, object[] args)
+        {
+            if (binder.Name.Equals("with", StringComparison.OrdinalIgnoreCase))
+            {
+                return With(args);
+            }
+
+            var objectName = binder.Name.Substring(4);
+            var withClause = new WithClause(new ObjectReference(objectName, new ObjectReference(_tableName, _dataStrategy), _dataStrategy));
+            return new SimpleQuery(this, _clauses.Append(withClause));
+        }
+
+        private SimpleQuery With(object[] args)
+        {
+            throw new NotImplementedException();
         }
 
         private ObjectReference ObjectAsObjectReference(object o)
@@ -392,7 +414,7 @@
 
         public IEnumerable<T> OfType<T>()
         {
-			return new OfTypeEnumerable<T>(Run());
+            return new OfTypeEnumerable<T>(Run());
         }
 
         public IList<dynamic> ToList()

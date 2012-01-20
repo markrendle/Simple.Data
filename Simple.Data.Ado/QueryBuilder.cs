@@ -8,8 +8,7 @@ namespace Simple.Data.Ado
 {
     public class QueryBuilder
     {
-        private readonly IFunctionNameConverter _functionNameConverter = new FunctionNameConverter();
-        private SimpleReferenceFormatter _simpleReferenceFormatter;
+        private readonly SimpleReferenceFormatter _simpleReferenceFormatter;
         private readonly AdoAdapter _adoAdapter;
         private readonly int _bulkIndex;
         private readonly DatabaseSchema _schema;
@@ -20,7 +19,7 @@ namespace Simple.Data.Ado
         private SimpleExpression _whereCriteria;
         private SimpleExpression _havingCriteria;
         private SimpleReference[] _columns;
-        private CommandBuilder _commandBuilder;
+        private readonly CommandBuilder _commandBuilder;
         private List<SimpleQueryClauseBase> _unhandledClauses;
 
         public QueryBuilder(AdoAdapter adoAdapter) : this(adoAdapter, -1)
@@ -54,6 +53,8 @@ namespace Simple.Data.Ado
         private void SetQueryContext(SimpleQuery query)
         {
             _query = query;
+            _tableName = _schema.BuildObjectName(query.TableName);
+            _table = _schema.FindTable(_tableName);
             var selectClause = _query.Clauses.OfType<SelectClause>().SingleOrDefault();
             if (selectClause != null)
             {
@@ -61,7 +62,25 @@ namespace Simple.Data.Ado
             }
             else
             {
-                _columns = new SimpleReference[0];
+                _columns = _table.Columns.Select(c => ObjectReference.FromStrings(_table.ActualName, c.ActualName)).ToArray();
+            }
+
+            var withClauses = _query.Clauses.OfType<WithClause>().ToList();
+            if (withClauses.Count > 0)
+            {
+                foreach (var withClause in withClauses)
+                {
+                    if (withClause.ObjectReference.GetOwner().GetName() == _tableName.Name)
+                    {
+                        _columns =
+                            _columns.Concat(
+                                _schema.FindTable(withClause.ObjectReference.GetName()).Columns.Select(
+                                    c => ObjectReference.FromStrings(_table.ActualName, withClause.ObjectReference.GetName(), c.ActualName))).ToArray();
+                    }
+                }
+                _columns =
+                    _columns.OfType<ObjectReference>().Select(
+                        c => c.As(string.Format("__with__{0}__{1}", c.GetOwner().GetName(), c.GetName()))).ToArray();
             }
 
             _whereCriteria = _query.Clauses.OfType<WhereClause>().Aggregate(SimpleExpression.Empty,
@@ -69,8 +88,6 @@ namespace Simple.Data.Ado
             _havingCriteria = _query.Clauses.OfType<HavingClause>().Aggregate(SimpleExpression.Empty,
                                                                               (seed, having) => seed && having.Criteria);
 
-            _tableName = _schema.BuildObjectName(query.TableName);
-            _table = _schema.FindTable(_tableName);
             _commandBuilder.SetText(GetSelectClause(_tableName));
         }
 
@@ -78,7 +95,7 @@ namespace Simple.Data.Ado
         {
             if (_whereCriteria == SimpleExpression.Empty && _havingCriteria == SimpleExpression.Empty
                 && (!_query.Clauses.OfType<JoinClause>().Any())
-                && (_columns.Where(r => !(r is CountSpecialReference)).Count() == 0)) return;
+                && (_columns.All(r => (r is CountSpecialReference)))) return;
 
             var joiner = new Joiner(JoinType.Inner, _schema);
 

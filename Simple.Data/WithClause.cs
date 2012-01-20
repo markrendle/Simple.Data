@@ -5,6 +5,10 @@ namespace Simple.Data
         private readonly ObjectReference _objectReference;
         private readonly WithMode _mode;
 
+        public WithClause(ObjectReference objectReference) : this(objectReference, WithMode.NotSpecified)
+        {
+        }
+
         public WithClause(ObjectReference objectReference, WithMode mode)
         {
             _objectReference = objectReference;
