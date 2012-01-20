@@ -118,7 +118,7 @@ namespace Simple.Data.Ado
                     || sp.Key.Equals("_" + i)
                 );
                 var cmdParameter = cmd.CreateParameter();
-                //Tim Cartwright: Using AddParameter does not allow for the "default" keyword to ever be passed into 
+                //Tim Cartwright: method AddParameter does not allow for the "default" keyword to ever be passed into 
                 //  parameters in stored procedures with defualt values. Null is always sent in. This will allow for default 
                 //  values to work properly. Not sure why this is so, in both cases the value gets set. Just is.
                 //var cmdParameter = cmd.AddParameter(parameter.Name, value);

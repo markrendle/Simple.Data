@@ -173,7 +173,9 @@
     <Compile Include="UnresolvableObjectException.cs" />
     <Compile Include="Commands\UpdateByCommand.cs" />
     <Compile Include="WhereClause.cs" />
+    <Compile Include="WithClause.cs" />
     <Compile Include="WithCountClause.cs" />
+    <Compile Include="WithMode.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
