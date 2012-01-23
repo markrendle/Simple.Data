@@ -629,5 +629,10 @@
         {
             return new SimpleQuery(this, _clauses.Where(c => !(c is OrderByClause)).ToArray());
         }
+
+        public SimpleQuery ClearWith()
+        {
+            return new SimpleQuery(this, _clauses.Where(c => !(c is WithClause)).ToArray());
+        }
     }
 }

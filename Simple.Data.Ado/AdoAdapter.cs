@@ -243,6 +243,7 @@ namespace Simple.Data.Ado
 
         public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
         {
+            // We don't need to implement Get because we provide a delegate for this operation...
             throw new NotImplementedException();
         }
 
@@ -266,136 +267,9 @@ namespace Simple.Data.Ado
                                                                           out IEnumerable<SimpleQueryClauseBase>
                                                                               unhandledClauses)
         {
-            if (query.Clauses.OfType<WithCountClause>().Any()) return RunQueryWithCount(query, out unhandledClauses);
-
-            ICommandBuilder[] commandBuilders = GetQueryCommandBuilders(query, out unhandledClauses);
-            IDbConnection connection = CreateConnection();
-            if (ProviderSupportsCompoundStatements || commandBuilders.Length == 1)
-            {
-                return
-                    CommandBuilder.CreateCommand(
-                        _providerHelper.GetCustomProvider<IDbParameterFactory>(_schema.SchemaProvider), commandBuilders,
-                        connection).ToEnumerable(this.CreateConnection);
-            }
-            else
-            {
-                return commandBuilders.SelectMany(cb => cb.GetCommand(connection).ToEnumerable(this.CreateConnection));
-            }
+            return new AdoAdapterQueryRunner(this).RunQuery(query, out unhandledClauses);
         }
 
-        private IEnumerable<IDictionary<string, object>> RunQueryWithCount(SimpleQuery query,
-                                                                           out IEnumerable<SimpleQueryClauseBase>
-                                                                               unhandledClauses)
-        {
-            WithCountClause withCountClause;
-            try
-            {
-                withCountClause = query.Clauses.OfType<WithCountClause>().First();
-            }
-            catch (InvalidOperationException)
-            {
-                // Rethrow with meaning.
-                throw new InvalidOperationException("No WithCountClause specified.");
-            }
-
-            query = query.ClearWithTotalCount();
-            SimpleQuery countQuery =
-                query.ClearSkip().ClearTake().ClearOrderBy().ReplaceSelect(new CountSpecialReference());
-            var unhandledClausesList = new List<IEnumerable<SimpleQueryClauseBase>>
-                                           {
-                                               Enumerable.Empty<SimpleQueryClauseBase>(),
-                                               Enumerable.Empty<SimpleQueryClauseBase>()
-                                           };
-
-            using (
-                IEnumerator<IEnumerable<IDictionary<string, object>>> enumerator =
-                    RunQueries(new[] {countQuery, query}, unhandledClausesList).GetEnumerator())
-            {
-                unhandledClauses = unhandledClausesList[1];
-                if (!enumerator.MoveNext())
-                {
-                    throw new InvalidOperationException();
-                }
-                IDictionary<string, object> countRow = enumerator.Current.Single();
-                withCountClause.SetCount((int) countRow.First().Value);
-                if (!enumerator.MoveNext())
-                {
-                    throw new InvalidOperationException();
-                }
-                return enumerator.Current;
-            }
-        }
-
-        private ICommandBuilder[] GetPagedQueryCommandBuilders(SimpleQuery query,
-                                                               out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
-        {
-            return GetPagedQueryCommandBuilders(query, -1, out unhandledClauses);
-        }
-
-        private ICommandBuilder[] GetPagedQueryCommandBuilders(SimpleQuery query, Int32 bulkIndex,
-                                                               out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
-        {
-            var commandBuilders = new List<ICommandBuilder>();
-            var unhandledClausesList = new List<SimpleQueryClauseBase>();
-            unhandledClauses = unhandledClausesList;
-
-            IEnumerable<SimpleQueryClauseBase> unhandledClausesForPagedQuery;
-            ICommandBuilder mainCommandBuilder = new QueryBuilder(this, bulkIndex).Build(query,
-                                                                                         out
-                                                                                             unhandledClausesForPagedQuery);
-            unhandledClausesList.AddRange(unhandledClausesForPagedQuery);
-
-            const int maxInt = 2147483646;
-
-            SkipClause skipClause = query.Clauses.OfType<SkipClause>().FirstOrDefault() ?? new SkipClause(0);
-            TakeClause takeClause = query.Clauses.OfType<TakeClause>().FirstOrDefault() ?? new TakeClause(maxInt);
-
-            if (skipClause.Count != 0 || takeClause.Count != maxInt)
-            {
-                var queryPager = ProviderHelper.GetCustomProvider<IQueryPager>(ConnectionProvider);
-                if (queryPager == null)
-                {
-                    unhandledClausesList.AddRange(query.OfType<SkipClause>());
-                    unhandledClausesList.AddRange(query.OfType<TakeClause>());
-                }
-
-                IEnumerable<string> commandTexts = queryPager.ApplyPaging(mainCommandBuilder.Text, skipClause.Count,
-                                                                          takeClause.Count);
-
-                foreach (string commandText in commandTexts)
-                {
-                    var commandBuilder = new CommandBuilder(commandText, _schema, mainCommandBuilder.Parameters);
-                    commandBuilders.Add(commandBuilder);
-                }
-            }
-            return commandBuilders.ToArray();
-        }
-
-        private ICommandBuilder[] GetQueryCommandBuilders(SimpleQuery query,
-                                                          out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
-        {
-            if (query.Clauses.OfType<TakeClause>().Any() || query.Clauses.OfType<SkipClause>().Any())
-            {
-                return GetPagedQueryCommandBuilders(query, out unhandledClauses);
-            }
-            else
-            {
-                return new[] {new QueryBuilder(this).Build(query, out unhandledClauses)};
-            }
-        }
-
-        private ICommandBuilder[] GetQueryCommandBuilders(SimpleQuery query, Int32 bulkIndex,
-                                                          out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
-        {
-            if (query.Clauses.OfType<TakeClause>().Any() || query.Clauses.OfType<SkipClause>().Any())
-            {
-                return GetPagedQueryCommandBuilders(query, bulkIndex, out unhandledClauses);
-            }
-            else
-            {
-                return new[] {new QueryBuilder(this, bulkIndex).Build(query, out unhandledClauses)};
-            }
-        }
 
         public override IEnumerable<IEnumerable<IDictionary<string, object>>> RunQueries(SimpleQuery[] queries,
                                                                                          List
@@ -404,34 +278,7 @@ namespace Simple.Data.Ado
                                                                                              <SimpleQueryClauseBase>>
                                                                                              unhandledClauses)
         {
-            if (ProviderSupportsCompoundStatements && queries.Length > 1)
-            {
-                var commandBuilders = new List<ICommandBuilder>();
-                for (int i = 0; i < queries.Length; i++)
-                {
-                    IEnumerable<SimpleQueryClauseBase> unhandledClausesForThisQuery;
-                    commandBuilders.AddRange(GetQueryCommandBuilders(queries[i], i, out unhandledClausesForThisQuery));
-                    unhandledClauses.Add(unhandledClausesForThisQuery);
-                }
-                IDbConnection connection = CreateConnection();
-                IDbCommand command =
-                    CommandBuilder.CreateCommand(
-                        _providerHelper.GetCustomProvider<IDbParameterFactory>(_schema.SchemaProvider),
-                        commandBuilders.ToArray(), connection);
-                foreach (var item in command.ToEnumerables(connection))
-                {
-                    yield return item.ToList();
-                }
-            }
-            else
-            {
-                foreach (SimpleQuery t in queries)
-                {
-                    IEnumerable<SimpleQueryClauseBase> unhandledClausesForThisQuery;
-                    yield return RunQuery(t, out unhandledClausesForThisQuery);
-                    unhandledClauses.Add(unhandledClausesForThisQuery);
-                }
-            }
+            return new AdoAdapterQueryRunner(this).RunQueries(queries, unhandledClauses);
         }
 
         public override bool IsExpressionFunction(string functionName, params object[] args)
@@ -448,10 +295,7 @@ namespace Simple.Data.Ado
                                                                                           <SimpleQueryClauseBase>
                                                                                           unhandledClauses)
         {
-            IDbConnection connection = CreateConnection();
-            return new QueryBuilder(this).Build(query, out unhandledClauses)
-                .GetCommand(connection)
-                .ToObservable(connection, this);
+            return new AdoAdapterQueryRunner(this).RunQueryAsObservable(query, out unhandledClauses);
         }
 
         public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, bool resultRequired)
