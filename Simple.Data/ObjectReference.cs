@@ -21,7 +21,7 @@ namespace Simple.Data
         {
         }
 
-        internal ObjectReference(string name, ObjectReference owner) : this(name, owner, null, null)
+        public ObjectReference(string name, ObjectReference owner) : this(name, owner, null, null)
         {
         }
 

@@ -2,10 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Data;
+    using System.Linq;
 
-    class AdoAdapterQueryRunner
+    internal class AdoAdapterQueryRunner
     {
         private readonly AdoAdapter _adapter;
 
@@ -14,8 +14,9 @@
             _adapter = adapter;
         }
 
-        public IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase>
-                                                                              unhandledClauses)
+        public IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query,
+                                                                 out IEnumerable<SimpleQueryClauseBase>
+                                                                     unhandledClauses)
         {
             if (query.Clauses.OfType<WithCountClause>().Any()) return RunQueryWithCount(query, out unhandledClauses);
 
@@ -25,17 +26,18 @@
             {
                 return
                     CommandBuilder.CreateCommand(
-                        _adapter.ProviderHelper.GetCustomProvider<IDbParameterFactory>(_adapter.SchemaProvider), commandBuilders,
+                        _adapter.ProviderHelper.GetCustomProvider<IDbParameterFactory>(_adapter.SchemaProvider),
+                        commandBuilders,
                         connection).ToEnumerable(_adapter.CreateConnection);
             }
             return commandBuilders.SelectMany(cb => cb.GetCommand(connection).ToEnumerable(_adapter.CreateConnection));
         }
 
         public IObservable<IDictionary<string, object>> RunQueryAsObservable(SimpleQuery query,
-                                                                                      out
-                                                                                          IEnumerable
-                                                                                          <SimpleQueryClauseBase>
-                                                                                          unhandledClauses)
+                                                                             out
+                                                                                 IEnumerable
+                                                                                 <SimpleQueryClauseBase>
+                                                                                 unhandledClauses)
         {
             IDbConnection connection = _adapter.CreateConnection();
             return new QueryBuilder(_adapter).Build(query, out unhandledClauses)
@@ -69,7 +71,7 @@
 
             using (
                 IEnumerator<IEnumerable<IDictionary<string, object>>> enumerator =
-                    RunQueries(new[] { countQuery, query }, unhandledClausesList).GetEnumerator())
+                    RunQueries(new[] {countQuery, query}, unhandledClausesList).GetEnumerator())
             {
                 unhandledClauses = unhandledClausesList[1];
                 if (!enumerator.MoveNext())
@@ -77,7 +79,7 @@
                     throw new InvalidOperationException();
                 }
                 IDictionary<string, object> countRow = enumerator.Current.Single();
-                withCountClause.SetCount((int)countRow.First().Value);
+                withCountClause.SetCount((int) countRow.First().Value);
                 if (!enumerator.MoveNext())
                 {
                     throw new InvalidOperationException();
@@ -101,8 +103,8 @@
 
             IEnumerable<SimpleQueryClauseBase> unhandledClausesForPagedQuery;
             ICommandBuilder mainCommandBuilder = new QueryBuilder(_adapter, bulkIndex).Build(query,
-                                                                                         out
-                                                                                             unhandledClausesForPagedQuery);
+                                                                                             out
+                                                                                                 unhandledClausesForPagedQuery);
             unhandledClausesList.AddRange(unhandledClausesForPagedQuery);
 
             const int maxInt = 2147483646;
@@ -123,10 +125,13 @@
                 }
                 else
                 {
-                    var commandTexts = queryPager.ApplyPaging(mainCommandBuilder.Text, skipClause.Count,
+                    IEnumerable<string> commandTexts = queryPager.ApplyPaging(mainCommandBuilder.Text, skipClause.Count,
                                                                               takeClause.Count);
 
-                    commandBuilders.AddRange(commandTexts.Select(commandText => new CommandBuilder(commandText, _adapter.GetSchema(), mainCommandBuilder.Parameters)));
+                    commandBuilders.AddRange(
+                        commandTexts.Select(
+                            commandText =>
+                            new CommandBuilder(commandText, _adapter.GetSchema(), mainCommandBuilder.Parameters)));
                 }
             }
             return commandBuilders.ToArray();
@@ -139,25 +144,26 @@
             {
                 return GetPagedQueryCommandBuilders(query, out unhandledClauses);
             }
-            return new[] { new QueryBuilder(_adapter).Build(query, out unhandledClauses) };
+            return new[] {new QueryBuilder(_adapter).Build(query, out unhandledClauses)};
         }
 
         private IEnumerable<ICommandBuilder> GetQueryCommandBuilders(SimpleQuery query, Int32 bulkIndex,
-                                                          out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
+                                                                     out IEnumerable<SimpleQueryClauseBase>
+                                                                         unhandledClauses)
         {
             if (query.Clauses.OfType<TakeClause>().Any() || query.Clauses.OfType<SkipClause>().Any())
             {
                 return GetPagedQueryCommandBuilders(query, bulkIndex, out unhandledClauses);
             }
-            return new[] { new QueryBuilder(_adapter, bulkIndex).Build(query, out unhandledClauses) };
+            return new[] {new QueryBuilder(_adapter, bulkIndex).Build(query, out unhandledClauses)};
         }
 
         public IEnumerable<IEnumerable<IDictionary<string, object>>> RunQueries(SimpleQuery[] queries,
-                                                                                         List
-                                                                                             <
-                                                                                             IEnumerable
-                                                                                             <SimpleQueryClauseBase>>
-                                                                                             unhandledClauses)
+                                                                                List
+                                                                                    <
+                                                                                    IEnumerable
+                                                                                    <SimpleQueryClauseBase>>
+                                                                                    unhandledClauses)
         {
             if (_adapter.ProviderSupportsCompoundStatements && queries.Length > 1)
             {

@@ -65,13 +65,22 @@ namespace Simple.Data.Ado
             var expressionFormatter = new ExpressionFormatter(commandBuilder, _schema);
             foreach (var join in joins)
             {
-                var builder = new StringBuilder(JoinKeyword);
+                var builder = new StringBuilder(JoinTypeToKeyword(join.JoinType));
+                var joinExpression = join.JoinExpression ?? InferJoinExpression(join.Table);
                 builder.AppendFormat(" JOIN {0}{1} ON ({2})",
                     _schema.FindTable(_schema.BuildObjectName(join.Table.ToString())).QualifiedName,
                     string.IsNullOrWhiteSpace(join.Table.GetAlias()) ? string.Empty : " " + _schema.QuoteObjectName(join.Table.GetAlias()),
-                    expressionFormatter.Format(join.JoinExpression));
+                    expressionFormatter.Format(joinExpression));
                 yield return builder.ToString().Trim();
             }
+        }
+
+        private SimpleExpression InferJoinExpression(ObjectReference table)
+        {
+            var table1 = _schema.FindTable(table.GetOwner().GetName());
+            var table2 = _schema.FindTable(table.GetName());
+            var foreignKey = GetForeignKey(table1, table2);
+            return MakeJoinExpression(table, foreignKey);
         }
 
         private void AddJoin(ObjectName table1Name, ObjectName table2Name, JoinType joinType = JoinType.Inner)
@@ -80,17 +89,24 @@ namespace Simple.Data.Ado
                                            {
                                                var table1 = _schema.FindTable(table1Name);
                                                var table2 = _schema.FindTable(table2Name);
-
-                                               var foreignKey =
-                                                   table2.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == table1.Schema && fk.MasterTable.Name == table1.ActualName)
-                                                   ??
-                                                   table1.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == table2.Schema && fk.MasterTable.Name == table2.ActualName);
-
-                                               if (foreignKey == null) throw new SchemaResolutionException(
-                                                   string.Format("Could not join '{0}' and '{1}'", table1.ActualName, table2.ActualName));
-
+                                               var foreignKey = GetForeignKey(table1, table2);
                                                return MakeJoinText(table2, foreignKey, joinType);
                                            });
+        }
+
+        private static ForeignKey GetForeignKey(Table table1, Table table2)
+        {
+            var foreignKey =
+                table2.ForeignKeys.SingleOrDefault(
+                    fk => fk.MasterTable.Schema == table1.Schema && fk.MasterTable.Name == table1.ActualName)
+                ??
+                table1.ForeignKeys.SingleOrDefault(
+                    fk => fk.MasterTable.Schema == table2.Schema && fk.MasterTable.Name == table2.ActualName);
+
+            if (foreignKey == null)
+                throw new SchemaResolutionException(
+                    string.Format("Could not join '{0}' and '{1}'", table1.ActualName, table2.ActualName));
+            return foreignKey;
         }
 
         private string MakeJoinText(Table rightTable, ForeignKey foreignKey, JoinType joinType)
@@ -108,9 +124,39 @@ namespace Simple.Data.Ado
             return builder.ToString();
         }
 
+        private SimpleExpression MakeJoinExpression(ObjectReference table, ForeignKey foreignKey)
+        {
+            var expression = CreateJoinExpression(table, foreignKey, 0);
+
+            for (int i = 1; i < foreignKey.Columns.Length; i++)
+            {
+                expression = expression && CreateJoinExpression(table, foreignKey, i);
+            }
+
+            return expression;
+        }
+
         private string JoinKeywordFor(JoinType joinType)
         {
             return joinType == JoinType.Inner ? string.Empty : "LEFT";
+        }
+
+        private SimpleExpression CreateJoinExpression(ObjectReference table, ForeignKey foreignKey, int columnIndex)
+        {
+            var masterObjectReference = ObjectReference.FromStrings(foreignKey.MasterTable.Name,
+                                                                    foreignKey.UniqueColumns[columnIndex]);
+            var detailObjectReference = ObjectReference.FromStrings(foreignKey.DetailTable.Name,
+                                                                    foreignKey.Columns[columnIndex]);
+
+            if (!string.IsNullOrWhiteSpace(table.GetAlias()))
+            {
+                if (detailObjectReference.GetOwner().GetName() == table.GetName())
+                    detailObjectReference = new ObjectReference(detailObjectReference.GetName(), table);
+                else if (masterObjectReference.GetOwner().GetName() == table.GetName())
+                    masterObjectReference = new ObjectReference(masterObjectReference.GetName(), table);
+            }
+
+            return masterObjectReference == detailObjectReference;
         }
 
         private string FormatJoinExpression(ForeignKey foreignKey, int columnIndex)
@@ -122,6 +168,11 @@ namespace Simple.Data.Ado
         private string JoinKeyword
         {
             get { return _joinType == JoinType.Inner ? string.Empty : "LEFT"; }
+        }
+
+        private string JoinTypeToKeyword(JoinType joinType)
+        {
+            return joinType == JoinType.Inner ? string.Empty : "LEFT";
         }
 
         private static IEnumerable<Tuple<ObjectName, ObjectName>> GetTableNames(IEnumerable<ObjectReference> references, string schema)

@@ -292,9 +292,18 @@
             return new SimpleQuery(this, _clauses.Append(withClause));
         }
 
-        private SimpleQuery With(object[] args)
+        private SimpleQuery With(IEnumerable<object> args)
         {
-            throw new NotImplementedException();
+            var clauses = new List<SimpleQueryClauseBase>(_clauses);
+            foreach (var reference in args.OfType<ObjectReference>())
+            {
+                clauses.Add(new WithClause(reference));
+                if (!string.IsNullOrWhiteSpace(reference.GetAlias()))
+                {
+                    clauses.Add(new JoinClause(reference, JoinType.Outer));
+                }
+            }
+            return new SimpleQuery(this, clauses.ToArray());
         }
 
         private ObjectReference ObjectAsObjectReference(object o)

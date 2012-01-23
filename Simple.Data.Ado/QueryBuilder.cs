@@ -18,7 +18,7 @@ namespace Simple.Data.Ado
         private SimpleQuery _query;
         private SimpleExpression _whereCriteria;
         private SimpleExpression _havingCriteria;
-        private SimpleReference[] _columns;
+        private IList<SimpleReference> _columns;
         private readonly CommandBuilder _commandBuilder;
         private List<SimpleQueryClauseBase> _unhandledClauses;
 
@@ -75,12 +75,12 @@ namespace Simple.Data.Ado
                         _columns =
                             _columns.Concat(
                                 _schema.FindTable(withClause.ObjectReference.GetName()).Columns.Select(
-                                    c => ObjectReference.FromStrings(_table.ActualName, withClause.ObjectReference.GetName(), c.ActualName))).ToArray();
+                                    c => new ObjectReference(c.ActualName, withClause.ObjectReference))).ToArray();
                     }
                 }
                 _columns =
                     _columns.OfType<ObjectReference>().Select(
-                        c => c.As(string.Format("__with__{0}__{1}", c.GetOwner().GetName(), c.GetName()))).ToArray();
+                        c => c.As(string.Format("__with__{0}__{1}", c.GetOwner().GetAliasOrName(), c.GetName()))).ToArray();
             }
 
             _whereCriteria = _query.Clauses.OfType<WhereClause>().Aggregate(SimpleExpression.Empty,
@@ -105,14 +105,15 @@ namespace Simple.Data.Ado
                                 ? joiner.GetJoinClauses(_tableName, dottedTables.Split('.').Reverse())
                                 : Enumerable.Empty<string>();
 
-            var fromJoins = joiner.GetJoinClauses(_query.Clauses.OfType<JoinClause>(), _commandBuilder);
+            var joinClauses = _query.Clauses.OfType<JoinClause>().ToArray();
+            var fromJoins = joiner.GetJoinClauses(joinClauses, _commandBuilder);
 
             var fromCriteria = joiner.GetJoinClauses(_tableName, _whereCriteria);
 
             var fromHavingCriteria = joiner.GetJoinClauses(_tableName, _havingCriteria);
 
             var fromColumnList = _columns.Any(r => !(r is SpecialReference))
-                                     ? joiner.GetJoinClauses(_tableName, GetObjectReferences(_columns), JoinType.Outer)
+                                     ? joiner.GetJoinClauses(_tableName, GetObjectReferences(_columns).Where(o => !joinClauses.Any(j => o.GetOwner().Equals(j.Table))), JoinType.Outer)
                                      : Enumerable.Empty<string>();
 
             var joins = string.Join(" ", fromTable.Concat(fromJoins)
@@ -209,7 +210,7 @@ namespace Simple.Data.Ado
 
         private string GetColumnsClause(Table table)
         {
-            if (_columns != null && _columns.Length == 1 && _columns[0] is SpecialReference)
+            if (_columns != null && _columns.Count == 1 && _columns[0] is SpecialReference)
             {
                 return FormatSpecialReference((SpecialReference) _columns[0]);
             }
@@ -226,7 +227,7 @@ namespace Simple.Data.Ado
 
         private IEnumerable<SimpleReference> GetColumnsToSelect(Table table)
         {
-            if (_columns != null && _columns.Length > 0)
+            if (_columns != null && _columns.Count > 0)
             {
                 return _columns;
             }
