@@ -6,6 +6,8 @@ using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
+    using Extensions;
+
     public class QueryBuilder
     {
         private readonly SimpleReferenceFormatter _simpleReferenceFormatter;
@@ -75,12 +77,13 @@ namespace Simple.Data.Ado
                         _columns =
                             _columns.Concat(
                                 _schema.FindTable(withClause.ObjectReference.GetName()).Columns.Select(
-                                    c => new ObjectReference(c.ActualName, withClause.ObjectReference))).ToArray();
+                                    c => new ObjectReference(c.ActualName, withClause.ObjectReference)))
+                                    .ToArray();
                     }
                 }
                 _columns =
                     _columns.OfType<ObjectReference>().Select(
-                        c => c.As(string.Format("__with__{0}__{1}", c.GetOwner().GetAliasOrName(), c.GetName()))).ToArray();
+                    c => _schema.FindTable(c.GetOwner().GetName()) == _table ? c : c.As(string.Format("__with__{0}__{1}", c.GetOwner().GetAliasOrName(), c.GetName()))).ToArray();
             }
 
             _whereCriteria = _query.Clauses.OfType<WhereClause>().Aggregate(SimpleExpression.Empty,

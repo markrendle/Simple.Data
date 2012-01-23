@@ -82,6 +82,7 @@
     <Compile Include="DelegatingConnectionBase1.cs" />
     <Compile Include="DeleteHelper.cs" />
     <Compile Include="DictionaryExtensions.cs" />
+    <Compile Include="EagerLoadingEnumerable.cs" />
     <Compile Include="ExpressionFormatter.cs" />
     <Compile Include="ExpressionFormatterBase.cs" />
     <Compile Include="ExpressionHasher.cs" />

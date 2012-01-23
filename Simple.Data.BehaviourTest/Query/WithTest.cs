@@ -39,8 +39,8 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void SingleWithClauseUsingMagicMethodShouldUseJoin()
         {
-            const string expectedSql = "select [dbo].[employee].[id] as [__with__employee__id],[dbo].[employee].[name] as [__with__employee__name],"+
-                "[dbo].[employee].[managerid] as [__with__employee__managerid],[dbo].[employee].[departmentid] as [__with__employee__departmentid],"+
+            const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name],"+
+                "[dbo].[employee].[managerid],[dbo].[employee].[departmentid],"+
                 "[dbo].[department].[id] as [__with__department__id],[dbo].[department].[name] as [__with__department__name]"+
                 " from [dbo].[employee] left join [dbo].[department] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])";
 
@@ -54,8 +54,8 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void SingleWithClauseUsingReferenceShouldUseJoin()
         {
-            const string expectedSql = "select [dbo].[employee].[id] as [__with__employee__id],[dbo].[employee].[name] as [__with__employee__name]," +
-                "[dbo].[employee].[managerid] as [__with__employee__managerid],[dbo].[employee].[departmentid] as [__with__employee__departmentid]," +
+            const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name]," +
+                "[dbo].[employee].[managerid],[dbo].[employee].[departmentid]," +
                 "[dbo].[department].[id] as [__with__department__id],[dbo].[department].[name] as [__with__department__name]" +
                 " from [dbo].[employee] left join [dbo].[department] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])";
 
@@ -69,8 +69,8 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void SingleWithClauseUsingReferenceWithAliasShouldApplyAliasToSql()
         {
-            const string expectedSql = "select [dbo].[employee].[id] as [__with__employee__id],[dbo].[employee].[name] as [__with__employee__name]," +
-                "[dbo].[employee].[managerid] as [__with__employee__managerid],[dbo].[employee].[departmentid] as [__with__employee__departmentid]," +
+            const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name]," +
+                "[dbo].[employee].[managerid],[dbo].[employee].[departmentid]," +
                 "[foo].[id] as [__with__foo__id],[foo].[name] as [__with__foo__name]" +
                 " from [dbo].[employee] left join [dbo].[department] [foo] on ([foo].[id] = [dbo].[employee].[departmentid])";
 

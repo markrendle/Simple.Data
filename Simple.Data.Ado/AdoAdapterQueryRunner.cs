@@ -61,17 +61,18 @@
             }
 
             query = query.ClearWithTotalCount();
-            SimpleQuery countQuery =
-                query.ClearSkip().ClearTake().ClearOrderBy().ReplaceSelect(new CountSpecialReference());
+            var countQuery = query.ClearSkip()
+                .ClearTake()
+                .ClearOrderBy()
+                .ClearWith()
+                .ReplaceSelect(new CountSpecialReference());
             var unhandledClausesList = new List<IEnumerable<SimpleQueryClauseBase>>
                                            {
                                                Enumerable.Empty<SimpleQueryClauseBase>(),
                                                Enumerable.Empty<SimpleQueryClauseBase>()
                                            };
 
-            using (
-                IEnumerator<IEnumerable<IDictionary<string, object>>> enumerator =
-                    RunQueries(new[] {countQuery, query}, unhandledClausesList).GetEnumerator())
+            using (var enumerator = RunQueries(new[] {countQuery, query}, unhandledClausesList).GetEnumerator())
             {
                 unhandledClauses = unhandledClausesList[1];
                 if (!enumerator.MoveNext())
