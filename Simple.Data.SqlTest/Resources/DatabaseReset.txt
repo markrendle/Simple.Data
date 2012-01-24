@@ -170,7 +170,7 @@ BEGIN
 		SET @PagingId = @PagingId + 1
 	END
 	
-	INSERT INTO [dbo].[DecimalTest] ([Value]) VALUES (1.2345678)
+	INSERT INTO [dbo].[DecimalTest] ([Value]) VALUES (1.234567)
 	COMMIT TRANSACTION
 
 	ALTER TABLE [dbo].[Orders] WITH NOCHECK
