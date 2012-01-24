@@ -54,6 +54,8 @@ BEGIN
 	DROP TABLE [dbo].[EnumTest]
 	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[DeleteTest]') AND type in (N'U'))
 	DROP TABLE [dbo].[DeleteTest]
+	IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[DecimalTest]') AND type in (N'U'))
+	DROP TABLE [dbo].[DecimalTest]
 
 	CREATE TABLE [dbo].[Users] (
 		[Id]       INT            IDENTITY (1, 1) NOT NULL,
@@ -136,6 +138,11 @@ BEGIN
 	ALTER TABLE [dbo].[DeleteTest]
 		ADD CONSTRAINT [PK_DeleteTest] PRIMARY KEY CLUSTERED ([Id] ASC)	
 
+	CREATE TABLE [dbo].[DecimalTest](
+		[Id] [int] IDENTITY (1, 1) NOT NULL,
+		[Value] [decimal](20,6) NOT NULL
+	)
+
 	BEGIN TRANSACTION
 	SET IDENTITY_INSERT [dbo].[Customers] ON
 	INSERT INTO [dbo].[Customers] ([CustomerId], [Name], [Address]) VALUES (1, N'Test', N'100 Road')
@@ -163,6 +170,7 @@ BEGIN
 		SET @PagingId = @PagingId + 1
 	END
 	
+	INSERT INTO [dbo].[DecimalTest] ([Value]) VALUES (1.2345678)
 	COMMIT TRANSACTION
 
 	ALTER TABLE [dbo].[Orders] WITH NOCHECK
