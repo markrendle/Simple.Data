@@ -6,6 +6,8 @@ using NUnit.Framework;
 
 namespace Simple.Data.SqlTest
 {
+    using System.Collections;
+
     [TestFixture]
     public class QueryTest
     {
@@ -315,6 +317,15 @@ namespace Simple.Data.SqlTest
                            .Single();
             Assert.AreEqual(2, result.This);
             Assert.AreEqual("Pass", result.That);
+        }
+
+        [Test]
+        public void WithClauseShouldPreselectSubTable()
+        {
+            var db = DatabaseHelper.Open();
+            var result = db.Customers.FindAllByCustomerId(1).WithOrders().FirstOrDefault() as IDictionary<string,object>;
+            Assert.IsNotNull(result);
+            Assert.Contains("Orders", (ICollection)result.Keys);
         }
     }
 }

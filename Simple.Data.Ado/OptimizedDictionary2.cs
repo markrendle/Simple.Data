@@ -14,7 +14,7 @@ namespace Simple.Data.Ado
         public OptimizedDictionary(IDictionary<TKey, int> index, IEnumerable<TValue> values)
         {
             _index = index;
-            _values = values.ToList();
+            _values = new List<TValue>(values);
         }
 
         /// <summary>
@@ -66,6 +66,10 @@ namespace Simple.Data.Ado
                 if (!_index.ContainsKey(key))
                 {
                     _index.Add(key, _index.Count);
+                    while (_values.Count < _index.Count)
+                    {
+                        _values.Add(default(TValue));
+                    }
                 }
             }
         }
@@ -217,6 +221,10 @@ namespace Simple.Data.Ado
             }
             set
             {
+                if (!_index.ContainsKey(key))
+                {
+                    AddKeyToIndex(key);
+                }
                 try
                 {
                     _values[_index[key]] = value;
@@ -224,10 +232,6 @@ namespace Simple.Data.Ado
                 catch (ArgumentNullException)
                 {
                     throw new ArgumentNullException("key");
-                }
-                catch (KeyNotFoundException)
-                {
-                    throw new KeyNotFoundException();
                 }
             }
         }

@@ -64,8 +64,14 @@
                 }
             }
 
+            IDictionary<string,int> index = null;
             foreach (var kvp in load)
             {
+                if (index == null)
+                {
+                    index = kvp.Key.Keys.Select((k, i) => new KeyValuePair<string, int>(k, i)).ToDictionary(HomogenizedEqualityComparer.DefaultInstance);
+                }
+                var row = new OptimizedDictionary<string, object>(index, kvp.Key.Values);
                 foreach (var sub in kvp.Value)
                 {
                     if (sub.Value.Count == 1)

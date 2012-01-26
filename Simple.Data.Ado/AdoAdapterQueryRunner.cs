@@ -18,19 +18,31 @@
                                                                  out IEnumerable<SimpleQueryClauseBase>
                                                                      unhandledClauses)
         {
+            IEnumerable<IDictionary<string, object>> result;
+
             if (query.Clauses.OfType<WithCountClause>().Any()) return RunQueryWithCount(query, out unhandledClauses);
 
             ICommandBuilder[] commandBuilders = GetQueryCommandBuilders(query, out unhandledClauses);
             IDbConnection connection = _adapter.CreateConnection();
             if (_adapter.ProviderSupportsCompoundStatements || commandBuilders.Length == 1)
             {
-                return
+                result =
                     CommandBuilder.CreateCommand(
                         _adapter.ProviderHelper.GetCustomProvider<IDbParameterFactory>(_adapter.SchemaProvider),
                         commandBuilders,
                         connection).ToEnumerable(_adapter.CreateConnection);
             }
-            return commandBuilders.SelectMany(cb => cb.GetCommand(connection).ToEnumerable(_adapter.CreateConnection));
+            else
+            {
+                result = commandBuilders.SelectMany(cb => cb.GetCommand(connection).ToEnumerable(_adapter.CreateConnection));
+            }
+
+            if (query.Clauses.OfType<WithClause>().Any())
+            {
+                result = new EagerLoadingEnumerable(result);
+            }
+
+            return result;
         }
 
         public IObservable<IDictionary<string, object>> RunQueryAsObservable(SimpleQuery query,
