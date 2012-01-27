@@ -78,6 +78,16 @@ namespace Simple.Data
             return GetAlias() ?? _name;
         }
 
+        public AllColumnsSpecialReference AllColumns()
+        {
+            return new AllColumnsSpecialReference(this);
+        }
+
+        public AllColumnsSpecialReference Star()
+        {
+            return new AllColumnsSpecialReference(this);
+        }
+
         public override bool TryInvoke(InvokeBinder binder, object[] args, out object result)
         {
             if (_dataStrategy != null)

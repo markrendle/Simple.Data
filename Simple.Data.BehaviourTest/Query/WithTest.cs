@@ -115,5 +115,46 @@ namespace Simple.Data.IntegrationTest.Query
 
             GeneratedSqlIs(expectedSql);
         }
+
+        [Test]
+        public void SingleWithOneClauseUsingExplicitJoinShouldApplyAliasToSql()
+        {
+            const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name]," +
+                "[dbo].[employee].[managerid],[dbo].[employee].[departmentid]," +
+                "[manager].[id] as [__with1__manager__id],[manager].[name] as [__with1__manager__name]," +
+                "[manager].[managerid] as [__with1__manager__managerid],[manager].[departmentid] as [__with1__manager__departmentid]" +
+                " from [dbo].[employee] left join [dbo].[employee] [manager] on ([manager].[id] = [dbo].[employee].[managerid])";
+
+            dynamic manager;
+            var q = _db.Employees.All()
+                .OuterJoin(_db.Employees.As("Manager"), out manager).On(Id: _db.Employees.ManagerId)
+                .WithOne(manager);
+
+            EatException(() => q.ToList());
+
+            GeneratedSqlIs(expectedSql);
+        }
+
+        [Test]
+        public void MultipleWithClauseJustDoesEverythingYouWouldHope()
+        {
+            const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name]," +
+                "[dbo].[employee].[managerid],[dbo].[employee].[departmentid]," +
+                "[manager].[id] as [__withn__manager__id],[manager].[name] as [__withn__manager__name]," +
+                "[manager].[managerid] as [__withn__manager__managerid],[manager].[departmentid] as [__withn__manager__departmentid]," +
+                "[dbo].[department].[id] as [__with1__department__id],[dbo].[department].[name] as [__with1__department__name]" +
+                " from [dbo].[employee] left join [dbo].[employee] [manager] on ([manager].[id] = [dbo].[employee].[managerid])" +
+                " left join [dbo].[department] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])";
+
+            dynamic manager;
+            var q = _db.Employees.All()
+                .OuterJoin(_db.Employees.As("Manager"), out manager).On(Id: _db.Employees.ManagerId)
+                .With(manager)
+                .WithDepartment();
+
+            EatException(() => q.ToList());
+
+            GeneratedSqlIs(expectedSql);
+        }
     }
 }

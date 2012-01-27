@@ -33,11 +33,23 @@ namespace Simple.Data.Ado
                             ??
                             TryFormatAsFunctionReference(reference as FunctionReference, excludeAlias)
                             ??
-                            TryFormatAsMathReference(reference as MathReference, excludeAlias);
+                            TryFormatAsMathReference(reference as MathReference, excludeAlias)
+                            ??
+                            TryFormatAsAllColumnsReference(reference as AllColumnsSpecialReference, excludeAlias);
 
             if (formatted != null) return formatted;
 
             throw new InvalidOperationException("SimpleReference type not supported.");
+        }
+
+        private string TryFormatAsAllColumnsReference(AllColumnsSpecialReference allColumnsSpecialReference, bool excludeAlias)
+        {
+            if (ReferenceEquals(allColumnsSpecialReference, null)) return null;
+            var table = _schema.FindTable(allColumnsSpecialReference.Table.GetAllObjectNamesDotted());
+            var tableName = string.IsNullOrWhiteSpace(allColumnsSpecialReference.GetAlias())
+                                ? table.QualifiedName
+                                : _schema.QuoteObjectName(allColumnsSpecialReference.GetAlias());
+            return string.Format("{0}.*", tableName);
         }
 
         private string FormatObject(object obj)

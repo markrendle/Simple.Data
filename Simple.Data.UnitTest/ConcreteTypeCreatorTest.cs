@@ -57,7 +57,7 @@ namespace Simple.Data.UnitTest
             Assert.IsInstanceOf<Int32ToEnum>(actual);
             Assert.AreEqual(expected, ((Int32ToEnum)actual).Value);
         }
-        
+
         public class DecimalToDouble
         {
             public double Value { get; set; }

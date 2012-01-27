@@ -102,6 +102,7 @@
     <Compile Include="SimpleQueryTest.cs" />
     <Compile Include="SimpleRecordAsDictionaryTest.cs" />
     <Compile Include="SimpleRecordCloneTest.cs" />
+    <Compile Include="SimpleRecordConvertTest.cs" />
     <Compile Include="SimpleResultSetTest.cs" />
     <Compile Include="SpecialReferenceTests.cs" />
     <Compile Include="StringExtensionsTest.cs" />

@@ -44,6 +44,26 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void SpecifyingColumnStarShouldSelectAllColumns()
+        {
+            _db.Users.All()
+                .Select(_db.Users.Name, _db.Users.UserBio.Star())
+                .ToList();
+            GeneratedSqlIs("select [dbo].[users].[name],[dbo].[userbio].[userid],[dbo].[userbio].[text] from [dbo].[users]" +
+                " left join [dbo].[userbio] on ([dbo].[users].[id] = [dbo].[userbio].[userid])");
+        }
+
+        [Test]
+        public void SpecifyingColumnAllColumnsShouldSelectAllColumns()
+        {
+            _db.Users.All()
+                .Select(_db.Users.Name, _db.Users.UserBio.AllColumns())
+                .ToList();
+            GeneratedSqlIs("select [dbo].[users].[name],[dbo].[userbio].[userid],[dbo].[userbio].[text] from [dbo].[users]" +
+                " left join [dbo].[userbio] on ([dbo].[users].[id] = [dbo].[userbio].[userid])");
+        }
+
+        [Test]
         public void SpecifyingColumnWithAliasShouldAddAsClause()
         {
             _db.Users.All()

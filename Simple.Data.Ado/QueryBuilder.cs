@@ -60,7 +60,14 @@ namespace Simple.Data.Ado
             var selectClause = _query.Clauses.OfType<SelectClause>().SingleOrDefault();
             if (selectClause != null)
             {
-                _columns = selectClause.Columns.ToArray();
+                if (selectClause.Columns.OfType<AllColumnsSpecialReference>().Any())
+                {
+                    _columns = ExpandAllColumnsReferences(selectClause.Columns).ToArray();
+                }
+                else
+                {
+                    _columns = selectClause.Columns.ToArray();
+                }
             }
             else
             {
@@ -75,6 +82,22 @@ namespace Simple.Data.Ado
                                                                               (seed, having) => seed && having.Criteria);
 
             _commandBuilder.SetText(GetSelectClause(_tableName));
+        }
+
+        private IEnumerable<SimpleReference> ExpandAllColumnsReferences(IEnumerable<SimpleReference> columns)
+        {
+            foreach (var column in columns)
+            {
+                var allColumns = column as AllColumnsSpecialReference;
+                if (ReferenceEquals(allColumns, null)) yield return column;
+                else
+                {
+                    foreach (var allColumn in _schema.FindTable(allColumns.Table.GetName()).Columns)
+                    {
+                        yield return new ObjectReference(allColumn.ActualName, allColumns.Table);
+                    }
+                }
+            }
         }
 
         private void HandleWithClauses()
