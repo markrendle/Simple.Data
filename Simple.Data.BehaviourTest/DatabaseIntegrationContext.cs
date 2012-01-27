@@ -6,6 +6,8 @@ using Simple.Data.Mocking.Ado;
 
 namespace Simple.Data.IntegrationTest
 {
+    using System.Diagnostics;
+
     public abstract class DatabaseIntegrationContext
     {
         protected MockDatabase _mockDatabase;
@@ -68,9 +70,10 @@ namespace Simple.Data.IntegrationTest
             {
                 action();
             }
-            catch (TException)
+            catch (TException ex)
             {
                 // This won't work on Mock provider, but the SQL should be generated OK
+                Trace.TraceError(ex.Message);
             }
 
         }

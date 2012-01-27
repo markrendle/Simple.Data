@@ -6,10 +6,11 @@ using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
+    using Extensions;
+
     public class QueryBuilder
     {
-        private readonly IFunctionNameConverter _functionNameConverter = new FunctionNameConverter();
-        private SimpleReferenceFormatter _simpleReferenceFormatter;
+        private readonly SimpleReferenceFormatter _simpleReferenceFormatter;
         private readonly AdoAdapter _adoAdapter;
         private readonly int _bulkIndex;
         private readonly DatabaseSchema _schema;
@@ -19,8 +20,8 @@ namespace Simple.Data.Ado
         private SimpleQuery _query;
         private SimpleExpression _whereCriteria;
         private SimpleExpression _havingCriteria;
-        private SimpleReference[] _columns;
-        private CommandBuilder _commandBuilder;
+        private IList<SimpleReference> _columns;
+        private readonly CommandBuilder _commandBuilder;
         private List<SimpleQueryClauseBase> _unhandledClauses;
 
         public QueryBuilder(AdoAdapter adoAdapter) : this(adoAdapter, -1)
@@ -54,31 +55,115 @@ namespace Simple.Data.Ado
         private void SetQueryContext(SimpleQuery query)
         {
             _query = query;
+            _tableName = _schema.BuildObjectName(query.TableName);
+            _table = _schema.FindTable(_tableName);
             var selectClause = _query.Clauses.OfType<SelectClause>().SingleOrDefault();
             if (selectClause != null)
             {
-                _columns = selectClause.Columns.ToArray();
+                if (selectClause.Columns.OfType<AllColumnsSpecialReference>().Any())
+                {
+                    _columns = ExpandAllColumnsReferences(selectClause.Columns).ToArray();
+                }
+                else
+                {
+                    _columns = selectClause.Columns.ToArray();
+                }
             }
             else
             {
-                _columns = new SimpleReference[0];
+                _columns = _table.Columns.Select(c => ObjectReference.FromStrings(_table.ActualName, c.ActualName)).ToArray();
             }
+
+            HandleWithClauses();
 
             _whereCriteria = _query.Clauses.OfType<WhereClause>().Aggregate(SimpleExpression.Empty,
                                                                             (seed, where) => seed && where.Criteria);
             _havingCriteria = _query.Clauses.OfType<HavingClause>().Aggregate(SimpleExpression.Empty,
                                                                               (seed, having) => seed && having.Criteria);
 
-            _tableName = _schema.BuildObjectName(query.TableName);
-            _table = _schema.FindTable(_tableName);
             _commandBuilder.SetText(GetSelectClause(_tableName));
+        }
+
+        private IEnumerable<SimpleReference> ExpandAllColumnsReferences(IEnumerable<SimpleReference> columns)
+        {
+            foreach (var column in columns)
+            {
+                var allColumns = column as AllColumnsSpecialReference;
+                if (ReferenceEquals(allColumns, null)) yield return column;
+                else
+                {
+                    foreach (var allColumn in _schema.FindTable(allColumns.Table.GetName()).Columns)
+                    {
+                        yield return new ObjectReference(allColumn.ActualName, allColumns.Table);
+                    }
+                }
+            }
+        }
+
+        private void HandleWithClauses()
+        {
+            var withClauses = _query.Clauses.OfType<WithClause>().ToList();
+            var relationTypeDict = new Dictionary<ObjectReference, RelationType>();
+            if (withClauses.Count > 0)
+            {
+                foreach (var withClause in withClauses)
+                {
+                    if (withClause.ObjectReference.GetOwner().IsNull())
+                    {
+                        var joinClause =
+                            _query.Clauses.OfType<JoinClause>().FirstOrDefault(j => j.Table.GetAliasOrName() == withClause.ObjectReference.GetAliasOrName());
+                        if (joinClause != null)
+                        {
+                            _columns =
+                                _columns.Concat(
+                                    _schema.FindTable(joinClause.Table.GetName()).Columns.Select(
+                                        c => new ObjectReference(c.ActualName, joinClause.Table)))
+                                    .ToArray();
+                            relationTypeDict[joinClause.Table] = withClause.Type == WithType.One
+                                                                     ? RelationType.ManyToOne
+                                                                     : RelationType.OneToMany;
+                        }
+                    }
+                    else
+                    {
+                        relationTypeDict[withClause.ObjectReference] = RelationType.None;
+                        _columns =
+                            _columns.Concat(
+                                _schema.FindTable(withClause.ObjectReference.GetName()).Columns.Select(
+                                    c => new ObjectReference(c.ActualName, withClause.ObjectReference)))
+                                .ToArray();
+                    }
+                }
+                _columns =
+                    _columns.OfType<ObjectReference>()
+                        .Select(c => IsCoreTable(c.GetOwner()) ? c : AddWithAlias(c, relationTypeDict[c.GetOwner()]))
+                        .ToArray();
+            }
+        }
+
+        private bool IsCoreTable(ObjectReference tableReference)
+        {
+            if (ReferenceEquals(tableReference, null)) throw new ArgumentNullException("tableReference");
+            if (!string.IsNullOrWhiteSpace(tableReference.GetAlias())) return false;
+            return _schema.FindTable(tableReference.GetName()) == _table;
+        }
+
+        private ObjectReference AddWithAlias(ObjectReference c, RelationType relationType = RelationType.None)
+        {
+            if (relationType == RelationType.None)
+                relationType = _schema.GetRelationType(c.GetOwner().GetOwner().GetName(), c.GetOwner().GetName());
+            if (relationType == RelationType.None) throw new InvalidOperationException("No Join found");
+            return c.As(string.Format("__with{0}__{1}__{2}",
+                               relationType == RelationType.OneToMany
+                                   ? "n"
+                                   : "1", c.GetOwner().GetAliasOrName(), c.GetName()));
         }
 
         private void HandleJoins()
         {
             if (_whereCriteria == SimpleExpression.Empty && _havingCriteria == SimpleExpression.Empty
                 && (!_query.Clauses.OfType<JoinClause>().Any())
-                && (_columns.Where(r => !(r is CountSpecialReference)).Count() == 0)) return;
+                && (_columns.All(r => (r is CountSpecialReference)))) return;
 
             var joiner = new Joiner(JoinType.Inner, _schema);
 
@@ -88,14 +173,15 @@ namespace Simple.Data.Ado
                                 ? joiner.GetJoinClauses(_tableName, dottedTables.Split('.').Reverse())
                                 : Enumerable.Empty<string>();
 
-            var fromJoins = joiner.GetJoinClauses(_query.Clauses.OfType<JoinClause>(), _commandBuilder);
+            var joinClauses = _query.Clauses.OfType<JoinClause>().ToArray();
+            var fromJoins = joiner.GetJoinClauses(joinClauses, _commandBuilder);
 
             var fromCriteria = joiner.GetJoinClauses(_tableName, _whereCriteria);
 
             var fromHavingCriteria = joiner.GetJoinClauses(_tableName, _havingCriteria);
 
             var fromColumnList = _columns.Any(r => !(r is SpecialReference))
-                                     ? joiner.GetJoinClauses(_tableName, GetObjectReferences(_columns), JoinType.Outer)
+                                     ? joiner.GetJoinClauses(_tableName, GetObjectReferences(_columns).Where(o => !joinClauses.Any(j => o.GetOwner().Equals(j.Table))), JoinType.Outer)
                                      : Enumerable.Empty<string>();
 
             var joins = string.Join(" ", fromTable.Concat(fromJoins)
@@ -192,7 +278,7 @@ namespace Simple.Data.Ado
 
         private string GetColumnsClause(Table table)
         {
-            if (_columns != null && _columns.Length == 1 && _columns[0] is SpecialReference)
+            if (_columns != null && _columns.Count == 1 && _columns[0] is SpecialReference)
             {
                 return FormatSpecialReference((SpecialReference) _columns[0]);
             }
@@ -209,7 +295,7 @@ namespace Simple.Data.Ado
 
         private IEnumerable<SimpleReference> GetColumnsToSelect(Table table)
         {
-            if (_columns != null && _columns.Length > 0)
+            if (_columns != null && _columns.Count > 0)
             {
                 return _columns;
             }

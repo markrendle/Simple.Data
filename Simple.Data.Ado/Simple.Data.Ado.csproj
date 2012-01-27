@@ -58,6 +58,7 @@
     <Compile Include="AdoAdapterFinder.cs" />
     <Compile Include="AdoAdapterGetter.cs" />
     <Compile Include="AdoAdapterInserter.cs" />
+    <Compile Include="AdoAdapterQueryRunner.cs" />
     <Compile Include="AdoAdapterRelatedFinder.cs" />
     <Compile Include="AdoAdapterTransaction.cs" />
     <Compile Include="BulkInserter.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="DelegatingConnectionBase1.cs" />
     <Compile Include="DeleteHelper.cs" />
     <Compile Include="DictionaryExtensions.cs" />
+    <Compile Include="EagerLoadingEnumerable.cs" />
     <Compile Include="ExpressionFormatter.cs" />
     <Compile Include="ExpressionFormatterBase.cs" />
     <Compile Include="ExpressionHasher.cs" />
@@ -101,7 +103,6 @@
     <Compile Include="ISchemaGetter.cs" />
     <Compile Include="ISqlOptimizer.cs" />
     <Compile Include="Joiner.cs" />
-    <Compile Include="JoinType.cs" />
     <Compile Include="OptimizedDictionary.cs" />
     <Compile Include="OptimizedDictionaryIndex.cs" />
     <Compile Include="OptimizedDictionary2.cs" />
@@ -134,6 +135,7 @@
     <Compile Include="Schema\TableJoin.cs" />
     <Compile Include="Schema\TableType.cs" />
     <Compile Include="ObjectName.cs" />
+    <Compile Include="SubDictionary.cs" />
     <Compile Include="TraceHelper.cs" />
     <Compile Include="TupleExtensions.cs" />
     <Compile Include="TypeHelper.cs" />

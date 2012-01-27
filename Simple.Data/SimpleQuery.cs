@@ -254,7 +254,12 @@
             }
             if (binder.Name.Equals("join", StringComparison.OrdinalIgnoreCase))
             {
-                result = args.Length == 1 ? Join(ObjectAsObjectReference(args[0])) : ParseJoin(binder, args);
+                result = args.Length == 1 ? Join(ObjectAsObjectReference(args[0]), JoinType.Inner) : ParseJoin(binder, args);
+                return true;
+            }
+            if (binder.Name.Equals("leftjoin", StringComparison.OrdinalIgnoreCase) || binder.Name.Equals("outerjoin", StringComparison.OrdinalIgnoreCase))
+            {
+                result = args.Length == 1 ? Join(ObjectAsObjectReference(args[0]), JoinType.Outer) : ParseJoin(binder, args);
                 return true;
             }
             if (binder.Name.Equals("on", StringComparison.OrdinalIgnoreCase))
@@ -271,8 +276,45 @@
                     return true;
                 }
             }
+            if (binder.Name.StartsWith("with", StringComparison.OrdinalIgnoreCase))
+            {
+                result = ParseWith(binder, args);
+                return true;
+            }
 
             return false;
+        }
+
+        private SimpleQuery ParseWith(InvokeMemberBinder binder, object[] args)
+        {
+            if (args.Length > 0)
+            {
+                if (binder.Name.Equals("with", StringComparison.OrdinalIgnoreCase))
+                {
+                    return With(args);
+                }
+
+                if (binder.Name.Equals("withone", StringComparison.OrdinalIgnoreCase))
+                {
+                    return With(args, WithType.One);
+                }
+
+                if (binder.Name.Equals("withmany", StringComparison.OrdinalIgnoreCase))
+                {
+                    return With(args, WithType.Many);
+                }
+            }
+
+            var objectName = binder.Name.Substring(4);
+            var withClause = new WithClause(new ObjectReference(objectName, new ObjectReference(_tableName, _dataStrategy), _dataStrategy));
+            return new SimpleQuery(this, _clauses.Append(withClause));
+        }
+
+        private SimpleQuery With(IEnumerable<object> args, WithType withType = WithType.NotSpecified)
+        {
+            var clauses = new List<SimpleQueryClauseBase>(_clauses);
+            clauses.AddRange(args.OfType<ObjectReference>().Select(reference => new WithClause(reference, withType)));
+            return new SimpleQuery(this, clauses.ToArray());
         }
 
         private ObjectReference ObjectAsObjectReference(object o)
@@ -286,18 +328,49 @@
             throw new InvalidOperationException("Could not convert parameter to ObjectReference.");
         }
 
-        public SimpleQuery Join(ObjectReference objectReference)
+        public SimpleQuery Join(ObjectReference objectReference, JoinType joinType)
         {
             if (ReferenceEquals(objectReference, null)) throw new ArgumentNullException("objectReference");
-            _tempJoinWaitingForOn = new JoinClause(objectReference, null);
+            _tempJoinWaitingForOn = new JoinClause(objectReference, joinType, null);
 
             return this;
         }
 
         public SimpleQuery Join(ObjectReference objectReference, out dynamic queryObjectReference)
         {
+            return Join(objectReference, JoinType.Inner, out queryObjectReference);
+        }
+
+        public SimpleQuery Join(ObjectReference objectReference, JoinType joinType, out dynamic queryObjectReference)
+        {
             var newJoin = new JoinClause(objectReference, null);
             _tempJoinWaitingForOn = newJoin;
+            queryObjectReference = objectReference;
+
+            return this;
+        }
+
+        public SimpleQuery LeftJoin(ObjectReference objectReference)
+        {
+            return OuterJoin(objectReference);
+        }
+
+        public SimpleQuery LeftJoin(ObjectReference objectReference, out dynamic queryObjectReference)
+        {
+            return OuterJoin(objectReference, out queryObjectReference);
+        }
+
+        public SimpleQuery OuterJoin(ObjectReference objectReference)
+        {
+            if (ReferenceEquals(objectReference, null)) throw new ArgumentNullException("objectReference");
+            _tempJoinWaitingForOn = new JoinClause(objectReference, JoinType.Outer);
+
+            return this;
+        }
+
+        public SimpleQuery OuterJoin(ObjectReference objectReference, out dynamic queryObjectReference)
+        {
+            _tempJoinWaitingForOn = new JoinClause(objectReference, JoinType.Outer);
             queryObjectReference = objectReference;
 
             return this;
@@ -307,7 +380,7 @@
         {
             if (_tempJoinWaitingForOn == null)
                 throw new InvalidOperationException("Call to On must be preceded by call to Join.");
-            return AddNewJoin(new JoinClause(_tempJoinWaitingForOn.Table, joinExpression));
+            return AddNewJoin(new JoinClause(_tempJoinWaitingForOn.Table, _tempJoinWaitingForOn.JoinType, joinExpression));
         }
 
         [Obsolete]
@@ -344,7 +417,8 @@
 
             if (joinExpression == null) throw new InvalidOperationException();
 
-            var newJoin = new JoinClause(tableToJoin, joinExpression);
+            var type = binder.Name.Equals("join", StringComparison.OrdinalIgnoreCase) ? JoinType.Inner : JoinType.Outer;
+            var newJoin = new JoinClause(tableToJoin, type, joinExpression);
 
             return AddNewJoin(newJoin);
         }
@@ -355,11 +429,12 @@
                 throw new InvalidOperationException("Call to On must be preceded by call to Join.");
             var joinExpression = ExpressionHelper.CriteriaDictionaryToExpression(_tempJoinWaitingForOn.Table,
                                                                                  binder.NamedArgumentsToDictionary(args));
-            return new SimpleQuery(this, _clauses.Append(new JoinClause(_tempJoinWaitingForOn.Table, joinExpression)));
+            return AddNewJoin(new JoinClause(_tempJoinWaitingForOn.Table, _tempJoinWaitingForOn.JoinType, joinExpression));
         }
 
         private SimpleQuery AddNewJoin(JoinClause newJoin)
         {
+            _tempJoinWaitingForOn = null;
             return new SimpleQuery(this, _clauses.Append(newJoin));
         }
 
@@ -392,7 +467,7 @@
 
         public IEnumerable<T> OfType<T>()
         {
-			return new OfTypeEnumerable<T>(Run());
+            return new OfTypeEnumerable<T>(Run());
         }
 
         public IList<dynamic> ToList()
@@ -606,6 +681,11 @@
         public SimpleQuery ClearOrderBy()
         {
             return new SimpleQuery(this, _clauses.Where(c => !(c is OrderByClause)).ToArray());
+        }
+
+        public SimpleQuery ClearWith()
+        {
+            return new SimpleQuery(this, _clauses.Where(c => !(c is WithClause)).ToArray());
         }
     }
 }

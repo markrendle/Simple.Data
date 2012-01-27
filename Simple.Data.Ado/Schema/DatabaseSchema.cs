@@ -115,5 +115,21 @@ namespace Simple.Data.Ado.Schema
             if (schemaDotTable.Length != 2) throw new InvalidOperationException("Could not parse table name.");
             return new ObjectName(schemaDotTable[0], schemaDotTable[1]);
         }
+
+        public RelationType GetRelationType(string fromTableName, string toTableName)
+        {
+            var fromTable = FindTable(fromTableName);
+
+            if (fromTable.GetMaster(toTableName) != null) return RelationType.ManyToOne;
+            if (fromTable.GetDetail(toTableName) != null) return RelationType.OneToMany;
+            return RelationType.None;
+        }
+    }
+
+    public enum RelationType
+    {
+        None,
+        OneToMany,
+        ManyToOne
     }
 }

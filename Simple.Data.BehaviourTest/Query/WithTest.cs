@@ -29,22 +29,128 @@ namespace Simple.Data.IntegrationTest.Query
                                       new[] { "dbo", "Activity_Join", "ID_Location" },
                                       new[] { "dbo", "Location", "ID_Location" }
                                       );
-            schemaProvider.SetPrimaryKeys(
-                new object[] { "dbo", "Employee", "Id", 0 },
-                new object[] { "dbo", "Department", "Id", 0 }
-                );
+
+            schemaProvider.SetPrimaryKeys(new object[] {"dbo", "Employee", "Id", 0},
+                                          new object[] {"dbo", "Department", "Id", 0});
+
             schemaProvider.SetForeignKeys(new object[] { "FK_Employee_Department", "dbo", "Employee", "DepartmentId", "dbo", "Department", "Id", 0 });
         }
 
         [Test]
-        public void SingleWithClauseShouldUseJoin()
+        public void SingleWithClauseUsingMagicMethodShouldUseWith1Join()
         {
-            const string expectedSql = "select [employee].[id] as [__with__employee__id],[employee].[name] as [__with__employee__name],"+
-                "[employee].[managerid] as [__with__employee__managerid],[employee].[departmentid] as [__with__employee__departmentid],"+
-                "[department].[id] as [__with__department__id],[department].[name] as [__with__department__name]"+
-                "from [employee] left join [department] on [employee].[departmentid] = [department].[id]";
+            const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name],"+
+                "[dbo].[employee].[managerid],[dbo].[employee].[departmentid],"+
+                "[dbo].[department].[id] as [__with1__department__id],[dbo].[department].[name] as [__with1__department__name]"+
+                " from [dbo].[employee] left join [dbo].[department] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])";
 
             var q = _db.Employees.All().WithDepartment();
+
+            EatException(() => q.ToList());
+
+            GeneratedSqlIs(expectedSql);
+        }
+
+        [Test]
+        public void SingleWithClauseUsingMagicMethodShouldUseWithNJoin()
+        {
+            const string expectedSql = "select " +
+                "[dbo].[department].[id],[dbo].[department].[name],"+
+                "[dbo].[employee].[id] as [__withn__employees__id],[dbo].[employee].[name] as [__withn__employees__name],"+
+                "[dbo].[employee].[managerid] as [__withn__employees__managerid],[dbo].[employee].[departmentid] as [__withn__employees__departmentid]"+
+                " from [dbo].[department] left join [dbo].[employee] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])";
+
+            var q = _db.Departments.All().WithEmployees();
+
+            EatException(() => q.ToList());
+
+            GeneratedSqlIs(expectedSql);
+        }
+
+        [Test]
+        public void SingleWithClauseUsingReferenceShouldUseJoin()
+        {
+            const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name]," +
+                "[dbo].[employee].[managerid],[dbo].[employee].[departmentid]," +
+                "[dbo].[department].[id] as [__with1__department__id],[dbo].[department].[name] as [__with1__department__name]" +
+                " from [dbo].[employee] left join [dbo].[department] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])";
+
+            var q = _db.Employees.All().With(_db.Employees.Department);
+
+            EatException(() => q.ToList());
+
+            GeneratedSqlIs(expectedSql);
+        }
+
+        [Test]
+        public void SingleWithClauseUsingReferenceWithAliasShouldApplyAliasToSql()
+        {
+            const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name]," +
+                "[dbo].[employee].[managerid],[dbo].[employee].[departmentid]," +
+                "[foo].[id] as [__with1__foo__id],[foo].[name] as [__with1__foo__name]" +
+                " from [dbo].[employee] left join [dbo].[department] [foo] on ([foo].[id] = [dbo].[employee].[departmentid])";
+
+            var q = _db.Employees.All().With(_db.Employees.Department.As("Foo"));
+
+            EatException(() => q.ToList());
+
+            GeneratedSqlIs(expectedSql);
+        }
+
+        [Test]
+        public void SingleWithClauseUsingExplicitJoinShouldApplyAliasToSql()
+        {
+            const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name]," +
+                "[dbo].[employee].[managerid],[dbo].[employee].[departmentid]," +
+                "[manager].[id] as [__withn__manager__id],[manager].[name] as [__withn__manager__name]," +
+                "[manager].[managerid] as [__withn__manager__managerid],[manager].[departmentid] as [__withn__manager__departmentid]" +
+                " from [dbo].[employee] left join [dbo].[employee] [manager] on ([manager].[id] = [dbo].[employee].[managerid])";
+
+            dynamic manager;
+            var q = _db.Employees.All()
+                .OuterJoin(_db.Employees.As("Manager"), out manager).On(Id: _db.Employees.ManagerId)
+                .With(manager);
+
+            EatException(() => q.ToList());
+
+            GeneratedSqlIs(expectedSql);
+        }
+
+        [Test]
+        public void SingleWithOneClauseUsingExplicitJoinShouldApplyAliasToSql()
+        {
+            const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name]," +
+                "[dbo].[employee].[managerid],[dbo].[employee].[departmentid]," +
+                "[manager].[id] as [__with1__manager__id],[manager].[name] as [__with1__manager__name]," +
+                "[manager].[managerid] as [__with1__manager__managerid],[manager].[departmentid] as [__with1__manager__departmentid]" +
+                " from [dbo].[employee] left join [dbo].[employee] [manager] on ([manager].[id] = [dbo].[employee].[managerid])";
+
+            dynamic manager;
+            var q = _db.Employees.All()
+                .OuterJoin(_db.Employees.As("Manager"), out manager).On(Id: _db.Employees.ManagerId)
+                .WithOne(manager);
+
+            EatException(() => q.ToList());
+
+            GeneratedSqlIs(expectedSql);
+        }
+
+        [Test]
+        public void MultipleWithClauseJustDoesEverythingYouWouldHope()
+        {
+            const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name]," +
+                "[dbo].[employee].[managerid],[dbo].[employee].[departmentid]," +
+                "[manager].[id] as [__withn__manager__id],[manager].[name] as [__withn__manager__name]," +
+                "[manager].[managerid] as [__withn__manager__managerid],[manager].[departmentid] as [__withn__manager__departmentid]," +
+                "[dbo].[department].[id] as [__with1__department__id],[dbo].[department].[name] as [__with1__department__name]" +
+                " from [dbo].[employee] left join [dbo].[employee] [manager] on ([manager].[id] = [dbo].[employee].[managerid])" +
+                " left join [dbo].[department] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])";
+
+            dynamic manager;
+            var q = _db.Employees.All()
+                .OuterJoin(_db.Employees.As("Manager"), out manager).On(Id: _db.Employees.ManagerId)
+                .With(manager)
+                .WithDepartment();
 
             EatException(() => q.ToList());
 

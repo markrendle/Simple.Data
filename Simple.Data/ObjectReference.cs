@@ -21,7 +21,7 @@ namespace Simple.Data
         {
         }
 
-        internal ObjectReference(string name, ObjectReference owner) : this(name, owner, null, null)
+        public ObjectReference(string name, ObjectReference owner) : this(name, owner, null, null)
         {
         }
 
@@ -76,6 +76,16 @@ namespace Simple.Data
         public override string GetAliasOrName()
         {
             return GetAlias() ?? _name;
+        }
+
+        public AllColumnsSpecialReference AllColumns()
+        {
+            return new AllColumnsSpecialReference(this);
+        }
+
+        public AllColumnsSpecialReference Star()
+        {
+            return new AllColumnsSpecialReference(this);
         }
 
         public override bool TryInvoke(InvokeBinder binder, object[] args, out object result)
@@ -163,6 +173,16 @@ namespace Simple.Data
         {
             if (ReferenceEquals(GetOwner(), null)) return new[] {_name};
             return _owner.GetAllObjectNames().Concat(new[] {_name}).ToArray();
+        }
+
+        /// <summary>
+        /// Gets the names of all objects included in the reference as an array, with the uppermost object first.
+        /// </summary>
+        /// <returns></returns>
+        public Tuple<string,string>[] GetAllObjectNamesAndAliases()
+        {
+            if (ReferenceEquals(GetOwner(), null)) return new[] {Tuple.Create(_name, GetAlias())};
+            return _owner.GetAllObjectNamesAndAliases().Concat(new[] {Tuple.Create(_name, GetAlias())}).ToArray();
         }
 
         public string GetAllObjectNamesDotted()

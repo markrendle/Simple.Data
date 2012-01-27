@@ -6,6 +6,8 @@ using NUnit.Framework;
 
 namespace Simple.Data.SqlTest
 {
+    using System.Collections;
+
     [TestFixture]
     public class QueryTest
     {
@@ -315,6 +317,50 @@ namespace Simple.Data.SqlTest
                            .Single();
             Assert.AreEqual(2, result.This);
             Assert.AreEqual("Pass", result.That);
+        }
+
+        [Test]
+        public void WithClauseShouldPreselectDetailTableAsCollection()
+        {
+            var db = DatabaseHelper.Open();
+            var result = db.Customers.FindAllByCustomerId(1).WithOrders().FirstOrDefault() as IDictionary<string,object>;
+            Assert.IsNotNull(result);
+            Assert.Contains("Orders", (ICollection)result.Keys);
+            var orders = result["Orders"] as IList<IDictionary<string, object>>;
+            Assert.IsNotNull(orders);
+            Assert.AreEqual(1, orders.Count);
+        }
+
+        [Test]
+        public void WithClauseShouldPreselectMasterTableAsDictionary()
+        {
+            var db = DatabaseHelper.Open();
+            var result = db.Orders.FindAllByOrderId(1).WithCustomer().FirstOrDefault() as IDictionary<string,object>;
+            Assert.IsNotNull(result);
+            Assert.Contains("Customer", (ICollection)result.Keys);
+            var customer = result["Customer"] as IDictionary<string, object>;
+            Assert.IsNotNull(customer);
+        }
+
+        [Test]
+        public void WithClauseShouldCastToStaticTypeWithComplexProperty()
+        {
+            var db = DatabaseHelper.Open();
+            Order actual = db.Orders.FindAllByOrderId(1).WithCustomer().FirstOrDefault();
+            Assert.IsNotNull(actual);
+            Assert.IsNotNull(actual.Customer);
+            Assert.AreEqual("Test", actual.Customer.Name);
+            Assert.AreEqual("100 Road", actual.Customer.Address);
+        }
+
+        [Test]
+        public void WithClauseShouldCastToStaticTypeWithCollection()
+        {
+            var db = DatabaseHelper.Open();
+            Customer actual = db.Customers.FindAllByCustomerId(1).WithOrders().FirstOrDefault();
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(1, actual.Orders.Single().OrderId);
+            Assert.AreEqual(new DateTime(2010,10,10), actual.Orders.Single().OrderDate);
         }
     }
 }

@@ -6,6 +6,10 @@ namespace Simple.Data.Ado
 {
     public class HomogenizedDictionaryIndex : OptimizedDictionaryIndex<string>
     {
+        internal HomogenizedDictionaryIndex(IEnumerable<string> index) : base(index)
+        {
+        }
+
         internal HomogenizedDictionaryIndex(IDictionary<string, int> index) : base(index)
         {
         }

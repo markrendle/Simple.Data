@@ -60,8 +60,28 @@ namespace Simple.Data
                 {
                     value = Convert.ChangeType(value, propertyInfo.PropertyType);
                 }
-                propertyInfo.SetValue(obj, value, null);
-                anyPropertiesSet = true;
+                if (propertyInfo.CanWrite)
+                {
+                    propertyInfo.SetValue(obj, value, null);
+                    anyPropertiesSet = true;
+                }
+                else
+                {
+                    var propertyValue = propertyInfo.GetValue(obj, null);
+                    if (propertyValue == null) continue;
+                    var addMethod = propertyValue.GetType().GetMethod("Add");
+                    if (addMethod != null)
+                    {
+                        var valueItems = value as IEnumerable;
+                        if (valueItems != null)
+                        {
+                            foreach (var valueItem in valueItems)
+                            {
+                                addMethod.Invoke(propertyValue, new[] {valueItem});
+                            }
+                        }
+                    }
+                }
             }
 
             result = anyPropertiesSet ? obj : null;

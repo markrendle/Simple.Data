@@ -84,6 +84,7 @@
     <Compile Include="ErrorCallback.cs" />
     <Compile Include="FunctionSignature.cs" />
     <Compile Include="InMemoryAdapter.cs" />
+    <Compile Include="JoinType.cs" />
     <Compile Include="OfTypeEnumerable.cs" />
     <Compile Include="OptimizingDelegateFactory.cs" />
     <Compile Include="QueryPolyfills\AggregateValueResolver.cs" />
@@ -174,6 +175,8 @@
     <Compile Include="Commands\UpdateByCommand.cs" />
     <Compile Include="WhereClause.cs" />
     <Compile Include="WithCountClause.cs" />
+    <Compile Include="WithMode.cs" />
+    <Compile Include="WithType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
