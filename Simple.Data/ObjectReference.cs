@@ -165,6 +165,16 @@ namespace Simple.Data
             return _owner.GetAllObjectNames().Concat(new[] {_name}).ToArray();
         }
 
+        /// <summary>
+        /// Gets the names of all objects included in the reference as an array, with the uppermost object first.
+        /// </summary>
+        /// <returns></returns>
+        public Tuple<string,string>[] GetAllObjectNamesAndAliases()
+        {
+            if (ReferenceEquals(GetOwner(), null)) return new[] {Tuple.Create(_name, GetAlias())};
+            return _owner.GetAllObjectNamesAndAliases().Concat(new[] {Tuple.Create(_name, GetAlias())}).ToArray();
+        }
+
         public string GetAllObjectNamesDotted()
         {
             return string.Join(".", GetAllObjectNames());

@@ -67,16 +67,22 @@ namespace Simple.Data.Ado
             {
                 var builder = new StringBuilder(JoinTypeToKeyword(join.JoinType));
                 var joinExpression = join.JoinExpression ?? InferJoinExpression(join.Table);
-                builder.AppendFormat(" JOIN {0}{1} ON ({2})",
-                    _schema.FindTable(_schema.BuildObjectName(join.Table.ToString())).QualifiedName,
-                    string.IsNullOrWhiteSpace(join.Table.GetAlias()) ? string.Empty : " " + _schema.QuoteObjectName(join.Table.GetAlias()),
-                    expressionFormatter.Format(joinExpression));
-                yield return builder.ToString().Trim();
+                if (!ReferenceEquals(joinExpression, null))
+                {
+                    builder.AppendFormat(" JOIN {0}{1} ON ({2})",
+                                         _schema.FindTable(_schema.BuildObjectName(join.Table.ToString())).QualifiedName,
+                                         string.IsNullOrWhiteSpace(join.Table.GetAlias())
+                                             ? string.Empty
+                                             : " " + _schema.QuoteObjectName(join.Table.GetAlias()),
+                                         expressionFormatter.Format(joinExpression));
+                    yield return builder.ToString().Trim();
+                }
             }
         }
 
         private SimpleExpression InferJoinExpression(ObjectReference table)
         {
+            if (table.GetOwner().IsNull()) return null;
             var table1 = _schema.FindTable(table.GetOwner().GetName());
             var table2 = _schema.FindTable(table.GetName());
             var foreignKey = GetForeignKey(table1, table2);
@@ -90,7 +96,7 @@ namespace Simple.Data.Ado
                                                var table1 = _schema.FindTable(table1Name);
                                                var table2 = _schema.FindTable(table2Name);
                                                var foreignKey = GetForeignKey(table1, table2);
-                                               return MakeJoinText(table2, foreignKey, joinType);
+                                               return MakeJoinText(table2, table2Name.Alias, foreignKey, joinType);
                                            });
         }
 
@@ -109,16 +115,18 @@ namespace Simple.Data.Ado
             return foreignKey;
         }
 
-        private string MakeJoinText(Table rightTable, ForeignKey foreignKey, JoinType joinType)
+        private string MakeJoinText(Table rightTable, string alias, ForeignKey foreignKey, JoinType joinType)
         {
             var builder = new StringBuilder(JoinKeywordFor(joinType));
-            builder.AppendFormat(" JOIN {0} ON (", rightTable.QualifiedName);
-            builder.Append(FormatJoinExpression(foreignKey, 0));
+            builder.AppendFormat(" JOIN {0}", rightTable.QualifiedName);
+            if (!string.IsNullOrWhiteSpace(alias)) builder.Append(" " + _schema.QuoteObjectName(alias));
+            builder.Append(" ON (");
+            builder.Append(FormatJoinExpression(foreignKey, 0, alias));
 
             for (int i = 1; i < foreignKey.Columns.Length; i++)
             {
                 builder.Append(" AND ");
-                builder.Append(FormatJoinExpression(foreignKey, i));
+                builder.Append(FormatJoinExpression(foreignKey, i, alias));
             }
             builder.Append(")");
             return builder.ToString();
@@ -159,9 +167,12 @@ namespace Simple.Data.Ado
             return masterObjectReference == detailObjectReference;
         }
 
-        private string FormatJoinExpression(ForeignKey foreignKey, int columnIndex)
+        private string FormatJoinExpression(ForeignKey foreignKey, int columnIndex, string alias)
         {
-            return string.Format("{0}.{1} = {2}.{3}", _schema.QuoteObjectName(foreignKey.MasterTable), _schema.QuoteObjectName(foreignKey.UniqueColumns[columnIndex]),
+            var leftTable = string.IsNullOrWhiteSpace(alias)
+                                ? _schema.QuoteObjectName(foreignKey.MasterTable)
+                                : _schema.QuoteObjectName(alias);
+            return string.Format("{0}.{1} = {2}.{3}", leftTable, _schema.QuoteObjectName(foreignKey.UniqueColumns[columnIndex]),
                                  _schema.QuoteObjectName(foreignKey.DetailTable), _schema.QuoteObjectName(foreignKey.Columns[columnIndex]));
         }
 
@@ -178,7 +189,7 @@ namespace Simple.Data.Ado
         private static IEnumerable<Tuple<ObjectName, ObjectName>> GetTableNames(IEnumerable<ObjectReference> references, string schema)
         {
             return references.SelectMany(r => DynamicReferenceToTuplePairs(r, schema))
-                .TupleSelect((table1, table2) => Tuple.Create(new ObjectName(schema, table1), new ObjectName(schema, table2)))
+                .TupleSelect((table1, table2) => Tuple.Create(new ObjectName(schema, table1.Item1, table1.Item2), new ObjectName(schema, table2.Item1, table2.Item2)))
                 .Distinct();
         }
 
@@ -187,10 +198,10 @@ namespace Simple.Data.Ado
             return expression == null ? Enumerable.Empty<Tuple<ObjectName, ObjectName>>() : GetTableNames(GetReferencesFromExpression(expression), schema);
         }
 
-        private static IEnumerable<Tuple<string, string>> DynamicReferenceToTuplePairs(ObjectReference reference, string schema)
+        private static IEnumerable<Tuple<Tuple<string, string>, Tuple<string, string>>> DynamicReferenceToTuplePairs(ObjectReference reference, string schema)
         {
-            return reference.GetAllObjectNames()
-                .SkipWhile(s => s.Equals(schema, StringComparison.OrdinalIgnoreCase))
+            return reference.GetAllObjectNamesAndAliases()
+                .SkipWhile(s => s.Item1.Equals(schema, StringComparison.OrdinalIgnoreCase))
                 .SkipLast()
                 .ToTuplePairs();
         }

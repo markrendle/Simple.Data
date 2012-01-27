@@ -298,10 +298,6 @@
             foreach (var reference in args.OfType<ObjectReference>())
             {
                 clauses.Add(new WithClause(reference));
-                if (!string.IsNullOrWhiteSpace(reference.GetAlias()))
-                {
-                    clauses.Add(new JoinClause(reference, JoinType.Outer));
-                }
             }
             return new SimpleQuery(this, clauses.ToArray());
         }
@@ -334,11 +330,37 @@
             return this;
         }
 
+        public SimpleQuery LeftJoin(ObjectReference objectReference)
+        {
+            return OuterJoin(objectReference);
+        }
+
+        public SimpleQuery LeftJoin(ObjectReference objectReference, out dynamic queryObjectReference)
+        {
+            return OuterJoin(objectReference, out queryObjectReference);
+        }
+
+        public SimpleQuery OuterJoin(ObjectReference objectReference)
+        {
+            if (ReferenceEquals(objectReference, null)) throw new ArgumentNullException("objectReference");
+            _tempJoinWaitingForOn = new JoinClause(objectReference, JoinType.Outer);
+
+            return this;
+        }
+
+        public SimpleQuery OuterJoin(ObjectReference objectReference, out dynamic queryObjectReference)
+        {
+            _tempJoinWaitingForOn = new JoinClause(objectReference, JoinType.Outer);
+            queryObjectReference = objectReference;
+
+            return this;
+        }
+
         public SimpleQuery On(SimpleExpression joinExpression)
         {
             if (_tempJoinWaitingForOn == null)
                 throw new InvalidOperationException("Call to On must be preceded by call to Join.");
-            return AddNewJoin(new JoinClause(_tempJoinWaitingForOn.Table, joinExpression));
+            return AddNewJoin(new JoinClause(_tempJoinWaitingForOn.Table, _tempJoinWaitingForOn.JoinType, joinExpression));
         }
 
         [Obsolete]
@@ -386,11 +408,12 @@
                 throw new InvalidOperationException("Call to On must be preceded by call to Join.");
             var joinExpression = ExpressionHelper.CriteriaDictionaryToExpression(_tempJoinWaitingForOn.Table,
                                                                                  binder.NamedArgumentsToDictionary(args));
-            return new SimpleQuery(this, _clauses.Append(new JoinClause(_tempJoinWaitingForOn.Table, joinExpression)));
+            return AddNewJoin(new JoinClause(_tempJoinWaitingForOn.Table, _tempJoinWaitingForOn.JoinType, joinExpression));
         }
 
         private SimpleQuery AddNewJoin(JoinClause newJoin)
         {
+            _tempJoinWaitingForOn = null;
             return new SimpleQuery(this, _clauses.Append(newJoin));
         }
 

@@ -10,6 +10,7 @@ namespace Simple.Data.Ado
     {
         private readonly string _schema;
         private readonly string _name;
+        private readonly string _alias;
 
         public ObjectName(object schema, object name)
         {
@@ -18,11 +19,21 @@ namespace Simple.Data.Ado
             _name = (string)name;
         }
 
-        public ObjectName(string schema, string name)
+        public ObjectName(string schema, string name) : this(schema, name, null)
+        {
+        }
+
+        public ObjectName(string schema, string name, string alias)
         {
             if (name == null) throw new ArgumentNullException("name");
             _schema = schema;
             _name = name;
+            _alias = alias;
+        }
+
+        public string Alias
+        {
+            get { return _alias; }
         }
 
         public string Name

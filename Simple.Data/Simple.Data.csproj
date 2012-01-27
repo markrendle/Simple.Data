@@ -177,6 +177,7 @@
     <Compile Include="WithClause.cs" />
     <Compile Include="WithCountClause.cs" />
     <Compile Include="WithMode.cs" />
+    <Compile Include="WithType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

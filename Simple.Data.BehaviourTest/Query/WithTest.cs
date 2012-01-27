@@ -96,5 +96,24 @@ namespace Simple.Data.IntegrationTest.Query
 
             GeneratedSqlIs(expectedSql);
         }
+
+        [Test]
+        public void SingleWithClauseUsingExplicitJoinShouldApplyAliasToSql()
+        {
+            const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name]," +
+                "[dbo].[employee].[managerid],[dbo].[employee].[departmentid]," +
+                "[manager].[id] as [__withn__manager__id],[manager].[name] as [__withn__manager__name]," +
+                "[manager].[managerid] as [__withn__manager__managerid],[manager].[departmentid] as [__withn__manager__departmentid]" +
+                " from [dbo].[employee] left join [dbo].[employee] [manager] on ([manager].[id] = [dbo].[employee].[managerid])";
+
+            dynamic manager;
+            var q = _db.Employees.All()
+                .OuterJoin(_db.Employees.As("Manager"), out manager).On(Id: _db.Employees.ManagerId)
+                .With(manager);
+
+            EatException(() => q.ToList());
+
+            GeneratedSqlIs(expectedSql);
+        }
     }
 }

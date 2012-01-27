@@ -80,12 +80,30 @@ namespace Simple.Data.Ado
         private void HandleWithClauses()
         {
             var withClauses = _query.Clauses.OfType<WithClause>().ToList();
+            var relationTypeDict = new Dictionary<ObjectReference, RelationType>();
             if (withClauses.Count > 0)
             {
                 foreach (var withClause in withClauses)
                 {
-                    if (withClause.ObjectReference.GetOwner().GetName() == _tableName.Name)
+                    if (withClause.ObjectReference.GetOwner().IsNull())
                     {
+                        var joinClause =
+                            _query.Clauses.OfType<JoinClause>().FirstOrDefault(j => j.Table.GetAliasOrName() == withClause.ObjectReference.GetAliasOrName());
+                        if (joinClause != null)
+                        {
+                            _columns =
+                                _columns.Concat(
+                                    _schema.FindTable(joinClause.Table.GetName()).Columns.Select(
+                                        c => new ObjectReference(c.ActualName, joinClause.Table)))
+                                    .ToArray();
+                            relationTypeDict[joinClause.Table] = withClause.Type == WithType.One
+                                                                     ? RelationType.ManyToOne
+                                                                     : RelationType.OneToMany;
+                        }
+                    }
+                    else
+                    {
+                        relationTypeDict[withClause.ObjectReference] = RelationType.None;
                         _columns =
                             _columns.Concat(
                                 _schema.FindTable(withClause.ObjectReference.GetName()).Columns.Select(
@@ -95,14 +113,22 @@ namespace Simple.Data.Ado
                 }
                 _columns =
                     _columns.OfType<ObjectReference>()
-                        .Select(c => _schema.FindTable(c.GetOwner().GetName()) == _table ? c : AddWithAlias(c))
+                        .Select(c => IsCoreTable(c.GetOwner()) ? c : AddWithAlias(c, relationTypeDict[c.GetOwner()]))
                         .ToArray();
             }
         }
 
-        private ObjectReference AddWithAlias(ObjectReference c)
+        private bool IsCoreTable(ObjectReference tableReference)
         {
-            var relationType = _schema.GetRelationType(c.GetOwner().GetOwner().GetName(), c.GetOwner().GetName());
+            if (ReferenceEquals(tableReference, null)) throw new ArgumentNullException("tableReference");
+            if (!string.IsNullOrWhiteSpace(tableReference.GetAlias())) return false;
+            return _schema.FindTable(tableReference.GetName()) == _table;
+        }
+
+        private ObjectReference AddWithAlias(ObjectReference c, RelationType relationType = RelationType.None)
+        {
+            if (relationType == RelationType.None)
+                relationType = _schema.GetRelationType(c.GetOwner().GetOwner().GetName(), c.GetOwner().GetName());
             if (relationType == RelationType.None) throw new InvalidOperationException("No Join found");
             return c.As(string.Format("__with{0}__{1}__{2}",
                                relationType == RelationType.OneToMany
