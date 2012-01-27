@@ -320,12 +320,26 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
-        public void WithClauseShouldPreselectSubTable()
+        public void WithClauseShouldPreselectDetailTableAsCollection()
         {
             var db = DatabaseHelper.Open();
             var result = db.Customers.FindAllByCustomerId(1).WithOrders().FirstOrDefault() as IDictionary<string,object>;
             Assert.IsNotNull(result);
             Assert.Contains("Orders", (ICollection)result.Keys);
+            var orders = result["Orders"] as IList<IDictionary<string, object>>;
+            Assert.IsNotNull(orders);
+            Assert.AreEqual(1, orders.Count);
+        }
+
+        [Test]
+        public void WithClauseShouldPreselectMasterTableAsDictionary()
+        {
+            var db = DatabaseHelper.Open();
+            var result = db.Orders.FindAllByOrderId(1).WithCustomer().FirstOrDefault() as IDictionary<string,object>;
+            Assert.IsNotNull(result);
+            Assert.Contains("Customer", (ICollection)result.Keys);
+            var customer = result["Customer"] as IDictionary<string, object>;
+            Assert.IsNotNull(customer);
         }
     }
 }

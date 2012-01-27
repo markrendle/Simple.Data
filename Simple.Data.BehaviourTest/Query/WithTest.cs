@@ -37,14 +37,30 @@ namespace Simple.Data.IntegrationTest.Query
         }
 
         [Test]
-        public void SingleWithClauseUsingMagicMethodShouldUseJoin()
+        public void SingleWithClauseUsingMagicMethodShouldUseWith1Join()
         {
             const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name],"+
                 "[dbo].[employee].[managerid],[dbo].[employee].[departmentid],"+
-                "[dbo].[department].[id] as [__with__department__id],[dbo].[department].[name] as [__with__department__name]"+
+                "[dbo].[department].[id] as [__with1__department__id],[dbo].[department].[name] as [__with1__department__name]"+
                 " from [dbo].[employee] left join [dbo].[department] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])";
 
             var q = _db.Employees.All().WithDepartment();
+
+            EatException(() => q.ToList());
+
+            GeneratedSqlIs(expectedSql);
+        }
+
+        [Test]
+        public void SingleWithClauseUsingMagicMethodShouldUseWithNJoin()
+        {
+            const string expectedSql = "select " +
+                "[dbo].[department].[id],[dbo].[department].[name],"+
+                "[dbo].[employee].[id] as [__withn__employees__id],[dbo].[employee].[name] as [__withn__employees__name],"+
+                "[dbo].[employee].[managerid] as [__withn__employees__managerid],[dbo].[employee].[departmentid] as [__withn__employees__departmentid]"+
+                " from [dbo].[department] left join [dbo].[employee] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])";
+
+            var q = _db.Departments.All().WithEmployees();
 
             EatException(() => q.ToList());
 
@@ -56,7 +72,7 @@ namespace Simple.Data.IntegrationTest.Query
         {
             const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name]," +
                 "[dbo].[employee].[managerid],[dbo].[employee].[departmentid]," +
-                "[dbo].[department].[id] as [__with__department__id],[dbo].[department].[name] as [__with__department__name]" +
+                "[dbo].[department].[id] as [__with1__department__id],[dbo].[department].[name] as [__with1__department__name]" +
                 " from [dbo].[employee] left join [dbo].[department] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])";
 
             var q = _db.Employees.All().With(_db.Employees.Department);
@@ -71,7 +87,7 @@ namespace Simple.Data.IntegrationTest.Query
         {
             const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name]," +
                 "[dbo].[employee].[managerid],[dbo].[employee].[departmentid]," +
-                "[foo].[id] as [__with__foo__id],[foo].[name] as [__with__foo__name]" +
+                "[foo].[id] as [__with1__foo__id],[foo].[name] as [__with1__foo__name]" +
                 " from [dbo].[employee] left join [dbo].[department] [foo] on ([foo].[id] = [dbo].[employee].[departmentid])";
 
             var q = _db.Employees.All().With(_db.Employees.Department.As("Foo"));

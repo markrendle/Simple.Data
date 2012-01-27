@@ -38,31 +38,7 @@
 
         private IEnumerable<IDictionary<string,object>> CreateObjectGraphs()
         {
-            var load = new Dictionary<IDictionary<string,object>,IDictionary<string, HashSet<IDictionary<string, object>>>>(new DictionaryEqualityComparer());
-
-            foreach (var dict in _source)
-            {
-                IDictionary<string, HashSet<IDictionary<string, object>>> children;
-
-                var main = new SubDictionary<string, object>(dict, s => !s.StartsWith("__with__"));
-                if (!load.TryGetValue(main, out children))
-                {
-                    children = new Dictionary<string, HashSet<IDictionary<string, object>>>();
-                    load.Add(main, children);
-                }
-
-                foreach (var tuple in ExtractObjects(dict))
-                {
-                    if (children.ContainsKey(tuple.Item1))
-                    {
-                        children[tuple.Item1].Add(tuple.Item2);
-                    }
-                    else
-                    {
-                        children.Add(tuple.Item1, new HashSet<IDictionary<string, object>>(new DictionaryEqualityComparer()) {tuple.Item2});
-                    }
-                }
-            }
+            var load = BuildLoadDictionary();
 
             IDictionary<string,int> index = null;
             foreach (var kvp in load)
@@ -74,128 +50,94 @@
                 var row = new OptimizedDictionary<string, object>(index, kvp.Key.Values);
                 foreach (var sub in kvp.Value)
                 {
-                    if (sub.Value.Count == 1)
+                    if (sub.Value.Single != null)
                     {
-                        kvp.Key[sub.Key] = sub.Value.Single();
+                        row[sub.Key] = sub.Value.Single;
                     }
-                    else
+                    else if (sub.Value.Collection != null)
                     {
-                        kvp.Key[sub.Key] = sub.Value.ToList();
+                        row[sub.Key] = sub.Value.Collection.ToList();
                     }
                 }
 
-                yield return kvp.Key;
+                yield return row;
             }
         }
 
-        private IEnumerable<Tuple<string,Dictionary<string,object>>> ExtractObjects(IDictionary<string,object> source)
+        private Dictionary<IDictionary<string, object>, IDictionary<string, WithContainer>> BuildLoadDictionary()
+        {
+            var load =
+                new Dictionary<IDictionary<string, object>, IDictionary<string, WithContainer>>(
+                    new DictionaryEqualityComparer());
+
+            foreach (var dict in _source)
+            {
+                IDictionary<string, WithContainer> withContainers;
+
+                var main = new SubDictionary<string, object>(dict, s => !s.StartsWith("__with"));
+                if (!load.TryGetValue(main, out withContainers))
+                {
+                    withContainers = new Dictionary<string, WithContainer>();
+                    load.Add(main, withContainers);
+                    foreach (var tuple in ExtractSingleObjects(dict))
+                    {
+                        var withContainer = new WithContainer();
+                        withContainer.SetSingle(tuple.Item2);
+                        withContainers.Add(tuple.Item1, withContainer);
+                    }
+                }
+
+                foreach (var tuple in ExtractCollectionObjects(dict))
+                {
+                    if (!withContainers.ContainsKey(tuple.Item1))
+                    {
+                        withContainers.Add(tuple.Item1, new WithContainer());
+                    }
+                    withContainers[tuple.Item1].AddToCollection(tuple.Item2);
+                }
+            }
+            return load;
+        }
+
+        private class WithContainer
+        {
+            public HashSet<IDictionary<string, object>> Collection { get; private set; }
+
+            public IDictionary<string, object> Single { get; private set; }
+
+            public void AddToCollection(IDictionary<string,object> row)
+            {
+                if (Collection == null) Collection = new HashSet<IDictionary<string, object>>(new DictionaryEqualityComparer());
+                Collection.Add(row);
+            }
+
+            public void SetSingle(IDictionary<string,object> row)
+            {
+                Single = row;
+            }
+        }
+
+        private IEnumerable<Tuple<string,Dictionary<string,object>>> ExtractSingleObjects(IDictionary<string,object> source)
         {
             var names =
-                source.Keys.Where(k => k.StartsWith("__with__")).Select(
-                    k => k.Split(new[] {"__"}, StringSplitOptions.RemoveEmptyEntries)[1]).ToList();
+                source.Keys.Where(k => k.StartsWith("__with1__")).Select(
+                    k => k.Split(new[] {"__"}, StringSplitOptions.RemoveEmptyEntries)[1]).Distinct().ToList();
 
             return from name in names
-                   let pattern = "__with__" + name + "__"
+                   let pattern = "__with1__" + name + "__"
                    select Tuple.Create(name, source.Where(kvp => kvp.Key.StartsWith(pattern))
-                                                 .ToDictionary(kvp => kvp.Key.Replace(pattern, ""), kvp => kvp.Value));
+                                                 .ToDictionary(kvp => kvp.Key.Replace(pattern, ""), kvp => kvp.Value, HomogenizedEqualityComparer.DefaultInstance));
         }
-    }
-
-    internal class SubDictionary<TKey,TValue> : IDictionary<TKey,TValue>
-    {
-        private readonly IDictionary<TKey, TValue> _super;
-        private readonly Func<TKey, bool> _keyFilter;
-
-        private IEnumerable<KeyValuePair<TKey, TValue>> Filter()
+        private IEnumerable<Tuple<string,Dictionary<string,object>>> ExtractCollectionObjects(IDictionary<string,object> source)
         {
-            return _super.Where(kvp => _keyFilter(kvp.Key));
-        }
+            var names =
+                source.Keys.Where(k => k.StartsWith("__withn__")).Select(
+                    k => k.Split(new[] {"__"}, StringSplitOptions.RemoveEmptyEntries)[1]).Distinct().ToList();
 
-        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
-        {
-            return Filter().GetEnumerator();
-        }
-
-        public void Add(KeyValuePair<TKey, TValue> item)
-        {
-            _super.Add(item);
-        }
-
-        public void Clear()
-        {
-            _super.Clear();
-        }
-
-        public bool Contains(KeyValuePair<TKey, TValue> item)
-        {
-            return _super.Contains(item);
-        }
-
-        public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
-        {
-            Filter().ToArray().CopyTo(array, arrayIndex);
-        }
-
-        public bool Remove(KeyValuePair<TKey, TValue> item)
-        {
-            return _super.Remove(item);
-        }
-
-        public int Count
-        {
-            get { return Filter().Count(); }
-        }
-
-        public bool IsReadOnly
-        {
-            get { return _super.IsReadOnly; }
-        }
-
-        public bool ContainsKey(TKey key)
-        {
-            return _keyFilter(key) && _super.ContainsKey(key);
-        }
-
-        public void Add(TKey key, TValue value)
-        {
-            _super.Add(key, value);
-        }
-
-        public bool Remove(TKey key)
-        {
-            return _super.Remove(key);
-        }
-
-        public bool TryGetValue(TKey key, out TValue value)
-        {
-            return _super.TryGetValue(key, out value);
-        }
-
-        public TValue this[TKey key]
-        {
-            get { return _super[key]; }
-            set { _super[key] = value; }
-        }
-
-        public ICollection<TKey> Keys
-        {
-            get { return _super.Keys.Where(_keyFilter).ToList().AsReadOnly(); }
-        }
-
-        public ICollection<TValue> Values
-        {
-            get { return Filter().Select(kvp => kvp.Value).ToList().AsReadOnly(); }
-        }
-
-        public SubDictionary(IDictionary<TKey, TValue> super, Func<TKey,bool> keyFilter)
-        {
-            _super = super;
-            _keyFilter = keyFilter;
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
+            return from name in names
+                   let pattern = "__withn__" + name + "__"
+                   select Tuple.Create(name, source.Where(kvp => kvp.Key.StartsWith(pattern))
+                                                 .ToDictionary(kvp => kvp.Key.Replace(pattern, ""), kvp => kvp.Value, HomogenizedEqualityComparer.DefaultInstance));
         }
     }
 }

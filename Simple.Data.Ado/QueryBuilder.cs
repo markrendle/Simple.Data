@@ -67,6 +67,18 @@ namespace Simple.Data.Ado
                 _columns = _table.Columns.Select(c => ObjectReference.FromStrings(_table.ActualName, c.ActualName)).ToArray();
             }
 
+            HandleWithClauses();
+
+            _whereCriteria = _query.Clauses.OfType<WhereClause>().Aggregate(SimpleExpression.Empty,
+                                                                            (seed, where) => seed && where.Criteria);
+            _havingCriteria = _query.Clauses.OfType<HavingClause>().Aggregate(SimpleExpression.Empty,
+                                                                              (seed, having) => seed && having.Criteria);
+
+            _commandBuilder.SetText(GetSelectClause(_tableName));
+        }
+
+        private void HandleWithClauses()
+        {
             var withClauses = _query.Clauses.OfType<WithClause>().ToList();
             if (withClauses.Count > 0)
             {
@@ -78,20 +90,24 @@ namespace Simple.Data.Ado
                             _columns.Concat(
                                 _schema.FindTable(withClause.ObjectReference.GetName()).Columns.Select(
                                     c => new ObjectReference(c.ActualName, withClause.ObjectReference)))
-                                    .ToArray();
+                                .ToArray();
                     }
                 }
                 _columns =
-                    _columns.OfType<ObjectReference>().Select(
-                    c => _schema.FindTable(c.GetOwner().GetName()) == _table ? c : c.As(string.Format("__with__{0}__{1}", c.GetOwner().GetAliasOrName(), c.GetName()))).ToArray();
+                    _columns.OfType<ObjectReference>()
+                        .Select(c => _schema.FindTable(c.GetOwner().GetName()) == _table ? c : AddWithAlias(c))
+                        .ToArray();
             }
+        }
 
-            _whereCriteria = _query.Clauses.OfType<WhereClause>().Aggregate(SimpleExpression.Empty,
-                                                                            (seed, where) => seed && where.Criteria);
-            _havingCriteria = _query.Clauses.OfType<HavingClause>().Aggregate(SimpleExpression.Empty,
-                                                                              (seed, having) => seed && having.Criteria);
-
-            _commandBuilder.SetText(GetSelectClause(_tableName));
+        private ObjectReference AddWithAlias(ObjectReference c)
+        {
+            var relationType = _schema.GetRelationType(c.GetOwner().GetOwner().GetName(), c.GetOwner().GetName());
+            if (relationType == RelationType.None) throw new InvalidOperationException("No Join found");
+            return c.As(string.Format("__with{0}__{1}__{2}",
+                               relationType == RelationType.OneToMany
+                                   ? "n"
+                                   : "1", c.GetOwner().GetAliasOrName(), c.GetName()));
         }
 
         private void HandleJoins()

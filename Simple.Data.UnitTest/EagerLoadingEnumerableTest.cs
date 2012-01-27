@@ -14,7 +14,7 @@
             var dict = new Dictionary<string, object>
                            {
                                {"foo", "Foo1"},
-                               {"__with__bar__quux", "Quux1"}
+                               {"__with1__bar__quux", "Quux1"}
                            };
 
             var test = new EagerLoadingEnumerable(new[] {dict}).ToList();
@@ -35,8 +35,8 @@
                                 new Dictionary<string, object>
                                     {
                                         {"foo", "Foo1"},
-                                        {"__with__bar__quux", "Quux1"},
-                                        {"__with__wibble__wobble", "Wobble1"}
+                                        {"__with1__bar__quux", "Quux1"},
+                                        {"__with1__wibble__wobble", "Wobble1"}
                                     },
                             };
 
@@ -61,26 +61,26 @@
                                 new Dictionary<string, object>
                                     {
                                         {"foo", "Foo1"},
-                                        {"__with__bar__quux", "Quux1"},
-                                        {"__with__wibble__wobble", "Wobble1"}
+                                        {"__withn__bar__quux", "Quux1"},
+                                        {"__withn__wibble__wobble", "Wobble1"}
                                     },
                                 new Dictionary<string, object>
                                     {
                                         {"foo", "Foo1"},
-                                        {"__with__bar__quux", "Quux1"},
-                                        {"__with__wibble__wobble", "Wobble2"}
+                                        {"__withn__bar__quux", "Quux1"},
+                                        {"__withn__wibble__wobble", "Wobble2"}
                                     },
                                 new Dictionary<string, object>
                                     {
                                         {"foo", "Foo1"},
-                                        {"__with__bar__quux", "Quux2"},
-                                        {"__with__wibble__wobble", "Wobble1"}
+                                        {"__withn__bar__quux", "Quux2"},
+                                        {"__withn__wibble__wobble", "Wobble1"}
                                     },
                                 new Dictionary<string, object>
                                     {
                                         {"foo", "Foo1"},
-                                        {"__with__bar__quux", "Quux2"},
-                                        {"__with__wibble__wobble", "Wobble2"}
+                                        {"__withn__bar__quux", "Quux2"},
+                                        {"__withn__wibble__wobble", "Wobble2"}
                                     },
                             };
 
