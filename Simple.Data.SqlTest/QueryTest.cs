@@ -341,5 +341,26 @@ namespace Simple.Data.SqlTest
             var customer = result["Customer"] as IDictionary<string, object>;
             Assert.IsNotNull(customer);
         }
+
+        [Test]
+        public void WithClauseShouldCastToStaticTypeWithComplexProperty()
+        {
+            var db = DatabaseHelper.Open();
+            Order actual = db.Orders.FindAllByOrderId(1).WithCustomer().FirstOrDefault();
+            Assert.IsNotNull(actual);
+            Assert.IsNotNull(actual.Customer);
+            Assert.AreEqual("Test", actual.Customer.Name);
+            Assert.AreEqual("100 Road", actual.Customer.Address);
+        }
+
+        [Test]
+        public void WithClauseShouldCastToStaticTypeWithCollection()
+        {
+            var db = DatabaseHelper.Open();
+            Customer actual = db.Customers.FindAllByCustomerId(1).WithOrders().FirstOrDefault();
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(1, actual.Orders.Single().OrderId);
+            Assert.AreEqual(new DateTime(2010,10,10), actual.Orders.Single().OrderDate);
+        }
     }
 }
