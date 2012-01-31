@@ -137,6 +137,16 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void TestFindAllByIdWithSchemaQualification()
+        {
+            var db = DatabaseHelper.Open();
+            var dboCount = db.dbo.SchemaTable.FindAllById(1).ToList().Count;
+            var testCount = db.test.SchemaTable.FindAllById(1).ToList().Count;
+            Assert.AreEqual(1, dboCount);
+            Assert.AreEqual(0, testCount);
+        }
+
+        [Test]
         public void TestFindOnAView()
         {
             var db = DatabaseHelper.Open();

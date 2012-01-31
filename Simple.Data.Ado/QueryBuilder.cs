@@ -71,7 +71,7 @@ namespace Simple.Data.Ado
             }
             else
             {
-                _columns = _table.Columns.Select(c => ObjectReference.FromStrings(_table.ActualName, c.ActualName)).ToArray();
+                _columns = _table.Columns.Select(c => ObjectReference.FromStrings(_table.Schema, _table.ActualName, c.ActualName)).ToArray();
             }
 
             HandleWithClauses();
@@ -301,7 +301,7 @@ namespace Simple.Data.Ado
             }
             else
             {
-                return table.Columns.Select(c => ObjectReference.FromStrings(table.ActualName, c.ActualName));
+                return table.Columns.Select(c => ObjectReference.FromStrings(table.Schema, table.ActualName, c.ActualName));
             }
         }
 

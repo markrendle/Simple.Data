@@ -197,7 +197,8 @@ namespace Simple.Data
 
         public static ObjectReference FromStrings(params string[] source)
         {
-            return source.Aggregate<string, ObjectReference>(null, (current, element) => new ObjectReference(element, current));
+            return source.Where(current => !String.IsNullOrEmpty(current))
+                         .Aggregate<string, ObjectReference>(null, (current, element) => new ObjectReference(element, current));
         }
 
         /// <summary>
