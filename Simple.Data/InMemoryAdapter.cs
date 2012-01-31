@@ -6,7 +6,7 @@
     using System.Linq;
     using QueryPolyfills;
 
-    public class InMemoryAdapter : Adapter
+    public partial class InMemoryAdapter : Adapter
     {
         private readonly Dictionary<string, string> _autoIncrementColumns = new Dictionary<string, string>();
         private readonly Dictionary<string, string[]> _keyColumns = new Dictionary<string, string[]>();

@@ -362,5 +362,33 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, actual.Orders.Single().OrderId);
             Assert.AreEqual(new DateTime(2010,10,10), actual.Orders.Single().OrderDate);
         }
+
+        [Test]
+        public void SelfJoinShouldNotThrowException()
+        {
+            var db = DatabaseHelper.Open();
+
+            var q = db.Employees.Query().LeftJoin(db.Employees.As("Manager"), Id: db.Employees.ManagerId);
+            q = q.Select(db.Employees.Name, q.Manager.Name.As("Manager"));
+            List<dynamic> employees = q.ToList();
+
+            Assert.AreEqual(3, employees.Count); // The top man is missing
+
+            var kingsSubordinates = employees.Where(e => e.Manager == "Alice").ToList();
+
+            Assert.AreEqual(1, kingsSubordinates.Count);
+        }
+
+        [Test]
+        public void CanFetchMoreThanOneHundredRows()
+        {
+            var db = DatabaseHelper.Open();
+
+            db.Customers.Insert(Enumerable.Range(0, 200).Select(n => new Customer {Name = "Customer " + n}));
+
+            List<dynamic> customers = db.Customers.All().ToList();
+
+            Assert.GreaterOrEqual(customers.Count, 200);
+        }
     }
 }

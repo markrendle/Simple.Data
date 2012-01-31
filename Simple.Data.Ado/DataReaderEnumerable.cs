@@ -110,7 +110,7 @@ namespace Simple.Data.Ado
                 _current = _reader.ToDictionary(_index);
 
                 // We don't want to cache more than 100 rows, too much memory would be used.
-                if (_cache.Count < 100)
+                if (_cache != null && _cache.Count < 100)
                 {
                     _cache.Add(_current);
                 }
@@ -161,7 +161,8 @@ namespace Simple.Data.Ado
             public void Reset()
             {
                 if (_reader != null) _reader.Dispose();
-                _cache.Clear();
+                if (_cache != null)
+                    _cache.Clear();
                 ExecuteReader();
             }
 

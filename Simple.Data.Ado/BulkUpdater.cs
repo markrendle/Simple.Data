@@ -37,13 +37,17 @@ namespace Simple.Data.Ado
             using (connection.MaybeDisposable())
             using (var command = commandBuilder.GetRepeatableCommand(connection))
             {
+                connection.OpenIfClosed();
                 var propertyToParameterMap = CreatePropertyToParameterMap(data, table, command);
 
                 foreach (var row in data)
                 {
                     foreach (var kvp in row)
                     {
-                        propertyToParameterMap[kvp.Key].Value = kvp.Value ?? DBNull.Value;
+                        if (propertyToParameterMap.ContainsKey(kvp.Key))
+                        {
+                            propertyToParameterMap[kvp.Key].Value = kvp.Value ?? DBNull.Value;
+                        }
                     }
                     count += command.ExecuteNonQuery();
                 }
@@ -65,11 +69,18 @@ namespace Simple.Data.Ado
 
         private static IDbDataParameter GetDbDataParameter(Table table, IDbCommand command, KeyValuePair<string, object> kvp)
         {
-            return command.Parameters.Cast<IDbDataParameter>().
+            try
+            {
+                return command.Parameters.Cast<IDbDataParameter>().
                 FirstOrDefault
                 (p =>
                  p.SourceColumn ==
                  table.FindColumn(kvp.Key).ActualName);
+            }
+            catch (UnresolvableObjectException)
+            {
+                return null;
+            }
         }
 
         private static bool AllRowsHaveSameKeys(IList<IDictionary<string, object>> data)

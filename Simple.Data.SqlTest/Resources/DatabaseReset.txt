@@ -34,6 +34,8 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
+	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Employee]') AND type in (N'U'))
+	DROP TABLE [dbo].[Employee];
 	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Users]') AND type in (N'U'))
 	DROP TABLE [dbo].[Users];
 	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[OrderItems]') AND type in (N'U'))
@@ -67,6 +69,13 @@ BEGIN
 	ALTER TABLE [dbo].[Users]
 		ADD CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
 
+	CREATE TABLE [dbo].[Employee](
+		[Id] [int] IDENTITY(1,1) NOT NULL,
+		[Name] [nvarchar](50) NOT NULL,
+		[ManagerId] [int] NULL)
+
+	ALTER TABLE [dbo].[Employee]
+		ADD CONSTRAINT [PK_Employee] PRIMARY KEY CLUSTERED ([Id] ASC)
 
 	CREATE TABLE [dbo].[Orders] (
 		[OrderId]    INT      IDENTITY (1, 1) NOT NULL,
@@ -161,6 +170,11 @@ BEGIN
 	INSERT INTO [dbo].[Users] ([Id], [Name], [Password], [Age]) VALUES (2,'Charlie','Charlie',49)
 	INSERT INTO [dbo].[Users] ([Id], [Name], [Password], [Age]) VALUES (3,'Dave','Dave',12)
 	SET IDENTITY_INSERT [dbo].[Users] OFF
+	SET IDENTITY_INSERT [dbo].[Employee] ON
+	INSERT INTO [dbo].[Employee] ([Id], [Name], [ManagerId]) VALUES (1, 'Alice', NULL)
+	INSERT INTO [dbo].[Employee] ([Id], [Name], [ManagerId]) VALUES (2, 'Bob', 1)
+	INSERT INTO [dbo].[Employee] ([Id], [Name], [ManagerId]) VALUES (3, 'Charlie', 2)
+	SET IDENTITY_INSERT [dbo].[Employee] OFF
 	
 	DECLARE @PagingId AS INT
 	SET @PagingId = 1

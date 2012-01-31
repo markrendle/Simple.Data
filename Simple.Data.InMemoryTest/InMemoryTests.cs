@@ -525,5 +525,22 @@
             Assert.AreEqual(2, orders.Count());
             Assert.AreEqual(2, orders.Count(x => x.CustomerName == "ACME"));
         }
+
+        [Test]
+        public void InsertAndGetWithTransactionShouldWork()
+        {
+            var adapter = new InMemoryAdapter();
+            adapter.SetKeyColumn("Test", "Id");
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            using (var tx = db.BeginTransaction())
+            {
+                tx.Test.Insert(Id: 1, Name: "Alice");
+                var record = tx.Test.Get(1);
+                Assert.IsNotNull(record);
+                Assert.AreEqual(1, record.Id);
+                Assert.AreEqual("Alice", record.Name);
+            }
+        }
     }
 }

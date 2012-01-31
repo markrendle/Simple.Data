@@ -5,6 +5,8 @@ using Simple.Data.SqlTest.Resources;
 
 namespace Simple.Data.SqlTest
 {
+    using System.Collections.Generic;
+
     [TestFixture]
     public class UpdateTests
     {
@@ -83,6 +85,19 @@ namespace Simple.Data.SqlTest
             blob = db.Blobs.FindById(1);
             
             Assert.IsTrue(newData.SequenceEqual(blob.Data));
+        }
+
+        [Test]
+        public void ToListShouldExecuteQuery()
+        {
+            var db = DatabaseHelper.Open();
+            List<Customer> customers = db.Customers.All().ToList<Customer>();
+            foreach (var customer in customers)
+            {
+                customer.Address = "Updated";
+            }
+
+            db.Customers.Update(customers);
         }
     }
 }
