@@ -21,9 +21,19 @@
         private DataStrategy _dataStrategy;
         private JoinClause _tempJoinWaitingForOn;
 
-        public SimpleQuery(Adapter adapter, string tableName)
+        public SimpleQuery(DataStrategy dataStrategy, string tableName)
+        {
+            _dataStrategy = dataStrategy;
+            if (_dataStrategy != null)
+                _adapter = _dataStrategy.GetAdapter();
+            _tableName = tableName;
+            _clauses = new SimpleQueryClauseBase[0];
+        }
+
+        public SimpleQuery(Adapter adapter, DataStrategy dataStrategy, string tableName)
         {
             _adapter = adapter;
+            _dataStrategy = dataStrategy;
             _tableName = tableName;
             _clauses = new SimpleQueryClauseBase[0];
         }
@@ -32,6 +42,7 @@
                             SimpleQueryClauseBase[] clauses)
         {
             _adapter = source._adapter;
+            _dataStrategy = source._dataStrategy;
             _tableName = source.TableName;
             _clauses = clauses;
         }
@@ -41,6 +52,7 @@
                             SimpleQueryClauseBase[] clauses)
         {
             _adapter = source._adapter;
+            _dataStrategy = source._dataStrategy;
             _tableName = tableName;
             _clauses = clauses;
         }

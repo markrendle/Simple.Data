@@ -31,7 +31,7 @@ namespace Simple.Data.Commands
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
-            return new SimpleQuery(dataStrategy.GetAdapter(), table.GetQualifiedName()).Where(criteria).Exists();
+            return new SimpleQuery(dataStrategy, table.GetQualifiedName()).Where(criteria).Exists();
         }
 
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)

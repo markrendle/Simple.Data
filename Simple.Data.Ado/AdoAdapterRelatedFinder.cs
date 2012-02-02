@@ -73,7 +73,7 @@ namespace Simple.Data.Ado
             var criteria = ExpressionHelper.CriteriaDictionaryToExpression(join.Detail.ActualName,
                 new Dictionary<string, object>
                                {{join.DetailColumn.ActualName, row[join.MasterColumn.HomogenizedName]}});
-            return new SimpleQuery(_adapter, join.Detail.ActualName).Where(criteria);
+            return new SimpleQuery(_adapter, null, join.Detail.ActualName).Where(criteria);
         }
     }
 }

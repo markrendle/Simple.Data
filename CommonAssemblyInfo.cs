@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyCompany("Simple.Data")]
 [assembly: AssemblyProduct("Simple.Data")]
-[assembly: AssemblyCopyright("Copyright © Mark Rendle 2010-2011")]
+[assembly: AssemblyCopyright("Copyright © Mark Rendle 2010-2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -19,6 +19,6 @@ using System.Runtime.InteropServices;
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-[assembly: AssemblyVersion("0.14.0.2")]
-[assembly: AssemblyFileVersion("0.14.0.2")]
+[assembly: AssemblyVersion("0.14.0.3")]
+[assembly: AssemblyFileVersion("0.14.0.3")]
 

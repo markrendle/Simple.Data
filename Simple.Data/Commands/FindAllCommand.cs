@@ -32,7 +32,7 @@ namespace Simple.Data.Commands
         {
             if (args.Length == 1 && args[0] is SimpleExpression)
             {
-                return new SimpleQuery(dataStrategy.GetAdapter(), table.GetQualifiedName()).Where((SimpleExpression)args[0]);
+                return new SimpleQuery(dataStrategy, table.GetQualifiedName()).Where((SimpleExpression)args[0]);
             }
 
             return null;

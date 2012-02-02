@@ -30,7 +30,7 @@ namespace Simple.Data.Commands
         /// <returns></returns>
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            var query = new SimpleQuery(dataStrategy.GetAdapter(), table.GetQualifiedName());
+            var query = new SimpleQuery(dataStrategy, table.GetQualifiedName());
 
             if (args.Length == 1 && args[0] is SimpleExpression)
             {
