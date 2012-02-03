@@ -178,11 +178,13 @@ namespace Simple.Data.Ado
             var actions =
                 _columns.Select<Column, Action<IDictionary<string,object>, IDbCommand>>((c, i) => (row, cmd) => cmd.SetParameterValue(i, null)).ToArray();
 
-            foreach (var key in sample.Keys)
+            var usedColumnNames = sample.Keys.Where(k => _columns.Any(c => String.Equals(c.ActualName, k, StringComparison.InvariantCultureIgnoreCase))).ToArray();
+
+            foreach (var columnName in usedColumnNames)
             {
-                int index = _columns.IndexOf(_table.FindColumn(key));
+                int index = _columns.IndexOf(_table.FindColumn(columnName));
                 if (index >= 0)
-                    actions[index] = BuildIndividualFunction(key, index);
+                    actions[index] = BuildIndividualFunction(columnName, index);
 
                 ++index;
             }
