@@ -23,6 +23,12 @@
             return _tables[tableName];
         }
 
+        public override IDictionary<string, object> GetKey(string tableName, IDictionary<string, object> record)
+        {
+            if (!_keyColumns.ContainsKey(tableName)) return null;
+            return _keyColumns[tableName].ToDictionary(key => key, key => record.ContainsKey(key) ? record[key] : null);
+        }
+
         public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
         {
             if (!_keyColumns.ContainsKey(tableName)) throw new InvalidOperationException("No key specified for In-Memory table.");
@@ -144,27 +150,6 @@
             {
                 record[kvp.Key] = kvp.Value;
             }
-        }
-
-        public override int Update(string tableName, IDictionary<string, object> data)
-        {
-            if (!_keyColumns.ContainsKey(tableName)) throw new InvalidOperationException("No key column(s) specified.");
-            IDictionary<string, object> row;
-            if (_keyColumns[tableName].Length == 1)
-            {
-                row =
-                    GetTable(tableName).Single(
-                        d => Equals(d[_keyColumns[tableName][0]], data[_keyColumns[tableName][0]]));
-            }
-            else
-            {
-                IEnumerable<IDictionary<string, object>> rows = GetTable(tableName);
-                row = _keyColumns[tableName]
-                    .Aggregate(rows, (current, keyColumn) => current.Where(d => Equals(d[keyColumn], data[keyColumn])))
-                    .Single();
-            }
-            UpdateRecord(data, row);
-            return 1;
         }
 
         public override int Delete(string tableName, SimpleExpression criteria)

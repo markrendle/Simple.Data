@@ -27,6 +27,12 @@ namespace Simple.Data.Mocking
             get { return _data.Value; }
         }
 
+        public override IDictionary<string, object> GetKey(string tableName, IDictionary<string, object> record)
+        {
+            return GetKeyFieldNames(tableName).ToDictionary(key => key,
+                                                            key => record.ContainsKey(key) ? record[key] : null);
+        }
+
         public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
         {
             throw new NotImplementedException();
@@ -126,22 +132,6 @@ namespace Simple.Data.Mocking
         public override bool IsExpressionFunction(string functionName, params object[] args)
         {
             return false;
-        }
-
-        public override int Update(string tableName, IDictionary<string, object> data)
-        {
-            return UpdateByKeyFields(tableName, data, GetKeyFieldNames(tableName));
-        }
-
-        internal int UpdateByKeyFields(string tableName, object entity, IEnumerable<string> keyFieldNames)
-        {
-            var record = ObjectToDictionary(entity);
-            var list = record as IList<IDictionary<string, object>>;
-            if (list != null) return UpdateMany(tableName, list, keyFieldNames);
-
-            var dict = record as IDictionary<string, object>;
-            var criteria = GetCriteria(tableName, keyFieldNames, dict);
-            return Update(tableName, dict, criteria);
         }
 
         private IEnumerable<IDictionary<string, object>> FindAll(string tableName)

@@ -130,11 +130,6 @@ namespace Simple.Data
             return _adapter.Update(tableName, data, criteria, AdapterTransaction);
         }
 
-        internal override int Update(string tableName, IDictionary<string, object> data)
-        {
-            return _adapter.Update(tableName, data, AdapterTransaction);
-        }
-
         internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> newValuesList, IList<IDictionary<string, object>> originalValuesList)
         {
             int count = 0;

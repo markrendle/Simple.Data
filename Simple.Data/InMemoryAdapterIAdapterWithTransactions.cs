@@ -83,11 +83,6 @@ namespace Simple.Data
             return UpdateMany(tableName, dataList, keyFields);
         }
 
-        public int Update(string tableName, IDictionary<string, object> data, IAdapterTransaction adapterTransaction)
-        {
-            return Update(tableName, data);
-        }
-
         public int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IEnumerable<string> criteriaFieldNames, IAdapterTransaction adapterTransaction)
         {
             return UpdateMany(tableName, dataList, criteriaFieldNames);

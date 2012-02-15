@@ -47,6 +47,11 @@
 
     class StubAdapter : Adapter
     {
+        public override IDictionary<string, object> GetKey(string tableName, IDictionary<string, object> record)
+        {
+            throw new NotImplementedException();
+        }
+
         public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
         {
             throw new NotImplementedException();
@@ -83,11 +88,6 @@
         }
 
         public override bool IsExpressionFunction(string functionName, params object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override int Update(string tableName, IDictionary<string, object> data)
         {
             throw new NotImplementedException();
         }

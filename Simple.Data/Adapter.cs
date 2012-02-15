@@ -58,6 +58,14 @@
         }
 
         /// <summary>
+        /// Gets the key value(s) for the record.
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="record">The record.</param>
+        /// <returns>An <c>IDictionary&lt;string,object&gt;</c> containing the key that uniquely identifies the record in the database.</returns>
+        public abstract IDictionary<string, object> GetKey(string tableName, IDictionary<string, object> record);
+
+        /// <summary>
         /// Gets a single record from the specified "table" using its default key.
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
@@ -98,15 +106,6 @@
         /// <param name="criteria">The expression to use as criteria for the update operation.</param>
         /// <returns>The number of records affected by the update operation.</returns>
         public abstract int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria);
-
-        /// <summary>
-        /// Updates the specified "table" according to default keys (to be handled by adapter).
-        /// </summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <param name="data">The new values.</param>
-        /// <returns>The number of records affected by the update operation.</returns>
-        /// <remarks>For example, the Ado adapter will fulfil this functionality using Primary Key data.</remarks>
-        public abstract int Update(string tableName, IDictionary<string, object> data);
 
         /// <summary>
         ///  Deletes from the specified table.
@@ -213,14 +212,16 @@
         /// <param name="tableName">Name of the table.</param>
         /// <param name="data">The data.</param>
         /// <returns>The total number of records affected by the update operations.</returns>
-        /// <remarks>This method has a default implementation based on the <see cref="Update(string,IDictionary{string, object})"/> method.
+        /// <remarks>This method has a default implementation based on the <see cref="Update(string,IDictionary{string, object},SimpleExpression)"/> method.
         /// You should override this method if your adapter can optimize the operation.</remarks>
         public virtual int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data)
         {
             int updateCount = 0;
             foreach (var row in data)
             {
-                updateCount += Update(tableName, row);
+                var key = GetKey(tableName, row);
+                var criteria = ExpressionHelper.CriteriaDictionaryToExpression(tableName, key);
+                updateCount += Update(tableName, row, criteria);
             }
             return updateCount;
         }

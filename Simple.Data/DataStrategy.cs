@@ -124,11 +124,6 @@ namespace Simple.Data
         internal abstract int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria);
 
         /// <summary>
-        ///  Updates the specified "table" using key fields.
-        ///  </summary><param name="tableName">Name of the table.</param><param name="data">The new values.</param><param name="criteria">The expression to use as criteria for the update operation.</param><returns>The number of records affected by the update operation.</returns>
-        internal abstract int Update(string tableName, IDictionary<string, object> data);
-
-        /// <summary>
         ///  Deletes from the specified table.
         ///  </summary><param name="tableName">Name of the table.</param><param name="criteria">The expression to use as criteria for the delete operation.</param><returns>The number of records which were deleted.</returns>
         internal abstract int Delete(string tableName, SimpleExpression criteria);

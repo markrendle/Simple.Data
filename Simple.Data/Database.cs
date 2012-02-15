@@ -128,17 +128,6 @@ namespace Simple.Data
         }
 
         /// <summary>
-        ///  Updates the specified "table" using data-store specific key fields.
-        ///  </summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <param name="data">The new values.</param>
-        /// <returns>The number of records affected by the update operation.</returns>
-        internal override int Update(string tableName, IDictionary<string, object> data)
-        {
-            return _adapter.Update(tableName, data);
-        }
-
-        /// <summary>
         ///  Deletes from the specified table.
         ///  </summary><param name="tableName">Name of the table.</param><param name="criteria">The expression to use as criteria for the delete operation.</param><returns>The number of records which were deleted.</returns>
         internal override int Delete(string tableName, SimpleExpression criteria)

@@ -76,6 +76,13 @@ namespace Simple.Data.Ado
             get { return _connectionProvider.GetSchemaProvider(); }
         }
 
+        public override IDictionary<string, object> GetKey(string tableName, IDictionary<string, object> record)
+        {
+            var homogenizedRecord = new Dictionary<string, object>(record, HomogenizedEqualityComparer.DefaultInstance);
+            return GetKeyFieldNames(tableName).ToDictionary(key => key,
+                                                            key => homogenizedRecord.ContainsKey(key) ? homogenizedRecord[key] : null);
+        }
+
         #region IAdapterWithRelation Members
 
         /// <summary>
@@ -309,14 +316,6 @@ namespace Simple.Data.Ado
         {
             return new AdoAdapterInserter(this).InsertMany(tableName, data, onError, resultRequired);
         }
-
-        public override int Update(string tableName, IDictionary<string, object> data)
-        {
-            string[] keyFieldNames = GetKeyFieldNames(tableName).ToArray();
-            if (keyFieldNames.Length == 0) throw new AdoAdapterException("No Primary Key found for implicit update");
-            return Update(tableName, data, GetCriteria(tableName, keyFieldNames, data));
-        }
-
 
         public override int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data,
                                        IEnumerable<string> criteriaFieldNames)

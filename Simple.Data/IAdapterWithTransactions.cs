@@ -60,7 +60,7 @@ namespace Simple.Data
         int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> dataList, IAdapterTransaction adapterTransaction);
 
         int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> dataList, IAdapterTransaction adapterTransaction, IList<string> keyFields);
-        int Update(string tableName, IDictionary<string, object> data, IAdapterTransaction adapterTransaction);
+
         int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IEnumerable<string> criteriaFieldNames, IAdapterTransaction adapterTransaction);
     }
 }

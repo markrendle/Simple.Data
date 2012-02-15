@@ -32,7 +32,7 @@
                 ResultDiscardedGetter = null;
             }
 
-            ResultDiscardedGetter = ResultDiscardedGetter ?? (_ => true);
+            ResultDiscardedGetter = ResultDiscardedGetter ?? (_ => false);
         }
 
         public static bool HasSingleUnnamedArgument(this InvokeMemberBinder binder)
