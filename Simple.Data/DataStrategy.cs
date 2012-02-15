@@ -111,7 +111,7 @@ namespace Simple.Data
         /// <summary>
         ///  Inserts a record into the specified "table".
         ///  </summary><param name="tableName">Name of the table.</param><param name="data">The values to insert.</param><returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
-        internal abstract IEnumerable<IDictionary<string, object>> Insert(string tableName, IEnumerable<IDictionary<string, object>> enumerable, ErrorCallback onError, bool resultRequired);
+        internal abstract IEnumerable<IDictionary<string, object>> InsertMany(string tableName, IEnumerable<IDictionary<string, object>> enumerable, ErrorCallback onError, bool resultRequired);
 
         /// <summary>
         ///  Inserts many records into the specified "table".
@@ -161,10 +161,10 @@ namespace Simple.Data
             return changedValuesDict;
         }
 
-        public abstract IEnumerable<IDictionary<string,object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames);
+        public abstract IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, bool isResultRequired, ErrorCallback errorCallback);
 
         public abstract IDictionary<string,object> Upsert(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired);
 
-        public abstract IEnumerable<IDictionary<string,object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list);
+        public abstract IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, bool isResultRequired, ErrorCallback errorCallback);
     }
 }

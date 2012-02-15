@@ -15,19 +15,25 @@ namespace Simple.Data.Commands
 
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            if (binder.HasSingleUnnamedArgument())
+            object result;
+
+            if (binder.HasSingleUnnamedArgument() || args.Length == 2 && args[1] is ErrorCallback)
             {
-                return UpsertByKeyFields(table.GetQualifiedName(), dataStrategy, args[0],
+                result = UpsertByKeyFields(table.GetQualifiedName(), dataStrategy, args[0],
                                          MethodNameParser.ParseCriteriaNamesFromMethodName(binder.Name),
-                                         !binder.IsResultDiscarded());
+                                         !binder.IsResultDiscarded(),
+                                         args.Length == 2 ? (ErrorCallback)args[1] : ((item, exception) => false));
+            }
+            else
+            {
+                var criteria = MethodNameParser.ParseFromBinder(binder, args);
+                var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(),
+                                                                                         criteria);
+                var data = binder.NamedArgumentsToDictionary(args);
+                result = dataStrategy.Upsert(table.GetQualifiedName(), data, criteriaExpression, !binder.IsResultDiscarded());
             }
 
-            var criteria = MethodNameParser.ParseFromBinder(binder, args);
-            var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), criteria);
-            var data = binder.NamedArgumentsToDictionary(args)
-                .Where(kvp => !criteria.ContainsKey(kvp.Key))
-                .ToDictionary();
-            return dataStrategy.Update(table.GetQualifiedName(), data, criteriaExpression);
+            return ResultHelper.TypeResult(result, table, dataStrategy);
         }
 
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
@@ -35,11 +41,11 @@ namespace Simple.Data.Commands
             throw new NotImplementedException();
         }
 
-        internal static object UpsertByKeyFields(string tableName, DataStrategy dataStrategy, object entity, IEnumerable<string> keyFieldNames, bool isResultRequired)
+        internal static object UpsertByKeyFields(string tableName, DataStrategy dataStrategy, object entity, IEnumerable<string> keyFieldNames, bool isResultRequired, ErrorCallback errorCallback)
         {
             var record = UpdateCommand.ObjectToDictionary(entity);
             var list = record as IList<IDictionary<string, object>>;
-            if (list != null) return dataStrategy.UpsertMany(tableName, list, keyFieldNames);
+            if (list != null) return dataStrategy.UpsertMany(tableName, list, keyFieldNames, isResultRequired, errorCallback);
 
             var dict = record as IDictionary<string, object>;
             var criteria = GetCriteria(keyFieldNames, dict);

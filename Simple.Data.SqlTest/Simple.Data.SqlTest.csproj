@@ -94,6 +94,7 @@
     <Compile Include="TestTraceListener.cs" />
     <Compile Include="TransactionTests.cs" />
     <Compile Include="UpdateTests.cs" />
+    <Compile Include="UpsertTests.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>

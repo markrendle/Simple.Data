@@ -19,14 +19,8 @@ namespace Simple.Data.Commands
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             var result = DoInsert(binder, args, dataStrategy, table.GetQualifiedName());
-            
-            var dictionary = result as IDictionary<string,object>;
-            if (dictionary != null) return dictionary.ToDynamicRecord(table.GetQualifiedName(), dataStrategy);
 
-            var list = result as IEnumerable<IDictionary<string, object>>;
-            if (list != null) return new SimpleResultSet(list.Select(d => d.ToDynamicRecord(table.GetQualifiedName(), dataStrategy)));
-
-            return null;
+            return ResultHelper.TypeResult(result, table, dataStrategy);
         }
 
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
@@ -65,7 +59,7 @@ namespace Simple.Data.Commands
 
             var list = entity as IEnumerable<IDictionary<string, object>>;
             if (list != null)
-                return dataStrategy.Insert(tableName, list, onError, resultRequired);
+                return dataStrategy.InsertMany(tableName, list, onError, resultRequired);
 
             var entityList = entity as IEnumerable;
             if (entityList != null)
@@ -82,7 +76,7 @@ namespace Simple.Data.Commands
                     rows.Add(dictionary);
                 }
 
-                return dataStrategy.Insert(tableName, rows, onError, resultRequired);
+                return dataStrategy.InsertMany(tableName, rows, onError, resultRequired);
             }
 
             dictionary = entity.ObjectToDictionary();

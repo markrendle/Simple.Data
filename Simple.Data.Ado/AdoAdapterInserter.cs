@@ -92,7 +92,7 @@ namespace Simple.Data.Ado
         {
             data = data.Where(kvp => table.HasColumn(kvp.Key));
 
-            if (data.Count() == 0)
+            if (!data.Any())
             {
                 throw new SimpleDataException("No properties were found which could be mapped to the database.");
             }

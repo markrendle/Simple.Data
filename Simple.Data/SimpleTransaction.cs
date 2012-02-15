@@ -120,7 +120,7 @@ namespace Simple.Data
         /// <summary>
         ///  Inserts a record into the specified "table".
         ///  </summary><param name="tableName">Name of the table.</param><param name="data">The values to insert.</param><returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
-        internal override IEnumerable<IDictionary<string, object>> Insert(string tableName, IEnumerable<IDictionary<string, object>> data, ErrorCallback onError, bool resultRequired)
+        internal override IEnumerable<IDictionary<string, object>> InsertMany(string tableName, IEnumerable<IDictionary<string, object>> data, ErrorCallback onError, bool resultRequired)
         {
             return _adapter.InsertMany(tableName, data, AdapterTransaction, (dict, exception) => onError(new SimpleRecord(dict), exception), resultRequired);
         }
@@ -135,14 +135,14 @@ namespace Simple.Data
             return _adapter.Upsert(tableName, dict, criteriaExpression, isResultRequired, AdapterTransaction);
         }
 
-        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list)
+        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, bool isResultRequired, ErrorCallback errorCallback)
         {
-            return _adapter.UpsertMany(tableName, list, AdapterTransaction, true);
+            return _adapter.UpsertMany(tableName, list, AdapterTransaction, isResultRequired, (dict, exception) => errorCallback(new SimpleRecord(dict), exception));
         }
 
-        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames)
+        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, bool isResultRequired, ErrorCallback errorCallback)
         {
-            return _adapter.UpsertMany(tableName, list, keyFieldNames, AdapterTransaction);
+            return _adapter.UpsertMany(tableName, list, keyFieldNames, AdapterTransaction, isResultRequired, (dict, exception) => errorCallback(new SimpleRecord(dict), exception));
         }
 
         internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> newValuesList, IList<IDictionary<string, object>> originalValuesList)

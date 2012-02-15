@@ -259,17 +259,17 @@
 
         public IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired, IAdapterTransaction adapterTransaction)
         {
-            return UpsertMany(tableName, dict, criteriaExpression, isResultRequired);
+            return Upsert(tableName, dict, criteriaExpression, isResultRequired);
         }
 
-        public IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, IAdapterTransaction adapterTransaction)
+        public IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IDictionary<string,object>,Exception,bool> errorCallback)
         {
-            return UpsertMany(tableName, list, keyFieldNames);
+            return UpsertMany(tableName, list, keyFieldNames, isResultRequired, errorCallback);
         }
 
-        public IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IAdapterTransaction adapterTransaction)
+        public IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
         {
-            return UpsertMany(tableName, list, true);
+            return UpsertMany(tableName, list, isResultRequired, errorCallback);
         }
     }
 }

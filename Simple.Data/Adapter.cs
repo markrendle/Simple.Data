@@ -141,6 +141,7 @@
         /// <param name="tableName">Name of the table.</param>
         /// <param name="dataList">The data.</param>
         /// <param name="onError">A Func to call when there is an error. It this func returns true, carry on, otherwise abort.</param>
+        /// <param name="resultRequired"><c>true</c> if the result of the insert is used in code; otherwise, <c>false</c>.</param>
         /// <returns>If possible, return the newly inserted rows, including any automatically-set values such as primary keys or timestamps.</returns>
         /// <remarks>This method has a default implementation based on the <see cref="Insert(string,IDictionary{string, object})"/> method.
         /// You should override this method if your adapter can optimize the operation.</remarks>
@@ -363,107 +364,224 @@
             return MefHelper.GetAdjacentComponent<OptimizingDelegateFactory>(this.GetType()) ?? new DefaultOptimizingDelegateFactory();
         }
 
-        public virtual IDictionary<string, object> UpsertMany(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired)
+        public virtual IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired)
         {
-            var extant = Find(tableName, criteriaExpression);
-            if (extant != null)
+            if (Find(tableName, criteriaExpression).Any())
             {
+                var key = GetKey(tableName, dict);
+                dict = dict.Where(kvp => key.All(keyKvp => keyKvp.Key.Homogenize() != kvp.Key.Homogenize())).ToDictionary();
                 Update(tableName, dict, criteriaExpression);
-                return isResultRequired ? dict : null;
+                return isResultRequired ? Find(tableName, criteriaExpression).FirstOrDefault() : null;
             }
 
             return Insert(tableName, dict, isResultRequired);
         }
 
-        public virtual IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames)
+        public virtual IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, bool isResultRequired, Func<IDictionary<string,object>,Exception,bool> errorCallback)
+        {
+            if (isResultRequired)
+                return UpsertManyWithResults(tableName, list, keyFieldNames, errorCallback);
+            UpsertManyWithoutResults(tableName, list, keyFieldNames, errorCallback);
+            return null;
+        }
+
+        private IEnumerable<IDictionary<string, object>> UpsertManyWithResults(string tableName, IEnumerable<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames,
+                                                  Func<IDictionary<string, object>, Exception, bool> errorCallback)
         {
             var criteriaFields = keyFieldNames.ToArray();
             foreach (var row in list)
             {
-                var criteria = GetCriteria(tableName, criteriaFields, row);
-                if (Find(tableName, criteria) != null)
+                IDictionary<string, object> result;
+                try
                 {
-                    Update(tableName, row, criteria);
-                    yield return row;
+                    var criteria = GetCriteria(tableName, criteriaFields, row);
+                    result = Upsert(tableName, row, criteria, true);
                 }
-                else
+                catch (Exception ex)
                 {
-                    yield return Insert(tableName, row, true);
+                    if (errorCallback(row, ex)) continue;
+                    throw;
+                }
+                yield return result;
+            }
+        }
+
+        private void UpsertManyWithoutResults(string tableName, IEnumerable<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames,
+                                                  Func<IDictionary<string, object>, Exception, bool> errorCallback)
+        {
+            var criteriaFields = keyFieldNames.ToArray();
+            foreach (var row in list)
+            {
+                try
+                {
+                    var criteria = GetCriteria(tableName, criteriaFields, row);
+                    Upsert(tableName, row, criteria, false);
+                }
+                catch (Exception ex)
+                {
+                    if (errorCallback(row, ex)) continue;
+                    throw;
                 }
             }
         }
 
-        public virtual IDictionary<string, object> UpsertMany(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired, IAdapterTransaction transaction)
+        public virtual IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired, IAdapterTransaction transaction)
         {
             var transactionAdapter = this as IAdapterWithTransactions;
             if (transactionAdapter == null) throw new NotSupportedException("Transactions are not supported with current adapter.");
-            var extant = transactionAdapter.Find(tableName, criteriaExpression, transaction);
-            if (extant != null)
+            if (transactionAdapter.Find(tableName, criteriaExpression, transaction).Any())
             {
                 transactionAdapter.Update(tableName, dict, criteriaExpression, transaction);
-                return isResultRequired ? dict : null;
+                return isResultRequired ? transactionAdapter.Find(tableName, criteriaExpression, transaction).FirstOrDefault() : null;
             }
 
             return transactionAdapter.Insert(tableName, dict, transaction, isResultRequired);
         }
 
-        public virtual IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, IAdapterTransaction transaction)
+        public virtual IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, IAdapterTransaction transaction, bool isResultRequired, Func<IDictionary<string,object>,Exception,bool> errorCallback)
         {
             var transactionAdapter = this as IAdapterWithTransactions;
             if (transactionAdapter == null) throw new NotSupportedException("Transactions are not supported with current adapter.");
 
             var criteriaFields = keyFieldNames.ToArray();
-            foreach (var row in list)
+            if (isResultRequired)
             {
-                var criteria = GetCriteria(tableName, criteriaFields, row);
-                if (transactionAdapter.Find(tableName, criteria, transaction) != null)
-                {
-                    transactionAdapter.Update(tableName, row, criteria, transaction);
-                    yield return row;
-                }
-                else
-                {
-                    yield return transactionAdapter.Insert(tableName, row, transaction, true);
-                }
+                return UpsertManyWithResults(tableName, list, transaction, transactionAdapter, criteriaFields, errorCallback);
             }
+
+            UpsertManyWithoutResults(tableName, list, transaction, transactionAdapter, criteriaFields, errorCallback);
+            return null;
         }
 
-        public virtual IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, bool isResultRequired)
+        private static IEnumerable<IDictionary<string, object>> UpsertManyWithResults(string tableName, IEnumerable<IDictionary<string, object>> list, IAdapterTransaction transaction, IAdapterWithTransactions transactionAdapter, string[] criteriaFields, Func<IDictionary<string, object>, Exception, bool> errorCallback)
         {
             foreach (var row in list)
             {
-                var key = GetKey(tableName, row);
-                var criteria = ExpressionHelper.CriteriaDictionaryToExpression(tableName, key);
-                if (Find(tableName, criteria) != null)
+                IDictionary<string, object> result;
+
+                try
                 {
-                    Update(tableName, row, criteria);
-                    yield return isResultRequired ? row : null;
+                    var criteria = GetCriteria(tableName, criteriaFields, row);
+                    result = transactionAdapter.Upsert(tableName, row, criteria, true, transaction);
                 }
-                else
+                catch (Exception ex)
                 {
-                    yield return Insert(tableName, row, isResultRequired);
+                    if (errorCallback(row, ex))
+                    {
+                        continue;
+                    }
+                    throw;
+                }
+
+                yield return result;
+            }
+        }
+
+        private static void UpsertManyWithoutResults(string tableName, IEnumerable<IDictionary<string, object>> list, IAdapterTransaction transaction, IAdapterWithTransactions transactionAdapter, string[] criteriaFields, Func<IDictionary<string, object>, Exception, bool> errorCallback)
+        {
+            foreach (var row in list)
+            {
+                var criteria = GetCriteria(tableName, criteriaFields, row);
+                transactionAdapter.Upsert(tableName, row, criteria, true, transaction);
+            }
+        }
+
+        public virtual IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, bool isResultRequired, Func<IDictionary<string,object>,Exception,bool> errorCallback)
+        {
+            if (isResultRequired)
+            {
+                return UpsertManyWithResults(tableName, list, errorCallback);
+            }
+            UpsertManyWithoutResults(tableName, list, errorCallback);
+            return null;
+        }
+
+        private IEnumerable<IDictionary<string, object>> UpsertManyWithResults(string tableName, IEnumerable<IDictionary<string, object>> list, Func<IDictionary<string, object>, Exception, bool> errorCallback)
+        {
+            foreach (var row in list)
+            {
+                IDictionary<string, object> result;
+                try
+                {
+                    var key = GetKey(tableName, row);
+                    var criteria = ExpressionHelper.CriteriaDictionaryToExpression(tableName, key);
+                    if (Find(tableName, criteria).Any())
+                    {
+                        var record = row.Except(key).ToDictionary();
+                        Update(tableName, record, criteria);
+                        result = FindOne(tableName, criteria);
+                    }
+                    else
+                    {
+                        result = Insert(tableName, row, true);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (errorCallback(row, ex))
+                    {
+                        continue;
+                    }
+                    throw;
+                }
+                yield return result;
+            }
+        }
+
+        private void UpsertManyWithoutResults(string tableName, IEnumerable<IDictionary<string, object>> list, Func<IDictionary<string, object>, Exception, bool> errorCallback)
+        {
+            foreach (var row in list)
+            {
+                try
+                {
+                    var key = GetKey(tableName, row);
+                    var criteria = ExpressionHelper.CriteriaDictionaryToExpression(tableName, key);
+                    if (Find(tableName, criteria).Any())
+                    {
+                        var record = row.Except(key).ToDictionary();
+                        Update(tableName, record, criteria);
+                    }
+                    else
+                    {
+                        Insert(tableName, row, false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (!errorCallback(row, ex)) throw;
                 }
             }
         }
 
-        public virtual IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IAdapterTransaction transaction, bool isResultRequired)
+        public virtual IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IAdapterTransaction transaction, bool isResultRequired, Func<IDictionary<string,object>,Exception,bool> errorCallback)
         {
             var transactionAdapter = this as IAdapterWithTransactions;
             if (transactionAdapter == null) throw new NotSupportedException("Transactions are not supported with current adapter.");
 
             foreach (var row in list)
             {
-                var key = GetKey(tableName, row);
-                var criteria = ExpressionHelper.CriteriaDictionaryToExpression(tableName, key);
-                if (transactionAdapter.Find(tableName, criteria, transaction) != null)
+                IDictionary<string, object> result;
+                try
                 {
-                    transactionAdapter.Update(tableName, row, criteria, transaction);
-                    yield return isResultRequired ? row : null;
+                    var key = GetKey(tableName, row);
+                    var criteria = ExpressionHelper.CriteriaDictionaryToExpression(tableName, key);
+                    if (transactionAdapter.Find(tableName, criteria, transaction).Any())
+                    {
+                        var record = row.Except(key).ToDictionary();
+                        transactionAdapter.Update(tableName, record, criteria, transaction);
+                        result = isResultRequired ? transactionAdapter.Find(tableName, criteria, transaction).FirstOrDefault() : null;
+                    }
+                    else
+                    {
+                        result = transactionAdapter.Insert(tableName, row, transaction, isResultRequired);
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    yield return transactionAdapter.Insert(tableName, row, transaction, isResultRequired);
+                    if (errorCallback(row, ex)) continue;
+                    throw;
                 }
+                yield return result;
             }
         }
     }

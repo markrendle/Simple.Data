@@ -66,6 +66,7 @@
     <Compile Include="Commands\GetCountCommand.cs" />
     <Compile Include="Commands\ExistsByCommand.cs" />
     <Compile Include="Commands\ExistsCommand.cs" />
+    <Compile Include="Commands\ResultHelper.cs" />
     <Compile Include="Commands\UpdateAllCommand.cs" />
     <Compile Include="Commands\DeleteAllCommand.cs" />
     <Compile Include="Commands\ExecuteFunctionCommand.cs" />

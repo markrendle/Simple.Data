@@ -16,24 +16,40 @@ namespace Simple.Data.Commands
 
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            if (args.Length != 1)
+            object[] objects;
+            if (binder.CallInfo.ArgumentNames.Count > 0 && binder.CallInfo.ArgumentNames.All(s => !string.IsNullOrWhiteSpace(s)))
             {
-                throw new ArgumentException("Incorrect number of arguments to Update method.");
+                objects = new object[] {binder.NamedArgumentsToDictionary(args)};
+            }
+            else if (args.Length == 0 || args.Length > 2)
+            {
+                throw new ArgumentException("Incorrect number of arguments to Upsert method.");
+            }
+            else
+            {
+                objects = args;
             }
 
-            return UpsertUsingKeys(dataStrategy, table, args, !binder.IsResultDiscarded());
+            var result = UpsertUsingKeys(dataStrategy, table, objects, !binder.IsResultDiscarded());
+
+            return ResultHelper.TypeResult(result, table, dataStrategy);
         }
 
         private static object UpsertUsingKeys(DataStrategy dataStrategy, DynamicTable table, object[] args, bool isResultRequired)
         {
             var record = ObjectToDictionary(args[0]);
             var list = record as IList<IDictionary<string, object>>;
-            if (list != null) return dataStrategy.UpsertMany(table.GetQualifiedName(), list);
+            if (list != null)
+            {
+                ErrorCallback errorCallback = (args.Length == 2 ? args[1] as ErrorCallback : null) ??
+                 ((item, exception) => false); 
+                return dataStrategy.UpsertMany(table.GetQualifiedName(), list, isResultRequired, errorCallback);
+            }
 
             var dict = record as IDictionary<string, object>;
             if (dict == null) throw new InvalidOperationException("Could not resolve data from passed object.");
             var key = dataStrategy.GetAdapter().GetKey(table.GetQualifiedName(), dict);
-            dict = dict.Where(kvp => key.All(keyKvp => keyKvp.Key.Homogenize() != kvp.Key.Homogenize())).ToDictionary();
+
             var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), key);
             return dataStrategy.Upsert(table.GetQualifiedName(), dict, criteria, isResultRequired);
         }
