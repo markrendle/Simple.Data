@@ -256,5 +256,20 @@
                 get { return _masterTableName; }
             }
         }
+
+        public IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired, IAdapterTransaction adapterTransaction)
+        {
+            return UpsertMany(tableName, dict, criteriaExpression, isResultRequired);
+        }
+
+        public IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, IAdapterTransaction adapterTransaction)
+        {
+            return UpsertMany(tableName, list, keyFieldNames);
+        }
+
+        public IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IAdapterTransaction adapterTransaction)
+        {
+            return UpsertMany(tableName, list, true);
+        }
     }
 }

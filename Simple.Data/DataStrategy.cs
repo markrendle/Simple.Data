@@ -160,5 +160,11 @@ namespace Simple.Data
                     .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             return changedValuesDict;
         }
+
+        public abstract IEnumerable<IDictionary<string,object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames);
+
+        public abstract IDictionary<string,object> Upsert(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired);
+
+        public abstract IEnumerable<IDictionary<string,object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list);
     }
 }

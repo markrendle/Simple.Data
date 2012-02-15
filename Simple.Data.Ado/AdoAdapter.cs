@@ -10,14 +10,12 @@ using Simple.Data.Ado.Schema;
 namespace Simple.Data.Ado
 {
     [Export("Ado", typeof (Adapter))]
-    public partial class AdoAdapter : Adapter, IAdapterWithRelation, IAdapterWithTransactions, ICloneable
+    public partial class AdoAdapter : Adapter, ICloneable
     {
         private readonly AdoAdapterFinder _finder;
         private readonly ProviderHelper _providerHelper = new ProviderHelper();
         private CommandOptimizer _commandOptimizer = new CommandOptimizer();
-
         private IConnectionProvider _connectionProvider;
-
         private Lazy<AdoAdapterRelatedFinder> _relatedFinder;
         private DatabaseSchema _schema;
         private IDbConnection _sharedConnection;
@@ -82,128 +80,6 @@ namespace Simple.Data.Ado
             return GetKeyFieldNames(tableName).ToDictionary(key => key,
                                                             key => homogenizedRecord.ContainsKey(key) ? homogenizedRecord[key] : null);
         }
-
-        #region IAdapterWithRelation Members
-
-        /// <summary>
-        /// Determines whether a relation is valid.
-        /// </summary>
-        /// <param name="tableName">Name of the known table.</param>
-        /// <param name="relatedTableName">Name of the table to test.</param>
-        /// <returns>
-        /// 	<c>true</c> if there is a valid relation; otherwise, <c>false</c>.
-        /// </returns>
-        public bool IsValidRelation(string tableName, string relatedTableName)
-        {
-            return _relatedFinder.Value.IsValidRelation(tableName, relatedTableName);
-        }
-
-        /// <summary>
-        /// Finds data from a "table" related to the specified "table".
-        /// </summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <param name="row"></param>
-        /// <param name="relatedTableName"></param>
-        /// <returns>The list of records matching the criteria. If no records are found, return an empty list.</returns>
-        /// <remarks>When implementing the <see cref="Adapter"/> interface, if relationships are not possible, throw a <see cref="NotSupportedException"/>.</remarks>
-        public object FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName)
-        {
-            return _relatedFinder.Value.FindRelated(tableName, row, relatedTableName);
-        }
-
-        #endregion
-
-        #region IAdapterWithTransactions Members
-
-        public IEnumerable<IDictionary<string, object>> InsertMany(string tableName,
-                                                                   IEnumerable<IDictionary<string, object>> data,
-                                                                   IAdapterTransaction transaction,
-                                                                   Func<IDictionary<string,object>,Exception,bool> onError, bool resultRequired)
-        {
-            return new AdoAdapterInserter(this, ((AdoAdapterTransaction) transaction).Transaction).InsertMany(
-                tableName, data, onError, resultRequired);
-        }
-
-        public int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data,
-                              IAdapterTransaction transaction)
-        {
-            IBulkUpdater bulkUpdater = ProviderHelper.GetCustomProvider<IBulkUpdater>(ConnectionProvider) ??
-                                       new BulkUpdater();
-            return bulkUpdater.Update(this, tableName, data.ToList(), ((AdoAdapterTransaction) transaction).Transaction);
-        }
-
-        public int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data,
-                              IAdapterTransaction transaction, IList<string> keyFields)
-        {
-            IBulkUpdater bulkUpdater = ProviderHelper.GetCustomProvider<IBulkUpdater>(ConnectionProvider) ??
-                                       new BulkUpdater();
-            return bulkUpdater.Update(this, tableName, data.ToList(), ((AdoAdapterTransaction) transaction).Transaction);
-        }
-
-        public int Update(string tableName, IDictionary<string, object> data, IAdapterTransaction adapterTransaction)
-        {
-            string[] keyFieldNames = GetKeyFieldNames(tableName).ToArray();
-            if (keyFieldNames.Length == 0) throw new AdoAdapterException("No Primary Key found for implicit update");
-            return Update(tableName, data, GetCriteria(tableName, keyFieldNames, data), adapterTransaction);
-        }
-
-        public int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList,
-                              IEnumerable<string> criteriaFieldNames, IAdapterTransaction adapterTransaction)
-        {
-            IBulkUpdater bulkUpdater = ProviderHelper.GetCustomProvider<IBulkUpdater>(ConnectionProvider) ??
-                                       new BulkUpdater();
-            return bulkUpdater.Update(this, tableName, dataList, criteriaFieldNames,
-                                      ((AdoAdapterTransaction) adapterTransaction).Transaction);
-        }
-
-        public IAdapterTransaction BeginTransaction()
-        {
-            IDbConnection connection = CreateConnection();
-            connection.OpenIfClosed();
-            IDbTransaction transaction = connection.BeginTransaction();
-            return new AdoAdapterTransaction(transaction, _sharedConnection != null);
-        }
-
-        public IAdapterTransaction BeginTransaction(string name)
-        {
-            IDbConnection connection = CreateConnection();
-            connection.OpenIfClosed();
-            var sqlConnection = connection as SqlConnection;
-            IDbTransaction transaction = sqlConnection != null
-                                             ? sqlConnection.BeginTransaction(name)
-                                             : connection.BeginTransaction();
-
-            return new AdoAdapterTransaction(transaction, name, _sharedConnection != null);
-        }
-
-        public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria,
-                                                             IAdapterTransaction transaction)
-        {
-            return new AdoAdapterFinder(this, ((AdoAdapterTransaction) transaction).Transaction).Find(tableName,
-                                                                                                      criteria);
-        }
-
-        public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data,
-                                                  IAdapterTransaction transaction, bool resultRequired)
-        {
-            return new AdoAdapterInserter(this, ((AdoAdapterTransaction) transaction).Transaction).Insert(tableName,
-                                                                                                          data, resultRequired);
-        }
-
-        public int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria,
-                          IAdapterTransaction transaction)
-        {
-            ICommandBuilder commandBuilder = new UpdateHelper(_schema).GetUpdateCommand(tableName, data, criteria);
-            return Execute(commandBuilder, transaction);
-        }
-
-        public int Delete(string tableName, SimpleExpression criteria, IAdapterTransaction transaction)
-        {
-            ICommandBuilder commandBuilder = new DeleteHelper(_schema).GetDeleteCommand(tableName, criteria);
-            return Execute(commandBuilder, transaction);
-        }
-
-        #endregion
 
         #region ICloneable Members
 

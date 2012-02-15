@@ -72,6 +72,8 @@
     <Compile Include="Commands\FindAllCommand.cs" />
     <Compile Include="Commands\QueryByCommand.cs" />
     <Compile Include="Commands\UpdateCommand.cs" />
+    <Compile Include="Commands\UpsertByCommand.cs" />
+    <Compile Include="Commands\UpsertCommand.cs" />
     <Compile Include="CommonTypes.cs" />
     <Compile Include="Composer.cs" />
     <Compile Include="ConcreteCollectionTypeCreator.cs" />

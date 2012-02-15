@@ -26,6 +26,7 @@ namespace Simple.Data.Commands
                                                                   new ExistsCommand(),
                                                                   new ExistsByCommand(),
                                                                   new GetCommand(),
+                                                                  new UpsertByCommand(),
                                                               };
 
         private static readonly ConcurrentDictionary<string, ICommand> Cache = new ConcurrentDictionary<string, ICommand>();

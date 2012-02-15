@@ -127,6 +127,21 @@ namespace Simple.Data
             return _adapter.Update(tableName, data, criteria);
         }
 
+        public override IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired)
+        {
+            return _adapter.UpsertMany(tableName, dict, criteriaExpression, isResultRequired);
+        }
+
+        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list)
+        {
+            return _adapter.UpsertMany(tableName, list, true);
+        }
+
+        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames)
+        {
+            return _adapter.UpsertMany(tableName, list, keyFieldNames);
+        }
+
         /// <summary>
         ///  Deletes from the specified table.
         ///  </summary><param name="tableName">Name of the table.</param><param name="criteria">The expression to use as criteria for the delete operation.</param><returns>The number of records which were deleted.</returns>

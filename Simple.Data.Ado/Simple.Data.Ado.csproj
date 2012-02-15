@@ -54,6 +54,8 @@
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AdoAdapter.cs" />
+    <Compile Include="AdoAdapter.IAdapterWithRelation.cs" />
+    <Compile Include="AdoAdapter.IAdapterWithTransactions.cs" />
     <Compile Include="AdoAdapterException.cs" />
     <Compile Include="AdoAdapterFinder.cs" />
     <Compile Include="AdoAdapterGetter.cs" />

@@ -130,6 +130,21 @@ namespace Simple.Data
             return _adapter.Update(tableName, data, criteria, AdapterTransaction);
         }
 
+        public override IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired)
+        {
+            return _adapter.Upsert(tableName, dict, criteriaExpression, isResultRequired, AdapterTransaction);
+        }
+
+        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list)
+        {
+            return _adapter.UpsertMany(tableName, list, AdapterTransaction, true);
+        }
+
+        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames)
+        {
+            return _adapter.UpsertMany(tableName, list, keyFieldNames, AdapterTransaction);
+        }
+
         internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> newValuesList, IList<IDictionary<string, object>> originalValuesList)
         {
             int count = 0;

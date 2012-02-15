@@ -330,7 +330,7 @@
             foreach (var criteriaFieldName in criteriaFieldNames)
             {
                 var name = criteriaFieldName;
-                var keyValuePair = record.Where(kvp => kvp.Key.Homogenize().Equals(name.Homogenize())).SingleOrDefault();
+                var keyValuePair = record.SingleOrDefault(kvp => kvp.Key.Homogenize().Equals(name.Homogenize()));
                 if (string.IsNullOrWhiteSpace(keyValuePair.Key))
                 {
                     throw new InvalidOperationException("Key field value not set.");
@@ -361,6 +361,110 @@
         private OptimizingDelegateFactory CreateOptimizingDelegateFactory()
         {
             return MefHelper.GetAdjacentComponent<OptimizingDelegateFactory>(this.GetType()) ?? new DefaultOptimizingDelegateFactory();
+        }
+
+        public virtual IDictionary<string, object> UpsertMany(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired)
+        {
+            var extant = Find(tableName, criteriaExpression);
+            if (extant != null)
+            {
+                Update(tableName, dict, criteriaExpression);
+                return isResultRequired ? dict : null;
+            }
+
+            return Insert(tableName, dict, isResultRequired);
+        }
+
+        public virtual IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames)
+        {
+            var criteriaFields = keyFieldNames.ToArray();
+            foreach (var row in list)
+            {
+                var criteria = GetCriteria(tableName, criteriaFields, row);
+                if (Find(tableName, criteria) != null)
+                {
+                    Update(tableName, row, criteria);
+                    yield return row;
+                }
+                else
+                {
+                    yield return Insert(tableName, row, true);
+                }
+            }
+        }
+
+        public virtual IDictionary<string, object> UpsertMany(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired, IAdapterTransaction transaction)
+        {
+            var transactionAdapter = this as IAdapterWithTransactions;
+            if (transactionAdapter == null) throw new NotSupportedException("Transactions are not supported with current adapter.");
+            var extant = transactionAdapter.Find(tableName, criteriaExpression, transaction);
+            if (extant != null)
+            {
+                transactionAdapter.Update(tableName, dict, criteriaExpression, transaction);
+                return isResultRequired ? dict : null;
+            }
+
+            return transactionAdapter.Insert(tableName, dict, transaction, isResultRequired);
+        }
+
+        public virtual IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, IAdapterTransaction transaction)
+        {
+            var transactionAdapter = this as IAdapterWithTransactions;
+            if (transactionAdapter == null) throw new NotSupportedException("Transactions are not supported with current adapter.");
+
+            var criteriaFields = keyFieldNames.ToArray();
+            foreach (var row in list)
+            {
+                var criteria = GetCriteria(tableName, criteriaFields, row);
+                if (transactionAdapter.Find(tableName, criteria, transaction) != null)
+                {
+                    transactionAdapter.Update(tableName, row, criteria, transaction);
+                    yield return row;
+                }
+                else
+                {
+                    yield return transactionAdapter.Insert(tableName, row, transaction, true);
+                }
+            }
+        }
+
+        public virtual IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, bool isResultRequired)
+        {
+            foreach (var row in list)
+            {
+                var key = GetKey(tableName, row);
+                var criteria = ExpressionHelper.CriteriaDictionaryToExpression(tableName, key);
+                if (Find(tableName, criteria) != null)
+                {
+                    Update(tableName, row, criteria);
+                    yield return isResultRequired ? row : null;
+                }
+                else
+                {
+                    yield return Insert(tableName, row, isResultRequired);
+                }
+            }
+        }
+
+        public virtual IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IAdapterTransaction transaction, bool isResultRequired)
+        {
+            var transactionAdapter = this as IAdapterWithTransactions;
+            if (transactionAdapter == null) throw new NotSupportedException("Transactions are not supported with current adapter.");
+
+            foreach (var row in list)
+            {
+                var key = GetKey(tableName, row);
+                var criteria = ExpressionHelper.CriteriaDictionaryToExpression(tableName, key);
+                if (transactionAdapter.Find(tableName, criteria, transaction) != null)
+                {
+                    transactionAdapter.Update(tableName, row, criteria, transaction);
+                    yield return isResultRequired ? row : null;
+                }
+                else
+                {
+                    yield return transactionAdapter.Insert(tableName, row, transaction, isResultRequired);
+                }
+            }
         }
     }
 }
