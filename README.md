@@ -45,14 +45,18 @@ almost any back-end.
 Currently, Simple.Data has adapters for:
 
 * ADO-based access to relational databases, with providers for:
-	* SQL Server 2005 and later
+	* SQL Server 2005 and later (including SQL Azure)
 	* SQL Server Compact Edition 4.0
-    * Oracle
+	* Oracle
 	* MySQL 4.0 and later
 	* SQLite
+	* PostgreSQL
+	* SQLAnywhere
+	* Informix
 * MongoDB
+* OData
 
-Work is in progress to support PostgreSQL and Azure Table Storage. I'm also ensuring that Simple.Data works on Mono by the 1.0 release.
+Work is in progress to support Azure Table Storage. I'm also ensuring that Simple.Data works on Mono by the 1.0 release.
 
 If you'd like to create an adapter or provider and need some help to get started, drop in on the mailing list (see below).
 
