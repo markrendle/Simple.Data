@@ -57,7 +57,7 @@
 
         public int Update(string tableName, IDictionary<string, object> data, IAdapterTransaction adapterTransaction)
         {
-            string[] keyFieldNames = GetKeyFieldNames(tableName).ToArray();
+            string[] keyFieldNames = GetKeyNames(tableName).ToArray();
             if (keyFieldNames.Length == 0) throw new AdoAdapterException("No Primary Key found for implicit update");
             return Update(tableName, data, GetCriteria(tableName, keyFieldNames, data), adapterTransaction);
         }
@@ -126,18 +126,19 @@
         public override IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> data, SimpleExpression criteria, bool resultRequired, IAdapterTransaction adapterTransaction)
         {
             var transaction = ((AdoAdapterTransaction) adapterTransaction).Transaction;
-            var finder = new AdoAdapterFinder(this, transaction);
-            if (finder.FindOne(tableName, criteria) != null)
-            {
-                // Don't update columns used as criteria
-                var keys = criteria.GetOperandsOfType<ObjectReference>().Select(o => o.GetName().Homogenize());
-                data = data.Where(kvp => keys.All(k => k != kvp.Key.Homogenize())).ToDictionary();
+            return new AdoAdapterUpserter(this, transaction).Upsert(tableName, data, criteria, resultRequired);
+        }
 
-                var commandBuilder = new UpdateHelper(_schema).GetUpdateCommand(tableName, data, criteria);
-                Execute(commandBuilder, adapterTransaction);
-                return resultRequired ? finder.FindOne(tableName, criteria) : null;
-            }
-            return new AdoAdapterInserter(this, transaction).Insert(tableName, data, resultRequired);
+        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
+        {
+            var transaction = ((AdoAdapterTransaction) adapterTransaction).Transaction;
+            return new AdoAdapterUpserter(this, transaction).UpsertMany(tableName, list, isResultRequired, errorCallback);
+        }
+
+        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
+        {
+            var transaction = ((AdoAdapterTransaction) adapterTransaction).Transaction;
+            return new AdoAdapterUpserter(this, transaction).UpsertMany(tableName, list, keyFieldNames.ToArray(), isResultRequired, errorCallback);
         }
     }
 }

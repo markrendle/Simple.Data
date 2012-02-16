@@ -293,6 +293,19 @@
                 return true;
             }
 
+            var command = Commands.CommandFactory.GetCommandFor(binder.Name);
+            if (command != null)
+            {
+                try
+                {
+                    result = command.Execute(_dataStrategy, this, binder, args);
+                    return true;
+                }
+                catch (NotImplementedException)
+                {
+                }
+            }
+
             return false;
         }
 

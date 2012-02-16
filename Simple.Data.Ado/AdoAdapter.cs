@@ -79,7 +79,7 @@ namespace Simple.Data.Ado
         public override IDictionary<string, object> GetKey(string tableName, IDictionary<string, object> record)
         {
             var homogenizedRecord = new Dictionary<string, object>(record, HomogenizedEqualityComparer.DefaultInstance);
-            return GetKeyFieldNames(tableName).ToDictionary(key => key,
+            return GetKeyNames(tableName).ToDictionary(key => key,
                                                             key => homogenizedRecord.ContainsKey(key) ? homogenizedRecord[key] : null);
         }
 
@@ -233,9 +233,9 @@ namespace Simple.Data.Ado
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
         /// <returns>A list of field names; an empty list if no key is defined.</returns>
-        public IEnumerable<string> GetKeyFieldNames(string tableName)
+        public override IList<string> GetKeyNames(string tableName)
         {
-            return _schema.FindTable(tableName).PrimaryKey.AsEnumerable();
+            return _schema.FindTable(tableName).PrimaryKey.AsEnumerable().ToList();
         }
 
         private int Execute(ICommandBuilder commandBuilder)
@@ -250,7 +250,8 @@ namespace Simple.Data.Ado
                 }
             }
         }
-        private int Execute(ICommandBuilder commandBuilder, IDbConnection connection)
+
+        internal static int Execute(ICommandBuilder commandBuilder, IDbConnection connection)
         {
             using (connection.MaybeDisposable())
             {
@@ -262,9 +263,14 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static int Execute(ICommandBuilder commandBuilder, IAdapterTransaction transaction)
+        internal static int Execute(ICommandBuilder commandBuilder, IAdapterTransaction transaction)
         {
             IDbTransaction dbTransaction = ((AdoAdapterTransaction) transaction).Transaction;
+            return Execute(commandBuilder, dbTransaction);
+        }
+
+        internal static int Execute(ICommandBuilder commandBuilder, IDbTransaction dbTransaction)
+        {
             using (IDbCommand command = commandBuilder.GetCommand(dbTransaction.Connection))
             {
                 command.Transaction = dbTransaction;
@@ -307,23 +313,17 @@ namespace Simple.Data.Ado
 
         public override IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> data, SimpleExpression criteria, bool resultRequired)
         {
-            var connection = CreateConnection();
-            using (connection.MaybeDisposable())
-            {
-                connection.OpenIfClosed();
-                var finder = new AdoAdapterFinder(this, connection);
-                if (finder.FindOne(tableName, criteria) != null)
-                {
-                    // Don't update columns used as criteria
-                    var keys = criteria.GetOperandsOfType<ObjectReference>().Select(o => o.GetName().Homogenize());
-                    data = data.Where(kvp => keys.All(k => k != kvp.Key.Homogenize())).ToDictionary();
+            return new AdoAdapterUpserter(this).Upsert(tableName, data, criteria, resultRequired);
+        }
 
-                    var commandBuilder = new UpdateHelper(_schema).GetUpdateCommand(tableName, data, criteria);
-                    Execute(commandBuilder, connection);
-                    return resultRequired ? finder.FindOne(tableName, criteria) : null;
-                }
-                return new AdoAdapterInserter(this, connection).Insert(tableName, data, resultRequired);
-            }
+        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
+        {
+            return new AdoAdapterUpserter(this).UpsertMany(tableName, list, isResultRequired, errorCallback);
+        }
+
+        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
+        {
+            return new AdoAdapterUpserter(this).UpsertMany(tableName, list, keyFieldNames.ToArray(), isResultRequired, errorCallback);
         }
 
         public string GetIdentityFunction()

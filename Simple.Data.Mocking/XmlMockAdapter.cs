@@ -33,6 +33,11 @@ namespace Simple.Data.Mocking
                                                             key => record.ContainsKey(key) ? record[key] : null);
         }
 
+        public override IList<string> GetKeyNames(string tableName)
+        {
+            return GetKeyFieldNames(tableName).ToList();
+        }
+
         public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
         {
             throw new NotImplementedException();

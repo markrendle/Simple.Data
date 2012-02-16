@@ -29,6 +29,11 @@ namespace Simple.Data.Commands
             return UpdateUsingOriginalValues(dataStrategy, table, args);
         }
 
+        public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
         private static object UpdateUsingOriginalValues(DataStrategy dataStrategy, DynamicTable table, object[] args)
         {
             var newValues = ObjectToDictionary(args[0]);

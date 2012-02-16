@@ -64,5 +64,14 @@ namespace Simple.Data.Commands
             var data = dataStrategy.FindOne(table.GetQualifiedName(), criteriaExpression);
             return data != null ? new SimpleRecord(data, table.GetQualifiedName(), dataStrategy) : null;
         }
+
+        public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)
+        {
+            var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(query.TableName,
+                                                                                     CreateCriteriaDictionary(binder,
+                                                                                                              args));
+            query = query.Where(criteriaExpression).Take(1);
+            return query.FirstOrDefault();
+        }
     }
 }

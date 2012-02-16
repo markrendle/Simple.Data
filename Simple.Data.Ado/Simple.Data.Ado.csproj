@@ -63,6 +63,7 @@
     <Compile Include="AdoAdapterQueryRunner.cs" />
     <Compile Include="AdoAdapterRelatedFinder.cs" />
     <Compile Include="AdoAdapterTransaction.cs" />
+    <Compile Include="AdoAdapterUpserter.cs" />
     <Compile Include="BulkInserter.cs" />
     <Compile Include="BulkInserterHelper.cs" />
     <Compile Include="BulkInserterTransactionHelper.cs" />

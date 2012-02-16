@@ -52,6 +52,11 @@
             throw new NotImplementedException();
         }
 
+        public override IList<string> GetKeyNames(string tableName)
+        {
+            throw new NotImplementedException();
+        }
+
         public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
         {
             throw new NotImplementedException();

@@ -29,6 +29,12 @@
             return _keyColumns[tableName].ToDictionary(key => key, key => record.ContainsKey(key) ? record[key] : null);
         }
 
+        public override IList<string> GetKeyNames(string tableName)
+        {
+            if (!_keyColumns.ContainsKey(tableName)) return null;
+            return _keyColumns[tableName];
+        }
+
         public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
         {
             if (!_keyColumns.ContainsKey(tableName)) throw new InvalidOperationException("No key specified for In-Memory table.");

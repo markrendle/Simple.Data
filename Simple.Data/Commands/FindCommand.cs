@@ -39,6 +39,11 @@ namespace Simple.Data.Commands
             return null;
         }
 
+        public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)
+        {
+            return query.Where((SimpleExpression) args[0]).Take(1).FirstOrDefault();
+        }
+
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             throw new NotImplementedException();

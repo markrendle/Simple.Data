@@ -12,7 +12,7 @@ namespace Simple.Data.Ado
     {
         public int Update(AdoAdapter adapter, string tableName, IList<IDictionary<string, object>> data, IDbTransaction transaction)
         {
-            return Update(adapter, tableName, data, adapter.GetKeyFieldNames(tableName).ToList(), transaction);
+            return Update(adapter, tableName, data, adapter.GetKeyNames(tableName).ToList(), transaction);
         }
 
         public int Update(AdoAdapter adapter, string tableName, IList<IDictionary<string, object>> data, IEnumerable<string> criteriaFieldNames, IDbTransaction transaction)

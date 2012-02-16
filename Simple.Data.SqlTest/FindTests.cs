@@ -10,6 +10,8 @@ using Simple.Data.TestHelper;
 
 namespace Simple.Data.SqlTest
 {
+    using System;
+
     /// <summary>
     /// Summary description for FindTests
     /// </summary>
@@ -171,6 +173,36 @@ namespace Simple.Data.SqlTest
             var user = db.Users.FindBy(Name: "Bob");
             Assert.IsNotNull(user);
 
+        }
+
+        [Test]
+        public void WithClauseShouldCastToStaticTypeWithCollection()
+        {
+            var db = DatabaseHelper.Open();
+            Customer actual = db.Customers.WithOrders().FindByCustomerId(1);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(1, actual.Orders.Single().OrderId);
+            Assert.AreEqual(new DateTime(2010, 10, 10), actual.Orders.Single().OrderDate);
+        }
+
+        [Test]
+        public void NamedParameterAndWithClauseShouldCastToStaticTypeWithCollection()
+        {
+            var db = DatabaseHelper.Open();
+            Customer actual = db.Customers.WithOrders().FindBy(CustomerId: 1);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(1, actual.Orders.Single().OrderId);
+            Assert.AreEqual(new DateTime(2010, 10, 10), actual.Orders.Single().OrderDate);
+        }
+
+        [Test]
+        public void ExpressionAndWithClauseShouldCastToStaticTypeWithCollection()
+        {
+            var db = DatabaseHelper.Open();
+            Customer actual = db.Customers.WithOrders().Find(db.Customers.CustomerId == 1);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(1, actual.Orders.Single().OrderId);
+            Assert.AreEqual(new DateTime(2010, 10, 10), actual.Orders.Single().OrderDate);
         }
     }
 }

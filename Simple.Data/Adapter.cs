@@ -66,6 +66,13 @@
         public abstract IDictionary<string, object> GetKey(string tableName, IDictionary<string, object> record);
 
         /// <summary>
+        /// Gets the key name(s) for the table.
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <returns>An <c>IList&lt;string&gt;</c> containing the key names that uniquely identify a record in the database.</returns>
+        public abstract IList<string> GetKeyNames(string tableName); 
+
+        /// <summary>
         /// Gets a single record from the specified "table" using its default key.
         /// </summary>
         /// <param name="tableName">Name of the table.</param>

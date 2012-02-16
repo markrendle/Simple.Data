@@ -94,6 +94,12 @@ namespace Simple.Data
                 return true;
             }
 
+            var query = new SimpleQuery(_dataStrategy, _tableName);
+            if (query.TryInvokeMember(binder, args, out result))
+            {
+                return true;
+            }
+
             return base.TryInvokeMember(binder, args, out result);
         }
 

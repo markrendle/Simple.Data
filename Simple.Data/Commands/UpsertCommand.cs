@@ -35,6 +35,11 @@ namespace Simple.Data.Commands
             return ResultHelper.TypeResult(result, table, dataStrategy);
         }
 
+        public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
         private static object UpsertUsingKeys(DataStrategy dataStrategy, DynamicTable table, object[] args, bool isResultRequired)
         {
             var record = ObjectToDictionary(args[0]);

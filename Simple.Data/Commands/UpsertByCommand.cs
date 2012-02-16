@@ -36,6 +36,11 @@ namespace Simple.Data.Commands
             return ResultHelper.TypeResult(result, table, dataStrategy);
         }
 
+        public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             throw new NotImplementedException();

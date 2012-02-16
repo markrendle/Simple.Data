@@ -284,6 +284,48 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void TestMultiUpsertWithErrorCallbackUsingTransaction()
+        {
+            IList<dynamic> actuals;
+            bool passed = false;
+            using (var tx = DatabaseHelper.Open().BeginTransaction())
+            {
+                dynamic user1 = new ExpandoObject();
+                user1.Name = "Slartibartfast";
+                user1.Password = "bistromathics";
+                user1.Age = 777;
+
+                dynamic user2 = new ExpandoObject();
+                user2.Name = null;
+                user2.Password = null;
+                user2.Age = null;
+
+                dynamic user3 = new ExpandoObject();
+                user3.Name = "Wowbagger";
+                user3.Password = "teatime";
+                user3.Age = int.MaxValue;
+
+                var users = new[] {user1, user2, user3};
+
+                ErrorCallback onError = (o, exception) => passed = true;
+
+                actuals = tx.Users.Upsert(users, onError).ToList();
+            }
+
+            Assert.IsTrue(passed, "Callback was not called.");
+            Assert.AreEqual(2, actuals.Count);
+            Assert.AreNotEqual(0, actuals[0].Id);
+            Assert.AreEqual("Slartibartfast", actuals[0].Name);
+            Assert.AreEqual("bistromathics", actuals[0].Password);
+            Assert.AreEqual(777, actuals[0].Age);
+
+            Assert.AreNotEqual(0, actuals[1].Id);
+            Assert.AreEqual("Wowbagger", actuals[1].Name);
+            Assert.AreEqual("teatime", actuals[1].Password);
+            Assert.AreEqual(int.MaxValue, actuals[1].Age);
+        }
+
+        [Test]
         public void TestTransactionMultiUpsertWithErrorCallback()
         {
             var db = DatabaseHelper.Open();

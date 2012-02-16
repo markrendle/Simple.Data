@@ -27,6 +27,8 @@ namespace Simple.Data.Commands
         /// <returns></returns>
         object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args);
 
+        object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args);
+
         Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder,
                                               object[] args);
     }
