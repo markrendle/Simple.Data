@@ -47,12 +47,12 @@ Currently, Simple.Data has adapters for:
 * ADO-based access to relational databases, with providers for:
 	* SQL Server 2005 and later (including SQL Azure)
 	* SQL Server Compact Edition 4.0
-        * Oracle
+	* Oracle
 	* MySQL 4.0 and later
 	* SQLite
-        * PostgreSQL
-        * SQLAnywhere
-        * Informix
+	* PostgreSQL
+	* SQLAnywhere
+	* Informix
 * MongoDB
 * OData
 
