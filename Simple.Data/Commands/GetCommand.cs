@@ -12,13 +12,16 @@ namespace Simple.Data.Commands
     {
         public bool IsCommandFor(string method)
         {
-            return method.Equals("get", StringComparison.OrdinalIgnoreCase);
+            return method.Equals("get", StringComparison.OrdinalIgnoreCase) || method.Equals("getscalar", StringComparison.OrdinalIgnoreCase);
         }
 
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             var result = dataStrategy.Get(table.GetName(), args);
-            return result == null ? null : new SimpleRecord(result, table.GetQualifiedName(), dataStrategy);
+            if (result == null || result.Count == 0) return null;
+            return binder.Name.Equals("get", StringComparison.OrdinalIgnoreCase)
+                       ? new SimpleRecord(result, table.GetQualifiedName(), dataStrategy)
+                       : result.First().Value;
         }
 
         public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)
@@ -26,7 +29,9 @@ namespace Simple.Data.Commands
             var keyNames = dataStrategy.GetAdapter().GetKeyNames(query.TableName);
             var dict = keyNames.Select((k, i) => new KeyValuePair<string, object>(k, args[i]));
             query = query.Where(ExpressionHelper.CriteriaDictionaryToExpression(query.TableName, dict)).Take(1);
-            return query.FirstOrDefault();
+            var result = query.FirstOrDefault();
+            if (result == null) return null;
+            return binder.Name == "get" ? result : ((IDictionary<string, object>) result).First().Value;
         }
 
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)

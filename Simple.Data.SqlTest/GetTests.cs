@@ -23,6 +23,15 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void SelectClauseWithGetScalarShouldLimitQuery()
+        {
+            var db = DatabaseHelper.Open();
+            string actual = db.Customers.Select(db.Customers.Name).GetScalar(1);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual("Test", actual);
+        }
+
+        [Test]
         public void WithClauseShouldCastToStaticTypeWithComplexProperty()
         {
             var db = DatabaseHelper.Open();

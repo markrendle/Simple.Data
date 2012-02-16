@@ -146,5 +146,17 @@ namespace Simple.Data
         {
             return new SimpleRecord(Cloner.CloneDictionary(_data), _tableName, _database);
         }
+
+        public object ToScalar()
+        {
+            if (_data == null || _data.Count == 0) return null;
+            return _data.First().Value;
+        }
+
+        public T ToScalar<T>()
+        {
+            if (_data == null || _data.Count == 0) return default(T);
+            return (T)_data.First().Value;
+        }
     }
 }

@@ -5,6 +5,7 @@
     using System.Collections.Generic;
     using System.Dynamic;
     using System.Linq;
+    using System.Reflection;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using Extensions;
@@ -292,6 +293,11 @@
                 result = ParseWith(binder, args);
                 return true;
             }
+            if (binder.Name.Equals("select", StringComparison.OrdinalIgnoreCase))
+            {
+                result = Select(args.OfType<SimpleReference>());
+                return true;
+            }
 
             var command = Commands.CommandFactory.GetCommandFor(binder.Name);
             if (command != null)
@@ -305,8 +311,26 @@
                 {
                 }
             }
+            try
+            {
+                var methodInfo = typeof(SimpleQuery).GetMethod(binder.Name);
+                if (methodInfo != null)
+                {
+                    methodInfo.Invoke(this, args);
+                }
+            }
+            catch (AmbiguousMatchException)
+            {
+            }
 
             return false;
+        }
+
+        private static bool MethodIsCallable(MethodInfo mi, InvokeMemberBinder binder, object[] args)
+        {
+            return mi.Name.Equals(binder.Name, StringComparison.OrdinalIgnoreCase) &&
+                   mi.GetParameters().Length == 1 &&
+                   Convert.ChangeType(args, mi.GetParameters().Single().ParameterType) != null;
         }
 
         private SimpleQuery ParseWith(InvokeMemberBinder binder, object[] args)
