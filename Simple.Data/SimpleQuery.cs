@@ -8,7 +8,6 @@
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using Extensions;
-    using Microsoft.CSharp.RuntimeBinder;
     using QueryPolyfills;
 
     public class SimpleQuery : DynamicObject, IEnumerable

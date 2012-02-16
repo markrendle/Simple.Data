@@ -91,6 +91,11 @@ namespace Simple.Data.Ado.Test
 
         public class StubQueryPager : IQueryPager
         {
+            public IEnumerable<string> ApplyLimit(string sql, int take)
+            {
+                throw new NotImplementedException();
+            }
+
             public IEnumerable<string> ApplyPaging(string sql, int skip, int take)
             {
                 throw new NotImplementedException();

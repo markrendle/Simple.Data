@@ -14,6 +14,18 @@ namespace Simple.Data.SqlTest
         static readonly Regex Normalize = new Regex(@"\s+", RegexOptions.Multiline);
 
         [Test]
+        public void ShouldApplyLimitUsingTop()
+        {
+            var sql = "select a,b,c from d where a = 1 order by c";
+            var expected = new[]{ "select top 5 a,b,c from d where a = 1 order by c"};
+
+            var pagedSql = new SqlQueryPager().ApplyLimit(sql, 5);
+            var modified = pagedSql.Select(x => Normalize.Replace(x, " ").ToLowerInvariant());
+
+            Assert.IsTrue(expected.SequenceEqual(modified));
+        }
+
+        [Test]
         public void ShouldApplyPagingUsingOrderBy()
         {
             var sql = "select a,b,c from d where a = 1 order by c";

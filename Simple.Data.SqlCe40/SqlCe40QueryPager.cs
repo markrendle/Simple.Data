@@ -12,7 +12,13 @@ namespace Simple.Data.SqlCe40
     public class SqlCe40QueryPager : IQueryPager
     {
         private static readonly Regex ColumnExtract = new Regex(@"SELECT\s*(.*)\s*(FROM.*)", RegexOptions.Multiline | RegexOptions.IgnoreCase);
-        
+        private static readonly Regex SelectMatch = new Regex(@"^SELECT\s*", RegexOptions.IgnoreCase);
+
+        public IEnumerable<string> ApplyLimit(string sql, int take)
+        {
+            yield return SelectMatch.Replace(sql, match => match.Value + " TOP(" + take + ") ");
+        }
+
         public IEnumerable<string> ApplyPaging(string sql, int skip, int take)
         {
             if (sql.IndexOf("order by", StringComparison.InvariantCultureIgnoreCase) < 0)

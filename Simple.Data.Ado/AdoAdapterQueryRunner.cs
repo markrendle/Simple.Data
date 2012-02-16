@@ -120,34 +120,56 @@
                                                                                                  unhandledClausesForPagedQuery);
             unhandledClausesList.AddRange(unhandledClausesForPagedQuery);
 
-            const int maxInt = 2147483646;
 
-            SkipClause skipClause = query.Clauses.OfType<SkipClause>().FirstOrDefault() ?? new SkipClause(0);
-            TakeClause takeClause = query.Clauses.OfType<TakeClause>().FirstOrDefault() ?? new TakeClause(maxInt);
+            SkipClause skipClause = query.Clauses.OfType<SkipClause>().FirstOrDefault();
+            TakeClause takeClause = query.Clauses.OfType<TakeClause>().FirstOrDefault();
 
-            if (skipClause.Count != 0 || takeClause.Count != maxInt)
+            if (skipClause != null || takeClause != null)
             {
                 var queryPager = _adapter.ProviderHelper.GetCustomProvider<IQueryPager>(_adapter.ConnectionProvider);
                 if (queryPager == null)
                 {
-                    unhandledClausesList.AddRange(query.OfType<SkipClause>());
-                    unhandledClausesList.AddRange(query.OfType<TakeClause>());
-                    var commandBuilder = new CommandBuilder(mainCommandBuilder.Text, _adapter.GetSchema(),
-                                                            mainCommandBuilder.Parameters);
-                    commandBuilders.Add(commandBuilder);
+                    DeferPaging(query, mainCommandBuilder, commandBuilders, unhandledClausesList);
                 }
                 else
                 {
-                    IEnumerable<string> commandTexts = queryPager.ApplyPaging(mainCommandBuilder.Text, skipClause.Count,
-                                                                              takeClause.Count);
-
-                    commandBuilders.AddRange(
-                        commandTexts.Select(
-                            commandText =>
-                            new CommandBuilder(commandText, _adapter.GetSchema(), mainCommandBuilder.Parameters)));
+                    ApplyPaging(commandBuilders, mainCommandBuilder, skipClause, takeClause, queryPager);
                 }
             }
             return commandBuilders.ToArray();
+        }
+
+        private void DeferPaging(SimpleQuery query, ICommandBuilder mainCommandBuilder, List<ICommandBuilder> commandBuilders,
+                                 List<SimpleQueryClauseBase> unhandledClausesList)
+        {
+            unhandledClausesList.AddRange(query.OfType<SkipClause>());
+            unhandledClausesList.AddRange(query.OfType<TakeClause>());
+            var commandBuilder = new CommandBuilder(mainCommandBuilder.Text, _adapter.GetSchema(),
+                                                    mainCommandBuilder.Parameters);
+            commandBuilders.Add(commandBuilder);
+        }
+
+        private void ApplyPaging(List<ICommandBuilder> commandBuilders, ICommandBuilder mainCommandBuilder, SkipClause skipClause,
+                                 TakeClause takeClause, IQueryPager queryPager)
+        {
+            const int maxInt = 2147483646;
+
+            IEnumerable<string> commandTexts;
+            if (skipClause == null)
+            {
+                commandTexts = queryPager.ApplyLimit(mainCommandBuilder.Text, takeClause.Count);
+            }
+            else
+            {
+                if (takeClause == null) takeClause = new TakeClause(maxInt);
+                commandTexts = queryPager.ApplyPaging(mainCommandBuilder.Text, skipClause.Count,
+                                                      takeClause.Count);
+            }
+
+            commandBuilders.AddRange(
+                commandTexts.Select(
+                    commandText =>
+                    new CommandBuilder(commandText, _adapter.GetSchema(), mainCommandBuilder.Parameters)));
         }
 
         private ICommandBuilder[] GetQueryCommandBuilders(SimpleQuery query,
