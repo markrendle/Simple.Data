@@ -6,6 +6,8 @@ using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
+    using Extensions;
+
     internal class UpdateHelper
     {
         private readonly DatabaseSchema _schema;
@@ -36,6 +38,7 @@ namespace Simple.Data.Ado
         private string GetUpdateClause(string tableName, IEnumerable<KeyValuePair<string, object>> data)
         {
             var table = _schema.FindTable(tableName);
+            
             var setClause = string.Join(", ",
                 data.Where(kvp => table.HasColumn(kvp.Key))
                 .Select(kvp => CreateColumnUpdateClause(kvp.Key, kvp.Value, table)));

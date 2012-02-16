@@ -19,8 +19,14 @@ namespace Simple.Data.Ado
         private readonly IDbTransaction _transaction;
         private readonly IDbConnection _connection;
 
-        public AdoAdapterFinder(AdoAdapter adapter) : this(adapter, null)
+        public AdoAdapterFinder(AdoAdapter adapter) : this(adapter, (IDbTransaction)null)
         {
+        }
+
+        public AdoAdapterFinder(AdoAdapter adapter, IDbConnection connection)
+        {
+            _adapter = adapter;
+            _connection = connection;
         }
 
         public AdoAdapterFinder(AdoAdapter adapter, IDbTransaction transaction)

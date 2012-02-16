@@ -137,6 +137,11 @@ namespace Simple.Data
             return _adapter.UpsertMany(tableName, list, isResultRequired, (dict, exception) => errorCallback(new SimpleRecord(dict), exception));
         }
 
+        public override IDictionary<string, object> Get(string tableName, object[] args)
+        {
+            return _adapter.Get(tableName, args);
+        }
+
         public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, bool isResultRequired, ErrorCallback errorCallback)
         {
             return _adapter.UpsertMany(tableName, list, keyFieldNames, isResultRequired, (dict, exception) => errorCallback(new SimpleRecord(dict), exception));

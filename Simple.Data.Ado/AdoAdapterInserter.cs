@@ -13,16 +13,24 @@ namespace Simple.Data.Ado
     class AdoAdapterInserter
     {
         private readonly AdoAdapter _adapter;
+        private readonly IDbConnection _connection;
         private readonly IDbTransaction _transaction;
 
-        public AdoAdapterInserter(AdoAdapter adapter) : this(adapter, null)
+        public AdoAdapterInserter(AdoAdapter adapter) : this(adapter, (IDbTransaction)null)
         {
+        }
+
+        public AdoAdapterInserter(AdoAdapter adapter, IDbConnection connection)
+        {
+            _adapter = adapter;
+            _connection = connection;
         }
 
         public AdoAdapterInserter(AdoAdapter adapter, IDbTransaction transaction)
         {
             _adapter = adapter;
             _transaction = transaction;
+            if (transaction != null) _connection = transaction.Connection;
         }
 
         public IEnumerable<IDictionary<string, object>> InsertMany(string tableName, IEnumerable<IDictionary<string, object>> data, Func<IDictionary<string,object>, Exception, bool> onError, bool resultRequired)
@@ -107,7 +115,7 @@ namespace Simple.Data.Ado
                 return TryExecuteSingletonQuery(command);
             }
 
-            var connection = _adapter.CreateConnection();
+            var connection = _connection ?? _adapter.CreateConnection();
             using (connection.MaybeDisposable())
             {
                 using (var command = new CommandHelper(_adapter).CreateInsert(connection, sql, columns, values.ToArray()))
@@ -130,7 +138,7 @@ namespace Simple.Data.Ado
                 return TryExecuteSingletonQuery(command);
             }
 
-            var connection = _adapter.CreateConnection();
+            var connection = _connection ?? _adapter.CreateConnection();
             using (connection.MaybeDisposable())
             {
                 using (var command = new CommandHelper(_adapter).CreateInsert(connection, insertSql, columns, values.ToArray()))
@@ -173,7 +181,7 @@ namespace Simple.Data.Ado
                 command.Transaction = _transaction;
                 return TryExecute(command);
             }
-            var connection = _adapter.CreateConnection();
+            var connection = _connection ?? _adapter.CreateConnection();
             using (connection.MaybeDisposable())
             {
                 using (var command = new CommandHelper(_adapter).CreateInsert(connection, sql, columns, values.ToArray()))

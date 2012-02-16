@@ -15,11 +15,14 @@ namespace Simple.Data.Commands
 
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            return dataStrategy.GetAdapter().Get(table.GetName(), args);
+            var result = dataStrategy.Get(table.GetName(), args);
+            return result == null ? null : new SimpleRecord(result, table.GetQualifiedName(), dataStrategy);
         }
 
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
+            if (dataStrategy is SimpleTransaction) return null;
+
             var func = dataStrategy.GetAdapter().OptimizingDelegateFactory.CreateGetDelegate(dataStrategy.GetAdapter(),
                                                                                          table.GetName(), args);
                 return a =>

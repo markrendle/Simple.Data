@@ -65,5 +65,6 @@ namespace Simple.Data
         IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired, IAdapterTransaction adapterTransaction);
         IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IDictionary<string,object>,Exception,bool> errorCallback);
         IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback);
+        IDictionary<string,object> Get(string tableName, IAdapterTransaction transaction, params object[] parameterValues);
     }
 }

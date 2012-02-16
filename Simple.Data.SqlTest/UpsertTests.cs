@@ -29,6 +29,22 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void TestUpsertWithNamedArgumentsAndExistingObjectUsingTransaction()
+        {
+            using (var tx = DatabaseHelper.Open().BeginTransaction())
+            {
+
+                tx.Users.UpsertById(Id: 1, Name: "Ford Prefect");
+                var user = tx.Users.Get(1);
+                tx.Commit();
+
+                Assert.IsNotNull(user);
+                Assert.AreEqual(1, user.Id);
+                Assert.AreEqual("Ford Prefect", user.Name);
+            }
+        }
+
+        [Test]
         public void TestUpsertWithNamedArgumentsAndNewObject()
         {
             var db = DatabaseHelper.Open();

@@ -9,6 +9,8 @@ using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
+    using Extensions;
+
     [Export("Ado", typeof (Adapter))]
     public partial class AdoAdapter : Adapter, ICloneable
     {
@@ -248,6 +250,17 @@ namespace Simple.Data.Ado
                 }
             }
         }
+        private int Execute(ICommandBuilder commandBuilder, IDbConnection connection)
+        {
+            using (connection.MaybeDisposable())
+            {
+                using (IDbCommand command = commandBuilder.GetCommand(connection))
+                {
+                    connection.OpenIfClosed();
+                    return TryExecute(command);
+                }
+            }
+        }
 
         private static int Execute(ICommandBuilder commandBuilder, IAdapterTransaction transaction)
         {
@@ -292,24 +305,25 @@ namespace Simple.Data.Ado
             return _schema ?? (_schema = DatabaseSchema.Get(_connectionProvider, _providerHelper));
         }
 
-        public IAdapterTransaction BeginTransaction(IsolationLevel isolationLevel)
+        public override IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> data, SimpleExpression criteria, bool resultRequired)
         {
-            IDbConnection connection = CreateConnection();
-            connection.OpenIfClosed();
-            IDbTransaction transaction = connection.BeginTransaction(isolationLevel);
-            return new AdoAdapterTransaction(transaction, _sharedConnection != null);
-        }
+            var connection = CreateConnection();
+            using (connection.MaybeDisposable())
+            {
+                connection.OpenIfClosed();
+                var finder = new AdoAdapterFinder(this, connection);
+                if (finder.FindOne(tableName, criteria) != null)
+                {
+                    // Don't update columns used as criteria
+                    var keys = criteria.GetOperandsOfType<ObjectReference>().Select(o => o.GetName().Homogenize());
+                    data = data.Where(kvp => keys.All(k => k != kvp.Key.Homogenize())).ToDictionary();
 
-        public IAdapterTransaction BeginTransaction(IsolationLevel isolationLevel, string name)
-        {
-            IDbConnection connection = CreateConnection();
-            connection.OpenIfClosed();
-            var sqlConnection = connection as SqlConnection;
-            IDbTransaction transaction = sqlConnection != null
-                                             ? sqlConnection.BeginTransaction(isolationLevel, name)
-                                             : connection.BeginTransaction(isolationLevel);
-
-            return new AdoAdapterTransaction(transaction, name, _sharedConnection != null);
+                    var commandBuilder = new UpdateHelper(_schema).GetUpdateCommand(tableName, data, criteria);
+                    Execute(commandBuilder, connection);
+                    return resultRequired ? finder.FindOne(tableName, criteria) : null;
+                }
+                return new AdoAdapterInserter(this, connection).Insert(tableName, data, resultRequired);
+            }
         }
 
         public string GetIdentityFunction()

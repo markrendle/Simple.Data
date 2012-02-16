@@ -271,5 +271,10 @@
         {
             return UpsertMany(tableName, list, isResultRequired, errorCallback);
         }
+
+        public IDictionary<string, object> Get(string tableName, IAdapterTransaction transaction, params object[] parameterValues)
+        {
+            return Get(tableName, parameterValues);
+        }
     }
 }
