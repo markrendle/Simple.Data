@@ -31,7 +31,7 @@ namespace Simple.Data.Commands
             query = query.Where(ExpressionHelper.CriteriaDictionaryToExpression(query.TableName, dict)).Take(1);
             var result = query.FirstOrDefault();
             if (result == null) return null;
-            return binder.Name == "get" ? result : ((IDictionary<string, object>) result).First().Value;
+            return binder.Name.Equals("get", StringComparison.OrdinalIgnoreCase) ? result : ((IDictionary<string, object>) result).First().Value;
         }
 
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)

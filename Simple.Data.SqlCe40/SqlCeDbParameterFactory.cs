@@ -26,7 +26,8 @@
 
 ﻿        public IDbDataParameter CreateParameter(string name, DbType dbType, int maxLength)
 ﻿        {
-﻿            IDbDataParameter parameter = new SqlCeParameter
+             if (dbType == DbType.AnsiStringFixedLength || dbType == DbType.StringFixedLength) maxLength = 0;
+ ﻿            IDbDataParameter parameter = new SqlCeParameter
 ﻿                                             {
 ﻿                                                 ParameterName = name,
 ﻿                                                 Size = maxLength

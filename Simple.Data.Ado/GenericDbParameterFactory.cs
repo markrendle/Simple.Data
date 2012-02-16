@@ -29,7 +29,7 @@ namespace Simple.Data.Ado
             var parameter = _command.CreateParameter();
             parameter.ParameterName = name;
             parameter.DbType = column.DbType;
-            parameter.Size = column.MaxLength;
+            parameter.Size = column.DbType == DbType.StringFixedLength || column.DbType == DbType.AnsiStringFixedLength ? 0 : column.MaxLength;
             parameter.SourceColumn = column.ActualName;
             return parameter;
         }

@@ -59,7 +59,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SqlBulkInserter.cs" />
-    <Compile Include="SqlCeDbParameterFactory.cs" />
+    <Compile Include="SqlDbParameterFactory.cs" />
     <Compile Include="SqlColumn.cs" />
     <Compile Include="SqlCommandOptimizer.cs" />
     <Compile Include="SqlConnectionProvider.cs" />

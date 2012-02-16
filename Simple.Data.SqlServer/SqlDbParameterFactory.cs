@@ -20,7 +20,7 @@
 ﻿        public IDbDataParameter CreateParameter(string name, Column column)
 ﻿        {
 ﻿            var sqlColumn = (SqlColumn) column;
-﻿            return new SqlParameter(name, sqlColumn.SqlDbType, column.MaxLength, column.ActualName);
+﻿            return new SqlParameter(name, sqlColumn.SqlDbType, sqlColumn.SqlDbType == SqlDbType.Char || sqlColumn.SqlDbType == SqlDbType.NChar ? 0 : column.MaxLength, column.ActualName);
 ﻿        }
 
 ﻿        public IDbDataParameter CreateParameter(string name, DbType dbType, int maxLength)
