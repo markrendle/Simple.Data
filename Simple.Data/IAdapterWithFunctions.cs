@@ -14,5 +14,6 @@ namespace Simple.Data
     {
         bool IsValidFunction(string functionName);
         IEnumerable<ResultSet> Execute(string functionName, IDictionary<string, object> parameters);
+        IEnumerable<ResultSet> Execute(string functionName, IDictionary<string, object> parameters, IAdapterTransaction transaction);
     }
 }

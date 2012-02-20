@@ -47,11 +47,13 @@ namespace Simple.Data
             if (adapterWithFunctions != null && adapterWithFunctions.IsValidFunction(functionName))
             {
                 var command = new ExecuteFunctionCommand(GetDatabase(), adapterWithFunctions, functionName, getFunctionArguments());
-                return command.Execute(out result);
+                return ExecuteFunction(out result, command);
             }
             result = null;
             return false;
         }
+
+        protected abstract bool ExecuteFunction(out object result, ExecuteFunctionCommand command);
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {

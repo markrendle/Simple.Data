@@ -7,7 +7,7 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data.Commands
 {
-    class ExecuteFunctionCommand
+    public class ExecuteFunctionCommand
     {
         private readonly Database _database;
         private readonly IAdapterWithFunctions _adapter;
@@ -42,6 +42,12 @@ namespace Simple.Data.Commands
             var result = new SimpleResultSet(resultSets.Select(resultSet => resultSet.Select(dict => new SimpleRecord(dict))));
             result.SetOutputValues(_arguments);
             return result;
+        }
+
+        public bool Execute(out object result, IAdapterTransaction adapterTransaction)
+        {
+            result = ToMultipleResultSets(_adapter.Execute(_functionName, _arguments, adapterTransaction));
+            return true;
         }
     }
 }

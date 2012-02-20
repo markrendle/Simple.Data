@@ -55,6 +55,21 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void TestRollbackOnProcedure()
+        {
+            var db = DatabaseHelper.Open();
+
+            Customer customer;
+            using (var tx = db.BeginTransaction())
+            {
+                customer = tx.CreateCustomer().FirstOrDefault();
+                tx.Rollback();
+            }
+            customer = db.Customers.FindByCustomerId(customer.CustomerId);
+            Assert.IsNull(customer);
+        }
+
+        [Test]
         public void QueryInsideTransaction()
         {
             var db = DatabaseHelper.Open();

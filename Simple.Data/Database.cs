@@ -165,6 +165,11 @@ namespace Simple.Data
             return SimpleTransaction.Begin(this, name);
         }
 
+        protected override bool ExecuteFunction(out object result, Commands.ExecuteFunctionCommand command)
+        {
+            return command.Execute(out result);
+        }
+
         protected internal override Database GetDatabase()
         {
             return this;

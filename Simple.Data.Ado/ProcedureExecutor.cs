@@ -12,7 +12,7 @@ namespace Simple.Data.Ado
     public interface IProcedureExecutor
     {
         IEnumerable<ResultSet> Execute(IDictionary<string, object> suppliedParameters);
-        IEnumerable<ResultSet> ExecuteReader(IDbCommand command);
+        IEnumerable<ResultSet> Execute(IDictionary<string, object> suppliedParameters, IDbTransaction transaction);
     }
 
     public class ProcedureExecutor : IProcedureExecutor
@@ -32,15 +32,22 @@ namespace Simple.Data.Ado
 
         public IEnumerable<ResultSet> Execute(IDictionary<string, object> suppliedParameters)
         {
+            return Execute(suppliedParameters, null);
+        }
+
+        public IEnumerable<ResultSet> Execute(IDictionary<string, object> suppliedParameters, IDbTransaction transaction)
+        {
             var procedure = _adapter.GetSchema().FindProcedure(_procedureName);
             if (procedure == null)
             {
                 throw new UnresolvableObjectException(_procedureName.ToString());
             }
 
-            using (var cn = _adapter.CreateConnection())
+            var cn = transaction == null ? _adapter.CreateConnection() : transaction.Connection;
+            using (cn.MaybeDisposable())
             using (var command = cn.CreateCommand())
             {
+                command.Transaction = transaction;
                 command.CommandText = procedure.QualifiedName;
                 command.CommandType = CommandType.StoredProcedure;
                 SetParameters(procedure, command, suppliedParameters);

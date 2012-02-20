@@ -7,6 +7,8 @@ using System.Text;
 
 namespace Simple.Data
 {
+    using Commands;
+
     /// <summary>
     /// Provides an abstraction over the underlying data adapter, if it is transaction-capable.
     /// </summary>
@@ -190,6 +192,11 @@ namespace Simple.Data
         public override Adapter GetAdapter()
         {
             return _adapter as Adapter;
+        }
+
+        protected override bool ExecuteFunction(out object result, ExecuteFunctionCommand command)
+        {
+            return command.Execute(out result, _adapterTransaction);
         }
 
         protected internal override Database GetDatabase()
