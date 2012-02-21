@@ -224,10 +224,14 @@ namespace Simple.Data.Ado
                 if (!_index.ContainsKey(key))
                 {
                     AddKeyToIndex(key);
+                    if (_index[key] >= _values.Capacity)
+                    {
+                        _values.Capacity *= 2;
+                    }
                 }
                 try
                 {
-                    _values[_index[key]] = value;
+                    _values.SetWithBuffer(_index[key], value);
                 }
                 catch (ArgumentNullException)
                 {

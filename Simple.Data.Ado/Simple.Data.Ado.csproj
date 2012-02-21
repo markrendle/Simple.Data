@@ -106,6 +106,7 @@
     <Compile Include="ISchemaGetter.cs" />
     <Compile Include="ISqlOptimizer.cs" />
     <Compile Include="Joiner.cs" />
+    <Compile Include="ListExtensions.cs" />
     <Compile Include="OptimizedDictionary.cs" />
     <Compile Include="OptimizedDictionaryIndex.cs" />
     <Compile Include="OptimizedDictionary2.cs" />
