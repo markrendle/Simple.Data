@@ -110,34 +110,56 @@ namespace Simple.Data.Ado
                 {
                     if (withClause.ObjectReference.GetOwner().IsNull())
                     {
-                        var joinClause =
-                            _query.Clauses.OfType<JoinClause>().FirstOrDefault(j => j.Table.GetAliasOrName() == withClause.ObjectReference.GetAliasOrName());
-                        if (joinClause != null)
-                        {
-                            _columns =
-                                _columns.Concat(
-                                    _schema.FindTable(joinClause.Table.GetName()).Columns.Select(
-                                        c => new ObjectReference(c.ActualName, joinClause.Table)))
-                                    .ToArray();
-                            relationTypeDict[joinClause.Table] = withClause.Type == WithType.One
-                                                                     ? RelationType.ManyToOne
-                                                                     : RelationType.OneToMany;
-                        }
+                        HandleWithClauseUsingAssociatedJoinClause(relationTypeDict, withClause);
                     }
                     else
                     {
-                        relationTypeDict[withClause.ObjectReference] = RelationType.None;
-                        _columns =
-                            _columns.Concat(
-                                _schema.FindTable(withClause.ObjectReference.GetName()).Columns.Select(
-                                    c => new ObjectReference(c.ActualName, withClause.ObjectReference)))
-                                .ToArray();
+                        HandleWithClauseUsingNaturalJoin(withClause, relationTypeDict);
                     }
                 }
                 _columns =
                     _columns.OfType<ObjectReference>()
                         .Select(c => IsCoreTable(c.GetOwner()) ? c : AddWithAlias(c, relationTypeDict[c.GetOwner()]))
                         .ToArray();
+            }
+        }
+
+        private void HandleWithClauseUsingAssociatedJoinClause(Dictionary<ObjectReference, RelationType> relationTypeDict, WithClause withClause)
+        {
+            var joinClause =
+                _query.Clauses.OfType<JoinClause>().FirstOrDefault(
+                    j => j.Table.GetAliasOrName() == withClause.ObjectReference.GetAliasOrName());
+            if (joinClause != null)
+            {
+                _columns =
+                    _columns.Concat(
+                        _schema.FindTable(joinClause.Table.GetName()).Columns.Select(
+                            c => new ObjectReference(c.ActualName, joinClause.Table)))
+                        .ToArray();
+                relationTypeDict[joinClause.Table] = WithTypeToRelationType(withClause.Type, RelationType.OneToMany);
+            }
+        }
+
+        private void HandleWithClauseUsingNaturalJoin(WithClause withClause, Dictionary<ObjectReference, RelationType> relationTypeDict)
+        {
+            relationTypeDict[withClause.ObjectReference] = WithTypeToRelationType(withClause.Type, RelationType.None);
+            _columns =
+                _columns.Concat(
+                    _schema.FindTable(withClause.ObjectReference.GetName()).Columns.Select(
+                        c => new ObjectReference(c.ActualName, withClause.ObjectReference)))
+                    .ToArray();
+        }
+
+        private static RelationType WithTypeToRelationType(WithType withType, RelationType defaultRelationType)
+        {
+            switch (withType)
+            {
+                case WithType.One:
+                    return RelationType.ManyToOne;
+                case WithType.Many:
+                    return RelationType.OneToMany;
+                default:
+                    return defaultRelationType;
             }
         }
 

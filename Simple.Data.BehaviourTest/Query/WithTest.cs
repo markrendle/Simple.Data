@@ -83,6 +83,22 @@ namespace Simple.Data.IntegrationTest.Query
         }
 
         [Test]
+        public void SingleWithOneClauseUsingReferenceShouldUseJoinAndForceOne()
+        {
+            const string expectedSql = "select " +
+                "[dbo].[department].[id],[dbo].[department].[name]," +
+                "[dbo].[employee].[id] as [__with1__employee__id],[dbo].[employee].[name] as [__with1__employee__name]," +
+                "[dbo].[employee].[managerid] as [__with1__employee__managerid],[dbo].[employee].[departmentid] as [__with1__employee__departmentid]" +
+                " from [dbo].[department] left join [dbo].[employee] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])";
+
+            var q = _db.Departments.All().WithOne(_db.Departments.Employee);
+
+            EatException(() => q.ToList());
+
+            GeneratedSqlIs(expectedSql);
+        }
+
+        [Test]
         public void SingleWithClauseUsingReferenceWithAliasShouldApplyAliasToSql()
         {
             const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name]," +
