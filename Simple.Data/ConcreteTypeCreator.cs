@@ -9,96 +9,100 @@ using System.Collections;
 
 namespace Simple.Data
 {
+    using System.Diagnostics;
+    using System.Linq.Expressions;
+    using System.Threading;
+
     internal class ConcreteTypeCreator
     {
-        private static readonly ConcurrentDictionary<Type, ConcreteTypeCreator> Cache =
-            new ConcurrentDictionary<Type, ConcreteTypeCreator>();
+        private readonly Lazy<Func<IDictionary<string, object>, object>> _func;
+        private static readonly Dictionary<Type, ConcreteTypeCreator> Creators;
+        private static readonly ICollection CreatorsCollection;
 
-        private readonly Type _concreteType;
-
-        private ConcreteTypeCreator(Type concreteType)
+        static ConcreteTypeCreator()
         {
-            _concreteType = concreteType;
+            CreatorsCollection = Creators = new Dictionary<Type, ConcreteTypeCreator>();
         }
 
-        public Type ConcreteType
+        private ConcreteTypeCreator(Lazy<Func<IDictionary<string, object>, object>> func)
         {
-            get { return _concreteType; }
+            _func = func;
         }
 
-        public static ConcreteTypeCreator Get(Type concreteType)
+        public object Create(IDictionary<string, object> source)
         {
-            return Cache.GetOrAdd(concreteType, type => new ConcreteTypeCreator(type));
+            return _func.Value(source);
         }
-
-        public bool TryCreate(IDictionary<string, object> data, out object result)
+        
+        public bool TryCreate(IDictionary<string,object> source, out object result)
         {
-            bool anyPropertiesSet = false;
-            object obj = Activator.CreateInstance(_concreteType);
-            object value;
-            foreach (var propertyInfo in _concreteType.GetProperties().Where(pi => CanSetProperty(pi, data)))
+            try
             {
-                value = data[propertyInfo.Name];
+                result = Create(source);
+                return true;
+            }
+            catch (Exception)
+            {
+                result = null;
+                return false;
+            }
+        }
 
-                if (ConcreteCollectionTypeCreator.IsCollectionType(propertyInfo.PropertyType))
-                {
-                    if (!ConcreteCollectionTypeCreator.TryCreate(propertyInfo.PropertyType, (IEnumerable)value, out value))
-                        continue;
-                }
-                else
-                {
-                    var subData = value as IDictionary<string, object>;
-                    if (subData != null && !ConcreteTypeCreator.Get(propertyInfo.PropertyType).TryCreate(subData, out value))
-                        continue;
-                }
-
-                if (value != null && propertyInfo.PropertyType.IsEnum && value is string)
-                {
-                    value = Enum.Parse(propertyInfo.PropertyType, value.ToString());
-                }
-                else if (value != null && IsTypeConversionRequired(value.GetType(), propertyInfo.PropertyType))
-                {
-                    value = Convert.ChangeType(value, propertyInfo.PropertyType);
-                }
-                if (propertyInfo.CanWrite)
-                {
-                    propertyInfo.SetValue(obj, value, null);
-                    anyPropertiesSet = true;
-                }
-                else
-                {
-                    var propertyValue = propertyInfo.GetValue(obj, null);
-                    if (propertyValue == null) continue;
-                    var addMethod = propertyValue.GetType().GetMethod("Add");
-                    if (addMethod != null)
-                    {
-                        var valueItems = value as IEnumerable;
-                        if (valueItems != null)
-                        {
-                            foreach (var valueItem in valueItems)
-                            {
-                                addMethod.Invoke(propertyValue, new[] {valueItem});
-                            }
-                        }
-                    }
-                }
+        public static ConcreteTypeCreator Get(Type targetType)
+        {
+            if (CreatorsCollection.IsSynchronized && Creators.ContainsKey(targetType))
+            {
+                return Creators[targetType];
             }
 
-            result = anyPropertiesSet ? obj : null;
+            lock (CreatorsCollection.SyncRoot)
+            {
+                if (Creators.ContainsKey(targetType)) return Creators[targetType];
 
-            return anyPropertiesSet;
+                var creator = BuildCreator(targetType);
+                Creators.Add(targetType, creator);
+                return creator;
+            }
         }
 
-        private static bool IsTypeConversionRequired(Type source, Type target)
+        private static ConcreteTypeCreator BuildCreator(Type targetType)
         {
-            if (target.IsEnum) return !target.GetEnumUnderlyingType().IsAssignableFrom(source);
-            return !target.IsAssignableFrom(source);
+            var creator = new ConcreteTypeCreator(new Lazy<Func<IDictionary<string, object>, object>>(() => BuildLambda(targetType), LazyThreadSafetyMode.PublicationOnly));
+            return creator;
         }
 
-        private static bool CanSetProperty(PropertyInfo propertyInfo, IDictionary<string, object> data)
+        private static Func<IDictionary<string, object>, object> BuildLambda(Type targetType)
         {
-            return data.ContainsKey(propertyInfo.Name) &&
-                   !(propertyInfo.PropertyType.IsValueType && data[propertyInfo.Name] == null);
+            var param = Expression.Parameter(typeof (IDictionary<string, object>), "source");
+            var obj = Expression.Variable(targetType, "obj");
+
+            var create = CreateNew(targetType, obj);
+
+            var assignments = Expression.Block(
+                targetType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                    .Where(PropertyIsConvertible)
+                    .Select(p => new PropertySetterBuilder(param, obj, p).CreatePropertySetter()));
+
+            var block = Expression.Block(new[] {obj},
+                                         create,
+                                         assignments,
+                                         obj);
+
+            var lambda = Expression.Lambda<Func<IDictionary<string, object>, object>>(block, param).Compile();
+            return lambda;
+        }
+
+        private static bool PropertyIsConvertible(PropertyInfo property)
+        {
+            return property.CanWrite || property.PropertyType.IsGenericCollection();
+        }
+
+        private static BinaryExpression CreateNew(Type targetType, ParameterExpression obj)
+        {
+            var ctor = targetType.GetConstructor(Type.EmptyTypes);
+            Debug.Assert(ctor != null);
+            var create = Expression.Assign(obj, Expression.New(ctor)); // obj = new T();
+            return create;
         }
     }
 }

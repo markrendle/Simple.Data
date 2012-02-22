@@ -91,6 +91,7 @@
     <Compile Include="JoinType.cs" />
     <Compile Include="OfTypeEnumerable.cs" />
     <Compile Include="OptimizingDelegateFactory.cs" />
+    <Compile Include="PropertySetterBuilder.cs" />
     <Compile Include="QueryPolyfills\AggregateValueResolver.cs" />
     <Compile Include="QueryPolyfills\DictionaryCreatorFactory.cs" />
     <Compile Include="QueryPolyfills\DictionaryEqualityComparer.cs" />
@@ -175,6 +176,7 @@
     <Compile Include="SkipClause.cs" />
     <Compile Include="SpecialReference.cs" />
     <Compile Include="TakeClause.cs" />
+    <Compile Include="TypeExtensions.cs" />
     <Compile Include="UnresolvableObjectException.cs" />
     <Compile Include="Commands\UpdateByCommand.cs" />
     <Compile Include="WhereClause.cs" />
