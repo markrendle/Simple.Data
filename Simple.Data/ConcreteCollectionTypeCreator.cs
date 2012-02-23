@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections;
-using System.Dynamic;
-using System.Linq.Expressions;
-
 namespace Simple.Data
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+
     internal static class ConcreteCollectionTypeCreator
     {
         private static readonly List<Creator> _creators = new List<Creator>
-        {
-            new GenericSetCreator(),
-            new GenericListCreator(),
-            new NonGenericListCreator()
-        };
+                                                              {
+                                                                  new GenericSetCreator(),
+                                                                  new GenericListCreator(),
+                                                                  new NonGenericListCreator()
+                                                              };
 
         public static bool IsCollectionType(Type type)
         {
@@ -85,10 +82,10 @@ namespace Simple.Data
             {
                 if (value is string)
                 {
-                    result = Enum.Parse(type, (string) value);
+                    result = Enum.Parse(type, (string)value);
                     return true;
                 }
-                
+
                 result = Enum.ToObject(type, value);
                 return true;
             }
@@ -103,10 +100,10 @@ namespace Simple.Data
                     list = items.OfType<object>().ToList();
 
                 var array = Array.CreateInstance(type, list.Count);
-                for(var i = 0; i < array.Length; i++)
+                for (var i = 0; i < array.Length; i++)
                 {
                     object element;
-                    if(!TryConvertElement(type, list[i], out element))
+                    if (!TryConvertElement(type, list[i], out element))
                         return false;
                     array.SetValue(element, i);
                 }
@@ -124,9 +121,9 @@ namespace Simple.Data
                     return false;
 
                 return type == typeof(IEnumerable) ||
-                    type == typeof(ICollection) ||
-                    type == typeof(IList) ||
-                    type == typeof(ArrayList);
+                       type == typeof(ICollection) ||
+                       type == typeof(IList) ||
+                       type == typeof(ArrayList);
             }
 
             public override bool TryCreate(Type type, IEnumerable items, out object result)
@@ -147,7 +144,7 @@ namespace Simple.Data
                     return false;
 
                 var genericTypeDef = type.GetGenericTypeDefinition();
-                if(genericTypeDef.GetGenericArguments().Length != 1)
+                if (genericTypeDef.GetGenericArguments().Length != 1)
                     return false;
 
                 return genericTypeDef == typeof(IEnumerable<>) ||

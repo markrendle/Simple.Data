@@ -5,9 +5,6 @@ using System.Xml.Linq;
 
 namespace Simple.Data.Mocking
 {
-    using System.Collections;
-    using Extensions;
-
     public class XmlMockAdapter : Adapter, IAdapterWithRelation
     {
         private readonly Lazy<XElement> _data;
@@ -193,32 +190,6 @@ namespace Simple.Data.Mocking
             var keyAttribute = GetTableElement(tableName).Attribute("_keys");
             if (keyAttribute == null) return Enumerable.Empty<string>();
             return keyAttribute.Value.Split(',');
-        }
-
-        private static object ObjectToDictionary(object obj)
-        {
-            var dynamicRecord = obj as SimpleRecord;
-            if (dynamicRecord != null)
-            {
-                return new Dictionary<string, object>(dynamicRecord, HomogenizedEqualityComparer.DefaultInstance);
-            }
-
-            var dictionary = obj as IDictionary<string, object>;
-            if (dictionary != null)
-            {
-                return dictionary;
-            }
-
-            var list = obj as IEnumerable;
-            if (list != null)
-            {
-                var originals = list.Cast<object>().ToList();
-                var dictionaries = originals.Select(o => ObjectToDictionary(o) as IDictionary<string, object>).Where(o => o != null && o.Count > 0).ToList();
-                if (originals.Count == dictionaries.Count)
-                    return dictionaries;
-            }
-
-            return obj.ObjectToDictionary();
         }
     }
 }
