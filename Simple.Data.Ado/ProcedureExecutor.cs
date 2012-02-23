@@ -96,7 +96,9 @@ namespace Simple.Data.Ado
         private static IEnumerable<ResultSet> ExecuteNonQuery(IDbCommand command)
         {
             command.WriteTrace();
+#if(DEBUG)
             Trace.TraceInformation("ExecuteNonQuery", "Simple.Data.SqlTest");
+#endif
             command.Connection.OpenIfClosed();
             command.ExecuteNonQuery();
             return Enumerable.Empty<ResultSet>();
