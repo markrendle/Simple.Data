@@ -332,6 +332,18 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void WithClauseWithJoinCriteriaShouldPreselectDetailTableAsCollection()
+        {
+            var db = DatabaseHelper.Open();
+            var result = db.Customers.FindAll(db.Customers.Order.OrderId == 1).WithOrders().FirstOrDefault() as IDictionary<string, object>;
+            Assert.IsNotNull(result);
+            Assert.Contains("Orders", (ICollection)result.Keys);
+            var orders = result["Orders"] as IList<IDictionary<string, object>>;
+            Assert.IsNotNull(orders);
+            Assert.AreEqual(1, orders.Count);
+        }
+
+        [Test]
         public void WithClauseShouldPreselectMasterTableAsDictionary()
         {
             var db = DatabaseHelper.Open();

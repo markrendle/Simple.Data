@@ -206,11 +206,19 @@ namespace Simple.Data.Ado
                                      ? joiner.GetJoinClauses(_tableName, GetObjectReferences(_columns).Where(o => !joinClauses.Any(j => o.GetOwner().Equals(j.Table))), JoinType.Outer)
                                      : Enumerable.Empty<string>();
 
-            var joins = string.Join(" ", fromTable.Concat(fromJoins)
-                                             .Concat(fromCriteria)
-                                             .Concat(fromHavingCriteria)
-                                             .Concat(fromColumnList)
-                                             .Distinct());
+            var joinList = fromTable.Concat(fromJoins).Concat(fromCriteria).Concat(fromHavingCriteria).Concat(fromColumnList).Select(s => s.Trim()).Distinct().ToList();
+
+            var leftJoinList = joinList.Where(s => s.StartsWith("LEFT ", StringComparison.OrdinalIgnoreCase)).ToList();
+
+            foreach (var leftJoin in leftJoinList)
+            {
+                if (joinList.Any(s => s.Equals(leftJoin.Substring(5), StringComparison.OrdinalIgnoreCase)))
+                {
+                    joinList.Remove(leftJoin);
+                }
+            }
+
+            var joins = string.Join(" ", joinList);
 
             if (!string.IsNullOrWhiteSpace(joins))
             {

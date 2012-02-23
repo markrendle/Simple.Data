@@ -172,5 +172,23 @@ namespace Simple.Data.IntegrationTest.Query
 
             GeneratedSqlIs(expectedSql);
         }
+
+        /// <summary>
+        /// Test for issue #157
+        /// </summary>
+        [Test]
+        public void CriteriaReferencesShouldNotBeDuplicatedInSql()
+        {
+            const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name]," +
+                "[dbo].[employee].[managerid],[dbo].[employee].[departmentid]," +
+                "[dbo].[department].[id] as [__with1__department__id],[dbo].[department].[name] as [__with1__department__name]" +
+                " from [dbo].[employee] join [dbo].[department] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])" +
+                " where [dbo].[department].[name] = @p1";
+
+            var q = _db.Employees.FindAll(_db.Employees.Department.Name == "Dev").WithDepartment();
+            EatException(() => q.ToList());
+
+            GeneratedSqlIs(expectedSql);
+        }
     }
 }
