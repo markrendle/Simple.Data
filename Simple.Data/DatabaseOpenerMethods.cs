@@ -72,5 +72,13 @@ namespace Simple.Data
             _open = (ignore1, ignore2) => new Database(adapterCreator());
             _openConnectionWithProvider = (ignore1, ignore2) => new Database(adapterCreator());
         }
+
+        public void StopUsingMock()
+        {
+            _openDefault = null;
+            _openFile = _openConnection = _openNamedConnection = null;
+            _open = null;
+            _openConnectionWithProvider = null;
+        }
     }
 }

@@ -201,6 +201,11 @@ namespace Simple.Data
             Data.DatabaseOpener.UseMockAdapter(mockAdapterCreator());
         }
 
+        public static void StopUsingMockAdapter()
+        {
+            Data.DatabaseOpener.StopUsingMock();
+        }
+
         private static TraceLevel? _traceLevel;
         public static TraceLevel TraceLevel
         {

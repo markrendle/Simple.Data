@@ -52,7 +52,6 @@ namespace Simple.Data.Mocking.Ado
             get { return _mockDatabase.GetHashCode().ToString(); }
             set
             {
-                throw new NotImplementedException();
             }
         }
 

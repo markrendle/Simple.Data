@@ -81,6 +81,7 @@
     <Compile Include="Query\WithCountTest.cs" />
     <Compile Include="Query\WithTest.cs" />
     <Compile Include="RangeAndArrayFindTest.cs" />
+    <Compile Include="StopUsingMockTest.cs" />
     <Compile Include="TraceSettingsTest.cs" />
     <Compile Include="TransactionTest.cs" />
     <Compile Include="UpdateTest.cs" />

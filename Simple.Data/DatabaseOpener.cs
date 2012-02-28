@@ -97,5 +97,10 @@
         {
             return new Database(AdapterFactory.Create(adapterName, settings));
         }
+
+        public static void StopUsingMock()
+        {
+            OpenMethods.StopUsingMock();
+        }
     }
 }

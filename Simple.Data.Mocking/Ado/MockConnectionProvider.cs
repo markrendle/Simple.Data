@@ -6,11 +6,21 @@ using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Mocking.Ado
 {
+    using System.ComponentModel.Composition;
+
+    [Export("System.Data.Mock", typeof(IConnectionProvider))]
     public class MockConnectionProvider : IConnectionProvider
     {
         private readonly DbConnection _connection;
         private readonly MockSchemaProvider _mockSchemaProvider;
         private string _identityFunction;
+
+        public MockConnectionProvider()
+        {
+            _connection = new MockDbConnection(new MockDatabase());
+            _connection.ConnectionString = string.Empty;
+            _mockSchemaProvider = new MockSchemaProvider();
+        }
 
         public MockConnectionProvider(DbConnection connection, MockSchemaProvider mockSchemaProvider, string identityFunction = null)
         {
@@ -21,7 +31,6 @@ namespace Simple.Data.Mocking.Ado
 
         public void SetConnectionString(string connectionString)
         {
-            throw new NotImplementedException();
         }
 
         public IDbConnection CreateConnection()
