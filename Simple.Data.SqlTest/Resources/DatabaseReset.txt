@@ -62,6 +62,12 @@ BEGIN
 	DROP TABLE [dbo].[DeleteTest]
 	IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[DecimalTest]') AND type in (N'U'))
 	DROP TABLE [dbo].[DecimalTest]
+	IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GeographyTest]') AND type in (N'U'))
+	DROP TABLE [dbo].[GeographyTest]
+	IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GeometryTest]') AND type in (N'U'))
+	DROP TABLE [dbo].[GeometryTest]
+	IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[HierarchyIdTest]') AND type in (N'U'))
+	DROP TABLE [dbo].[HierarchyIdTest]
 
 	CREATE TABLE [dbo].[Users] (
 		[Id]       INT            IDENTITY (1, 1) NOT NULL,
@@ -165,6 +171,33 @@ BEGIN
 		[Id] [int] IDENTITY (1, 1) NOT NULL,
 		[Value] [decimal](20,6) NOT NULL
 	)
+
+	CREATE TABLE [dbo].[GeographyTest](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Description] [nvarchar](50) NOT NULL,
+	[Place] [geography] NULL,
+	CONSTRAINT [PK_GeographyTest] PRIMARY KEY CLUSTERED 
+	(
+		[Id] ASC
+	))
+	
+	CREATE TABLE [dbo].[GeometryTest](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Description] [nvarchar](50) NOT NULL,
+	[Place] [geography] NULL,
+	CONSTRAINT [PK_GeometryTest] PRIMARY KEY CLUSTERED 
+	(
+		[Id] ASC
+	))
+	
+	CREATE TABLE [dbo].[HierarchyIdTest](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Description] [nvarchar](50) NOT NULL,
+	[Place] [geography] NULL,
+	CONSTRAINT [PK_HierarchyIdTest] PRIMARY KEY CLUSTERED 
+	(
+		[Id] ASC
+	))
 
 	BEGIN TRANSACTION
 	SET IDENTITY_INSERT [dbo].[Customers] ON

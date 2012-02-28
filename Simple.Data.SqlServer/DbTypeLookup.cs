@@ -42,6 +42,9 @@ namespace Simple.Data.SqlServer
                                                                                         {"nchar", SqlDbType.NChar},
                                                                                         {"xml", SqlDbType.Xml},
                                                                                         {"image", SqlDbType.Image},
+                                                                                        {"geography", SqlDbType.Udt},
+                                                                                        {"geometry", SqlDbType.Udt},
+                                                                                        {"hierarchyid", SqlDbType.Udt},
                                                                                     };
 
         public static SqlDbType GetSqlDbType(string typeName)

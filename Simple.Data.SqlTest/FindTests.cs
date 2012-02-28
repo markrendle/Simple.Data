@@ -212,5 +212,14 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, actual.Orders.Single().OrderId);
             Assert.AreEqual(new DateTime(2010, 10, 10), actual.Orders.Single().OrderDate);
         }
+
+        [Test]
+        public void SelectClauseShouldRestrictColumn()
+        {
+            var db = DatabaseHelper.Open();
+            var actual = db.Customers.Select(db.Customers.Name).FindByCustomerId(1).ToScalar();
+            Assert.AreEqual("Test", actual);
+
+        }
     }
 }

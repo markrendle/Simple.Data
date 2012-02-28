@@ -41,11 +41,9 @@ namespace Simple.Data.SqlServer
             return cols.AsEnumerable().Select(row => SchemaRowToColumn(table, row));
         }
 
-
-
         private static Column SchemaRowToColumn(Table table, DataRow row)
         {
-            var sqlDbType = DbTypeFromInformationSchemaTypeName((string)row["type_name"]);
+            var sqlDbType = row.IsNull("type_name") ? SqlDbType.Udt : DbTypeFromInformationSchemaTypeName((string)row["type_name"]);
             var size = (short)row["max_length"];
             switch (sqlDbType)
             {
@@ -156,7 +154,8 @@ namespace Simple.Data.SqlServer
         {
             var columnSelect =
                 string.Format(
-                    "SELECT name, is_identity, type_name(system_type_id) as type_name, max_length from sys.columns where object_id = object_id('{0}.{1}', 'TABLE') or object_id = object_id('{0}.{1}', 'VIEW') order by column_id",
+                    @"SELECT name, is_identity, type_name(system_type_id) as type_name, max_length from sys.columns 
+where object_id = object_id('{0}.{1}', 'TABLE') or object_id = object_id('{0}.{1}', 'VIEW') order by column_id",
                     table.Schema, table.ActualName);
             return SelectToDataTable(columnSelect);
         }

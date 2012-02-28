@@ -65,6 +65,8 @@
     <Compile Include="ConversionTests.cs" />
     <Compile Include="DatabaseHelper.cs" />
     <Compile Include="DatabaseOpenerTests.cs" />
+    <Compile Include="FunctionTest.cs" />
+    <Compile Include="WeirdTypeTest.cs" />
     <Compile Include="SchemaTests\DataTypeTests.cs" />
     <Compile Include="DbImage.cs" />
     <Compile Include="DeleteTest.cs" />
