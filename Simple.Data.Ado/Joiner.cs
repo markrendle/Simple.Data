@@ -103,10 +103,10 @@ namespace Simple.Data.Ado
         private static ForeignKey GetForeignKey(Table table1, Table table2)
         {
             var foreignKey =
-                table2.ForeignKeys.SingleOrDefault(
+                table2.ForeignKeys.FirstOrDefault(
                     fk => fk.MasterTable.Schema == table1.Schema && fk.MasterTable.Name == table1.ActualName)
                 ??
-                table1.ForeignKeys.SingleOrDefault(
+                table1.ForeignKeys.FirstOrDefault(
                     fk => fk.MasterTable.Schema == table2.Schema && fk.MasterTable.Name == table2.ActualName);
 
             if (foreignKey == null)

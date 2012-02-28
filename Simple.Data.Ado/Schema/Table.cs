@@ -145,7 +145,7 @@ namespace Simple.Data.Ado.Schema
             var table = _databaseSchema.FindTable(name);
 
             var foreignKey =
-                this.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == table.Schema && fk.MasterTable.Name == table.ActualName);
+                this.ForeignKeys.FirstOrDefault(fk => fk.MasterTable.Schema == table.Schema && fk.MasterTable.Name == table.ActualName);
 
             if (foreignKey == null) return null;
 
@@ -164,7 +164,7 @@ namespace Simple.Data.Ado.Schema
         {
             var table = DatabaseSchema.FindTable(name);
             var foreignKey =
-                table.ForeignKeys.SingleOrDefault(fk => fk.MasterTable.Schema == this.Schema && fk.MasterTable.Name == this.ActualName);
+                table.ForeignKeys.FirstOrDefault(fk => fk.MasterTable.Schema == this.Schema && fk.MasterTable.Name == this.ActualName);
 
             if (foreignKey == null) return null;
 
