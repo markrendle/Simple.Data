@@ -6,6 +6,7 @@ using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
+    using System.Diagnostics;
     using Extensions;
 
     internal class UpdateHelper
@@ -23,11 +24,23 @@ namespace Simple.Data.Ado
 
         public ICommandBuilder GetUpdateCommand(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
         {
-            _commandBuilder.Append(GetUpdateClause(tableName, data));
+            var table = _schema.FindTable(tableName);
+            _commandBuilder.Append(GetUpdateClause(table, data));
 
             if (criteria != null )
             {
-                var whereStatement = _expressionFormatter.Format(criteria);
+                string whereStatement = null;
+                if (criteria.GetOperandsOfType<ObjectReference>().Any(o => !o.GetOwner().GetName().Equals(tableName)))
+                {
+                    if (table.PrimaryKey.Length == 1)
+                    {
+                        whereStatement = CreateWhereInStatement(criteria, table);
+                    }
+                }
+                else
+                {
+                    whereStatement = _expressionFormatter.Format(criteria);
+                }
                 if (!string.IsNullOrEmpty(whereStatement))
                   _commandBuilder.Append(" where " + whereStatement);
             }
@@ -35,10 +48,23 @@ namespace Simple.Data.Ado
             return _commandBuilder;
         }
 
-        private string GetUpdateClause(string tableName, IEnumerable<KeyValuePair<string, object>> data)
+        private string CreateWhereInStatement(SimpleExpression criteria, Table table)
         {
-            var table = _schema.FindTable(tableName);
-            
+            var inClauseBuilder = new CommandBuilder(_schema);
+            var keyColumn = table.FindColumn(table.PrimaryKey[0]);
+            inClauseBuilder.Append(string.Format("SELECT {0} FROM {1}",
+                                                 keyColumn.QualifiedName, table.QualifiedName));
+            inClauseBuilder.Append(" ");
+            inClauseBuilder.Append(string.Join(" ",
+                                               new Joiner(JoinType.Inner, _schema).GetJoinClauses(
+                                                   new ObjectName(table.Schema, table.ActualName), criteria)));
+            inClauseBuilder.Append(" where ");
+            inClauseBuilder.Append(_expressionFormatter.Format(criteria));
+            return string.Format("{0} IN ({1})", keyColumn.QualifiedName, inClauseBuilder.Text);
+        }
+
+        private string GetUpdateClause(Table table, IEnumerable<KeyValuePair<string, object>> data)
+        {
             var setClause = string.Join(", ",
                 data.Where(kvp => table.HasColumn(kvp.Key))
                 .Select(kvp => CreateColumnUpdateClause(kvp.Key, kvp.Value, table)));

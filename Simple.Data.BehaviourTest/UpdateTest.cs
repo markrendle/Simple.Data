@@ -3,6 +3,7 @@ using Simple.Data.Mocking.Ado;
 
 namespace Simple.Data.IntegrationTest
 {
+    using System;
     using System.Collections.Generic;
 
     [TestFixture]
@@ -11,19 +12,26 @@ namespace Simple.Data.IntegrationTest
         protected override void SetSchema(MockSchemaProvider schemaProvider)
         {
             schemaProvider.SetTables(new[] { "dbo", "Users", "BASE TABLE" },
+                                     new[] { "dbo", "UserHistory", "BASE TABLE"},
                                      new[] {"dbo", "USER_TABLE", "BASE TABLE"});
 
             schemaProvider.SetColumns(new object[] { "dbo", "Users", "Id", true },
                                       new[] { "dbo", "Users", "Name" },
                                       new[] { "dbo", "Users", "Password" },
                                       new[] { "dbo", "Users", "Age" },
+                                      new[] { "dbo", "UserHistory", "Id" },
+                                      new[] { "dbo", "UserHistory", "UserId" },
+                                      new[] { "dbo", "UserHistory", "LastSeen" },
                                       new object[] { "dbo", "USER_TABLE", "ID", true },
                                       new[] { "dbo", "USER_TABLE", "NAME" },
                                       new[] { "dbo", "USER_TABLE", "PASSWORD" },
                                       new[] { "dbo", "USER_TABLE", "AGE" });
 
             schemaProvider.SetPrimaryKeys(new object[] { "dbo", "Users", "Id", 0 },
+                                          new object[] { "dbo", "UserHistory", "Id", 0 },
                                           new object[] { "dbo", "USER_TABLE", "ID", 0 });
+
+            schemaProvider.SetForeignKeys(new object[] { "FK_UserHistory_User", "dbo", "UserHistory", "UserId", "dbo", "Users", "Id", 0 });
         }
 
         [Test]
@@ -300,6 +308,17 @@ namespace Simple.Data.IntegrationTest
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Age] > @p2");
             Parameter(0).Is("Steve");
             Parameter(1).Is(30);
+        }
+
+        [Test]
+        public void TestUpdateWithCriteriaWithNaturalJoin()
+        {
+            var yearAgo = DateTime.Today.Subtract(TimeSpan.FromDays(365));
+            _db.Users.UpdateAll(_db.Users.UserHistory.LastSeen < yearAgo, Name: "Dead User");
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Id] in " +
+                "(select [dbo].[Users].[Id] from [dbo].[Users] join [dbo].[UserHistory] on ([dbo].[Users].[Id] = [dbo].[UserHistory].[UserId]) where [dbo].[UserHistory].[LastSeen] < @p2)");
+            Parameter(0).Is("Dead User");
+            Parameter(1).Is(yearAgo);
         }
 
         [Test]
