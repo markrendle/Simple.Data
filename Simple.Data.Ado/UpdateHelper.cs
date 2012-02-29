@@ -36,6 +36,10 @@ namespace Simple.Data.Ado
                     {
                         whereStatement = CreateWhereInStatement(criteria, table);
                     }
+                    else if (table.PrimaryKey.Length > 1)
+                    {
+                        whereStatement = CreateWhereExistsStatement(criteria, table);
+                    }
                 }
                 else
                 {
@@ -61,6 +65,29 @@ namespace Simple.Data.Ado
             inClauseBuilder.Append(" where ");
             inClauseBuilder.Append(_expressionFormatter.Format(criteria));
             return string.Format("{0} IN ({1})", keyColumn.QualifiedName, inClauseBuilder.Text);
+        }
+
+        private string CreateWhereExistsStatement(SimpleExpression criteria, Table table)
+        {
+            var inClauseBuilder = new CommandBuilder(_schema);
+            inClauseBuilder.Append(string.Join(" ",
+                                               new Joiner(JoinType.Inner, _schema).GetJoinClauses(
+                                                   new ObjectName(table.Schema, table.ActualName), criteria)));
+            inClauseBuilder.Append(" where ");
+            inClauseBuilder.Append(_expressionFormatter.Format(criteria));
+            var updateJoin = _schema.QuoteObjectName("_updatejoin");
+            var whereClause = new StringBuilder(string.Format("SELECT 1 FROM {0} [_updatejoin] ", table.QualifiedName));
+            whereClause.Append(inClauseBuilder.Text.Replace(table.QualifiedName, updateJoin));
+            whereClause.Append(" AND (");
+            bool appendAnd = false;
+            foreach (var column in table.PrimaryKey.AsEnumerable().Select(table.FindColumn))
+            {
+                if (appendAnd) whereClause.Append(" AND ");
+                whereClause.AppendFormat("{0}.{1} = {2}", updateJoin, column.QuotedName, column.QualifiedName);
+                appendAnd = true;
+            }
+            whereClause.Append(")");
+            return string.Format("EXISTS ({0})", whereClause);
         }
 
         private string GetUpdateClause(Table table, IEnumerable<KeyValuePair<string, object>> data)

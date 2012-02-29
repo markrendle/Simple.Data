@@ -13,6 +13,8 @@ namespace Simple.Data.IntegrationTest
         {
             schemaProvider.SetTables(new[] { "dbo", "Users", "BASE TABLE" },
                                      new[] { "dbo", "UserHistory", "BASE TABLE"},
+                                     new[] { "dbo", "AnnoyingMaster", "BASE TABLE"},
+                                     new[] { "dbo", "AnnoyingDetail", "BASE TABLE"},
                                      new[] {"dbo", "USER_TABLE", "BASE TABLE"});
 
             schemaProvider.SetColumns(new object[] { "dbo", "Users", "Id", true },
@@ -22,6 +24,13 @@ namespace Simple.Data.IntegrationTest
                                       new[] { "dbo", "UserHistory", "Id" },
                                       new[] { "dbo", "UserHistory", "UserId" },
                                       new[] { "dbo", "UserHistory", "LastSeen" },
+                                      new[] { "dbo", "AnnoyingMaster", "Id1" },
+                                      new[] { "dbo", "AnnoyingMaster", "Id2" },
+                                      new[] { "dbo", "AnnoyingMaster", "Text" },
+                                      new[] { "dbo", "AnnoyingDetail", "Id" },
+                                      new[] { "dbo", "AnnoyingDetail", "MasterId1" },
+                                      new[] { "dbo", "AnnoyingDetail", "MasterId2" },
+                                      new[] { "dbo", "AnnoyingDetail", "Value" },
                                       new object[] { "dbo", "USER_TABLE", "ID", true },
                                       new[] { "dbo", "USER_TABLE", "NAME" },
                                       new[] { "dbo", "USER_TABLE", "PASSWORD" },
@@ -29,9 +38,16 @@ namespace Simple.Data.IntegrationTest
 
             schemaProvider.SetPrimaryKeys(new object[] { "dbo", "Users", "Id", 0 },
                                           new object[] { "dbo", "UserHistory", "Id", 0 },
+                                          new object[] { "dbo", "AnnoyingMaster", "Id1", 0 },
+                                          new object[] { "dbo", "AnnoyingMaster", "Id2", 1 },
+                                          new object[] { "dbo", "AnnoyingDetail", "Id", 0 },
                                           new object[] { "dbo", "USER_TABLE", "ID", 0 });
 
-            schemaProvider.SetForeignKeys(new object[] { "FK_UserHistory_User", "dbo", "UserHistory", "UserId", "dbo", "Users", "Id", 0 });
+            schemaProvider.SetForeignKeys(
+                new object[] { "FK_UserHistory_User", "dbo", "UserHistory", "UserId", "dbo", "Users", "Id", 0 },
+                new object[] { "FK_AnnoyingDetail_AnnoyingMaster", "dbo", "AnnoyingDetail", "MasterId1", "dbo", "AnnoyingMaster", "Id1", 0 },
+                new object[] { "FK_AnnoyingDetail_AnnoyingMaster", "dbo", "AnnoyingDetail", "MasterId2", "dbo", "AnnoyingMaster", "Id2", 1 }
+                );
         }
 
         [Test]
@@ -319,6 +335,17 @@ namespace Simple.Data.IntegrationTest
                 "(select [dbo].[Users].[Id] from [dbo].[Users] join [dbo].[UserHistory] on ([dbo].[Users].[Id] = [dbo].[UserHistory].[UserId]) where [dbo].[UserHistory].[LastSeen] < @p2)");
             Parameter(0).Is("Dead User");
             Parameter(1).Is(yearAgo);
+        }
+
+        [Test]
+        public void TestUpdateWithCriteriaWithNaturalJoinOnCompoundKeyTable()
+        {
+            _db.AnnoyingMaster.UpdateAll(_db.AnnoyingMaster.AnnoyingDetail.Value < 42, Text: "Really annoying");
+            GeneratedSqlIs("update [dbo].[AnnoyingMaster] set [Text] = @p1 where exists " +
+                "(select 1 from [dbo].[AnnoyingMaster] [_updatejoin] join [dbo].[AnnoyingDetail] on ([_updatejoin].[Id1] = [dbo].[AnnoyingDetail].[MasterId1] and [_updatejoin].[Id2] = [dbo].[AnnoyingDetail].[MasterId2]) "+
+                "where [dbo].[AnnoyingDetail].[Value] < @p2 and ([_updatejoin].[Id1] = [dbo].[AnnoyingMaster].[Id1] and [_updatejoin].[Id2] = [dbo].[AnnoyingMaster].[Id2]))");
+            Parameter(0).Is("Really annoying");
+            Parameter(1).Is(42);
         }
 
         [Test]
