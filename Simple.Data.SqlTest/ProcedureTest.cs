@@ -43,6 +43,7 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, results.ReturnValue);
         }
 
+#if DEBUG // Trace is only written for DEBUG build
         [Test]
         public void GetCustomerCountSecondCallExecutesNonQueryTest()
         {
@@ -55,6 +56,7 @@ namespace Simple.Data.SqlTest
             Assert.IsTrue(listener.Output.Contains("ExecuteNonQuery"));
             Trace.Listeners.Remove(listener);
         }
+#endif
 
         [Test]
         public void GetCustomerAndOrdersTest()
