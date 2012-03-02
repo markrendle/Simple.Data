@@ -332,7 +332,31 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
-        public void WithClauseWithJoinCriteriaShouldPreselectDetailTableAsCollection()
+        public void FindAllWithClauseWithJoinCriteriaShouldPreselectDetailTableAsCollection()
+        {
+            var db = DatabaseHelper.Open();
+            var result = db.Customers.FindAllByCustomerId(1).With(db.Customers.Orders.OrderItems).FirstOrDefault() as IDictionary<string, object>;
+            Assert.IsNotNull(result);
+            Assert.Contains("OrderItems", (ICollection)result.Keys);
+            var orderItems = result["OrderItems"] as IList<IDictionary<string, object>>;
+            Assert.IsNotNull(orderItems);
+            Assert.AreEqual(1, orderItems.Count);
+        }
+
+        [Test]
+        public void GetWithClauseWithJoinCriteriaShouldPreselectDetailTableAsCollection()
+        {
+            var db = DatabaseHelper.Open();
+            var result = db.Customers.With(db.Customers.Orders.OrderItems).Get(1) as IDictionary<string, object>;
+            Assert.IsNotNull(result);
+            Assert.Contains("OrderItems", (ICollection)result.Keys);
+            var orderItems = result["OrderItems"] as IList<IDictionary<string, object>>;
+            Assert.IsNotNull(orderItems);
+            Assert.AreEqual(1, orderItems.Count);
+        }
+
+        [Test]
+        public void WithClauseWithTwoStepShouldPreselectManyToManyTableAsCollection()
         {
             var db = DatabaseHelper.Open();
             var result = db.Customers.FindAll(db.Customers.Order.OrderId == 1).WithOrders().FirstOrDefault() as IDictionary<string, object>;

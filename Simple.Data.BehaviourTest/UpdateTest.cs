@@ -11,9 +11,9 @@ namespace Simple.Data.IntegrationTest
     {
         protected override void SetSchema(MockSchemaProvider schemaProvider)
         {
-            schemaProvider.SetTables(new[] { "dbo", "Users", "BASE TABLE" },
-                                     new[] { "dbo", "UserHistory", "BASE TABLE"},
-                                     new[] { "dbo", "AnnoyingMaster", "BASE TABLE"},
+            schemaProvider.SetTables(new object[] { "dbo", "Users", "BASE TABLE" },
+                                     new object[] { "dbo", "UserHistory", "BASE TABLE"},
+                                     new object[] { "dbo", "AnnoyingMaster", "BASE TABLE"},
                                      new[] { "dbo", "AnnoyingDetail", "BASE TABLE"},
                                      new[] {"dbo", "USER_TABLE", "BASE TABLE"});
 

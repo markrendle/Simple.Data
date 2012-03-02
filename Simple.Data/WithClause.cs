@@ -4,7 +4,7 @@ namespace Simple.Data
     {
         private readonly ObjectReference _objectReference;
         private readonly WithMode _mode;
-        private readonly WithType _type;
+        private WithType _type;
 
         public WithClause(ObjectReference objectReference) : this(objectReference, WithType.NotSpecified)
         {
@@ -33,6 +33,7 @@ namespace Simple.Data
         public WithType Type
         {
             get { return _type; }
+            set { _type = value; }
         }
 
         public ObjectReference ObjectReference

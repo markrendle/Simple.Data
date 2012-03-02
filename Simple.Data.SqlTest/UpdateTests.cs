@@ -88,6 +88,24 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void TestUpdateWithJoinCriteria()
+        {
+            var db = DatabaseHelper.Open();
+            db.Customers.UpdateAll(db.Customers.Orders.OrderId == 1, Name: "Updated");
+            var customer = db.Customers.Get(1);
+            Assert.AreEqual("Updated", customer.Name);
+        }
+
+        [Test]
+        public void TestUpdateWithJoinCriteriaOnCompoundKeyTable()
+        {
+            var db = DatabaseHelper.Open();
+            db.CompoundKeyMaster.UpdateAll(db.CompoundKeyMaster.CompoundKeyDetail.Value == 1, Description: "Updated");
+            var record = db.CompoundKeyMaster.Get(1, 1);
+            Assert.AreEqual("Updated", record.Description);
+        }
+        
+        [Test]
         public void ToListShouldExecuteQuery()
         {
             var db = DatabaseHelper.Open();
@@ -97,7 +115,8 @@ namespace Simple.Data.SqlTest
                 customer.Address = "Updated";
             }
 
-            db.Customers.Update(customers);
+            Assert.DoesNotThrow(() =>
+                db.Customers.Update(customers));
         }
     }
 }

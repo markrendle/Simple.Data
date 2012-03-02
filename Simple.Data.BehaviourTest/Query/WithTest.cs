@@ -21,19 +21,22 @@ namespace Simple.Data.IntegrationTest.Query
                                       new[] { "dbo", "Employee", "DepartmentId" },
                                       new[] { "dbo", "Department", "Id" },
                                       new[] { "dbo", "Department", "Name" },
-                                      new[] { "dbo", "Activity", "ID_Activity" },
-                                      new[] { "dbo", "Activity", "ID_Trip" },
-                                      new[] { "dbo", "Activity", "Activity_Time" },
-                                      new[] { "dbo", "Activity", "Is_Public" },
+                                      new[] { "dbo", "Activity", "ID" },
+                                      new[] { "dbo", "Activity", "Description" },
                                       new[] { "dbo", "Activity_Join", "ID_Activity" },
                                       new[] { "dbo", "Activity_Join", "ID_Location" },
-                                      new[] { "dbo", "Location", "ID_Location" }
+                                      new[] { "dbo", "Location", "ID" },
+                                      new[] { "dbo", "Location", "Address" }
                                       );
 
             schemaProvider.SetPrimaryKeys(new object[] {"dbo", "Employee", "Id", 0},
                                           new object[] {"dbo", "Department", "Id", 0});
 
-            schemaProvider.SetForeignKeys(new object[] { "FK_Employee_Department", "dbo", "Employee", "DepartmentId", "dbo", "Department", "Id", 0 });
+            schemaProvider.SetForeignKeys(
+                new object[] { "FK_Employee_Department", "dbo", "Employee", "DepartmentId", "dbo", "Department", "Id", 0 },
+                new object[] { "FK_Activity_Join_Activity", "dbo", "Activity_Join", "ID_Activity", "dbo", "Activity", "ID", 0 },
+                new object[] { "FK_Activity_Join_Location", "dbo", "Activity_Join", "ID_Location", "dbo", "Location", "ID", 0 }
+                );
         }
 
         [Test]
@@ -107,6 +110,25 @@ namespace Simple.Data.IntegrationTest.Query
                 " from [dbo].[employee] left join [dbo].[department] [foo] on ([foo].[id] = [dbo].[employee].[departmentid])";
 
             var q = _db.Employees.All().With(_db.Employees.Department.As("Foo"));
+
+            EatException(() => q.ToList());
+
+            GeneratedSqlIs(expectedSql);
+        }
+
+        [Test]
+        public void SingleWithClauseUsingTwoStepReference()
+        {
+            const string expectedSql = "select "+
+                "[dbo].[activity].[id],"+
+                "[dbo].[activity].[description],"+
+                "[dbo].[location].[id] as [__withn__location__id]," +
+                "[dbo].[location].[address] as [__withn__location__address]" +
+                " from [dbo].[activity] "+
+                "left join [dbo].[activity_join] on ([dbo].[activity].[id] = [dbo].[activity_join].[id_activity]) "+
+                "left join [dbo].[location] on ([dbo].[location].[id] = [dbo].[activity_join].[id_location])";
+
+            var q = _db.Activity.All().With(_db.Activity.ActivityJoin.Location);
 
             EatException(() => q.ToList());
 

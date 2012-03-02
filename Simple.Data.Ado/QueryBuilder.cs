@@ -114,6 +114,10 @@ namespace Simple.Data.Ado
                     }
                     else
                     {
+                        if (withClause.Type == WithType.NotSpecified)
+                        {
+                            InferWithType(withClause);
+                        }
                         HandleWithClauseUsingNaturalJoin(withClause, relationTypeDict);
                     }
                 }
@@ -121,6 +125,22 @@ namespace Simple.Data.Ado
                     _columns.OfType<ObjectReference>()
                         .Select(c => IsCoreTable(c.GetOwner()) ? c : AddWithAlias(c, relationTypeDict[c.GetOwner()]))
                         .ToArray();
+            }
+        }
+
+        private void InferWithType(WithClause withClause)
+        {
+            var objectReference = withClause.ObjectReference;
+            while (!ReferenceEquals(objectReference.GetOwner(), null))
+            {
+                var fromTable = _schema.FindTable(objectReference.GetName());
+                var toTable = _schema.FindTable(objectReference.GetOwner().GetName());
+                if (_schema.GetRelationType(fromTable.ActualName, toTable.ActualName) == RelationType.OneToMany)
+                {
+                    withClause.Type = WithType.Many;
+                    return;
+                }
+                objectReference = objectReference.GetOwner();
             }
         }
 
