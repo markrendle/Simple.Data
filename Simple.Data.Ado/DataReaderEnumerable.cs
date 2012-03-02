@@ -139,6 +139,7 @@ namespace Simple.Data.Ado
             {
                 try
                 {
+                    _command.WriteTrace();
                     _command.Connection.OpenIfClosed();
                     _reader = _command.ExecuteReader();
                     CreateIndexIfNecessary();

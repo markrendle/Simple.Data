@@ -6,7 +6,7 @@
     using System.Linq;
     using QueryPolyfills;
 
-    public partial class InMemoryAdapter : Adapter
+    public partial class InMemoryAdapter : Adapter, IAdapterWithFunctions
     {
         private readonly Dictionary<string, string> _autoIncrementColumns = new Dictionary<string, string>();
         private readonly Dictionary<string, string[]> _keyColumns = new Dictionary<string, string[]>();
@@ -14,7 +14,9 @@
         private readonly Dictionary<string, List<IDictionary<string, object>>> _tables =
             new Dictionary<string, List<IDictionary<string, object>>>();
 
-        private readonly ICollection<Join> _joins = new Collection<Join>();
+        private readonly Dictionary<string, Delegate> _functions = new Dictionary<string, Delegate>(); 
+
+        private readonly ICollection<JoinInfo> _joins = new Collection<JoinInfo>();
 
         private List<IDictionary<string, object>> GetTable(string tableName)
         {
@@ -208,12 +210,17 @@
         /// <param name="detailPropertyName">The name to give the collection property in the master object</param>
         public void ConfigureJoin(string masterTableName, string masterKey, string masterPropertyName, string detailTableName, string detailKey, string detailPropertyName)
         {
-            var join = new Join(masterTableName, masterKey, masterPropertyName, detailTableName, detailKey,
+            var join = new JoinInfo(masterTableName, masterKey, masterPropertyName, detailTableName, detailKey,
                                 detailPropertyName);
             _joins.Add(join);
         }
 
-        public class Join
+        public JoinConfig Join
+        {
+            get { return new JoinConfig(_joins);}
+        }
+
+        internal class JoinInfo
         {
             private readonly string _masterTableName;
             private readonly string _masterKey;
@@ -222,7 +229,7 @@
             private readonly string _detailKey;
             private readonly string _detailPropertyName;
 
-            public Join(string masterTableName, string masterKey, string masterPropertyName, string detailTableName, string detailKey, string detailPropertyName)
+            public JoinInfo(string masterTableName, string masterKey, string masterPropertyName, string detailTableName, string detailKey, string detailPropertyName)
             {
                 _masterTableName = masterTableName;
                 _masterKey = masterKey;
@@ -281,6 +288,92 @@
         public IDictionary<string, object> Get(string tableName, IAdapterTransaction transaction, params object[] parameterValues)
         {
             return Get(tableName, parameterValues);
+        }
+
+        public class JoinConfig
+        {
+            private readonly ICollection<JoinInfo> _joins;
+            private JoinInfo _joinInfo;
+
+            internal JoinConfig(ICollection<JoinInfo> joins)
+            {
+                _joins = joins;
+                _joinInfo = new JoinInfo(null,null,null,null,null,null);
+            }
+
+            public JoinConfig Master(string tableName, string keyName, string propertyNameInDetailRecords = null)
+            {
+                if (_joins.Contains(_joinInfo)) _joins.Remove(_joinInfo);
+                _joinInfo = new JoinInfo(tableName, keyName, propertyNameInDetailRecords ?? tableName, _joinInfo.DetailTableName,
+                                 _joinInfo.DetailKey, _joinInfo.DetailPropertyName);
+                _joins.Add(_joinInfo);
+                return this;
+            }
+
+
+            public JoinConfig Detail(string tableName, string keyName, string propertyNameInMasterRecords = null)
+            {
+                if (_joins.Contains(_joinInfo)) _joins.Remove(_joinInfo);
+                _joinInfo = new JoinInfo(_joinInfo.MasterTableName, _joinInfo.MasterKey, _joinInfo.MasterPropertyName,
+                                         tableName, keyName,
+                                         propertyNameInMasterRecords ?? tableName);
+                _joins.Add(_joinInfo);
+                return this;
+            }
+        }
+
+        public void AddFunction<TResult>(string functionName, Func<TResult> function)
+        {
+            _functions.Add(functionName, function);
+        }
+
+        public void AddFunction<T,TResult>(string functionName, Func<T,TResult> function)
+        {
+            _functions.Add(functionName, function);
+        }
+
+        public void AddFunction<T1,T2,TResult>(string functionName, Func<T1,T2,TResult> function)
+        {
+            _functions.Add(functionName, function);
+        }
+
+        public void AddFunction<T1,T2,T3,TResult>(string functionName, Func<T1,T2,T3,TResult> function)
+        {
+            _functions.Add(functionName, function);
+        }
+
+        public void AddFunction<T1, T2, T3, T4, TResult>(string functionName, Func<T1, T2, T3, T4, TResult> function)
+        {
+            _functions.Add(functionName, function);
+        }
+
+        public void AddDelegate(string functionName, Delegate function)
+        {
+            _functions.Add(functionName, function);
+        }
+
+        public bool IsValidFunction(string functionName)
+        {
+            return _functions.ContainsKey(functionName);
+        }
+
+        public IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> Execute(string functionName, IDictionary<string, object> parameters)
+        {
+            if (!_functions.ContainsKey(functionName)) throw new InvalidOperationException("No function found with that name.");
+            var obj = _functions[functionName].DynamicInvoke(parameters.Values.ToArray());
+
+            var dict = obj as IDictionary<string, object>;
+            if (dict != null) return new List<IEnumerable<IDictionary<string, object>>> { new List<IDictionary<string, object>> { dict } };
+
+            var list = obj as IEnumerable<IDictionary<string, object>>;
+            if (list != null) return new List<IEnumerable<IDictionary<string, object>>> { list };
+
+            return obj as IEnumerable<IEnumerable<IDictionary<string, object>>>;
+        }
+
+        public IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> Execute(string functionName, IDictionary<string, object> parameters, IAdapterTransaction transaction)
+        {
+            return Execute(functionName, parameters);
         }
     }
 }

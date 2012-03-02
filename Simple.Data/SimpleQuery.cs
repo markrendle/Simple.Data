@@ -427,7 +427,7 @@
         public SimpleQuery On(SimpleExpression joinExpression)
         {
             if (_tempJoinWaitingForOn == null)
-                throw new InvalidOperationException("Call to On must be preceded by call to Join.");
+                throw new InvalidOperationException("Call to On must be preceded by call to JoinInfo.");
             return AddNewJoin(new JoinClause(_tempJoinWaitingForOn.Table, _tempJoinWaitingForOn.JoinType, joinExpression));
         }
 
@@ -474,7 +474,7 @@
         private SimpleQuery ParseOn(InvokeMemberBinder binder, IEnumerable<object> args)
         {
             if (_tempJoinWaitingForOn == null)
-                throw new InvalidOperationException("Call to On must be preceded by call to Join.");
+                throw new InvalidOperationException("Call to On must be preceded by call to JoinInfo.");
             var joinExpression = ExpressionHelper.CriteriaDictionaryToExpression(_tempJoinWaitingForOn.Table,
                                                                                  binder.NamedArgumentsToDictionary(args));
             return AddNewJoin(new JoinClause(_tempJoinWaitingForOn.Table, _tempJoinWaitingForOn.JoinType, joinExpression));

@@ -285,6 +285,23 @@
             Assert.AreEqual(1, customers.Count);
         }
 
+        [Test]
+        public void TestJoinConfig()
+        {
+            var adapter = new InMemoryAdapter();
+            adapter.Join.Master("Customer", "ID").Detail("Order", "CustomerID");
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            db.Customer.Insert(ID: 1, Name: "NASA");
+            db.Customer.Insert(ID: 2, Name: "ACME");
+            db.Order.Insert(ID: 1, CustomerID: 1, Date: new DateTime(1997, 1, 12));
+            db.Order.Insert(ID: 2, CustomerID: 2, Date: new DateTime(2001, 1, 1));
+
+            var customers = db.Customer.FindAll(db.Customer.Order.Date < new DateTime(1999, 12, 31)).ToList();
+            Assert.IsNotNull(customers);
+            Assert.AreEqual(1, customers.Count);
+        }
+
         /// <summary>
         ///A test for Find
         ///</summary>
@@ -540,6 +557,58 @@
                 Assert.IsNotNull(record);
                 Assert.AreEqual(1, record.Id);
                 Assert.AreEqual("Alice", record.Name);
+            }
+        }
+
+        [Test]
+        public void ProcedureShouldWork()
+        {
+            var adapter = new InMemoryAdapter();
+            adapter.AddFunction("Test", () => new Dictionary<string,object> { { "Foo", "Bar"}});
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            foreach (var row in db.Test())
+            {
+                Assert.AreEqual("Bar", row.Foo);
+            }
+        }
+
+        [Test]
+        public void ProcedureWithParametersShouldWork()
+        {
+            var adapter = new InMemoryAdapter();
+            adapter.AddFunction<string,object,IDictionary<string,object>>("Test", (key, value) => new Dictionary<string, object> { { key, value } });
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            foreach (var row in db.Test("Foo", "Bar"))
+            {
+                Assert.AreEqual("Bar", row.Foo);
+            }
+        }
+
+        [Test]
+        public void ProcedureReturningArrayShouldWork()
+        {
+            var adapter = new InMemoryAdapter();
+            adapter.AddFunction("Test", () => new[] { new Dictionary<string, object> { { "Foo", "Bar" } } });
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            foreach (var row in db.Test())
+            {
+                Assert.AreEqual("Bar", row.Foo);
+            }
+        }
+
+        [Test]
+        public void ProcedureWithParametersReturningArrayShouldWork()
+        {
+            var adapter = new InMemoryAdapter();
+            adapter.AddFunction<string, object, IDictionary<string, object>[]>("Test", (key, value) => new IDictionary<string, object>[] {new Dictionary<string, object> { { key, value } }});
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            foreach (var row in db.Test("Foo", "Bar"))
+            {
+                Assert.AreEqual("Bar", row.Foo);
             }
         }
     }

@@ -133,8 +133,8 @@ namespace Simple.Data.Ado
             var objectReference = withClause.ObjectReference;
             while (!ReferenceEquals(objectReference.GetOwner(), null))
             {
-                var fromTable = _schema.FindTable(objectReference.GetName());
-                var toTable = _schema.FindTable(objectReference.GetOwner().GetName());
+                var toTable = _schema.FindTable(objectReference.GetName());
+                var fromTable = _schema.FindTable(objectReference.GetOwner().GetName());
                 if (_schema.GetRelationType(fromTable.ActualName, toTable.ActualName) == RelationType.OneToMany)
                 {
                     withClause.Type = WithType.Many;
