@@ -37,7 +37,7 @@ namespace Simple.Data.SqlServer
                 bulkCopy = new SqlBulkCopy(connection);
             }
 
-            bulkCopy.DestinationTableName = adapter.GetSchema().FindTable(tableName).ActualName;
+            bulkCopy.DestinationTableName = adapter.GetSchema().FindTable(tableName).QualifiedName;
 
             using (connection.MaybeDisposable())
             using (bulkCopy)

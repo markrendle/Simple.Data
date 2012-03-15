@@ -11,11 +11,16 @@ namespace Simple.Data.IntegrationTest
         protected override void SetSchema(MockSchemaProvider schemaProvider)
         {
             schemaProvider.SetTables(new[] { "dbo", "Users", "BASE TABLE" },
-                                     new[] { "dbo", "NoIdentityColumnUsers", "BASE TABLE" });
+                                     new[] { "dbo", "NoIdentityColumnUsers", "BASE TABLE" },
+                                     new[] { "foo", "Users", "BASE TABLE" });
             schemaProvider.SetColumns(new object[] { "dbo", "Users", "Id", true },
                                       new[] { "dbo", "Users", "Name" },
                                       new[] { "dbo", "Users", "Password" },
                                       new[] { "dbo", "Users", "Age" },
+                                      new object[] { "foo", "Users", "Id", true },
+                                      new[] { "foo", "Users", "Name" },
+                                      new[] { "foo", "Users", "Password" },
+                                      new[] { "foo", "Users", "Age" },
                                       new[] { "dbo", "NoIdentityColumnUsers", "Id" },
                                       new[] { "dbo", "NoIdentityColumnUsers", "Name" },
                                       new[] { "dbo", "NoIdentityColumnUsers", "Password" },
@@ -29,6 +34,17 @@ namespace Simple.Data.IntegrationTest
             var users = new[] { new User { Name = "Steve", Age = 50 },  new User { Name = "Phil", Age = 42 }};
             _db.Users.Insert(users);
             GeneratedSqlIs("insert into [dbo].[Users] ([Name],[Password],[Age]) values (@p0,@p1,@p2)");
+            Parameter(0).Is("Phil");
+            Parameter(1).Is(DBNull.Value);
+            Parameter(2).Is(42);
+        }
+ 
+        [Test]
+        public void TestBulkInsertWithStaticTypeObjectAndIdentityColumnOnSchemaQualifiedTable()
+        {
+            var users = new[] { new User { Name = "Steve", Age = 50 },  new User { Name = "Phil", Age = 42 }};
+            _db.foo.Users.Insert(users);
+            GeneratedSqlIs("insert into [foo].[Users] ([Name],[Password],[Age]) values (@p0,@p1,@p2)");
             Parameter(0).Is("Phil");
             Parameter(1).Is(DBNull.Value);
             Parameter(2).Is(42);
