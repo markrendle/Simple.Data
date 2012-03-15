@@ -671,7 +671,7 @@
 
         public int Count()
         {
-            return (int)Select(new CountSpecialReference()).ToScalar();
+            return Convert.ToInt32(Select(new CountSpecialReference()).ToScalar());
         }
 
         /// <summary>
