@@ -21,6 +21,8 @@
 
             var list = db.test.SchemaTable.All().ToList();
             Assert.AreEqual(1000, list.Count);
+
+            db.test.SchemaTable.DeleteAll();
         }
 
         private static IEnumerable<SchemaItem> GenerateItems()

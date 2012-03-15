@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Data;
+    using System.Diagnostics;
     using System.Linq;
 
     internal class AdoAdapterQueryRunner
@@ -22,7 +23,7 @@
 
             if (query.Clauses.OfType<WithCountClause>().Any()) return RunQueryWithCount(query, out unhandledClauses);
 
-            ICommandBuilder[] commandBuilders = GetQueryCommandBuilders(query, out unhandledClauses);
+            ICommandBuilder[] commandBuilders = GetQueryCommandBuilders(ref query, out unhandledClauses);
             IDbConnection connection = _adapter.CreateConnection();
             if (_adapter.ProviderSupportsCompoundStatements || commandBuilders.Length == 1)
             {
@@ -101,13 +102,13 @@
             }
         }
 
-        private ICommandBuilder[] GetPagedQueryCommandBuilders(SimpleQuery query,
+        private ICommandBuilder[] GetPagedQueryCommandBuilders(ref SimpleQuery query,
                                                                out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
         {
-            return GetPagedQueryCommandBuilders(query, -1, out unhandledClauses);
+            return GetPagedQueryCommandBuilders(ref query, -1, out unhandledClauses);
         }
 
-        private ICommandBuilder[] GetPagedQueryCommandBuilders(SimpleQuery query, Int32 bulkIndex,
+        private ICommandBuilder[] GetPagedQueryCommandBuilders(ref SimpleQuery query, Int32 bulkIndex,
                                                                out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
         {
             var commandBuilders = new List<ICommandBuilder>();
@@ -120,7 +121,6 @@
                                                                                                  unhandledClausesForPagedQuery);
             unhandledClausesList.AddRange(unhandledClausesForPagedQuery);
 
-
             SkipClause skipClause = query.Clauses.OfType<SkipClause>().FirstOrDefault();
             TakeClause takeClause = query.Clauses.OfType<TakeClause>().FirstOrDefault();
 
@@ -129,7 +129,8 @@
                 var queryPager = _adapter.ProviderHelper.GetCustomProvider<IQueryPager>(_adapter.ConnectionProvider);
                 if (queryPager == null)
                 {
-                    DeferPaging(query, mainCommandBuilder, commandBuilders, unhandledClausesList);
+                    Trace.TraceWarning("There is no database-specific query paging in your current Simple.Data Provider. Paging will be done in memory.");
+                    DeferPaging(ref query, mainCommandBuilder, commandBuilders, unhandledClausesList);
                 }
                 else
                 {
@@ -139,11 +140,12 @@
             return commandBuilders.ToArray();
         }
 
-        private void DeferPaging(SimpleQuery query, ICommandBuilder mainCommandBuilder, List<ICommandBuilder> commandBuilders,
+        private void DeferPaging(ref SimpleQuery query, ICommandBuilder mainCommandBuilder, List<ICommandBuilder> commandBuilders,
                                  List<SimpleQueryClauseBase> unhandledClausesList)
         {
             unhandledClausesList.AddRange(query.OfType<SkipClause>());
             unhandledClausesList.AddRange(query.OfType<TakeClause>());
+            query = query.ClearSkip().ClearTake();
             var commandBuilder = new CommandBuilder(mainCommandBuilder.Text, _adapter.GetSchema(),
                                                     mainCommandBuilder.Parameters);
             commandBuilders.Add(commandBuilder);
@@ -172,23 +174,23 @@
                     new CommandBuilder(commandText, _adapter.GetSchema(), mainCommandBuilder.Parameters)));
         }
 
-        private ICommandBuilder[] GetQueryCommandBuilders(SimpleQuery query,
+        private ICommandBuilder[] GetQueryCommandBuilders(ref SimpleQuery query,
                                                           out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
         {
             if (query.Clauses.OfType<TakeClause>().Any() || query.Clauses.OfType<SkipClause>().Any())
             {
-                return GetPagedQueryCommandBuilders(query, out unhandledClauses);
+                return GetPagedQueryCommandBuilders(ref query, out unhandledClauses);
             }
             return new[] {new QueryBuilder(_adapter).Build(query, out unhandledClauses)};
         }
 
-        private IEnumerable<ICommandBuilder> GetQueryCommandBuilders(SimpleQuery query, Int32 bulkIndex,
+        private IEnumerable<ICommandBuilder> GetQueryCommandBuilders(ref SimpleQuery query, Int32 bulkIndex,
                                                                      out IEnumerable<SimpleQueryClauseBase>
                                                                          unhandledClauses)
         {
             if (query.Clauses.OfType<TakeClause>().Any() || query.Clauses.OfType<SkipClause>().Any())
             {
-                return GetPagedQueryCommandBuilders(query, bulkIndex, out unhandledClauses);
+                return GetPagedQueryCommandBuilders(ref query, bulkIndex, out unhandledClauses);
             }
             return new[] {new QueryBuilder(_adapter, bulkIndex).Build(query, out unhandledClauses)};
         }
@@ -206,7 +208,7 @@
                 for (int i = 0; i < queries.Length; i++)
                 {
                     IEnumerable<SimpleQueryClauseBase> unhandledClausesForThisQuery;
-                    commandBuilders.AddRange(GetQueryCommandBuilders(queries[i], i, out unhandledClausesForThisQuery));
+                    commandBuilders.AddRange(GetQueryCommandBuilders(ref queries[i], i, out unhandledClausesForThisQuery));
                     unhandledClauses.Add(unhandledClausesForThisQuery);
                 }
                 IDbConnection connection = _adapter.CreateConnection();

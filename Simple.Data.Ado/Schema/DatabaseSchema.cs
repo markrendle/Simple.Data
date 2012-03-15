@@ -14,6 +14,7 @@ namespace Simple.Data.Ado.Schema
         private readonly ISchemaProvider _schemaProvider;
         private readonly Lazy<TableCollection> _lazyTables;
         private readonly Lazy<ProcedureCollection> _lazyProcedures;
+        private string _defaultSchema;
 
         private DatabaseSchema(ISchemaProvider schemaProvider, ProviderHelper providerHelper)
         {
@@ -45,6 +46,10 @@ namespace Simple.Data.Ado.Schema
 
         public Table FindTable(string tableName)
         {
+            if (!string.IsNullOrWhiteSpace(DefaultSchema) && !(tableName.Contains(".")))
+            {
+                tableName = DefaultSchema + "." + tableName;
+            }
             return _lazyTables.Value.Find(tableName);
         }
 
@@ -63,11 +68,11 @@ namespace Simple.Data.Ado.Schema
             return _lazyProcedures.Value.Find(procedureName);
         }
 
-        private String GetDefaultSchema()
+        private string DefaultSchema
         {
-            return _schemaProvider.GetDefaultSchema();
+            get { return _defaultSchema ?? (_defaultSchema = _schemaProvider.GetDefaultSchema() ?? string.Empty); }
         }
-        
+
         private TableCollection CreateTableCollection()
         {
             return new TableCollection(_schemaProvider.GetTables()
@@ -110,7 +115,7 @@ namespace Simple.Data.Ado.Schema
         public ObjectName BuildObjectName(String text)
         {
             if (text == null) throw new ArgumentNullException("text");
-            if (!text.Contains('.')) return new ObjectName(this.GetDefaultSchema(), text);
+            if (!text.Contains('.')) return new ObjectName(this.DefaultSchema, text);
             var schemaDotTable = text.Split('.');
             if (schemaDotTable.Length != 2) throw new InvalidOperationException("Could not parse table name.");
             return new ObjectName(schemaDotTable[0], schemaDotTable[1]);
