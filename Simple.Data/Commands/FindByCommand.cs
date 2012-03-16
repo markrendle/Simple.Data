@@ -52,7 +52,7 @@ namespace Simple.Data.Commands
             }
         }
 
-        private static IDictionary<string, object> CreateCriteriaDictionary(InvokeMemberBinder binder, IList<object> args)
+        private static IEnumerable<KeyValuePair<string, object>> CreateCriteriaDictionary(InvokeMemberBinder binder, IList<object> args)
         {
             IDictionary<string, object> criteriaDictionary = null;
             if (binder.Name.Equals("FindBy") || binder.Name.Equals("find_by"))

@@ -51,7 +51,7 @@ namespace Simple.Data.Commands
             return InsertDictionary(binder, args, dataStrategy, tableName);
         }
 
-        private static object InsertDictionary(InvokeMemberBinder binder, object[] args, DataStrategy dataStrategy, string tableName)
+        private static object InsertDictionary(InvokeMemberBinder binder, IEnumerable<object> args, DataStrategy dataStrategy, string tableName)
         {
             return dataStrategy.Insert(tableName, binder.NamedArgumentsToDictionary(args), !binder.IsResultDiscarded());
         }

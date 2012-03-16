@@ -80,7 +80,7 @@
                 object nextVal = 0;
                 if(table.Count > 0)
                 {
-                    nextVal = table.Select(d => d[autoIncrementColumn]).Max(); ;
+                    nextVal = table.Select(d => d[autoIncrementColumn]).Max();
                 }
                 
                 nextVal = ObjectMaths.Increment(nextVal);
@@ -152,7 +152,7 @@
             return count;
         }
 
-        private static void UpdateRecord(IDictionary<string, object> data, IDictionary<string, object> record)
+        private static void UpdateRecord(IEnumerable<KeyValuePair<string, object>> data, IDictionary<string, object> record)
         {
             foreach (var kvp in data)
             {
@@ -270,17 +270,17 @@
             }
         }
 
-        public IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired, IAdapterTransaction adapterTransaction)
+        public override IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired, IAdapterTransaction adapterTransaction)
         {
             return Upsert(tableName, dict, criteriaExpression, isResultRequired);
         }
 
-        public IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IDictionary<string,object>,Exception,bool> errorCallback)
+        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IDictionary<string,object>,Exception,bool> errorCallback)
         {
             return UpsertMany(tableName, list, keyFieldNames, isResultRequired, errorCallback);
         }
 
-        public IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
+        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
         {
             return UpsertMany(tableName, list, isResultRequired, errorCallback);
         }

@@ -150,7 +150,7 @@
         /// <param name="onError">A Func to call when there is an error. It this func returns true, carry on, otherwise abort.</param>
         /// <param name="resultRequired"><c>true</c> if the result of the insert is used in code; otherwise, <c>false</c>.</param>
         /// <returns>If possible, return the newly inserted rows, including any automatically-set values such as primary keys or timestamps.</returns>
-        /// <remarks>This method has a default implementation based on the <see cref="Insert(string,IDictionary{string, object})"/> method.
+        /// <remarks>This method has a default implementation based on the <see cref="Insert(string,IDictionary{TKey,TValue},bool)"/> method.
         /// You should override this method if your adapter can optimize the operation.</remarks>
         public virtual IEnumerable<IDictionary<string, object>> InsertMany(string tableName,
                                                                            IEnumerable<IDictionary<string, object>> dataList,
@@ -194,7 +194,6 @@
         {
             foreach (var row in dataList)
             {
-                IDictionary<string, object> inserted;
                 try
                 {
                     Insert(tableName, row, false);

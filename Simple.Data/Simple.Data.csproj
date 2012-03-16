@@ -56,8 +56,6 @@
     <Compile Include="AdapterWithFunctionsExtensions.cs" />
     <Compile Include="AllColumnsSpecialReference.cs" />
     <Compile Include="BinderHelper.cs" />
-    <Compile Include="BufferedEnumerable.cs" />
-    <Compile Include="BufferedEnumerable1.cs" />
     <Compile Include="CachingAdapterFactory.cs" />
     <Compile Include="CastEnumerable.cs" />
     <Compile Include="Commands\CommandFactory.cs" />
@@ -117,7 +115,6 @@
     <Compile Include="QueryPolyfills\FunctionHandlers.cs" />
     <Compile Include="QueryPolyfills\FunctionValueResolver.cs" />
     <Compile Include="QueryPolyfills\GroupingHandler.cs" />
-    <Compile Include="QueryPolyfills\HavingClauseHandler.cs" />
     <Compile Include="QueryPolyfills\ObjectMaths.cs" />
     <Compile Include="QueryPolyfills\ObjectValueResolver.cs" />
     <Compile Include="QueryPolyfills\OrderByClauseHandler.cs" />

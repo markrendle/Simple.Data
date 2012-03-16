@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Linq;
 using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
-    using Extensions;
-
     [Export("Ado", typeof (Adapter))]
     public partial class AdoAdapter : Adapter, ICloneable
     {

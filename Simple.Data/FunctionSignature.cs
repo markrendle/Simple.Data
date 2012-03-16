@@ -98,7 +98,7 @@ namespace Simple.Data
             {
                 if (ReferenceEquals(null, other)) return false;
                 if (ReferenceEquals(this, other)) return true;
-                return Equals(other._type, _type) && Equals(other._name, _name) && other._size == _size;
+                return other._type == _type && Equals(other._name, _name) && other._size == _size;
             }
 
             public override bool Equals(object obj)

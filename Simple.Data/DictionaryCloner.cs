@@ -38,7 +38,7 @@ namespace Simple.Data
             return clone;
         }
 
-        private void CopyDictionaryAndCloneNestedDictionaries(IDictionary<string, object> dictionary, IDictionary<string, object> clone)
+        private void CopyDictionaryAndCloneNestedDictionaries(IEnumerable<KeyValuePair<string, object>> dictionary, IDictionary<string, object> clone)
         {
             foreach (var keyValuePair in dictionary)
             {

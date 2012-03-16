@@ -59,7 +59,7 @@ namespace Simple.Data.Commands
             foreach (var keyFieldName in keyFieldNames)
             {
                 var name = keyFieldName;
-                var keyValuePair = record.Where(kvp => kvp.Key.Homogenize().Equals(name.Homogenize())).SingleOrDefault();
+                var keyValuePair = record.SingleOrDefault(kvp => kvp.Key.Homogenize().Equals(name.Homogenize()));
                 if (string.IsNullOrWhiteSpace(keyValuePair.Key))
                 {
                     throw new InvalidOperationException("Key field value not set.");

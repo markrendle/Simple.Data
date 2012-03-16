@@ -22,7 +22,7 @@ namespace Simple.Data
             get { return _args; }
         }
 
-        public SimpleFunction(string name, object[] args)
+        public SimpleFunction(string name, IEnumerable<object> args)
         {
             _name = name;
             _args = args.ToList().AsReadOnly();

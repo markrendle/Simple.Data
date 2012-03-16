@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Simple.Data
 {
-    public class ActionDisposable : IDisposable
+    public sealed class ActionDisposable : IDisposable
     {
         public static readonly IDisposable NoOp = new ActionDisposable();
         private readonly Action _action;
@@ -19,7 +19,18 @@ namespace Simple.Data
             _action = action ?? (() => { });
         }
 
+        ~ActionDisposable()
+        {
+            Dispose(false);
+        }
+
         public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
         {
             _action();
         }

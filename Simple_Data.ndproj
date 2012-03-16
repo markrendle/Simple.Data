@@ -10,6 +10,7 @@
     <Name>System</Name>
     <Name>System.ComponentModel.Composition</Name>
     <Name>Microsoft.CSharp</Name>
+    <Name>System.Configuration</Name>
   </FrameworkAssemblies>
   <Dirs>
     <Dir>C:\Windows\Microsoft.NET\Framework\v4.0.30319</Dir>

@@ -65,7 +65,7 @@ namespace Simple.Data
         {
             if (methodName == null) throw new ArgumentNullException("methodName");
             if (!methodName.Contains("By")) return methodName;
-            return methodName.Substring(methodName.IndexOf("By") + 2);
+            return methodName.Substring(methodName.IndexOf("By", StringComparison.Ordinal) + 2);
         }
 
         internal static IList<string> GetColumns(string methodName)

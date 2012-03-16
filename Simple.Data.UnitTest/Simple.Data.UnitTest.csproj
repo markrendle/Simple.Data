@@ -71,7 +71,6 @@
   <ItemGroup>
     <Compile Include="AdapterFactoryTest.cs" />
     <Compile Include="BinderHelperTest.cs" />
-    <Compile Include="BufferedEnumerableTest.cs" />
     <Compile Include="ComposerTest.cs" />
     <Compile Include="ConcreteCollectionTypeCreatorTest.cs" />
     <Compile Include="ConcreteTypeCreatorTest.cs" />
