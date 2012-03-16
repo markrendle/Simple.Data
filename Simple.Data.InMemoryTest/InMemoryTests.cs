@@ -48,6 +48,18 @@
         }
 
         [Test]
+        public void InsertAndFindWithTwoColumnsUsingNamedParametersShouldWork()
+        {
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            db.Test.Insert(Id: 1, Name: "Alice");
+            var record = db.Test.FindBy(Id: 1, Name: "Alice");
+            Assert.IsNotNull(record);
+            Assert.AreEqual(1, record.Id);
+            Assert.AreEqual("Alice", record.Name);
+        }
+
+        [Test]
         public void AllShouldReturnAllRecords()
         {
             Database.UseMockAdapter(new InMemoryAdapter());
