@@ -16,13 +16,18 @@
         public void BulkInsertUsesSchema()
         {
             var db = DatabaseHelper.Open();
-            db.test.SchemaTable.DeleteAll();
-            db.test.SchemaTable.Insert(GenerateItems());
+            List<dynamic> list;
+            Promise<int> count;
+            using (var tx = db.BeginTransaction())
+            {
+                tx.test.SchemaTable.DeleteAll();
+                tx.test.SchemaTable.Insert(GenerateItems());
 
-            var list = db.test.SchemaTable.All().ToList();
+                list = tx.test.SchemaTable.All().WithTotalCount(out count).ToList();
+                tx.Rollback();
+            }
+            Assert.AreEqual(1000, count.Value);
             Assert.AreEqual(1000, list.Count);
-
-            db.test.SchemaTable.DeleteAll();
         }
 
         private static IEnumerable<SchemaItem> GenerateItems()

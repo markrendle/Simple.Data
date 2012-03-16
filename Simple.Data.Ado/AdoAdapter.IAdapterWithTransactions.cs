@@ -35,7 +35,7 @@
                                                                    IAdapterTransaction transaction,
                                                                    Func<IDictionary<string, object>, Exception, bool> onError, bool resultRequired)
         {
-            return new AdoAdapterInserter(this, ((AdoAdapterTransaction)transaction).Transaction).InsertMany(
+            return new AdoAdapterInserter(this, ((AdoAdapterTransaction)transaction).DbTransaction).InsertMany(
                 tableName, data, onError, resultRequired);
         }
 
@@ -44,7 +44,7 @@
         {
             IBulkUpdater bulkUpdater = ProviderHelper.GetCustomProvider<IBulkUpdater>(ConnectionProvider) ??
                                        new BulkUpdater();
-            return bulkUpdater.Update(this, tableName, data.ToList(), ((AdoAdapterTransaction)transaction).Transaction);
+            return bulkUpdater.Update(this, tableName, data.ToList(), ((AdoAdapterTransaction)transaction).DbTransaction);
         }
 
         public int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data,
@@ -52,7 +52,7 @@
         {
             IBulkUpdater bulkUpdater = ProviderHelper.GetCustomProvider<IBulkUpdater>(ConnectionProvider) ??
                                        new BulkUpdater();
-            return bulkUpdater.Update(this, tableName, data.ToList(), ((AdoAdapterTransaction)transaction).Transaction);
+            return bulkUpdater.Update(this, tableName, data.ToList(), ((AdoAdapterTransaction)transaction).DbTransaction);
         }
 
         public int Update(string tableName, IDictionary<string, object> data, IAdapterTransaction adapterTransaction)
@@ -68,7 +68,7 @@
             IBulkUpdater bulkUpdater = ProviderHelper.GetCustomProvider<IBulkUpdater>(ConnectionProvider) ??
                                        new BulkUpdater();
             return bulkUpdater.Update(this, tableName, dataList, criteriaFieldNames,
-                                      ((AdoAdapterTransaction)adapterTransaction).Transaction);
+                                      ((AdoAdapterTransaction)adapterTransaction).DbTransaction);
         }
 
         public IAdapterTransaction BeginTransaction()
@@ -93,20 +93,26 @@
 
         public IDictionary<string,object> Get(string tableName, IAdapterTransaction transaction, params object[] parameterValues)
         {
-            return new AdoAdapterGetter(this, ((AdoAdapterTransaction) transaction).Transaction).Get(tableName,
+            return new AdoAdapterGetter(this, ((AdoAdapterTransaction) transaction).DbTransaction).Get(tableName,
                                                                                                      parameterValues);
         }
+
+        public IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query, IAdapterTransaction transaction, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
+        {
+            return new AdoAdapterQueryRunner(this, (AdoAdapterTransaction)transaction).RunQuery(query, out unhandledClauses);
+        }
+
         public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria,
                                                              IAdapterTransaction transaction)
         {
-            return new AdoAdapterFinder(this, ((AdoAdapterTransaction)transaction).Transaction).Find(tableName,
+            return new AdoAdapterFinder(this, ((AdoAdapterTransaction)transaction).DbTransaction).Find(tableName,
                                                                                                       criteria);
         }
 
         public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data,
                                                   IAdapterTransaction transaction, bool resultRequired)
         {
-            return new AdoAdapterInserter(this, ((AdoAdapterTransaction)transaction).Transaction).Insert(tableName,
+            return new AdoAdapterInserter(this, ((AdoAdapterTransaction)transaction).DbTransaction).Insert(tableName,
                                                                                                           data, resultRequired);
         }
 
@@ -125,19 +131,19 @@
 
         public override IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> data, SimpleExpression criteria, bool resultRequired, IAdapterTransaction adapterTransaction)
         {
-            var transaction = ((AdoAdapterTransaction) adapterTransaction).Transaction;
+            var transaction = ((AdoAdapterTransaction) adapterTransaction).DbTransaction;
             return new AdoAdapterUpserter(this, transaction).Upsert(tableName, data, criteria, resultRequired);
         }
 
         public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
         {
-            var transaction = ((AdoAdapterTransaction) adapterTransaction).Transaction;
+            var transaction = ((AdoAdapterTransaction) adapterTransaction).DbTransaction;
             return new AdoAdapterUpserter(this, transaction).UpsertMany(tableName, list, isResultRequired, errorCallback);
         }
 
         public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
         {
-            var transaction = ((AdoAdapterTransaction) adapterTransaction).Transaction;
+            var transaction = ((AdoAdapterTransaction) adapterTransaction).DbTransaction;
             return new AdoAdapterUpserter(this, transaction).UpsertMany(tableName, list, keyFieldNames.ToArray(), isResultRequired, errorCallback);
         }
     }

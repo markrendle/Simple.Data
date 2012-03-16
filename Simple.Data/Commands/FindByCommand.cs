@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace Simple.Data.Commands
 {
+    using System.Reflection;
     using Extensions;
 
     class FindByCommand : ICommand
@@ -18,6 +19,16 @@ namespace Simple.Data.Commands
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             if (dataStrategy is SimpleTransaction) return null;
+
+            if (binder.Name.Equals("FindBy") || binder.Name.Equals("find_by"))
+            {
+                if (args.Length == 0) throw new ArgumentException("FindBy requires arguments.");
+                if (args.Length == 1)
+                {
+                    if (ReferenceEquals(args[0], null)) throw new ArgumentException("FindBy does not accept unnamed null argument.");
+                    if (args[0].GetType().Namespace == null) return null;
+                }
+            }
 
             var criteriaDictionary = CreateCriteriaDictionary(binder, args);
             if (criteriaDictionary == null) return null;
@@ -46,9 +57,15 @@ namespace Simple.Data.Commands
             IDictionary<string, object> criteriaDictionary = null;
             if (binder.Name.Equals("FindBy") || binder.Name.Equals("find_by"))
             {
+                if (args.Count == 0) throw new ArgumentException("FindBy requires arguments.");
                 if (binder.CallInfo.ArgumentNames != null && binder.CallInfo.ArgumentNames.Count > 0)
                 {
                     criteriaDictionary = binder.NamedArgumentsToDictionary(args);
+                }
+                else if (args.Count == 1)
+                {
+                    if (ReferenceEquals(args[0], null)) throw new ArgumentException("FindBy does not accept unnamed null argument.");
+                    criteriaDictionary = args[0].ObjectToDictionary();
                 }
             }
             else

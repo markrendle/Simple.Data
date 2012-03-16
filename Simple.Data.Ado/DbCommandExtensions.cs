@@ -102,6 +102,16 @@
         {
             ((IDbDataParameter) command.Parameters[index]).Value = CommandHelper.FixObjectType(value);
         }
+
+        public static IEnumerable<IDictionary<string, object>> ToEnumerable(this IDbCommand command, IDbTransaction transaction)
+        {
+            return ToEnumerable(command, transaction, null);
+        }
+
+        public static IEnumerable<IDictionary<string, object>> ToEnumerable(this IDbCommand command, IDbTransaction transaction, IDictionary<string, int> index)
+        {
+            return new DataReaderEnumerable(command, transaction, index);
+        }
     }
 
     class EnumerableShim<T> : IEnumerable<T>

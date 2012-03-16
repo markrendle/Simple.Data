@@ -9,10 +9,16 @@
     internal class AdoAdapterQueryRunner
     {
         private readonly AdoAdapter _adapter;
+        private readonly AdoAdapterTransaction _transaction;
 
-        public AdoAdapterQueryRunner(AdoAdapter adapter)
+        public AdoAdapterQueryRunner(AdoAdapter adapter) : this(adapter, null)
+        {
+        }
+
+        public AdoAdapterQueryRunner(AdoAdapter adapter, AdoAdapterTransaction transaction)
         {
             _adapter = adapter;
+            _transaction = transaction;
         }
 
         public IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query,
@@ -27,11 +33,21 @@
             IDbConnection connection = _adapter.CreateConnection();
             if (_adapter.ProviderSupportsCompoundStatements || commandBuilders.Length == 1)
             {
-                result =
+                var command =
                     CommandBuilder.CreateCommand(
                         _adapter.ProviderHelper.GetCustomProvider<IDbParameterFactory>(_adapter.SchemaProvider),
                         commandBuilders,
-                        connection).ToEnumerable(_adapter.CreateConnection);
+                        connection);
+
+                if (_transaction != null)
+                {
+                    command.Transaction = _transaction.DbTransaction;
+                    result = command.ToEnumerable(_transaction.DbTransaction);
+                }
+                else
+                {
+                    result = command.ToEnumerable(_adapter.CreateConnection);
+                }
             }
             else
             {
@@ -211,11 +227,23 @@
                     commandBuilders.AddRange(GetQueryCommandBuilders(ref queries[i], i, out unhandledClausesForThisQuery));
                     unhandledClauses.Add(unhandledClausesForThisQuery);
                 }
-                IDbConnection connection = _adapter.CreateConnection();
+                IDbConnection connection;
+                if (_transaction != null)
+                {
+                    connection = _transaction.DbTransaction.Connection;
+                }
+                else
+                {
+                    connection = _adapter.CreateConnection();
+                }
                 IDbCommand command =
                     CommandBuilder.CreateCommand(
                         _adapter.ProviderHelper.GetCustomProvider<IDbParameterFactory>(_adapter.SchemaProvider),
                         commandBuilders.ToArray(), connection);
+                if (_transaction != null)
+                {
+                    command.Transaction = _transaction.DbTransaction;
+                }
                 foreach (var item in command.ToEnumerables(connection))
                 {
                     yield return item.ToList();

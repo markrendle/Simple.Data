@@ -26,7 +26,7 @@ namespace Simple.Data.Ado
             _sharedConnection = sharedConnection;
         }
 
-        internal IDbTransaction Transaction
+        internal IDbTransaction DbTransaction
         {
             get { return _dbTransaction; }
         }

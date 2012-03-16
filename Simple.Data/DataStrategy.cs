@@ -169,5 +169,6 @@ namespace Simple.Data
 
         public abstract IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, bool isResultRequired, ErrorCallback errorCallback);
         public abstract IDictionary<string,object> Get(string tableName, object[] args);
+        public abstract IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses);
     }
 }

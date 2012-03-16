@@ -122,19 +122,7 @@ namespace Simple.Data.SqlTest
             }
         }
 
-        [Test]
-        public void TestFindWithSchemaQualification()
-        {
-            var db = DatabaseHelper.Open();
-            
-            var dboActual = db.dbo.SchemaTable.FindById(1);
-            var testActual = db.test.SchemaTable.FindById(1);
-
-            Assert.IsNotNull(dboActual);
-            Assert.AreEqual("Pass", dboActual.Description);
-            Assert.IsNull(testActual);
-        }
-
+        
         [Test]
         public void TestFindWithCriteriaAndSchemaQualification()
         {
@@ -144,16 +132,6 @@ namespace Simple.Data.SqlTest
 
             Assert.IsNotNull(dboActual);
             Assert.AreEqual("Pass", dboActual.Description);
-        }
-
-        [Test]
-        public void TestFindAllByIdWithSchemaQualification()
-        {
-            var db = DatabaseHelper.Open();
-            var dboCount = db.dbo.SchemaTable.FindAllById(1).ToList().Count;
-            var testCount = db.test.SchemaTable.FindAllById(1).ToList().Count;
-            Assert.AreEqual(1, dboCount);
-            Assert.AreEqual(0, testCount);
         }
 
         [Test]

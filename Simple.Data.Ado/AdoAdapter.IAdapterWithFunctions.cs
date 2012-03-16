@@ -25,7 +25,7 @@ namespace Simple.Data.Ado
         public IEnumerable<ResultSet> Execute(string functionName, IDictionary<string, object> parameters, IAdapterTransaction transaction)
         {
             var executor = _executors.GetOrAdd(functionName, f => _connectionProvider.GetProcedureExecutor(this, _schema.BuildObjectName(f)));
-            return executor.Execute(parameters, ((AdoAdapterTransaction)transaction).Transaction);
+            return executor.Execute(parameters, ((AdoAdapterTransaction)transaction).DbTransaction);
         }
 	}
 }

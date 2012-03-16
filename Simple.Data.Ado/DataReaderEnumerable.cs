@@ -15,6 +15,7 @@ namespace Simple.Data.Ado
         private IEnumerable<IDictionary<string, object>> _cache; 
         private IDictionary<string, int> _index;
         private readonly IDbCommand _command;
+        private readonly IDbTransaction _transaction;
         private readonly Func<IDbConnection> _createConnection;
 
         public DataReaderEnumerable(IDbCommand command, Func<IDbConnection> createConnection)
@@ -29,6 +30,11 @@ namespace Simple.Data.Ado
             _index = index;
         }
 
+        public DataReaderEnumerable(IDbCommand command, IDbTransaction transaction, IDictionary<string, int> index) : this(command, () => transaction.Connection, index)
+        {
+            _transaction = transaction;
+        }
+
         public IEnumerator<IDictionary<string, object>> GetEnumerator()
         {
             if (_cache != null) return _cache.GetEnumerator();
@@ -40,6 +46,10 @@ namespace Simple.Data.Ado
             {
                 command = (IDbCommand) clonable.Clone();
                 command.Connection = _createConnection();
+                if (_transaction != null)
+                {
+                    command.Transaction = _transaction;
+                }
             }
             else
             {

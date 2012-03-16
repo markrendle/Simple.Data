@@ -265,7 +265,7 @@ namespace Simple.Data.Ado
 
         internal static int Execute(ICommandBuilder commandBuilder, IAdapterTransaction transaction)
         {
-            IDbTransaction dbTransaction = ((AdoAdapterTransaction) transaction).Transaction;
+            IDbTransaction dbTransaction = ((AdoAdapterTransaction) transaction).DbTransaction;
             return Execute(commandBuilder, dbTransaction);
         }
 

@@ -234,7 +234,7 @@
         protected IEnumerable<dynamic> Run()
         {
             IEnumerable<SimpleQueryClauseBase> unhandledClauses;
-            var result = _adapter.RunQuery(this, out unhandledClauses);
+            var result = _dataStrategy.RunQuery(this, out unhandledClauses);
 
             if (unhandledClauses != null)
             {
@@ -288,7 +288,7 @@
                     return true;
                 }
             }
-            if (binder.Name.StartsWith("with", StringComparison.OrdinalIgnoreCase))
+            if (binder.Name.StartsWith("with", StringComparison.OrdinalIgnoreCase) && !binder.Name.Equals("WithTotalCount", StringComparison.OrdinalIgnoreCase))
             {
                 result = ParseWith(binder, args);
                 return true;

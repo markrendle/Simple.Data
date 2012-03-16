@@ -87,5 +87,10 @@ namespace Simple.Data
         {
             return UpdateMany(tableName, dataList, criteriaFieldNames);
         }
+
+        public IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query, IAdapterTransaction transaction, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
+        {
+            return RunQuery(query, out unhandledClauses);
+        }
     }
 }

@@ -147,6 +147,11 @@ namespace Simple.Data
             return _adapter.Get(tableName, AdapterTransaction, args);
         }
 
+        public override IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
+        {
+            return _adapter.RunQuery(query, AdapterTransaction, out unhandledClauses);
+        }
+
         public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, bool isResultRequired, ErrorCallback errorCallback)
         {
             return _adapter.UpsertMany(tableName, list, keyFieldNames, AdapterTransaction, isResultRequired, (dict, exception) => errorCallback(new SimpleRecord(dict), exception));
