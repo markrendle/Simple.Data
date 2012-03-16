@@ -1,5 +1,6 @@
 ﻿namespace Simple.Data.Ado
 {
+    using System;
     using System.Collections.Generic;
 
     internal static class ListExtensions
@@ -8,7 +9,18 @@
         {
             if (list.Capacity > index)
             {
-                list[index] = value;
+                while (list.Count < index)
+                {
+                    list.Add(default(T));
+                }
+                if (list.Count == index)
+                {
+                    list.Add(value);
+                }
+                else
+                {
+                    list[index] = value;
+                }
             }
             else
             {

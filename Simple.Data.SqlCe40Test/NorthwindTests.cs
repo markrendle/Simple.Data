@@ -44,5 +44,20 @@ namespace Simple.Data.SqlCe40Test
 
             Assert.AreEqual(countries.Distinct().Count(), countries.Count);
         }
+
+        [Test]
+        public void NestedFindAllIssue167()
+        {
+            var db = Database.OpenFile(DatabasePath);
+
+            List<dynamic> customers = db.Customers.All().ToList();
+
+            foreach (var customer in customers)
+            {
+                customer.Orders = db.Orders.FindAllByCustomerID(customer.CustomerID).ToList();
+            }
+
+            Assert.Pass();
+        }
     }
 }
