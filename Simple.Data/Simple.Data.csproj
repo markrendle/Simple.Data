@@ -53,6 +53,7 @@
     <Compile Include="ActionDisposable.cs" />
     <Compile Include="AdapterException.cs" />
     <Compile Include="AdapterFactory.cs" />
+    <Compile Include="AdapterMethodDynamicInvoker.cs" />
     <Compile Include="AdapterWithFunctionsExtensions.cs" />
     <Compile Include="AllColumnsSpecialReference.cs" />
     <Compile Include="BinderHelper.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="CountSpecialReference.cs" />
     <Compile Include="Database.Open.cs" />
     <Compile Include="DatabaseOpenerMethods.cs" />
+    <Compile Include="DatabaseRunner.cs" />
     <Compile Include="DictionaryCloner.cs" />
     <Compile Include="ErrorCallback.cs" />
     <Compile Include="FunctionSignature.cs" />
@@ -123,6 +125,7 @@
     <Compile Include="QueryPolyfills\WhereClauseHandler.cs" />
     <Compile Include="Range.cs" />
     <Compile Include="Range1.cs" />
+    <Compile Include="RunStrategy.cs" />
     <Compile Include="SelectClause.cs" />
     <Compile Include="SimpleDataConfigurationSection.cs" />
     <Compile Include="SimpleEmptyExpression.cs" />
@@ -173,6 +176,7 @@
     <Compile Include="SkipClause.cs" />
     <Compile Include="SpecialReference.cs" />
     <Compile Include="TakeClause.cs" />
+    <Compile Include="TransactionRunner.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="UnresolvableObjectException.cs" />
     <Compile Include="Commands\UpdateByCommand.cs" />

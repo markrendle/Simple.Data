@@ -47,8 +47,8 @@ namespace Simple.Data.Commands
             if (list != null)
             {
                 ErrorCallback errorCallback = (args.Length == 2 ? args[1] as ErrorCallback : null) ??
-                 ((item, exception) => false); 
-                return dataStrategy.UpsertMany(table.GetQualifiedName(), list, isResultRequired, errorCallback);
+                 ((item, exception) => false);
+                return dataStrategy.Run.UpsertMany(table.GetQualifiedName(), list, isResultRequired, errorCallback);
             }
 
             var dict = record as IDictionary<string, object>;
@@ -56,7 +56,7 @@ namespace Simple.Data.Commands
             var key = dataStrategy.GetAdapter().GetKey(table.GetQualifiedName(), dict);
 
             var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), key);
-            return dataStrategy.Upsert(table.GetQualifiedName(), dict, criteria, isResultRequired);
+            return dataStrategy.Run.Upsert(table.GetQualifiedName(), dict, criteria, isResultRequired);
         }
 
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)

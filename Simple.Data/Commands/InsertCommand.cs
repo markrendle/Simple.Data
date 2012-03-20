@@ -53,18 +53,18 @@ namespace Simple.Data.Commands
 
         private static object InsertDictionary(InvokeMemberBinder binder, IEnumerable<object> args, DataStrategy dataStrategy, string tableName)
         {
-            return dataStrategy.Insert(tableName, binder.NamedArgumentsToDictionary(args), !binder.IsResultDiscarded());
+            return dataStrategy.Run.Insert(tableName, binder.NamedArgumentsToDictionary(args), !binder.IsResultDiscarded());
         }
 
         private static object InsertEntity(object entity, DataStrategy dataStrategy, string tableName, ErrorCallback onError, bool resultRequired)
         {
             var dictionary = entity as IDictionary<string, object>;
             if (dictionary != null)
-                return dataStrategy.Insert(tableName, dictionary, resultRequired);
+                return dataStrategy.Run.Insert(tableName, dictionary, resultRequired);
 
             var list = entity as IEnumerable<IDictionary<string, object>>;
             if (list != null)
-                return dataStrategy.InsertMany(tableName, list, onError, resultRequired);
+                return dataStrategy.Run.InsertMany(tableName, list, onError, resultRequired);
 
             var entityList = entity as IEnumerable;
             if (entityList != null)
@@ -81,13 +81,13 @@ namespace Simple.Data.Commands
                     rows.Add(dictionary);
                 }
 
-                return dataStrategy.InsertMany(tableName, rows, onError, resultRequired);
+                return dataStrategy.Run.InsertMany(tableName, rows, onError, resultRequired);
             }
 
             dictionary = entity.ObjectToDictionary();
             if (dictionary.Count == 0)
                 throw new SimpleDataException("Could not discover data in object.");
-            return dataStrategy.Insert(tableName, dictionary, resultRequired);
+            return dataStrategy.Run.Insert(tableName, dictionary, resultRequired);
         }
     }
 }

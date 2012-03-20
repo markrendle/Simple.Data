@@ -80,7 +80,7 @@ namespace Simple.Data.Commands
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(),
                                                                                      CreateCriteriaDictionary(binder,
                                                                                                               args));
-            var data = dataStrategy.FindOne(table.GetQualifiedName(), criteriaExpression);
+            var data = dataStrategy.Run.FindOne(table.GetQualifiedName(), criteriaExpression);
             return data != null ? new SimpleRecord(data, table.GetQualifiedName(), dataStrategy) : null;
         }
 

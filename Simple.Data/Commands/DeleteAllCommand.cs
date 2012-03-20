@@ -17,12 +17,12 @@ namespace Simple.Data.Commands
 
             if (args.Length == 0)
             {
-                deletedCount = dataStrategy.Delete(table.GetQualifiedName(), new SimpleEmptyExpression());
+                deletedCount = dataStrategy.Run.Delete(table.GetQualifiedName(), new SimpleEmptyExpression());
             }
 
             if (args.Length == 1 && args[0] is SimpleExpression)
             {
-                deletedCount = dataStrategy.Delete(table.GetQualifiedName(), (SimpleExpression)args[0]);
+                deletedCount = dataStrategy.Run.Delete(table.GetQualifiedName(), (SimpleExpression)args[0]);
             }
 
             return deletedCount.ResultSetFromModifiedRowCount();

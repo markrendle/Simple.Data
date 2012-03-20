@@ -27,7 +27,7 @@ namespace Simple.Data.Commands
             var data = binder.NamedArgumentsToDictionary(args)
                 .Where(kvp => !criteria.ContainsKey(kvp.Key))
                 .ToDictionary();
-            return dataStrategy.Update(table.GetQualifiedName(), data, criteriaExpression);
+            return dataStrategy.Run.Update(table.GetQualifiedName(), data, criteriaExpression);
         }
 
         public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)
@@ -44,12 +44,12 @@ namespace Simple.Data.Commands
         {
             var record = UpdateCommand.ObjectToDictionary(entity);
             var list = record as IList<IDictionary<string, object>>;
-            if (list != null) return dataStrategy.UpdateMany(tableName, list, keyFieldNames);
+            if (list != null) return dataStrategy.Run.UpdateMany(tableName, list, keyFieldNames);
 
             var dict = record as IDictionary<string, object>;
             var criteria = GetCriteria(keyFieldNames, dict);
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteria);
-            return dataStrategy.Update(tableName, dict, criteriaExpression);
+            return dataStrategy.Run.Update(tableName, dict, criteriaExpression);
         }
 
         private static IEnumerable<KeyValuePair<string, object>> GetCriteria(IEnumerable<string> keyFieldNames, IDictionary<string, object> record)

@@ -13,7 +13,7 @@ namespace Simple.Data.Ado
 
 	    public bool IsValidFunction(string functionName)
 	    {
-	        return _connectionProvider.SupportsStoredProcedures && _schema.FindProcedure(functionName) != null;
+	        return _connectionProvider.SupportsStoredProcedures && _schema.IsProcedure(functionName);
 	    }
 
 	    public IEnumerable<ResultSet> Execute(string functionName, IDictionary<string, object> parameters)

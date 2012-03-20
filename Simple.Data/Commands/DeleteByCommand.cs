@@ -16,7 +16,7 @@ namespace Simple.Data.Commands
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             SimpleExpression criteriaExpression = GetCriteriaExpression(binder, args, table);
-            return dataStrategy.Delete(table.GetQualifiedName(), criteriaExpression);
+            return dataStrategy.Run.Delete(table.GetQualifiedName(), criteriaExpression);
         }
 
         public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)

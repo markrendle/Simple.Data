@@ -171,7 +171,7 @@ end
             var tests = new Tests();
             var simpleDb = Simple.Data.Database.OpenConnection(Program.ConnectionString);
             SqlConnection connection = Program.GetOpenConnection();
-            ((AdoAdapter) simpleDb.GetAdapter()).UseSharedConnection(connection);
+            simpleDb.UseSharedConnection(connection);
             simpleDb.Posts.FindById(1);
             tests.Add(id => simpleDb.Posts.FindById(id), "Dynamic Simple.Data Query");
 

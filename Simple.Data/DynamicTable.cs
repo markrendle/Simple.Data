@@ -159,7 +159,7 @@ namespace Simple.Data
 
         private IEnumerable<dynamic> GetAll()
         {
-            return _dataStrategy.Find(_tableName, null).Select(dict => new SimpleRecord(dict, _tableName, _dataStrategy));
+            return _dataStrategy.Run.Find(_tableName, null).Select(dict => new SimpleRecord(dict, _tableName, _dataStrategy));
         }
     }
 }

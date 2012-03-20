@@ -28,7 +28,7 @@ namespace Simple.Data.Commands
                 throw new SimpleDataException("Could not resolve data.");
             }
 
-            var updatedCount = dataStrategy.Update(table.GetQualifiedName(), data, criteria);
+            var updatedCount = dataStrategy.Run.Update(table.GetQualifiedName(), data, criteria);
             
             return updatedCount.ResultSetFromModifiedRowCount();
         }

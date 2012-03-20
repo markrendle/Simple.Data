@@ -45,6 +45,19 @@ namespace Simple.Data.Ado.Schema
             return procedure;
         }
 
+        public bool IsProcedure(string procedureName)
+        {
+            if (procedureName.Contains('.'))
+            {
+                var schemaDotprocedure = procedureName.Split('.');
+                if (schemaDotprocedure.Length != 2) throw new InvalidOperationException("Could not resolve qualified procedure name.");
+                return Find(schemaDotprocedure[1], schemaDotprocedure[0]) != null;
+            }
+            return (FindprocedureWithName(procedureName.Homogenize())
+                   ?? FindprocedureWithPluralName(procedureName.Homogenize())
+                   ?? FindprocedureWithSingularName(procedureName.Homogenize())) != null;
+        }
+
         /// <summary>
         /// Finds the procedure with a name most closely matching the specified procedure name.
         /// This method will try an exact match first, then a case-insensitve search, then a pluralized or singular version.

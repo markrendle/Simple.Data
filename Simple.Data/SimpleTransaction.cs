@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
-using System.Linq;
 using System.Text;
 
 namespace Simple.Data
@@ -17,6 +15,7 @@ namespace Simple.Data
         private readonly Database _database;
 
         private readonly IAdapterWithTransactions _adapter;
+        private TransactionRunner _transactionRunner;
         private IAdapterTransaction _adapterTransaction;
 
         private SimpleTransaction(IAdapterWithTransactions adapter, Database database)
@@ -27,14 +26,24 @@ namespace Simple.Data
             _database = database;
         }
 
+        private SimpleTransaction(SimpleTransaction copy) : base(copy)
+        {
+            _adapter = copy._adapter;
+            _database = copy._database;
+            _adapterTransaction = copy._adapterTransaction;
+            _transactionRunner = copy._transactionRunner;
+        }
+
         private void Begin()
         {
             _adapterTransaction = _adapter.BeginTransaction();
+            _transactionRunner = new TransactionRunner(_adapter, _adapterTransaction);
         }
 
         private void Begin(string name)
         {
             _adapterTransaction = _adapter.BeginTransaction(name);
+            _transactionRunner = new TransactionRunner(_adapter, _adapterTransaction);
         }
 
         internal static SimpleTransaction Begin(Database database)
@@ -94,90 +103,7 @@ namespace Simple.Data
             _adapterTransaction.Rollback();
         }
 
-        internal override IDictionary<string, object> FindOne(string tableName, SimpleExpression criteria)
-        {
-            return Find(tableName, criteria).FirstOrDefault();
-        }
-
-        internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList)
-        {
-            return _adapter.UpdateMany(tableName, dataList, AdapterTransaction);
-        }
-
-        internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IEnumerable<string> criteriaFieldNames)
-        {
-            return _adapter.UpdateMany(tableName, dataList, criteriaFieldNames, AdapterTransaction);
-        }
-
-        internal override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
-        {
-            return _adapter.Find(tableName, criteria, AdapterTransaction);
-        }
-
-        internal override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, bool resultRequired)
-        {
-            return _adapter.Insert(tableName, data, AdapterTransaction, resultRequired);
-        }
-
-        /// <summary>
-        ///  Inserts a record into the specified "table".
-        ///  </summary><param name="tableName">Name of the table.</param><param name="data">The values to insert.</param><returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
-        internal override IEnumerable<IDictionary<string, object>> InsertMany(string tableName, IEnumerable<IDictionary<string, object>> data, ErrorCallback onError, bool resultRequired)
-        {
-            return _adapter.InsertMany(tableName, data, AdapterTransaction, (dict, exception) => onError(new SimpleRecord(dict), exception), resultRequired);
-        }
-
-        internal override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
-        {
-            return _adapter.Update(tableName, data, criteria, AdapterTransaction);
-        }
-
-        public override IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired)
-        {
-            return _adapter.Upsert(tableName, dict, criteriaExpression, isResultRequired, AdapterTransaction);
-        }
-
-        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, bool isResultRequired, ErrorCallback errorCallback)
-        {
-            return _adapter.UpsertMany(tableName, list, AdapterTransaction, isResultRequired, (dict, exception) => errorCallback(new SimpleRecord(dict), exception));
-        }
-
-        public override IDictionary<string, object> Get(string tableName, object[] args)
-        {
-            return _adapter.Get(tableName, AdapterTransaction, args);
-        }
-
-        public override IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
-        {
-            return _adapter.RunQuery(query, AdapterTransaction, out unhandledClauses);
-        }
-
-        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, bool isResultRequired, ErrorCallback errorCallback)
-        {
-            return _adapter.UpsertMany(tableName, list, keyFieldNames, AdapterTransaction, isResultRequired, (dict, exception) => errorCallback(new SimpleRecord(dict), exception));
-        }
-
-        internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> newValuesList, IList<IDictionary<string, object>> originalValuesList)
-        {
-            int count = 0;
-            for (int i = 0; i < newValuesList.Count; i++)
-            {
-                count += Update(tableName, newValuesList[i], originalValuesList[i]);
-            }
-            return count;
-        }
-
-        public override int Update(string tableName, IDictionary<string, object> newValuesDict, IDictionary<string, object> originalValuesDict)
-        {
-            SimpleExpression criteria = CreateCriteriaFromOriginalValues(tableName, newValuesDict, originalValuesDict);
-            var changedValuesDict = CreateChangedValuesDict(newValuesDict, originalValuesDict);
-            return _adapter.Update(tableName, changedValuesDict, criteria, AdapterTransaction);
-        }
-
-        internal override int Delete(string tableName, SimpleExpression criteria)
-        {
-            return _adapter.Delete(tableName, criteria, AdapterTransaction);
-        }
+        
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -207,6 +133,16 @@ namespace Simple.Data
         protected internal override Database GetDatabase()
         {
             return _database;
+        }
+
+        internal override RunStrategy Run
+        {
+            get { return _transactionRunner; }
+        }
+
+        protected internal override DataStrategy Clone()
+        {
+            return new SimpleTransaction(this);
         }
     }
 }

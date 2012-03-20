@@ -42,27 +42,27 @@ namespace Simple.Data.Commands
             {
                 var originalValuesList = ObjectToDictionary(args[1]) as IList<IDictionary<string, object>>;
                 if (originalValuesList == null) throw new InvalidOperationException("Parameter type mismatch; both parameters to Update should be same type.");
-                return dataStrategy.UpdateMany(table.GetQualifiedName(), newValuesList, originalValuesList);
+                return dataStrategy.Run.UpdateMany(table.GetQualifiedName(), newValuesList, originalValuesList);
             }
 
             var newValuesDict = newValues as IDictionary<string, object>;
             var originalValuesDict = ObjectToDictionary(args[1]) as IDictionary<string, object>;
             if (originalValuesDict == null) throw new InvalidOperationException("Parameter type mismatch; both parameters to Update should be same type.");
-            return dataStrategy.Update(table.GetQualifiedName(), newValuesDict, originalValuesDict);
+            return dataStrategy.Run.Update(table.GetQualifiedName(), newValuesDict, originalValuesDict);
         }
 
         private static object UpdateUsingKeys(DataStrategy dataStrategy, DynamicTable table, object[] args)
         {
             var record = ObjectToDictionary(args[0]);
             var list = record as IList<IDictionary<string, object>>;
-            if (list != null) return dataStrategy.UpdateMany(table.GetQualifiedName(), list);
+            if (list != null) return dataStrategy.Run.UpdateMany(table.GetQualifiedName(), list);
 
             var dict = record as IDictionary<string, object>;
             if (dict == null) throw new InvalidOperationException("Could not resolve data from passed object.");
             var key = dataStrategy.GetAdapter().GetKey(table.GetQualifiedName(), dict);
             dict = dict.Where(kvp => key.All(keyKvp => keyKvp.Key.Homogenize() != kvp.Key.Homogenize())).ToDictionary();
             var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), key);
-            return dataStrategy.Update(table.GetQualifiedName(), dict, criteria);
+            return dataStrategy.Run.Update(table.GetQualifiedName(), dict, criteria);
         }
 
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)

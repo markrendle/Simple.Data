@@ -129,6 +129,11 @@ namespace Simple.Data.Ado.Schema
             if (fromTable.GetDetail(toTableName) != null) return RelationType.OneToMany;
             return RelationType.None;
         }
+
+        public bool IsProcedure(string procedureName)
+        {
+            return _lazyProcedures.Value.IsProcedure(procedureName);
+        }
     }
 
     public enum RelationType

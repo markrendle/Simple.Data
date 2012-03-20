@@ -17,7 +17,7 @@ namespace Simple.Data.Commands
 
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            var result = dataStrategy.Get(table.GetName(), args);
+            var result = dataStrategy.Run.Get(table.GetName(), args);
             if (result == null || result.Count == 0) return null;
             return binder.Name.Equals("get", StringComparison.OrdinalIgnoreCase)
                        ? new SimpleRecord(result, table.GetQualifiedName(), dataStrategy)

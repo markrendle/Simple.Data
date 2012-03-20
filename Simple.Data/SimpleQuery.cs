@@ -234,7 +234,7 @@
         protected IEnumerable<dynamic> Run()
         {
             IEnumerable<SimpleQueryClauseBase> unhandledClauses;
-            var result = _dataStrategy.RunQuery(this, out unhandledClauses);
+            var result = _dataStrategy.Run.RunQuery(this, out unhandledClauses);
 
             if (unhandledClauses != null)
             {

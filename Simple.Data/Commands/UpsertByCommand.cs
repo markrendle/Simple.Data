@@ -30,7 +30,7 @@ namespace Simple.Data.Commands
                 var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(),
                                                                                          criteria);
                 var data = binder.NamedArgumentsToDictionary(args);
-                result = dataStrategy.Upsert(table.GetQualifiedName(), data, criteriaExpression, !binder.IsResultDiscarded());
+                result = dataStrategy.Run.Upsert(table.GetQualifiedName(), data, criteriaExpression, !binder.IsResultDiscarded());
             }
 
             return ResultHelper.TypeResult(result, table, dataStrategy);
@@ -50,12 +50,12 @@ namespace Simple.Data.Commands
         {
             var record = UpdateCommand.ObjectToDictionary(entity);
             var list = record as IList<IDictionary<string, object>>;
-            if (list != null) return dataStrategy.UpsertMany(tableName, list, keyFieldNames, isResultRequired, errorCallback);
+            if (list != null) return dataStrategy.Run.UpsertMany(tableName, list, keyFieldNames, isResultRequired, errorCallback);
 
             var dict = record as IDictionary<string, object>;
             var criteria = GetCriteria(keyFieldNames, dict);
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteria);
-            return dataStrategy.Upsert(tableName, dict, criteriaExpression, isResultRequired);
+            return dataStrategy.Run.Upsert(tableName, dict, criteriaExpression, isResultRequired);
         }
 
         private static IEnumerable<KeyValuePair<string, object>> GetCriteria(IEnumerable<string> keyFieldNames, IDictionary<string, object> record)
