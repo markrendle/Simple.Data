@@ -11,6 +11,7 @@ namespace Simple.Data.IntegrationTest
     {
         protected override void SetSchema(MockSchemaProvider schemaProvider)
         {
+// ReSharper disable CoVariantArrayConversion
             schemaProvider.SetTables(new object[] { "dbo", "Users", "BASE TABLE" },
                                      new object[] { "dbo", "UserHistory", "BASE TABLE"},
                                      new object[] { "dbo", "AnnoyingMaster", "BASE TABLE"},
@@ -48,6 +49,7 @@ namespace Simple.Data.IntegrationTest
                 new object[] { "FK_AnnoyingDetail_AnnoyingMaster", "dbo", "AnnoyingDetail", "MasterId1", "dbo", "AnnoyingMaster", "Id1", 0 },
                 new object[] { "FK_AnnoyingDetail_AnnoyingMaster", "dbo", "AnnoyingDetail", "MasterId2", "dbo", "AnnoyingMaster", "Id2", 1 }
                 );
+// ReSharper restore CoVariantArrayConversion
         }
 
         [Test]
@@ -58,6 +60,14 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is("Steve");
             Parameter(1).Is(50);
             Parameter(2).Is(1);
+        }
+
+        [Test]
+        public void TestUpdateWithNamedArgumentsUsingExpression()
+        {
+            _db.Users.UpdateAll(Age: _db.Users.Age + 1);
+            GeneratedSqlIs("update [dbo].[Users] set [Age] = [dbo].[Users].[Age] + @p1");
+            Parameter(0).Is(1);
         }
 
         [Test]
@@ -187,7 +197,7 @@ namespace Simple.Data.IntegrationTest
                                Name = "Steve",
                                Age = 50
                            };
-            var originalUser = new User() {Id = 2, Name = "Steve", Age = 50};
+            var originalUser = new User {Id = 2, Name = "Steve", Age = 50};
             _db.Users.Update(newUser, originalUser);
             GeneratedSqlIs(
                 "update [dbo].[Users] set [Id] = @p1 where [dbo].[Users].[Id] = @p2");
@@ -204,7 +214,7 @@ namespace Simple.Data.IntegrationTest
                 Name = "Steve",
                 Age = 50
             };
-            var originalUser = new User() { Id = 2, Name = "Steve", Age = 50 };
+            var originalUser = new User { Id = 2, Name = "Steve", Age = 50 };
             _db.Users.Update(new[] {newUser}, new[] {originalUser});
             GeneratedSqlIs(
                 "update [dbo].[Users] set [Id] = @p1 where [dbo].[Users].[Id] = @p2");
@@ -255,7 +265,7 @@ namespace Simple.Data.IntegrationTest
             var users = new[]
                             {
                                 new User { Id = 2, Name = "Bob", Age = 42 },
-                                new User { Id = 1, Name = "Steve", Age = 50 },
+                                new User { Id = 1, Name = "Steve", Age = 50 }
                             };
             _db.Users.Update(users);
             GeneratedSqlIs(
@@ -272,7 +282,7 @@ namespace Simple.Data.IntegrationTest
             var users = new[]
                             {
                                 new User { Id = 2, Name = "Bob", Age = 42 },
-                                new User { Id = 1, Name = "Steve", Age = 50 },
+                                new User { Id = 1, Name = "Steve", Age = 50 }
                             };
             _db.Users.UpdateById(users);
             GeneratedSqlIs(

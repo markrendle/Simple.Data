@@ -101,7 +101,20 @@ namespace Simple.Data.Ado
         private string CreateColumnUpdateClause(string columnName, object value, Table table)
         {
             var column = table.FindColumn(columnName);
-            return string.Format("{0} = {1}", column.QuotedName, _commandBuilder.AddParameter(value, column).Name);
+            var mathReference = value as SimpleReference;
+            string rightOperand;
+            if (ReferenceEquals(mathReference, null))
+            {
+                rightOperand = _commandBuilder.AddParameter(value, column).Name;
+            }
+            else
+            {
+                rightOperand =
+                    new SimpleReferenceFormatter(_schema, _commandBuilder).FormatColumnClauseWithoutAlias(mathReference);
+            }
+
+
+            return string.Format("{0} = {1}", column.QuotedName, rightOperand);
         }
     }
 }

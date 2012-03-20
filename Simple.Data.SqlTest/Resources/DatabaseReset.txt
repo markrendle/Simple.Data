@@ -48,6 +48,8 @@ BEGIN
 	DROP TABLE [dbo].[Orders];
 	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Items]') AND type in (N'U'))
 	DROP TABLE [dbo].[Items];
+	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Notes]') AND type in (N'U'))
+	DROP TABLE [dbo].[Notes];
 	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Customers]') AND type in (N'U'))
 	DROP TABLE [dbo].[Customers];
 	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[PagingTest]') AND type in (N'U'))
@@ -141,6 +143,12 @@ BEGIN
 
 	ALTER TABLE [dbo].[Customers]
 		ADD CONSTRAINT [PK_Customers] PRIMARY KEY CLUSTERED ([CustomerId] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
+
+	CREATE TABLE [dbo].[Notes](
+		[NoteId] [int] IDENTITY(1,1) NOT NULL,
+		[CustomerId] [int] NOT NULL,
+		[Text] [nvarchar](50) NOT NULL,
+	CONSTRAINT [PK_Notes] PRIMARY KEY CLUSTERED ( [NoteId] ASC) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]) ON [PRIMARY]
 	    
 	CREATE TABLE [dbo].[PagingTest] ([Id] int not null, [Dummy] int);
 
@@ -203,6 +211,8 @@ BEGIN
 	SET IDENTITY_INSERT [dbo].[Customers] ON
 	INSERT INTO [dbo].[Customers] ([CustomerId], [Name], [Address]) VALUES (1, N'Test', N'100 Road')
 	SET IDENTITY_INSERT [dbo].[Customers] OFF
+	INSERT INTO [dbo].[Notes] ([CustomerId], [Text]) VALUES (1, 'Note 1');
+	INSERT INTO [dbo].[Notes] ([CustomerId], [Text]) VALUES (1, 'Note 2');
 	SET IDENTITY_INSERT [dbo].[Orders] ON
 	INSERT INTO [dbo].[Orders] ([OrderId], [OrderDate], [CustomerId]) VALUES (1, '20101010 00:00:00.000', 1)
 	SET IDENTITY_INSERT [dbo].[Orders] OFF
@@ -238,6 +248,9 @@ BEGIN
 	
 	INSERT INTO [dbo].[DecimalTest] ([Value]) VALUES (1.234567)
 	COMMIT TRANSACTION
+
+	ALTER TABLE [dbo].[Notes] WITH NOCHECK
+		ADD CONSTRAINT [FK_Notes_Customers] FOREIGN KEY ([CustomerId]) REFERENCES [dbo].[Customers] ([CustomerId]) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 	ALTER TABLE [dbo].[Orders] WITH NOCHECK
 		ADD CONSTRAINT [FK_Orders_Customers] FOREIGN KEY ([CustomerId]) REFERENCES [dbo].[Customers] ([CustomerId]) ON DELETE NO ACTION ON UPDATE NO ACTION;

@@ -1,6 +1,5 @@
 namespace Simple.Data.IntegrationTest.Query
 {
-    using System;
     using Mocking.Ado;
     using NUnit.Framework;
 
@@ -9,9 +8,13 @@ namespace Simple.Data.IntegrationTest.Query
     {
         protected override void SetSchema(MockSchemaProvider schemaProvider)
         {
+// ReSharper disable CoVariantArrayConversion
             schemaProvider.SetTables(new[] { "dbo", "Employee", "BASE TABLE" },
                                      new[] { "dbo", "Department", "BASE TABLE" },
                                      new[] { "dbo", "Activity", "BASE TABLE" },
+                                     new[] { "dbo", "Customer", "BASE TABLE" },
+                                     new[] { "dbo", "Order", "BASE TABLE" },
+                                     new[] { "dbo", "Note", "BASE TABLE" },
                                      new[] { "dbo", "Activity_Join", "BASE TABLE" },
                                      new[] { "dbo", "Location", "BASE_TABLE" });
 
@@ -21,6 +24,14 @@ namespace Simple.Data.IntegrationTest.Query
                                       new[] { "dbo", "Employee", "DepartmentId" },
                                       new[] { "dbo", "Department", "Id" },
                                       new[] { "dbo", "Department", "Name" },
+                                      new[] { "dbo", "Customer", "Id" },
+                                      new[] { "dbo", "Customer", "Name" },
+                                      new[] { "dbo", "Order", "Id" },
+                                      new[] { "dbo", "Order", "CustomerId" },
+                                      new[] { "dbo", "Order", "Description" },
+                                      new[] { "dbo", "Note", "Id" },
+                                      new[] { "dbo", "Note", "CustomerId" },
+                                      new[] { "dbo", "Note", "Text" },
                                       new[] { "dbo", "Activity", "ID" },
                                       new[] { "dbo", "Activity", "Description" },
                                       new[] { "dbo", "Activity_Join", "ID_Activity" },
@@ -30,13 +41,20 @@ namespace Simple.Data.IntegrationTest.Query
                                       );
 
             schemaProvider.SetPrimaryKeys(new object[] {"dbo", "Employee", "Id", 0},
-                                          new object[] {"dbo", "Department", "Id", 0});
+                                          new object[] {"dbo", "Department", "Id", 0},
+                                          new object[] {"dbo", "Customer", "Id", 0},
+                                          new object[] {"dbo", "Order", "Id", 0},
+                                          new object[] {"dbo", "Note", "Id", 0}
+                                          );
 
             schemaProvider.SetForeignKeys(
                 new object[] { "FK_Employee_Department", "dbo", "Employee", "DepartmentId", "dbo", "Department", "Id", 0 },
                 new object[] { "FK_Activity_Join_Activity", "dbo", "Activity_Join", "ID_Activity", "dbo", "Activity", "ID", 0 },
-                new object[] { "FK_Activity_Join_Location", "dbo", "Activity_Join", "ID_Location", "dbo", "Location", "ID", 0 }
+                new object[] { "FK_Activity_Join_Location", "dbo", "Activity_Join", "ID_Location", "dbo", "Location", "ID", 0 },
+                new object[] { "FK_Order_Customer", "dbo", "Order", "CustomerId", "dbo", "Customer", "Id", 0 },
+                new object[] { "FK_Note_Customer", "dbo", "Note", "CustomerId", "dbo", "Customer", "Id", 0 }
                 );
+// ReSharper restore CoVariantArrayConversion
         }
 
         [Test]
@@ -190,6 +208,25 @@ namespace Simple.Data.IntegrationTest.Query
                 .With(manager)
                 .WithDepartment();
 
+            EatException(() => q.ToList());
+
+            GeneratedSqlIs(expectedSql);
+        }
+
+        /// <summary>
+        /// Test for multiple child tables...
+        /// </summary>
+        [Test]
+        public void CustomerWithOrdersAndNotes()
+        {
+            const string expectedSql = "select [dbo].[customer].[id],[dbo].[customer].[name]," +
+                                       "[dbo].[order].[id] as [__withn__orders__id],[dbo].[order].[customerid] as [__withn__orders__customerid],[dbo].[order].[description] as [__withn__orders__description]," +
+                                       "[dbo].[note].[id] as [__withn__notes__id],[dbo].[note].[customerid] as [__withn__notes__customerid],[dbo].[note].[text] as [__withn__notes__text]" +
+                                       " from [dbo].[customer]" +
+                                       " left join [dbo].[order] on ([dbo].[customer].[id] = [dbo].[order].[customerid])" +
+                                       " left join [dbo].[note] on ([dbo].[customer].[id] = [dbo].[note].[customerid])";
+
+            var q = _db.Customers.All().WithOrders().WithNotes();
             EatException(() => q.ToList());
 
             GeneratedSqlIs(expectedSql);

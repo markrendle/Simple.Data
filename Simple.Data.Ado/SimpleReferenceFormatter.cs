@@ -42,7 +42,9 @@ namespace Simple.Data.Ado
             throw new InvalidOperationException("SimpleReference type not supported.");
         }
 
+// ReSharper disable UnusedParameter.Local
         private string TryFormatAsAllColumnsReference(AllColumnsSpecialReference allColumnsSpecialReference, bool excludeAlias)
+// ReSharper restore UnusedParameter.Local
         {
             if (ReferenceEquals(allColumnsSpecialReference, null)) return null;
             var table = _schema.FindTable(allColumnsSpecialReference.Table.GetAllObjectNamesDotted());
@@ -55,7 +57,7 @@ namespace Simple.Data.Ado
         private string FormatObject(object obj)
         {
             var reference = obj as SimpleReference;
-            return reference != null ? FormatColumnClause(reference) : obj.ToString();
+            return reference != null ? FormatColumnClause(reference) : _commandBuilder.AddParameter(obj).Name;
         }
 
         private string TryFormatAsMathReference(MathReference mathReference, bool excludeAlias)
@@ -133,10 +135,12 @@ namespace Simple.Data.Ado
                                 : _schema.QuoteObjectName(objectReference.GetOwner().GetAlias());
             var column = table.FindColumn(objectReference.GetName());
             if (excludeAlias || objectReference.GetAlias() == null)
+            {
                 return string.Format("{0}.{1}", tableName, column.QuotedName);
-            else
-                return string.Format("{0}.{1} AS {2}", tableName, column.QuotedName,
-                                     _schema.QuoteObjectName(objectReference.GetAlias()));
+            }
+
+            return string.Format("{0}.{1} AS {2}", tableName, column.QuotedName,
+                                 _schema.QuoteObjectName(objectReference.GetAlias()));
         }
 
     }

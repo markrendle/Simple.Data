@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using NUnit.Framework;
 
 namespace Simple.Data.SqlTest
@@ -179,7 +178,9 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+// ReSharper disable InconsistentNaming
         public void WithTotalCountShouldGiveCount_ObsoleteFutureVersion()
+// ReSharper restore InconsistentNaming
         {
             Future<int> count;
             var db = DatabaseHelper.Open();
@@ -295,17 +296,33 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(0, max);
         }
 
-        
+
         [Test]
         public void WithClauseShouldPreselectDetailTableAsCollection()
         {
             var db = DatabaseHelper.Open();
-            var result = db.Customers.FindAllByCustomerId(1).WithOrders().FirstOrDefault() as IDictionary<string,object>;
+            var result = db.Customers.FindAllByCustomerId(1).WithOrders().FirstOrDefault() as IDictionary<string, object>;
             Assert.IsNotNull(result);
             Assert.Contains("Orders", (ICollection)result.Keys);
             var orders = result["Orders"] as IList<IDictionary<string, object>>;
             Assert.IsNotNull(orders);
             Assert.AreEqual(1, orders.Count);
+        }
+
+        [Test]
+        public void WithClauseShouldPreselectDetailTablesAsCollections()
+        {
+            var db = DatabaseHelper.Open();
+            var result = db.Customers.FindAllByCustomerId(1).WithOrders().WithNotes().FirstOrDefault() as IDictionary<string, object>;
+            Assert.IsNotNull(result);
+            Assert.Contains("Orders", (ICollection)result.Keys);
+            var orders = result["Orders"] as IList<IDictionary<string, object>>;
+            Assert.IsNotNull(orders);
+            Assert.AreEqual(1, orders.Count);
+            Assert.Contains("Notes", (ICollection)result.Keys);
+            var notes = result["Notes"] as IList<IDictionary<string, object>>;
+            Assert.IsNotNull(notes);
+            Assert.AreEqual(2, notes.Count);
         }
 
         [Test]
