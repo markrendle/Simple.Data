@@ -70,6 +70,8 @@ BEGIN
 	DROP TABLE [dbo].[GeometryTest]
 	IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[HierarchyIdTest]') AND type in (N'U'))
 	DROP TABLE [dbo].[HierarchyIdTest]
+	IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[TimestampTest]') AND type in (N'U'))
+	DROP TABLE [dbo].[TimestampTest]
 
 	CREATE TABLE [dbo].[Users] (
 		[Id]       INT            IDENTITY (1, 1) NOT NULL,
@@ -203,6 +205,15 @@ BEGIN
 	[Description] [nvarchar](50) NOT NULL,
 	[Place] [geography] NULL,
 	CONSTRAINT [PK_HierarchyIdTest] PRIMARY KEY CLUSTERED 
+	(
+		[Id] ASC
+	))
+
+	CREATE TABLE [dbo].[TimestampTest](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Description] [nvarchar](50),
+	[Version] [timestamp],
+	CONSTRAINT [PK_TimestampTest] PRIMARY KEY CLUSTERED 
 	(
 		[Id] ASC
 	))

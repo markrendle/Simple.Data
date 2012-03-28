@@ -1,6 +1,7 @@
 namespace Simple.Data
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
@@ -42,6 +43,11 @@ namespace Simple.Data
                 return Expression.IfThen(_containsKey, CreateTrySimpleAssign());
             }
 
+            if (_property.PropertyType.IsArray)
+            {
+                return Expression.IfThen(_containsKey, CreateTrySimpleArrayAssign());
+            }
+
             if (_property.PropertyType.IsGenericCollection())
             {
                 var collectionCreator = BuildCollectionCreator();
@@ -62,6 +68,29 @@ namespace Simple.Data
             return ifThen;
         }
 
+        private Expression BuildArrayCreator()
+        {
+            if (!_property.CanWrite) return null;
+
+            var genericType = _property.PropertyType.GetGenericArguments().Single();
+            var creatorInstance = ConcreteTypeCreator.Get(genericType);
+            var collection = Expression.Variable(_property.PropertyType);
+
+            var createCollection = MakeCreateNewCollection(collection, genericType);
+
+            if (createCollection == null) return null;
+
+            var addMethod = _property.PropertyType.GetMethod("Add");
+
+            if (addMethod == null) return null;
+
+            BlockExpression block;
+            var isDictionaryCollection = BuildCollectionPopulator(collection, genericType, addMethod, createCollection,
+                                                                 creatorInstance, out block);
+
+            return Expression.IfThen(isDictionaryCollection, block);
+        }
+
         private Expression BuildCollectionCreator()
         {
             var genericType = _property.PropertyType.GetGenericArguments().Single();
@@ -70,71 +99,96 @@ namespace Simple.Data
             BinaryExpression createCollection = null;
             if (_property.CanWrite)
             {
-                if (_property.PropertyType.IsInterface)
-                {
-                    createCollection = Expression.Assign(collection,
-                                                         Expression.Call(
-                                                             typeof (PropertySetterBuilder).GetMethod("CreateList",
-                                                                                                      BindingFlags.
-                                                                                                          NonPublic |
-                                                                                                      BindingFlags.
-                                                                                                          Static).
-                                                                 MakeGenericMethod(genericType)));
-                }
-                else
-                {
-                    var defaultConstructor = _property.PropertyType.GetConstructor(Type.EmptyTypes);
-                    if (defaultConstructor != null)
-                    {
-                        createCollection = Expression.Assign(collection, Expression.New(defaultConstructor));
-                    }
-                }
+                createCollection = MakeCreateNewCollection(collection, genericType);
             }
             else
             {
                 createCollection = Expression.Assign(collection, _nameProperty);
             }
+
             var addMethod = _property.PropertyType.GetMethod("Add");
 
             if (createCollection != null && addMethod != null)
             {
-                var creator = Expression.Constant(creatorInstance);
-                var array = Expression.Variable(typeof(IDictionary<string, object>[]));
-                var i = Expression.Variable(typeof(int));
-                var current = Expression.Variable(typeof(IDictionary<string, object>));
-
-
-                var isDictionaryCollection = Expression.TypeIs(_itemProperty,
-                                                               typeof(IEnumerable<IDictionary<string, object>>));
-
-                var toArray = Expression.Assign(array, Expression.Call(ToArrayMethod, Expression.Convert(_itemProperty, typeof(IEnumerable<IDictionary<string, object>>))));
-                var start = Expression.Assign(i, Expression.Constant(0));
-                var label = Expression.Label();
-                var loop = Expression.Loop(
-                    Expression.IfThenElse(
-                        Expression.LessThan(i, Expression.Property(array, ArrayLengthProperty)),
-                        Expression.Block(
-                            Expression.Assign(current, Expression.ArrayIndex(array, i)),
-                            Expression.Call(collection, addMethod,
-                                            Expression.Convert(Expression.Call(creator, CreatorCreateMethod, current), genericType)),
-                            Expression.PreIncrementAssign(i)
-                            ),
-                        Expression.Break(label)
-                        ),
-                    label
-                    );
-
-                var block = Expression.Block(
-                    new[] { array, i, collection, current },
-                    createCollection,
-                    toArray,
-                    start,
-                    loop,
-                    _property.CanWrite ? (Expression)Expression.Assign(_nameProperty, collection) : Expression.Empty());
+                BlockExpression block;
+                var isDictionaryCollection = BuildCollectionPopulator(collection, genericType, addMethod, createCollection, creatorInstance, out block);
 
                 return Expression.IfThen(isDictionaryCollection, block);
             }
             return null;
+        }
+
+        private TypeBinaryExpression BuildCollectionPopulator(ParameterExpression collection, Type genericType,
+                                                             MethodInfo addMethod, BinaryExpression createCollection,
+                                                             ConcreteTypeCreator creatorInstance, out BlockExpression block)
+        {
+            var creator = Expression.Constant(creatorInstance);
+            var array = Expression.Variable(typeof (IDictionary<string, object>[]));
+            var i = Expression.Variable(typeof (int));
+            var current = Expression.Variable(typeof (IDictionary<string, object>));
+
+            var isDictionaryCollection = Expression.TypeIs(_itemProperty,
+                                                           typeof (IEnumerable<IDictionary<string, object>>));
+
+            var toArray = Expression.Assign(array,
+                                            Expression.Call(ToArrayMethod,
+                                                            Expression.Convert(_itemProperty,
+                                                                               typeof (IEnumerable<IDictionary<string, object>>))));
+            var start = Expression.Assign(i, Expression.Constant(0));
+            var label = Expression.Label();
+            var loop = Expression.Loop(
+                Expression.IfThenElse(
+                    Expression.LessThan(i, Expression.Property(array, ArrayLengthProperty)),
+                    Expression.Block(
+                        Expression.Assign(current, Expression.ArrayIndex(array, i)),
+                        Expression.Call(collection, addMethod,
+                                        Expression.Convert(Expression.Call(creator, CreatorCreateMethod, current), genericType)),
+                        Expression.PreIncrementAssign(i)
+                        ),
+                    Expression.Break(label)
+                    ),
+                label
+                );
+
+            block = Expression.Block(
+                new[] {array, i, collection, current},
+                createCollection,
+                toArray,
+                start,
+                loop,
+                _property.CanWrite ? (Expression) Expression.Assign(_nameProperty, collection) : Expression.Empty());
+
+            return isDictionaryCollection;
+        }
+
+        private BinaryExpression MakeCreateNewCollection(ParameterExpression collection, Type genericType)
+        {
+            BinaryExpression createCollection;
+
+            if (_property.PropertyType.IsInterface)
+            {
+                createCollection = Expression.Assign(collection,
+                                                     Expression.Call(
+                                                         typeof (PropertySetterBuilder).GetMethod("CreateList",
+                                                                                                  BindingFlags.
+                                                                                                      NonPublic |
+                                                                                                  BindingFlags.
+                                                                                                      Static).
+                                                             MakeGenericMethod(genericType)));
+            }
+            else
+            {
+                var defaultConstructor = _property.PropertyType.GetConstructor(Type.EmptyTypes);
+                if (defaultConstructor != null)
+                {
+                    createCollection = Expression.Assign(collection, Expression.New(defaultConstructor));
+                }
+                else
+                {
+                    createCollection = null;
+                }
+            }
+            return createCollection;
         }
 
         private bool PropertyIsPrimitive()
@@ -163,8 +217,10 @@ namespace Simple.Data
         {
             var creator = Expression.Constant(ConcreteTypeCreator.Get(_property.PropertyType));
             var methodCallExpression = Expression.Call(creator, CreatorCreateMethod,
+// ReSharper disable PossiblyMistakenUseOfParamsMethod
                                                        Expression.Convert(_itemProperty,
                                                                           typeof(IDictionary<string, object>)));
+// ReSharper restore PossiblyMistakenUseOfParamsMethod
 
             var complexAssign = Expression.Assign(_nameProperty,
                                                   Expression.Convert(
@@ -210,14 +266,51 @@ namespace Simple.Data
                 CreateCatchBlock());
         }
 
+        private TryExpression CreateTrySimpleArrayAssign()
+        {
+            var createArrayMethod = typeof (PropertySetterBuilder).GetMethod("CreateArray", BindingFlags.Static | BindingFlags.NonPublic)
+                .MakeGenericMethod(_property.PropertyType.GetElementType());
+
+            var callConvert = Expression.Call(createArrayMethod, _itemProperty);
+
+            var assign = Expression.Assign(_nameProperty, Expression.Convert(callConvert, _property.PropertyType));
+            return Expression.TryCatch( // try {
+                Expression.IfThenElse(Expression.TypeIs(_itemProperty, typeof (string)),
+                                      Expression.Assign(_nameProperty,
+                                                        Expression.Convert(Expression.Call(typeof (Enum).GetMethod("Parse", new[] {typeof(Type), typeof(string), typeof(bool)}),
+                                                                                           Expression.Constant(_property.PropertyType),
+                                                                                           Expression.Call(_itemProperty, typeof(object).GetMethod("ToString")), Expression.Constant(true)), _property.PropertyType)),
+                                      assign), Expression.Catch(typeof(Exception), Expression.Empty()));
+        }
+
+// ReSharper disable UnusedMember.Local
+// Because they're used from runtime-generated code, you see.
         private static object SafeConvert(object source, Type targetType)
         {
-            return ReferenceEquals(source, null) ? null : Convert.ChangeType(source, targetType);
+            if (ReferenceEquals(source, null)) return null;
+            if (targetType.IsInstanceOfType(source)) return source;
+            return Convert.ChangeType(source, targetType);
+        }
+
+        private static T[] CreateArray<T>(object source)
+        {
+            if (ReferenceEquals(source, null)) return null;
+            var enumerable = source as IEnumerable;
+            if (ReferenceEquals(enumerable, null)) return null;
+            try
+            {
+                return enumerable.Cast<T>().ToArray();
+            }
+            catch (InvalidCastException)
+            {
+                return null;
+            }
         }
 
         private static List<T> CreateList<T>()
         {
             return new List<T>();
         }
+// ReSharper restore UnusedMember.Local
     }
 }

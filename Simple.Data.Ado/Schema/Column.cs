@@ -69,6 +69,11 @@ namespace Simple.Data.Ado.Schema
             get { return _isIdentity; }
         }
 
+        public virtual bool IsWriteable
+        {
+            get { return !IsIdentity; }
+        }
+
         public virtual bool IsBinary
         {
             get { return _dbType == DbType.Binary; }

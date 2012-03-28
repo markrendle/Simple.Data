@@ -262,5 +262,14 @@ namespace Simple.Data.SqlTest
             blob = db.Blobs.FindById(1);
             Assert.IsTrue(image.SequenceEqual(blob.Data));
         }
+
+        [Test]
+        public void TestInsertWithTimestampColumn()
+        {
+            var db = DatabaseHelper.Open();
+            var row = db.TimestampTest.Insert(Description: "Foo");
+            Assert.IsNotNull(row);
+            Assert.IsInstanceOf<byte[]>(row.Version);
+        }
     }
 }

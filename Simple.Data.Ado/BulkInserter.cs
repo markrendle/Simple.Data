@@ -11,7 +11,7 @@
         public IEnumerable<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IEnumerable<IDictionary<string, object>> data, IDbTransaction transaction, Func<IDictionary<string,object>, Exception, bool> onError, bool resultRequired)
         {
             var table = adapter.GetSchema().FindTable(tableName);
-            var columns = table.Columns.Where(c => !c.IsIdentity).ToList();
+            var columns = table.Columns.Where(c => c.IsWriteable).ToList();
 
             string columnList = string.Join(",", columns.Select(c => c.QuotedName));
             string valueList = string.Join(",", columns.Select(c => "?"));

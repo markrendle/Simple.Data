@@ -39,5 +39,10 @@
                        SqlDbType == SqlDbType.VarBinary;
             }
         }
+
+        public override bool IsWriteable
+        {
+            get { return (!IsIdentity) && SqlDbType != SqlDbType.Timestamp; }
+        }
     }
 }

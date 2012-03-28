@@ -50,16 +50,16 @@ namespace Simple.Data.Ado
         public IDictionary<string, object> Insert(string tableName, IEnumerable<KeyValuePair<string, object>> data, bool resultRequired)
         {
             var table = _adapter.GetSchema().FindTable(tableName);
-
-            CheckInsertablePropertiesAreAvailable(table, data);
+            var dataArray = data.ToArray();
+            CheckInsertablePropertiesAreAvailable(table, dataArray);
 
             var customInserter = _adapter.ProviderHelper.GetCustomProvider<ICustomInserter>(_adapter.ConnectionProvider);
             if (customInserter != null)
             {
-                return customInserter.Insert(_adapter, tableName, data.ToDictionary(), _transaction);
+                return customInserter.Insert(_adapter, tableName, dataArray.ToDictionary(), _transaction);
             }
 
-            var dataDictionary = data.Where(kvp => table.HasColumn(kvp.Key) && !table.FindColumn(kvp.Key).IsIdentity)
+            var dataDictionary = dataArray.Where(kvp => table.HasColumn(kvp.Key) && table.FindColumn(kvp.Key).IsWriteable)
                                      .ToDictionary(kvp => table.FindColumn(kvp.Key), kvp => kvp.Value);
 
             string columnList = dataDictionary.Keys.Select(c => c.QuotedName).Aggregate((agg, next) => agg + "," + next);
@@ -83,11 +83,8 @@ namespace Simple.Data.Ado
                             insertSql += "; " + selectSql;
                             return ExecuteSingletonQuery(insertSql, dataDictionary.Keys, dataDictionary.Values);
                         }
-                        else
-                        {
-                            return ExecuteSingletonQuery(insertSql, selectSql, dataDictionary.Keys,
-                                                         dataDictionary.Values);
-                        }
+                        return ExecuteSingletonQuery(insertSql, selectSql, dataDictionary.Keys,
+                                                     dataDictionary.Values);
                     }
                 }
             }
