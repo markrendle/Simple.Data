@@ -8,15 +8,26 @@
 
     public partial class InMemoryAdapter : Adapter, IAdapterWithFunctions
     {
-        private readonly Dictionary<string, string> _autoIncrementColumns = new Dictionary<string, string>();
-        private readonly Dictionary<string, string[]> _keyColumns = new Dictionary<string, string[]>();
+        private readonly Dictionary<string, string> _autoIncrementColumns;
+        private readonly Dictionary<string, string[]> _keyColumns;
 
-        private readonly Dictionary<string, List<IDictionary<string, object>>> _tables =
-            new Dictionary<string, List<IDictionary<string, object>>>();
+        private readonly Dictionary<string, List<IDictionary<string, object>>> _tables;
 
         private readonly Dictionary<string, Delegate> _functions = new Dictionary<string, Delegate>(); 
 
         private readonly ICollection<JoinInfo> _joins = new Collection<JoinInfo>();
+
+        public InMemoryAdapter() : this(StringComparer.OrdinalIgnoreCase)
+        {
+        }
+
+        public InMemoryAdapter(IEqualityComparer<string> nameComparer)
+        {
+            _nameComparer = nameComparer;
+            _keyColumns = new Dictionary<string, string[]>(_nameComparer);
+            _autoIncrementColumns = new Dictionary<string, string>(_nameComparer);
+            _tables = new Dictionary<string, List<IDictionary<string, object>>>(nameComparer);
+        }
 
         private List<IDictionary<string, object>> GetTable(string tableName)
         {
@@ -67,6 +78,7 @@
 
         public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, bool resultRequired)
         {
+            data = new Dictionary<string, object>(data, _nameComparer);
             if (_autoIncrementColumns.ContainsKey(tableName))
             {
                 var table = GetTable(tableName);
@@ -219,6 +231,8 @@
         {
             get { return new JoinConfig(_joins);}
         }
+
+        private IEqualityComparer<string> _nameComparer = EqualityComparer<string>.Default;
 
         internal class JoinInfo
         {

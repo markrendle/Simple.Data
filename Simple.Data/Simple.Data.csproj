@@ -55,6 +55,7 @@
     <Compile Include="AdapterFactory.cs" />
     <Compile Include="AdapterMethodDynamicInvoker.cs" />
     <Compile Include="AdapterWithFunctionsExtensions.cs" />
+    <Compile Include="AdoCompatibleComparer.cs" />
     <Compile Include="AllColumnsSpecialReference.cs" />
     <Compile Include="BinderHelper.cs" />
     <Compile Include="CachingAdapterFactory.cs" />

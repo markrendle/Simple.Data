@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="CanAssignArray.cs" />
     <Compile Include="InMemoryTests.cs" />
+    <Compile Include="NameResolutionTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
