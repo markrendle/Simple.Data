@@ -118,5 +118,16 @@ namespace Simple.Data.SqlTest
             Assert.DoesNotThrow(() =>
                 db.Customers.Update(customers));
         }
+
+        [Test]
+        public void TestUpdateWithTimestamp()
+        {
+            var db = DatabaseHelper.Open();
+            var row = db.TimestampTest.Insert(Description: "Inserted");
+            row.Description = "Updated";
+            db.TimestampTest.Update(row);
+            row = db.TimestampTest.Get(row.Id);
+            Assert.AreEqual("Updated", row.Description);
+        }
     }
 }

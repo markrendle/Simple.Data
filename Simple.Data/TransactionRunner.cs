@@ -14,6 +14,11 @@ namespace Simple.Data
             _adapterTransaction = adapterTransaction;
         }
 
+        protected override Adapter Adapter
+        {
+            get { return (Adapter) _adapter; }
+        }
+
         internal override IDictionary<string, object> FindOne(string tableName, SimpleExpression criteria)
         {
             return Find(tableName, criteria).FirstOrDefault();

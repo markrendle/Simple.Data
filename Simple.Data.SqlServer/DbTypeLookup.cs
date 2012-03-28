@@ -37,7 +37,7 @@ namespace Simple.Data.SqlServer
                                                                                         {"varchar", SqlDbType.VarChar},
                                                                                         {"binary", SqlDbType.Binary},
                                                                                         {"char", SqlDbType.Char},
-                                                                                        {"timestamp", SqlDbType.Binary},
+                                                                                        {"timestamp", SqlDbType.Timestamp},
                                                                                         {"nvarchar", SqlDbType.NVarChar},
                                                                                         {"nchar", SqlDbType.NChar},
                                                                                         {"xml", SqlDbType.Xml},

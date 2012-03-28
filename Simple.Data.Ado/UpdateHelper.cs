@@ -93,7 +93,7 @@ namespace Simple.Data.Ado
         private string GetUpdateClause(Table table, IEnumerable<KeyValuePair<string, object>> data)
         {
             var setClause = string.Join(", ",
-                data.Where(kvp => table.HasColumn(kvp.Key))
+                data.Where(kvp => table.HasColumn(kvp.Key) && table.FindColumn(kvp.Key).IsWriteable)
                 .Select(kvp => CreateColumnUpdateClause(kvp.Key, kvp.Value, table)));
             return string.Format("update {0} set {1}", table.QualifiedName, setClause);
         }

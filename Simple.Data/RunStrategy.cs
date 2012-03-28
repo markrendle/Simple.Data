@@ -5,6 +5,8 @@ namespace Simple.Data
 
     internal abstract class RunStrategy
     {
+        protected abstract Adapter Adapter { get; }
+
         /// <summary>
         ///  Finds data from the specified "table".
         ///  </summary>
@@ -65,16 +67,24 @@ namespace Simple.Data
             return changedValuesDict;
         }
 
-        protected static SimpleExpression CreateCriteriaFromOriginalValues(string tableName,
+        protected SimpleExpression CreateCriteriaFromOriginalValues(string tableName,
                                                                            IDictionary<string, object> newValuesDict,
                                                                            IDictionary<string, object>
                                                                                originalValuesDict)
         {
-            var criteriaValues = originalValuesDict
+            var criteriaValues = Adapter.GetKey(tableName, originalValuesDict);
+
+            foreach (var kvp in originalValuesDict
                 .Where(
                     originalKvp =>
                     newValuesDict.ContainsKey(originalKvp.Key) &&
-                    !(Equals(newValuesDict[originalKvp.Key], originalKvp.Value)));
+                    !(Equals(newValuesDict[originalKvp.Key], originalKvp.Value))))
+            {
+                if (!criteriaValues.ContainsKey(kvp.Key))
+                {
+                    criteriaValues.Add(kvp);
+                }
+            };
 
             return ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteriaValues);
         }

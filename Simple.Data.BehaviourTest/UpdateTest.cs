@@ -89,17 +89,18 @@ namespace Simple.Data.IntegrationTest
         {
             dynamic newRecord = new SimpleRecord();
             newRecord.Id = 1;
-            newRecord.Name = "Steve";
+            newRecord.Name = "Steve-o";
             newRecord.Age = 50;
             dynamic originalRecord = new SimpleRecord();
-            originalRecord.Id = 2;
+            originalRecord.Id = 1;
             originalRecord.Name = "Steve";
             originalRecord.Age = 50;
 
             _db.Users.Update(newRecord, originalRecord);
-            GeneratedSqlIs("update [dbo].[Users] set [Id] = @p1 where [dbo].[Users].[Id] = @p2");
-            Parameter(0).Is(1);
-            Parameter(1).Is(2);
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where ([dbo].[Users].[Id] = @p2 and [dbo].[Users].[Name] = @p3)");
+            Parameter(0).Is("Steve-o");
+            Parameter(1).Is(1);
+            Parameter(2).Is("Steve");
         }
 
         [Test]
@@ -107,17 +108,18 @@ namespace Simple.Data.IntegrationTest
         {
             dynamic newRecord = new SimpleRecord();
             newRecord.Id = 1;
-            newRecord.Name = "Steve";
+            newRecord.Name = "Steve-o";
             newRecord.Age = 50;
             dynamic originalRecord = new SimpleRecord();
-            originalRecord.Id = 2;
+            originalRecord.Id = 1;
             originalRecord.Name = "Steve";
             originalRecord.Age = 50;
 
             _db.Users.Update(new[] {newRecord}, new[] {originalRecord});
-            GeneratedSqlIs("update [dbo].[Users] set [Id] = @p1 where [dbo].[Users].[Id] = @p2");
-            Parameter(0).Is(1);
-            Parameter(1).Is(2);
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where ([dbo].[Users].[Id] = @p2 and [dbo].[Users].[Name] = @p3)");
+            Parameter(0).Is("Steve-o");
+            Parameter(1).Is(1);
+            Parameter(2).Is("Steve");
         }
 
         [Test]
@@ -194,15 +196,15 @@ namespace Simple.Data.IntegrationTest
             var newUser = new User
                            {
                                Id = 1,
-                               Name = "Steve",
+                               Name = "Steve-o",
                                Age = 50
                            };
-            var originalUser = new User {Id = 2, Name = "Steve", Age = 50};
+            var originalUser = new User {Id = 1, Name = "Steve", Age = 50};
             _db.Users.Update(newUser, originalUser);
-            GeneratedSqlIs(
-                "update [dbo].[Users] set [Id] = @p1 where [dbo].[Users].[Id] = @p2");
-            Parameter(0).Is(1);
-            Parameter(1).Is(2);
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where ([dbo].[Users].[Id] = @p2 and [dbo].[Users].[Name] = @p3)");
+            Parameter(0).Is("Steve-o");
+            Parameter(1).Is(1);
+            Parameter(2).Is("Steve");
         }
 
         [Test]
@@ -211,15 +213,15 @@ namespace Simple.Data.IntegrationTest
             var newUser = new User
             {
                 Id = 1,
-                Name = "Steve",
+                Name = "Steve-o",
                 Age = 50
             };
-            var originalUser = new User { Id = 2, Name = "Steve", Age = 50 };
+            var originalUser = new User { Id = 1, Name = "Steve", Age = 50 };
             _db.Users.Update(new[] {newUser}, new[] {originalUser});
-            GeneratedSqlIs(
-                "update [dbo].[Users] set [Id] = @p1 where [dbo].[Users].[Id] = @p2");
-            Parameter(0).Is(1);
-            Parameter(1).Is(2);
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where ([dbo].[Users].[Id] = @p2 and [dbo].[Users].[Name] = @p3)");
+            Parameter(0).Is("Steve-o");
+            Parameter(1).Is(1);
+            Parameter(2).Is("Steve");
         }
         
         [Test]
