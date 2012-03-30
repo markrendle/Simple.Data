@@ -12,12 +12,20 @@ namespace Simple.Data
         private static readonly MethodInfo DictionaryContainsKeyMethod = typeof(IDictionary<string, object>).GetMethod("ContainsKey", new[] { typeof(string) });
         private static readonly PropertyInfo DictionaryIndexerProperty = typeof(IDictionary<string, object>).GetProperty("Item");
 
-        private static readonly MethodInfo ToArrayMethod = typeof(Enumerable).GetMethod("ToArray",
+        private static readonly MethodInfo ToArrayDictionaryMethod = typeof(Enumerable).GetMethod("ToArray",
                                                                                         BindingFlags.Public |
                                                                                         BindingFlags.Static).MakeGenericMethod(typeof(IDictionary<string, object>));
 
-        private static readonly PropertyInfo ArrayLengthProperty =
+        private static readonly MethodInfo ToArrayObjectMethod = typeof(Enumerable).GetMethod("ToArray",
+                                                                                BindingFlags.Public |
+                                                                                BindingFlags.Static).MakeGenericMethod(typeof(object));
+
+
+        private static readonly PropertyInfo ArrayDictionaryLengthProperty =
             typeof(IDictionary<string, object>[]).GetProperty("Length");
+
+        private static readonly PropertyInfo ArrayObjectLengthProperty =
+            typeof(object[]).GetProperty("Length");
 
         private readonly ParameterExpression _param;
         private readonly ParameterExpression _obj;
@@ -84,11 +92,7 @@ namespace Simple.Data
 
             if (addMethod == null) return null;
 
-            BlockExpression block;
-            var isDictionaryCollection = BuildCollectionPopulator(collection, genericType, addMethod, createCollection,
-                                                                 creatorInstance, out block);
-
-            return Expression.IfThen(isDictionaryCollection, block);
+            return BuildCollectionCreatorExpression(genericType, creatorInstance, collection, createCollection, addMethod);
         }
 
         private Expression BuildCollectionCreator()
@@ -110,15 +114,24 @@ namespace Simple.Data
 
             if (createCollection != null && addMethod != null)
             {
-                BlockExpression block;
-                var isDictionaryCollection = BuildCollectionPopulator(collection, genericType, addMethod, createCollection, creatorInstance, out block);
-
-                return Expression.IfThen(isDictionaryCollection, block);
+                return BuildCollectionCreatorExpression(genericType, creatorInstance, collection, createCollection, addMethod);
             }
             return null;
         }
 
-        private TypeBinaryExpression BuildCollectionPopulator(ParameterExpression collection, Type genericType,
+        private Expression BuildCollectionCreatorExpression(Type genericType, ConcreteTypeCreator creatorInstance, ParameterExpression collection, BinaryExpression createCollection, MethodInfo addMethod)
+        {
+            BlockExpression dictionaryBlock;
+            var isDictionaryCollection = BuildComplexTypeCollectionPopulator(collection, genericType, addMethod, createCollection, creatorInstance, out dictionaryBlock);
+
+            BlockExpression objectBlock;
+            var isObjectcollection = BuildSimpleTypeCollectionPopulator(collection, genericType, addMethod, createCollection, out objectBlock);
+
+            return Expression.IfThenElse(isDictionaryCollection, dictionaryBlock,
+                Expression.IfThen(isObjectcollection, objectBlock));
+        }
+
+        private TypeBinaryExpression BuildComplexTypeCollectionPopulator(ParameterExpression collection, Type genericType,
                                                              MethodInfo addMethod, BinaryExpression createCollection,
                                                              ConcreteTypeCreator creatorInstance, out BlockExpression block)
         {
@@ -131,14 +144,14 @@ namespace Simple.Data
                                                            typeof (IEnumerable<IDictionary<string, object>>));
 
             var toArray = Expression.Assign(array,
-                                            Expression.Call(ToArrayMethod,
+                                            Expression.Call(ToArrayDictionaryMethod,
                                                             Expression.Convert(_itemProperty,
                                                                                typeof (IEnumerable<IDictionary<string, object>>))));
             var start = Expression.Assign(i, Expression.Constant(0));
             var label = Expression.Label();
             var loop = Expression.Loop(
                 Expression.IfThenElse(
-                    Expression.LessThan(i, Expression.Property(array, ArrayLengthProperty)),
+                    Expression.LessThan(i, Expression.Property(array, ArrayDictionaryLengthProperty)),
                     Expression.Block(
                         Expression.Assign(current, Expression.ArrayIndex(array, i)),
                         Expression.Call(collection, addMethod,
@@ -159,6 +172,48 @@ namespace Simple.Data
                 _property.CanWrite ? (Expression) Expression.Assign(_nameProperty, collection) : Expression.Empty());
 
             return isDictionaryCollection;
+        }
+
+        private TypeBinaryExpression BuildSimpleTypeCollectionPopulator(ParameterExpression collection, Type genericType,
+                                                             MethodInfo addMethod, BinaryExpression createCollection, 
+                                                             out BlockExpression block)
+        {
+            var array = Expression.Variable(typeof(object[]));
+            var i = Expression.Variable(typeof(int));
+            var current = Expression.Variable(typeof(object));
+
+            var isObjectCollection = Expression.TypeIs(_itemProperty,
+                                                           typeof(IEnumerable<object>));
+
+            var toArray = Expression.Assign(array,
+                                            Expression.Call(ToArrayObjectMethod,
+                                                            Expression.Convert(_itemProperty,
+                                                                               typeof(IEnumerable<object>))));
+            var start = Expression.Assign(i, Expression.Constant(0));
+            var label = Expression.Label();
+            var loop = Expression.Loop(
+                Expression.IfThenElse(
+                    Expression.LessThan(i, Expression.Property(array, ArrayObjectLengthProperty)),
+                    Expression.Block(
+                        Expression.Assign(current, Expression.ArrayIndex(array, i)),
+                        Expression.Call(collection, addMethod,
+                                        Expression.Convert(current, genericType)),
+                        Expression.PreIncrementAssign(i)
+                        ),
+                    Expression.Break(label)
+                    ),
+                label
+                );
+
+            block = Expression.Block(
+                new[] { array, i, collection, current },
+                createCollection,
+                toArray,
+                start,
+                loop,
+                _property.CanWrite ? (Expression)Expression.Assign(_nameProperty, collection) : Expression.Empty());
+
+            return isObjectCollection;
         }
 
         private BinaryExpression MakeCreateNewCollection(ParameterExpression collection, Type genericType)
@@ -282,6 +337,8 @@ namespace Simple.Data
                                                                                            Expression.Call(_itemProperty, typeof(object).GetMethod("ToString")), Expression.Constant(true)), _property.PropertyType)),
                                       assign), Expression.Catch(typeof(Exception), Expression.Empty()));
         }
+
+        
 
 // ReSharper disable UnusedMember.Local
 // Because they're used from runtime-generated code, you see.

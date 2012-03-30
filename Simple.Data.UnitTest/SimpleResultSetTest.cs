@@ -392,10 +392,33 @@
             Assert.AreEqual(1, converted.Count());
             Assert.AreEqual("0", converted.First().Data);
         }
+
+        [Test]
+        public void CastToGenericCreatesTypedListWithSubTypes()
+        {
+            var firstRecord = new SimpleRecord(new Dictionary<string, object>
+            {
+                { "Data", "First" },
+                { "List", new List<string> { "First-One", "First-Two" } }
+            });
+
+            var list = new SimpleResultSet(new List<dynamic> { firstRecord });
+
+            var result = list.Cast<TestType2>().First();
+
+            Assert.AreEqual(2, result.List.Count);
+        }
     }
 
     class TestType
     {
         public string Data { get; set; }
+    }
+
+    class TestType2
+    {
+        public string Data { get; set; }
+
+        public List<string> List { get; set; }
     }
 }
