@@ -43,7 +43,11 @@ namespace Simple.Data.SqlServer
 
         private static Column SchemaRowToColumn(Table table, DataRow row)
         {
-            var sqlDbType = row.IsNull("type_name") ? SqlDbType.Udt : DbTypeFromInformationSchemaTypeName((string)row["type_name"]);
+            SqlDbType sqlDbType = SqlDbType.Udt;
+
+            if (!row.IsNull("type_name"))
+                sqlDbType = DbTypeFromInformationSchemaTypeName((string)row["type_name"]);
+
             var size = (short)row["max_length"];
             switch (sqlDbType)
             {
