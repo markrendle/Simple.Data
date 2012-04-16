@@ -401,5 +401,17 @@ namespace Simple.Data.SqlTest
             blob = db.Blobs.FindById(1);
             Assert.IsTrue(image.SequenceEqual(blob.Data));
         }
+
+        [Test]
+        public void TestUpsertWithSingleArgumentAndExistingObject()
+        {
+            var db = DatabaseHelper.Open();
+
+            var actual = db.Users.UpsertById(Id: 1);
+
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(1, actual.Id);
+            Assert.AreEqual("Ford Prefect", actual.Name);
+        }
     }
 }
