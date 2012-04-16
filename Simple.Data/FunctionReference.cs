@@ -8,14 +8,9 @@ namespace Simple.Data
 
     public class FunctionReference : SimpleReference, IEquatable<FunctionReference>
     {
-        private static readonly HashSet<string> KnownFunctionNames = new HashSet<string>
-                                                                         {
-                                                                             "min", "max", "average", "length", "sum", "count",
-                                                                         };
-
         private static readonly HashSet<string> AggregateFunctionNames = new HashSet<string>
                                                                              {
-                                                                                 "min", "max", "average", "sum", "count",
+                                                                                 "min", "max", "average", "sum", "count", "countdistinct"
                                                                              };
         private readonly string _name;
         private readonly SimpleReference _argument;
@@ -66,18 +61,6 @@ namespace Simple.Data
         public SimpleReference Argument
         {
             get { return _argument; }
-        }
-
-        public static bool TryCreate(string name, SimpleReference argument, out object functionReference)
-        {
-            if (!KnownFunctionNames.Contains(name.ToLowerInvariant()))
-            {
-                functionReference = null;
-                return false;
-            }
-
-            functionReference = new FunctionReference(name, argument);
-            return true;
         }
 
         /// <summary>

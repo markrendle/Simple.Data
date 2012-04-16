@@ -45,13 +45,19 @@
             var finder = _transaction == null
                              ? new AdoAdapterFinder(_adapter, connection)
                              : new AdoAdapterFinder(_adapter, _transaction);
-            if (finder.FindOne(tableName, criteria) != null)
+
+            var existing = finder.FindOne(tableName, criteria);
+            if (existing != null)
             {
                 // Don't update columns used as criteria
                 var keys = criteria.GetOperandsOfType<ObjectReference>().Select(o => o.GetName().Homogenize());
-                data = data.Where(kvp => keys.All(k => k != kvp.Key.Homogenize())).ToDictionary();
+                var updateData = data.Where(kvp => keys.All(k => k != kvp.Key.Homogenize())).ToDictionary();
+                if (updateData.Count == 0)
+                {
+                    return existing;
+                }
 
-                var commandBuilder = new UpdateHelper(_adapter.GetSchema()).GetUpdateCommand(tableName, data, criteria);
+                var commandBuilder = new UpdateHelper(_adapter.GetSchema()).GetUpdateCommand(tableName, updateData, criteria);
                 if (_transaction == null)
                 {
                     AdoAdapter.Execute(commandBuilder, connection);

@@ -63,5 +63,15 @@ namespace Simple.Data.IntegrationTest.Query
 
             GeneratedSqlIs(expected);
         }
+
+        [Test]
+        public void CountingOnColumn()
+        {
+            const string expected =
+                @"select [dbo].[users].[name],count(distinct isnull([dbo].[users].[password],@p1)) as [c] from [dbo].[users] group by [dbo].[users].[name]";
+            EatException<InvalidOperationException>(
+                () => _db.Users.All().Select(_db.Users.Name, _db.Users.Password.IsNull("No Password").CountDistinct().As("c")).ToList());
+            GeneratedSqlIs(expected);
+        }
     }
 }

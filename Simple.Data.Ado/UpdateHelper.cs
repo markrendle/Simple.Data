@@ -25,7 +25,9 @@ namespace Simple.Data.Ado
         public ICommandBuilder GetUpdateCommand(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
         {
             var table = _schema.FindTable(tableName);
-            _commandBuilder.Append(GetUpdateClause(table, data));
+            var updateClause = GetUpdateClause(table, data);
+            if (string.IsNullOrWhiteSpace(updateClause)) throw new InvalidOperationException("No columns to update.");
+            _commandBuilder.Append(updateClause);
 
             if (criteria != null )
             {

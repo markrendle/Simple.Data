@@ -165,10 +165,20 @@ namespace Simple.Data.Ado
 
         public override bool IsExpressionFunction(string functionName, params object[] args)
         {
-            return (functionName.Equals("like", StringComparison.OrdinalIgnoreCase) ||
-                    functionName.Equals("notlike", StringComparison.OrdinalIgnoreCase))
-                   && args.Length == 1
-                   && args[0] is string;
+            return FunctionIsLikeOrNotLike(functionName, args);
+        }
+
+        private static bool FunctionIsLikeOrNotLike(string functionName, object[] args)
+        {
+            return ((functionName.Equals("like", StringComparison.OrdinalIgnoreCase)
+                     || functionName.Equals("notlike", StringComparison.OrdinalIgnoreCase))
+                    && args.Length == 1
+                    && args[0] is string);
+        }
+
+        private static bool FunctionIsCount(string functionName, object[] args)
+        {
+            return (functionName.Equals("count", StringComparison.OrdinalIgnoreCase) && args.Length == 0);
         }
 
         public override IObservable<IDictionary<string, object>> RunQueryAsObservable(SimpleQuery query,

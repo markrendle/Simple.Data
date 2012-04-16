@@ -281,7 +281,7 @@ namespace Simple.Data.Ado
 
         private void HandleGrouping()
         {
-            if (_havingCriteria == SimpleExpression.Empty && !_columns.OfType<FunctionReference>().Any(fr => fr.IsAggregate)) return;
+            if (_havingCriteria == SimpleExpression.Empty && !_columns.OfType<FunctionReference>().Any(f => f.IsAggregate)) return;
 
             var groupColumns =
                 GetColumnsToSelect(_table).Where(c => (!(c is FunctionReference)) || !((FunctionReference) c).IsAggregate).ToList();

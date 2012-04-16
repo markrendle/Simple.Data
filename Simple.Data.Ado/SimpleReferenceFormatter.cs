@@ -102,16 +102,24 @@ namespace Simple.Data.Ado
             if (ReferenceEquals(functionReference, null)) return null;
 
             var sqlName = _functionNameConverter.ConvertToSqlName(functionReference.Name);
-            if (excludeAlias || functionReference.GetAlias() == null)
+            string formatted;
+
+            if (sqlName.Equals("countdistinct", StringComparison.OrdinalIgnoreCase))
             {
-                return string.Format("{0}({1}{2})", sqlName,
+                formatted = string.Format("count(distinct {0})", FormatColumnClause(functionReference.Argument));
+            }
+            else
+            {
+                formatted = string.Format("{0}({1}{2})", sqlName,
                                      FormatColumnClause(functionReference.Argument),
                                      FormatAdditionalArguments(functionReference.AdditionalArguments));
             }
-            return string.Format("{0}({1}{2}) AS {3}", sqlName,
-                                       FormatColumnClause(functionReference.Argument),
-                                       FormatAdditionalArguments(functionReference.AdditionalArguments),
-                                       _schema.QuoteObjectName(functionReference.GetAlias()));
+
+            if ((!excludeAlias) && functionReference.GetAlias() != null)
+            {
+                formatted = string.Format("{0} AS {1}", formatted, _schema.QuoteObjectName(functionReference.GetAlias()));
+            }
+            return formatted;
         }
 
         private string FormatAdditionalArguments(IEnumerable<object> additionalArguments)
