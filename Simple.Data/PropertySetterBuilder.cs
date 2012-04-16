@@ -110,7 +110,7 @@ namespace Simple.Data
                 createCollection = Expression.Assign(collection, _nameProperty);
             }
 
-            var addMethod = _property.PropertyType.GetMethod("Add");
+            var addMethod = _property.PropertyType.GetInterfaceMethod("Add");
 
             if (createCollection != null && addMethod != null)
             {
