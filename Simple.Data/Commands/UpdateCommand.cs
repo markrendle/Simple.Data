@@ -29,11 +29,6 @@ namespace Simple.Data.Commands
             return UpdateUsingOriginalValues(dataStrategy, table, args);
         }
 
-        public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
         private static object UpdateUsingOriginalValues(DataStrategy dataStrategy, DynamicTable table, object[] args)
         {
             var newValues = ObjectToDictionary(args[0]);
@@ -63,11 +58,6 @@ namespace Simple.Data.Commands
             dict = dict.Where(kvp => key.All(keyKvp => keyKvp.Key.Homogenize() != kvp.Key.Homogenize())).ToDictionary();
             var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), key);
             return dataStrategy.Run.Update(table.GetQualifiedName(), dict, criteria);
-        }
-
-        public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
-        {
-            throw new NotImplementedException();
         }
 
         internal static object ObjectToDictionary(object obj)

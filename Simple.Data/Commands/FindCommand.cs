@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Simple.Data.Commands
 {
-    class FindCommand : ICommand
+    class FindCommand : ICommand, IQueryCompatibleCommand
     {
         /// <summary>
         /// Determines whether the instance is able to handle the specified method.
@@ -42,11 +42,6 @@ namespace Simple.Data.Commands
         public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)
         {
             return query.Where((SimpleExpression) args[0]).Take(1).FirstOrDefault();
-        }
-
-        public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
-        {
-            throw new NotImplementedException();
         }
     }
 }

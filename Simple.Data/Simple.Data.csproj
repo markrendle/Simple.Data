@@ -61,11 +61,13 @@
     <Compile Include="CachingAdapterFactory.cs" />
     <Compile Include="CastEnumerable.cs" />
     <Compile Include="Commands\CommandFactory.cs" />
+    <Compile Include="Commands\ArgumentHelper.cs" />
     <Compile Include="Commands\GetCommand.cs" />
     <Compile Include="Commands\GetCountByCommand.cs" />
     <Compile Include="Commands\GetCountCommand.cs" />
     <Compile Include="Commands\ExistsByCommand.cs" />
     <Compile Include="Commands\ExistsCommand.cs" />
+    <Compile Include="Commands\QueryCommand.cs" />
     <Compile Include="Commands\ResultHelper.cs" />
     <Compile Include="Commands\UpdateAllCommand.cs" />
     <Compile Include="Commands\DeleteAllCommand.cs" />

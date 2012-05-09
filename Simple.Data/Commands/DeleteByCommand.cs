@@ -19,16 +19,6 @@ namespace Simple.Data.Commands
             return dataStrategy.Run.Delete(table.GetQualifiedName(), criteriaExpression);
         }
 
-        public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
         private static SimpleExpression GetCriteriaExpression(InvokeMemberBinder binder, object[] args, DynamicTable table)
         {
             IDictionary<string, object> criteria;

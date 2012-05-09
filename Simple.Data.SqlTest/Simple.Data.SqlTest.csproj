@@ -62,7 +62,6 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdventureWorks.cs" />
     <Compile Include="BulkInsertTest.cs" />
     <Compile Include="ConversionTests.cs" />
     <Compile Include="DatabaseHelper.cs" />

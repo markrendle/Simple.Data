@@ -107,9 +107,9 @@ namespace Simple.Data
         {
             try
             {
-                var command = CommandFactory.GetCommandFor(binder.Name);
-                if (command == null) return null;
-                return command.CreateDelegate(_dataStrategy, this, binder, args);
+                var delegateCreatingCommand = CommandFactory.GetCommandFor(binder.Name) as ICreateDelegate;
+                if (delegateCreatingCommand == null) return null;
+                return delegateCreatingCommand.CreateDelegate(_dataStrategy, this, binder, args);
             }
             catch (NotImplementedException)
             {

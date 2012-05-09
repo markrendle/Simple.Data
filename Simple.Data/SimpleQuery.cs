@@ -8,6 +8,7 @@
     using System.Reflection;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
+    using Commands;
     using Extensions;
     using QueryPolyfills;
 
@@ -299,7 +300,7 @@
                 return true;
             }
 
-            var command = Commands.CommandFactory.GetCommandFor(binder.Name);
+            var command = Commands.CommandFactory.GetCommandFor(binder.Name) as IQueryCompatibleCommand;
             if (command != null)
             {
                 try

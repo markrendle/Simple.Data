@@ -35,11 +35,6 @@ namespace Simple.Data.Commands
             return ResultHelper.TypeResult(result, table, dataStrategy);
         }
 
-        public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
         private static object UpsertUsingKeys(DataStrategy dataStrategy, DynamicTable table, object[] args, bool isResultRequired)
         {
             var record = ObjectToDictionary(args[0]);
@@ -57,11 +52,6 @@ namespace Simple.Data.Commands
 
             var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), key);
             return dataStrategy.Run.Upsert(table.GetQualifiedName(), dict, criteria, isResultRequired);
-        }
-
-        public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
-        {
-            throw new NotImplementedException();
         }
 
         internal static object ObjectToDictionary(object obj)

@@ -9,7 +9,7 @@ namespace Simple.Data.Commands
     using System.Reflection;
     using Extensions;
 
-    class FindByCommand : ICommand
+    class FindByCommand : ICommand, ICreateDelegate, IQueryCompatibleCommand
     {
         public bool IsCommandFor(string method)
         {
@@ -22,15 +22,11 @@ namespace Simple.Data.Commands
 
             if (binder.Name.Equals("FindBy") || binder.Name.Equals("find_by"))
             {
-                if (args.Length == 0) throw new ArgumentException("FindBy requires arguments.");
-                if (args.Length == 1)
-                {
-                    if (ReferenceEquals(args[0], null)) throw new ArgumentException("FindBy does not accept unnamed null argument.");
-                    if (args[0].GetType().Namespace == null) return null;
-                }
+                ArgumentHelper.CheckFindArgs(args, binder);
+                if (args.Length == 1 && args[0].IsAnonymous()) return null;
             }
 
-            var criteriaDictionary = CreateCriteriaDictionary(binder, args);
+            var criteriaDictionary = ArgumentHelper.CreateCriteriaDictionary(binder, args, "FindBy", "find_by");
             if (criteriaDictionary == null) return null;
 
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), criteriaDictionary);

@@ -8,7 +8,7 @@ namespace Simple.Data.Commands
 {
     using Extensions;
 
-    public class GetCommand : ICommand
+    public class GetCommand : ICommand, ICreateDelegate, IQueryCompatibleCommand
     {
         public bool IsCommandFor(string method)
         {

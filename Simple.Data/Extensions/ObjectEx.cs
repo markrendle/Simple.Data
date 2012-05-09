@@ -50,5 +50,10 @@ namespace Simple.Data.Extensions
                 Expression.Constant(propertyInfo.Name),
                 Expression.Convert(Expression.Property(instance, propertyInfo), typeof(object)));
         }
+
+        internal static bool IsAnonymous(this object obj)
+        {
+            return obj.GetType().Namespace == null;
+        }
     }
 }

@@ -22,13 +22,13 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, user.Id);
         }
 
-    [Test]
-    public void GetWithNonExistentPrimaryKeyShouldReturnNull()
-    {
-        var db = DatabaseHelper.Open();
-        var user = db.Users.Get(1138);
-        Assert.IsNull(user);
-    }
+        [Test]
+        public void GetWithNonExistentPrimaryKeyShouldReturnNull()
+        {
+            var db = DatabaseHelper.Open();
+            var user = db.Users.Get(1138);
+            Assert.IsNull(user);
+        }
 
         [Test]
         public void SelectClauseWithGetScalarShouldLimitQuery()

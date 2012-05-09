@@ -1,5 +1,6 @@
 namespace Simple.Data.IntegrationTest
 {
+    using System;
     using System.Collections.Generic;
     using Mocking.Ado;
     using NUnit.Framework;
@@ -224,6 +225,13 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestFindAllByNamedParameterSingleColumnNull()
+        {
+            _db.Users.FindAllBy(Name: null).ToList();
+            GeneratedSqlIs("select [dbo].[Users].[id],[dbo].[Users].[name],[dbo].[Users].[password],[dbo].[Users].[age] from [dbo].[Users] where [dbo].[Users].[name] is null");
+        }
+
+        [Test]
         public void TestFindAllByNamedParameterTwoColumns()
         {
             _db.Users.FindAllBy(Name: "Foo", Password: "password").ToList();
@@ -248,6 +256,18 @@ namespace Simple.Data.IntegrationTest
             _db.Users.FindAllByName("Foo").ToList();
             GeneratedSqlIs("select [dbo].[Users].[id],[dbo].[Users].[name],[dbo].[Users].[password],[dbo].[Users].[age] from [dbo].[Users] where [dbo].[Users].[name] = @p1");
             Parameter(0).Is("Foo");
+        }
+
+        [Test]
+        public void FindByWithoutArgsThrowsArgumentException()
+        {
+            Assert.Throws<ArgumentException>(() => _db.Users.FindBy());
+        }
+ 
+        [Test]
+        public void FindAllByWithoutArgsThrowsArgumentException()
+        {
+            Assert.Throws<ArgumentException>(() => _db.Users.FindAllBy());
         }
     }
 

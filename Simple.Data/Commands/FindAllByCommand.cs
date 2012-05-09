@@ -14,26 +14,15 @@ namespace Simple.Data.Commands
 
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            SimpleExpression criteriaExpression;
             if (binder.Name.Equals("FindAllBy") || binder.Name.Equals("find_all_by"))
             {
-                criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), binder.NamedArgumentsToDictionary(args));
+                ArgumentHelper.CheckFindArgs(args, binder);
             }
-            else
-            {
-                criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
-            }
+
+            var criteriaDictionary = ArgumentHelper.CreateCriteriaDictionary(binder, args, "FindAllBy", "find_all_by");
+            var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(),
+                                                                                                  criteriaDictionary);
             return new SimpleQuery(dataStrategy, table.GetQualifiedName()).Where(criteriaExpression);
-        }
-
-        public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
-        {
-            throw new NotImplementedException();
         }
     }
 }
