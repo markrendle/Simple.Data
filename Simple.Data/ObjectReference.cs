@@ -103,7 +103,6 @@ namespace Simple.Data
 
             if (_dataStrategy != null)
             {
-                // Probably a table...
                 var table = new DynamicTable(_name, _dataStrategy);
                 if (table.TryInvokeMember(binder, args, out result))
                 {
@@ -128,7 +127,8 @@ namespace Simple.Data
                 {
                     var schema = dataStrategy.SetMemberAsSchema(_owner);
                     var table = schema.GetTable(_name);
-                    result = command.Execute(dataStrategy, table, binder, args);
+                    table.TryInvokeMember(binder, args, out result);
+                    //result = command.Execute(dataStrategy, table, binder, args);
                 }
                 else
                 {
