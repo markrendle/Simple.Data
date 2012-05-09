@@ -32,7 +32,7 @@ namespace Simple.Data.Ado
             if (criteria != null )
             {
                 string whereStatement = null;
-                if (criteria.GetOperandsOfType<ObjectReference>().Any(o => !o.GetOwner().GetName().Equals(tableName)))
+                if (criteria.GetOperandsOfType<ObjectReference>().Any(o => IsTableChain(tableName, o)))
                 {
                     if (table.PrimaryKey.Length == 1)
                     {
@@ -52,6 +52,12 @@ namespace Simple.Data.Ado
             }
 
             return _commandBuilder;
+        }
+
+        private bool IsTableChain(string tableName, ObjectReference o)
+        {
+            var ownerName = tableName.Contains(".") ? o.GetOwner().GetAllObjectNamesDotted() : o.GetOwner().GetName();
+            return (!ownerName.Equals(tableName, StringComparison.InvariantCultureIgnoreCase)) && _schema.IsTable(ownerName);
         }
 
         private string CreateWhereInStatement(SimpleExpression criteria, Table table)

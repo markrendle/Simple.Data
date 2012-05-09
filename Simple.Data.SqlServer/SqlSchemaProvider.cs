@@ -176,10 +176,9 @@ where object_id = object_id('{0}.{1}', 'TABLE') or object_id = object_id('{0}.{1
 
         private DataTable GetPrimaryKeys(string tableName)
         {
-            return GetPrimaryKeys().AsEnumerable()
-                .Where(
-                    row => row["TABLE_NAME"].ToString().Equals(tableName, StringComparison.InvariantCultureIgnoreCase))
-                .CopyToDataTable();
+            var primaryKeys = GetPrimaryKeys();
+            var dataTable = primaryKeys.AsEnumerable().Where(row => row["TABLE_NAME"].ToString().Equals(tableName, StringComparison.InvariantCultureIgnoreCase)).CopyToDataTable();
+            return dataTable;
         }
 
         private EnumerableRowCollection<DataRow> GetForeignKeys(string tableName)

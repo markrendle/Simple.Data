@@ -44,6 +44,18 @@ namespace Simple.Data.Ado.Schema
             get { return _lazyTables.Value.AsEnumerable(); }
         }
 
+        public bool IsTable(string name)
+        {
+            try
+            {
+                var table = FindTable(name);
+                return table != null;
+            }
+            catch (UnresolvableObjectException)
+            {
+                return false;
+            }
+        }
         public Table FindTable(string tableName)
         {
             if (!string.IsNullOrWhiteSpace(DefaultSchema) && !(tableName.Contains(".")))

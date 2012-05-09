@@ -97,6 +97,15 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void TestUpdateAllWithNoMatchingRows()
+        {
+            var db = DatabaseHelper.Open();
+            db.test.SchemaTable.UpdateAll(db.test.SchemaTable.Id == 1138, Description: "Updated");
+            var test = db.test.SchemaTable.FindById(1138);
+            Assert.IsNull(test);
+        }
+
+        [Test]
         public void TestUpdateWithJoinCriteriaOnCompoundKeyTable()
         {
             var db = DatabaseHelper.Open();
