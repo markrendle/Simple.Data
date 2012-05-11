@@ -327,11 +327,22 @@
             return false;
         }
 
-        private static bool MethodIsCallable(MethodInfo mi, InvokeMemberBinder binder, object[] args)
+        public SimpleQuery With(ObjectReference reference, out dynamic queryObjectReference)
         {
-            return mi.Name.Equals(binder.Name, StringComparison.OrdinalIgnoreCase) &&
-                   mi.GetParameters().Length == 1 &&
-                   Convert.ChangeType(args, mi.GetParameters().Single().ParameterType) != null;
+            queryObjectReference = reference;
+            return With(new[] {reference});
+        }
+
+        public SimpleQuery WithOne(ObjectReference reference, out dynamic queryObjectReference)
+        {
+            queryObjectReference = reference;
+            return With(new[] {reference}, WithType.One);
+        }
+
+        public SimpleQuery WithMany(ObjectReference reference, out dynamic queryObjectReference)
+        {
+            queryObjectReference = reference;
+            return With(new[] {reference}, WithType.Many);
         }
 
         private SimpleQuery ParseWith(InvokeMemberBinder binder, object[] args)

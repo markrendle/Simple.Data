@@ -249,5 +249,28 @@ namespace Simple.Data.IntegrationTest.Query
 
             GeneratedSqlIs(expectedSql);
         }
+        
+        /// <summary>
+        /// Test for issue #184
+        /// </summary>
+        [Test]
+        public void CriteriaReferencesShouldUseWithAlias()
+        {
+            const string expectedSql = "select [dbo].[employee].[id],[dbo].[employee].[name]," +
+                "[dbo].[employee].[managerid],[dbo].[employee].[departmentid]," +
+                "[foo].[id] as [__with1__foo__id],[foo].[name] as [__with1__foo__name]" +
+                " from [dbo].[employee] join [dbo].[department] [foo] on ([foo].[id] = [dbo].[employee].[departmentid])" +
+                " where ([dbo].[employee].[name] like @p1" +
+                " and [foo].[name] = @p2)";
+
+            dynamic foo;
+            var q = _db.Employees.Query()
+                .Where(_db.Employees.Name.Like("A%"))
+                .WithOne(_db.Employees.Department.As("Foo"), out foo)
+                .Where(foo.Name == "Admin");
+            EatException(() => q.ToList());
+
+            GeneratedSqlIs(expectedSql);
+        }
     }
 }
