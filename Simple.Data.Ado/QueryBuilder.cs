@@ -223,7 +223,7 @@ namespace Simple.Data.Ado
             var fromHavingCriteria = joiner.GetJoinClauses(_tableName, _havingCriteria);
 
             var fromColumnList = _columns.Any(r => !(r is SpecialReference))
-                                     ? joiner.GetJoinClauses(_tableName, GetObjectReferences(_columns).Where(o => !joinClauses.Any(j => o.GetOwner().Equals(j.Table))), JoinType.Outer)
+                                     ? GetJoinClausesFromColumnList(joinClauses, joiner)
                                      : Enumerable.Empty<string>();
 
             var joinList = fromTable.Concat(fromJoins).Concat(fromCriteria).Concat(fromHavingCriteria).Concat(fromColumnList).Select(s => s.Trim()).Distinct().ToList();
@@ -244,6 +244,18 @@ namespace Simple.Data.Ado
             {
                 _commandBuilder.Append(" " + joins);
             }
+        }
+
+        private IEnumerable<string> GetJoinClausesFromColumnList(IEnumerable<JoinClause> joinClauses, Joiner joiner)
+        {
+            return joiner.GetJoinClauses(_tableName, GetObjectReferences(_columns)
+                .Where(o => !joinClauses.Any(j => ObjectReferenceIsInJoinClause(j, o))), JoinType.Outer);
+
+        }
+
+        private static bool ObjectReferenceIsInJoinClause(JoinClause clause, ObjectReference reference)
+        {
+            return reference.GetOwner().GetAliasOrName().Equals(clause.Table.GetAliasOrName());
         }
 
         private IEnumerable<ObjectReference> GetObjectReferences(IEnumerable<SimpleReference> source)

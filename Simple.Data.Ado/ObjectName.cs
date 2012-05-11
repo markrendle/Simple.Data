@@ -57,7 +57,7 @@ namespace Simple.Data.Ado
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(other._schema, _schema) && Equals(other._name, _name);
+            return Equals(other._schema, _schema) && Equals(other._name, _name) && Equals(other._alias, _alias);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Simple.Data.Ado
         {
             unchecked
             {
-                return ((_schema??string.Empty).GetHashCode()*397) ^ _name.GetHashCode();
+                return ((_schema??string.Empty).GetHashCode()*397) ^ (_name.GetHashCode()*397) ^ ((_alias??string.Empty).GetHashCode());
             }
         }
 
