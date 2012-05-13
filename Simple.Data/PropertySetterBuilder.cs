@@ -285,22 +285,26 @@ namespace Simple.Data
 
         private TryExpression CreateTrySimpleAssign()
         {
-            var changeTypeMethod = typeof (PropertySetterBuilder).GetMethod("SafeConvert",
-                                                                            BindingFlags.Static | BindingFlags.NonPublic);
-
             MethodCallExpression callConvert;
             if (_property.PropertyType.IsEnum)
             {
+                var changeTypeMethod = typeof (PropertySetterBuilder).GetMethod("SafeConvert",
+                                                                                BindingFlags.Static | BindingFlags.NonPublic);
                 callConvert = Expression.Call(changeTypeMethod, _itemProperty,
                                               Expression.Constant(_property.PropertyType.GetEnumUnderlyingType()));
             }
             else if (_property.PropertyType.IsGenericType && _property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
-                callConvert = Expression.Call(changeTypeMethod, _itemProperty,
-                                              Expression.Constant(_property.PropertyType.GetGenericArguments().Single()));
+                var changeTypeMethod = typeof (PropertySetterBuilder)
+                    .GetMethod("SafeConvertNullable", BindingFlags.Static | BindingFlags.NonPublic)
+                    .MakeGenericMethod(_property.PropertyType.GetGenericArguments().Single());
+
+                callConvert = Expression.Call(changeTypeMethod, _itemProperty);
             }
             else
             {
+                var changeTypeMethod = typeof (PropertySetterBuilder).GetMethod("SafeConvert",
+                                                                                BindingFlags.Static | BindingFlags.NonPublic);
                 callConvert = Expression.Call(changeTypeMethod, _itemProperty,
                                               Expression.Constant(_property.PropertyType));
             }
@@ -342,11 +346,18 @@ namespace Simple.Data
 
 // ReSharper disable UnusedMember.Local
 // Because they're used from runtime-generated code, you see.
-        private static object SafeConvert(object source, Type targetType)
+        internal static object SafeConvert(object source, Type targetType)
         {
             if (ReferenceEquals(source, null)) return null;
             if (targetType.IsInstanceOfType(source)) return source;
             return Convert.ChangeType(source, targetType);
+        }
+
+        internal static T? SafeConvertNullable<T>(object source)
+            where T : struct 
+        {
+            if (ReferenceEquals(source, null)) return default(T);
+            return (T) source;
         }
 
         private static T[] CreateArray<T>(object source)

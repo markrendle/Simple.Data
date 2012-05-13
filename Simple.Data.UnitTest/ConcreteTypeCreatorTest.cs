@@ -45,6 +45,18 @@ namespace Simple.Data.UnitTest
             Assert.IsInstanceOf<Int32ToEnum>(actual);
             Assert.AreEqual(expected, ((Int32ToEnum)actual).Value);
         }
+        
+        [Test]
+        public void CanConvertInt32ToNullableEnum()
+        {
+            Int32ToNullableEnum.Numbers? expected = Int32ToNullableEnum.Numbers.One;
+            var source = new Dictionary<string, object> { { "Value", (int)expected } };
+            var target = ConcreteTypeCreator.Get(typeof(Int32ToNullableEnum));
+            object actual;
+            Assert.IsTrue(target.TryCreate(source, out actual));
+            Assert.IsInstanceOf<Int32ToNullableEnum>(actual);
+            Assert.AreEqual(expected, ((Int32ToNullableEnum)actual).Value);
+        }
 
         [Test]
         public void CanConvertStringToEnum()
@@ -61,6 +73,16 @@ namespace Simple.Data.UnitTest
         public class DecimalToDouble
         {
             public double Value { get; set; }
+        }
+
+        public class Int32ToNullableEnum
+        {
+            public Numbers? Value { get; set; }
+            public enum Numbers
+            {
+                One = 1,
+                Two = 2
+            }
         }
 
         public class DateTimeToNullableDateTime
