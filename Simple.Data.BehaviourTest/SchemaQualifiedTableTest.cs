@@ -15,11 +15,14 @@ namespace Simple.Data.IntegrationTest
         static Database CreateDatabase(MockDatabase mockDatabase)
         {
             var mockSchemaProvider = new MockSchemaProvider();
-            mockSchemaProvider.SetTables(new[] { "foo", "Users", "BASE TABLE" });
+            mockSchemaProvider.SetTables(new[] {"foo", "Users", "BASE TABLE"},
+                                         new[] {"foo.bar", "Test", "BASE TABLE"});
             mockSchemaProvider.SetColumns(new[] { "foo", "Users", "Id" },
                                           new[] { "foo", "Users", "Name" },
                                           new[] { "foo", "Users", "Password" },
-                                          new[] { "foo", "Users", "Age" });
+                                          new[] { "foo", "Users", "Age" },
+                                          new[] { "foo.bar", "Test", "Id"},
+                                          new[] { "foo.bar", "Test", "Value"});
             mockSchemaProvider.SetPrimaryKeys(new object[] { "foo", "Users", "Id", 0 });
             return new Database(new AdoAdapter(new MockConnectionProvider(new MockDbConnection(mockDatabase), mockSchemaProvider)));
         }
@@ -242,6 +245,16 @@ namespace Simple.Data.IntegrationTest
             Assert.AreEqual("insert into [foo].[Users] ([Name],[Age]) values (@p0,@p1)".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Phil", mockDatabase.Parameters[0]);
             Assert.AreEqual(42, mockDatabase.Parameters[1]);
+        }
+
+        [Test]
+        public void TestFindWithDotInSchemaName()
+        {
+            var mockDatabase = new MockDatabase();
+            dynamic database = CreateDatabase(mockDatabase);
+            database.foobar.Test.Find(database.foobar.Test.Id == 1);
+            Assert.AreEqual("select [foo.bar].[Test].[Id], [foo.bar].[Test].[Value] from [foo.bar].[Test] where [foo.bar].[Test].[id] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual(1, mockDatabase.Parameters[0]);
         }
     }
 }
