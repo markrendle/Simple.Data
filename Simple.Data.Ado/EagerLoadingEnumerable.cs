@@ -107,6 +107,7 @@
 
             public void AddToCollection(IDictionary<string,object> row)
             {
+                if (row.All(kvp => ReferenceEquals(null, kvp.Value))) return;
                 if (Collection == null) Collection = new HashSet<IDictionary<string, object>>(new DictionaryEqualityComparer());
                 Collection.Add(row);
             }
