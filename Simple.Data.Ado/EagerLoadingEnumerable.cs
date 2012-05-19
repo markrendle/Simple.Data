@@ -83,7 +83,10 @@
                     {
                         var withContainer = new WithContainer();
                         withContainer.SetSingle(tuple.Item2);
-                        withContainers.Add(tuple.Item1, withContainer);
+                        if (!ReferenceEquals(withContainer.Single, null))
+                        {
+                            withContainers.Add(tuple.Item1, withContainer);
+                        }
                     }
                 }
 
@@ -114,6 +117,7 @@
 
             public void SetSingle(IDictionary<string,object> row)
             {
+                if (row.All(kvp => ReferenceEquals(null, kvp.Value))) return;
                 Single = row;
             }
         }
