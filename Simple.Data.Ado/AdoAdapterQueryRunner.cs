@@ -34,7 +34,7 @@
             if (_adapter.ProviderSupportsCompoundStatements || commandBuilders.Length == 1)
             {
                 var command =
-                    CommandBuilder.CreateCommand(
+                    new CommandBuilder(_adapter.GetSchema()).CreateCommand(
                         _adapter.ProviderHelper.GetCustomProvider<IDbParameterFactory>(_adapter.SchemaProvider),
                         commandBuilders,
                         connection);
@@ -237,7 +237,7 @@
                     connection = _adapter.CreateConnection();
                 }
                 IDbCommand command =
-                    CommandBuilder.CreateCommand(
+                    new CommandBuilder(_adapter.GetSchema()).CreateCommand(
                         _adapter.ProviderHelper.GetCustomProvider<IDbParameterFactory>(_adapter.SchemaProvider),
                         commandBuilders.ToArray(), connection);
                 if (_transaction != null)

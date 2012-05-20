@@ -13,6 +13,7 @@ namespace Simple.Data.Ado
     {
         private int _number;
         private Func<IDbCommand, IDbParameterFactory> _getParameterFactory;
+        private readonly DatabaseSchema _schema;
         private readonly ISchemaProvider _schemaProvider;
         private readonly Dictionary<ParameterTemplate, object> _parameters = new Dictionary<ParameterTemplate, object>();
         private readonly StringBuilder _text;
@@ -28,6 +29,7 @@ namespace Simple.Data.Ado
         public CommandBuilder(DatabaseSchema schema, int bulkIndex)
         {
             _text = new StringBuilder();
+            _schema = schema;
             _schemaProvider = schema.SchemaProvider;
             _customInterfaceProvider = schema.ProviderHelper;
             _parameterSuffix = (bulkIndex >= 0) ? "_c" + bulkIndex : string.Empty;
@@ -36,6 +38,7 @@ namespace Simple.Data.Ado
         public CommandBuilder(string text, DatabaseSchema schema, int bulkIndex)
         {
             _text = new StringBuilder(text);
+            _schema = schema;
             _schemaProvider = schema.SchemaProvider;
             _customInterfaceProvider = schema.ProviderHelper;
             _parameterSuffix = (bulkIndex >= 0) ? "_c" + bulkIndex : string.Empty;
@@ -166,7 +169,7 @@ namespace Simple.Data.Ado
             SetParameters(parameterFactory, command, parameters);
         }
 
-        private static void SetParameters(IDbParameterFactory parameterFactory, IDbCommand command, IEnumerable<KeyValuePair<ParameterTemplate, object>> parameters)
+        private void SetParameters(IDbParameterFactory parameterFactory, IDbCommand command, IEnumerable<KeyValuePair<ParameterTemplate, object>> parameters)
         {
             var parameterList = parameters.ToList();
             if (parameterList.Any(kvp => kvp.Value is IRange) ||
@@ -189,7 +192,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static IEnumerable<IDbDataParameter> CreateParameterComplex(IDbParameterFactory parameterFactory, ParameterTemplate template, object value, IDbCommand command)
+        private IEnumerable<IDbDataParameter> CreateParameterComplex(IDbParameterFactory parameterFactory, ParameterTemplate template, object value, IDbCommand command)
         {
             if (template.Column != null && template.Column.IsBinary)
             {
@@ -228,13 +231,13 @@ namespace Simple.Data.Ado
                             if (command.CommandText.Contains("!= " + template.Name))
                             {
                                 command.CommandText = command.CommandText.Replace("!= " + template.Name,
-                                                                                  "NOT IN (" +
+                                                                                  _schema.Operators.NotIn + " (" +
                                                                                   builder.ToString().Substring(1) + ")");
                             }
                             else
                             {
                                 command.CommandText = command.CommandText.Replace("= " + template.Name,
-                                                                                  "IN (" +
+                                                                                  _schema.Operators.In + " (" +
                                                                                   builder.ToString().Substring(1) +
                                                                                   ")");
                             }
@@ -248,17 +251,17 @@ namespace Simple.Data.Ado
             }
         }
 
-        public static void SetBetweenInCommandText(IDbCommand command, string name)
+        public void SetBetweenInCommandText(IDbCommand command, string name)
         {
             if (command.CommandText.Contains("!= " + name))
             {
                 command.CommandText = command.CommandText.Replace("!= " + name,
-                                                                  string.Format("NOT BETWEEN {0}_start AND {0}_end", name));
+                                                                  string.Format("{0} {1}_start AND {1}_end", _schema.Operators.NotBetween, name));
             }
             else
             {
                 command.CommandText = command.CommandText.Replace("= " + name,
-                                                                  string.Format("BETWEEN {0}_start AND {0}_end", name));
+                                                                  string.Format("{0} {1}_start AND {1}_end", _schema.Operators.Between, name));
             }
         }
 
@@ -289,7 +292,7 @@ namespace Simple.Data.Ado
             return parameter;
         }
 
-        internal static IDbCommand CreateCommand(IDbParameterFactory parameterFactory, ICommandBuilder[] commandBuilders, IDbConnection connection)
+        internal IDbCommand CreateCommand(IDbParameterFactory parameterFactory, ICommandBuilder[] commandBuilders, IDbConnection connection)
         {
             var command = connection.CreateCommand();
             parameterFactory = parameterFactory ?? new GenericDbParameterFactory(command);

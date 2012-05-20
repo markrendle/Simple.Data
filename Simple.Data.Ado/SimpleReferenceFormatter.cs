@@ -78,20 +78,20 @@ namespace Simple.Data.Ado
 
         }
 
-        private static string MathOperatorToString(MathOperator @operator)
+        private string MathOperatorToString(MathOperator @operator)
         {
             switch (@operator)
             {
                 case MathOperator.Add:
-                    return "+";
+                    return _schema.Operators.Add;
                 case MathOperator.Subtract:
-                    return "-";
+                    return _schema.Operators.Subtract;
                 case MathOperator.Multiply:
-                    return "*";
+                    return _schema.Operators.Multiply;
                 case MathOperator.Divide:
-                    return "/";
+                    return _schema.Operators.Divide;
                 case MathOperator.Modulo:
-                    return "%";
+                    return _schema.Operators.Modulo;
                 default:
                     throw new InvalidOperationException("Invalid MathOperator specified.");
             }
