@@ -9,7 +9,7 @@ using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
-    class CommandBuilder : ICommandBuilder
+    public class CommandBuilder : ICommandBuilder
     {
         private int _number;
         private Func<IDbCommand, IDbParameterFactory> _getParameterFactory;

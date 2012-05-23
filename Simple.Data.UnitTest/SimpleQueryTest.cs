@@ -168,5 +168,45 @@ namespace Simple.Data.UnitTest
             Assert.AreEqual(quux.foo_id, join.JoinExpression.RightOperand);
             Assert.AreEqual(SimpleExpressionType.Equal, join.JoinExpression.Type);
         }
+
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void ForUpdateWithoutSelectShouldThrow()
+        {
+            new SimpleQuery(null, "foo").ForUpdate(false);
+        }
+
+        [Test]
+        public void ForUpdateShouldAddAClause()
+        {
+            var query = new SimpleQuery(null, "foo").Select(new AllColumnsSpecialReference()).ForUpdate(true);
+            Assert.AreEqual(1, query.Clauses.OfType<ForUpdateClause>().Count());
+            var forUpdate = query.Clauses.OfType<ForUpdateClause>().Single();
+            Assert.IsTrue(forUpdate.SkipLockedRows);
+        }
+
+        [Test]
+        public void SubsequentCallsToForUpdateShouldReplaceClause()
+        {
+            var query = new SimpleQuery(null, "foo").Select(new AllColumnsSpecialReference()).ForUpdate(false);
+            Assert.AreEqual(1, query.Clauses.OfType<ForUpdateClause>().Count());
+            var forUpdate = query.Clauses.OfType<ForUpdateClause>().Single();
+            Assert.IsFalse(forUpdate.SkipLockedRows);
+            query = query.ForUpdate(true);
+            Assert.AreEqual(1, query.Clauses.OfType<ForUpdateClause>().Count());
+            forUpdate = query.Clauses.OfType<ForUpdateClause>().Single();
+            Assert.IsTrue(forUpdate.SkipLockedRows);
+        }
+
+        [Test]
+        public void ClearForUpdateRemovesClause()
+        {
+            var query = new SimpleQuery(null, "foo").Select(new AllColumnsSpecialReference()).ForUpdate(false);
+            Assert.AreEqual(1, query.Clauses.OfType<ForUpdateClause>().Count());
+            var forUpdate = query.Clauses.OfType<ForUpdateClause>().Single();
+            Assert.IsFalse(forUpdate.SkipLockedRows);
+            query = query.ClearForUpdate();
+            Assert.AreEqual(0, query.Clauses.OfType<ForUpdateClause>().Count());
+        }
     }
 }

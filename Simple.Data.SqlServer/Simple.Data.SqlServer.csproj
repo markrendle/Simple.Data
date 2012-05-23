@@ -59,12 +59,14 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SqlBulkInserter.cs" />
+    <Compile Include="SqlCustomQueryBuilder.cs" />
     <Compile Include="SqlDbParameterFactory.cs" />
     <Compile Include="SqlColumn.cs" />
     <Compile Include="SqlCommandOptimizer.cs" />
     <Compile Include="SqlConnectionProvider.cs" />
     <Compile Include="SqlDbTypeEx.cs" />
     <Compile Include="SqlObservableQueryRunner.cs" />
+    <Compile Include="SqlQueryBuilder.cs" />
     <Compile Include="SqlQueryPager.cs" />
     <Compile Include="SqlSchemaProvider.cs" />
     <Compile Include="SqlTypeResolver.cs" />
