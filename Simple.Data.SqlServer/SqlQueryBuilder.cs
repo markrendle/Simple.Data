@@ -34,7 +34,7 @@ namespace Simple.Data.SqlServer
             var forUpdateClause = _query.Clauses.OfType<ForUpdateClause>().FirstOrDefault();
             if (forUpdateClause != null)
             {
-                var forUpdate = " WITH (UPDLOCK";
+                var forUpdate = " WITH (UPDLOCK, ROWLOCK";
                 if (forUpdateClause.SkipLockedRows)
                 {
                     forUpdate += ", READPAST";

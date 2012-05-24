@@ -151,14 +151,12 @@
         }
 
         /// <summary>
-        /// Alters the query to lock the rows for update.
-        /// Requires that a form of Select has already been requested
+        /// Alters the query to lock the rows for update. 
         /// </summary>
         /// <param name="skipLockedRows">Indicates whether the selection should skip rows already locked</param>
         /// <returns>A new <see cref="SimpleQuery"/> which will perform locking on the selected rows</returns>
         public SimpleQuery ForUpdate(bool skipLockedRows)
         {
-            ThrowIfThereIsNotASelectClause();
             return new SimpleQuery(this, _clauses.Where(c => !(c is ForUpdateClause)).Append(new ForUpdateClause(skipLockedRows)).ToArray());
         }
 
@@ -169,12 +167,6 @@
         public SimpleQuery ClearForUpdate()
         {
             return new SimpleQuery(this, _clauses.Where(c => !(c is ForUpdateClause)).ToArray());
-        }
-
-        private void ThrowIfThereIsNotASelectClause()
-        {
-            if (!_clauses.OfType<SelectClause>().Any())
-                throw new InvalidOperationException("Query does not contain a Select clause.");
         }
 
         private void ThrowIfThereIsAlreadyASelectClause()

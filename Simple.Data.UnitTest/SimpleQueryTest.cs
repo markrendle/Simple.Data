@@ -170,16 +170,9 @@ namespace Simple.Data.UnitTest
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void ForUpdateWithoutSelectShouldThrow()
-        {
-            new SimpleQuery(null, "foo").ForUpdate(false);
-        }
-
-        [Test]
         public void ForUpdateShouldAddAClause()
         {
-            var query = new SimpleQuery(null, "foo").Select(new AllColumnsSpecialReference()).ForUpdate(true);
+            var query = new SimpleQuery(null, "foo").ForUpdate(true);
             Assert.AreEqual(1, query.Clauses.OfType<ForUpdateClause>().Count());
             var forUpdate = query.Clauses.OfType<ForUpdateClause>().Single();
             Assert.IsTrue(forUpdate.SkipLockedRows);
@@ -188,7 +181,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void SubsequentCallsToForUpdateShouldReplaceClause()
         {
-            var query = new SimpleQuery(null, "foo").Select(new AllColumnsSpecialReference()).ForUpdate(false);
+            var query = new SimpleQuery(null, "foo").ForUpdate(false);
             Assert.AreEqual(1, query.Clauses.OfType<ForUpdateClause>().Count());
             var forUpdate = query.Clauses.OfType<ForUpdateClause>().Single();
             Assert.IsFalse(forUpdate.SkipLockedRows);
@@ -201,7 +194,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void ClearForUpdateRemovesClause()
         {
-            var query = new SimpleQuery(null, "foo").Select(new AllColumnsSpecialReference()).ForUpdate(false);
+            var query = new SimpleQuery(null, "foo").ForUpdate(false);
             Assert.AreEqual(1, query.Clauses.OfType<ForUpdateClause>().Count());
             var forUpdate = query.Clauses.OfType<ForUpdateClause>().Single();
             Assert.IsFalse(forUpdate.SkipLockedRows);
