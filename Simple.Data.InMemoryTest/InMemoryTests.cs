@@ -623,5 +623,33 @@
                 Assert.AreEqual("Bar", row.Foo);
             }
         }
+
+        [Test]
+        public void UpsertShouldAddNewRecord()
+        {
+            var adapter = new InMemoryAdapter();
+            adapter.SetKeyColumn("Test", "Id");
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            db.Test.Upsert(Id: 1, SomeValue: "Testing");
+            var record = db.Test.Get(1);
+            Assert.IsNotNull(record);
+            Assert.AreEqual("Testing", record.SomeValue);
+        }
+
+        [Test]
+        public void UpsertShouldUpdateExistingRecord()
+        {
+            var adapater = new InMemoryAdapter();
+            adapater.SetKeyColumn("Test","Id");
+            Database.UseMockAdapter(adapater);
+            var db = Database.Open();
+            db.Test.Upsert(Id: 1, SomeValue: "Testing");
+            db.Test.Upsert(Id: 1, SomeValue: "Updated");
+            List<dynamic> allRecords = db.Test.All().ToList();
+            Assert.IsNotNull(allRecords);
+            Assert.AreEqual(1,allRecords.Count);
+            Assert.AreEqual("Updated", allRecords.Single().SomeValue);
+        }
     }
 }
