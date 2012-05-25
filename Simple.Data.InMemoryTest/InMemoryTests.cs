@@ -651,5 +651,15 @@
             Assert.AreEqual(1,allRecords.Count);
             Assert.AreEqual("Updated", allRecords.Single().SomeValue);
         }
+
+        [Test]
+        public void UpsertWithoutDefinedKeyColumnsSHouldThrowMeaningfulException()
+        {
+            var adapter = new InMemoryAdapter();
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            var exception = Assert.Throws<InvalidOperationException>(() => db.Test.Upsert(Id: 1, HasTowel: true));
+            Assert.AreEqual("No key columns defined for table \"Test\"", exception.Message);
+        }
     }
 }
