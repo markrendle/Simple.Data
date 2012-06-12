@@ -3,8 +3,14 @@ using System.Linq;
 
 namespace Simple.Data.Ado
 {
+    using System;
+
     class ExpressionHasher : ExpressionFormatterBase
     {
+        public ExpressionHasher() : base(() => new Operators())
+        {
+        }
+
         protected override string FormatObject(object value, object otherOperand)
         {
             var reference = value as SimpleReference;

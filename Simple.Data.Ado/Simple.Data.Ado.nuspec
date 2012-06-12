@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Simple.Data.Ado</id>
-    <version>0.16.1.1</version>
+    <version>0.16.2.2</version>
     <authors>Mark Rendle</authors>
     <owners>Mark Rendle</owners>
     <description>ADO Adapter for the Simple.Data data access library.</description> 
@@ -12,7 +12,7 @@
     <tags>sqlserver database data ado .net40</tags>
     <language>en-us</language>
     <dependencies>
-      <dependency id="Simple.Data.Core" version="0.16.1.1" />
+      <dependency id="Simple.Data.Core" version="0.16.2.2" />
     </dependencies>
   </metadata>
 </package>

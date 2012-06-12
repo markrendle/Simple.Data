@@ -156,12 +156,11 @@ namespace Simple.Data.SqlServer
 
         private DataTable GetColumnsDataTable(Table table)
         {
-            var columnSelect =
-                string.Format(
-                    @"SELECT name, is_identity, type_name(system_type_id) as type_name, max_length from sys.columns 
-where object_id = object_id('{0}.{1}', 'TABLE') or object_id = object_id('{0}.{1}', 'VIEW') order by column_id",
-                    table.Schema, table.ActualName);
-            return SelectToDataTable(columnSelect);
+            const string columnSelect = @"SELECT name, is_identity, type_name(system_type_id) as type_name, max_length from sys.columns 
+where object_id = object_id(@tableName, 'TABLE') or object_id = object_id(@tableName, 'VIEW') order by column_id";
+            var @tableName = new SqlParameter("@tableName", SqlDbType.NVarChar, 128);
+            @tableName.Value = string.Format("[{0}].[{1}]", table.Schema, table.ActualName);
+            return SelectToDataTable(columnSelect, @tableName);
         }
 
         private DataTable GetPrimaryKeys()
@@ -188,13 +187,14 @@ where object_id = object_id('{0}.{1}', 'TABLE') or object_id = object_id('{0}.{1
                     row => row["TABLE_NAME"].ToString().Equals(tableName, StringComparison.InvariantCultureIgnoreCase));
         }
 
-        private DataTable SelectToDataTable(string sql)
+        private DataTable SelectToDataTable(string sql, params SqlParameter[] parameters)
         {
             var dataTable = new DataTable();
             using (var cn = ConnectionProvider.CreateConnection() as SqlConnection)
             {
                 using (var adapter = new SqlDataAdapter(sql, cn))
                 {
+                    adapter.SelectCommand.Parameters.AddRange(parameters);
                     adapter.Fill(dataTable);
                 }
 

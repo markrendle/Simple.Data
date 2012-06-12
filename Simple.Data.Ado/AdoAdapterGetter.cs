@@ -70,7 +70,7 @@ namespace Simple.Data.Ado
         private IDictionary<string, object> ExecuteSingletonQuery(CommandTemplate commandTemplate, IEnumerable<object> parameterValues)
         {
             var connection = _connection ?? _adapter.CreateConnection();
-            var command = commandTemplate.GetDbCommand(connection, parameterValues);
+            var command = commandTemplate.GetDbCommand(_adapter, connection, parameterValues);
             command.Transaction = _transaction;
             return TryExecuteSingletonQuery(connection, command, commandTemplate.Index);
         }

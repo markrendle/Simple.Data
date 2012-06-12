@@ -14,12 +14,14 @@ namespace Simple.Data.Ado.Schema
         private readonly ISchemaProvider _schemaProvider;
         private readonly Lazy<TableCollection> _lazyTables;
         private readonly Lazy<ProcedureCollection> _lazyProcedures;
+        private readonly Lazy<Operators> _operators;
         private string _defaultSchema;
 
         private DatabaseSchema(ISchemaProvider schemaProvider, ProviderHelper providerHelper)
         {
             _lazyTables = new Lazy<TableCollection>(CreateTableCollection);
             _lazyProcedures = new Lazy<ProcedureCollection>(CreateProcedureCollection);
+            _operators = new Lazy<Operators>(CreateOperators);
             _schemaProvider = schemaProvider;
             _providerHelper = providerHelper;
         }
@@ -145,6 +147,16 @@ namespace Simple.Data.Ado.Schema
         public bool IsProcedure(string procedureName)
         {
             return _lazyProcedures.Value.IsProcedure(procedureName);
+        }
+
+        public Operators Operators
+        {
+            get { return _operators.Value; }
+        }
+
+        private Operators CreateOperators()
+        {
+            return ProviderHelper.GetCustomProvider<Operators>(_schemaProvider) ?? new Operators();
         }
     }
 

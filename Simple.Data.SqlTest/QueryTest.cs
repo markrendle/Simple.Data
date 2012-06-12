@@ -392,6 +392,17 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, actual.Orders.Single().OrderId);
             Assert.AreEqual(new DateTime(2010,10,10), actual.Orders.Single().OrderDate);
         }
+        
+        [Test]
+        public void WithClauseShouldCastToStaticTypeWithEmptyCollection()
+        {
+            var db = DatabaseHelper.Open();
+            var newCustomer = db.Customers.Insert(Name: "No Orders");
+            Customer actual = db.Customers.FindAllByCustomerId(newCustomer.CustomerId).WithOrders().FirstOrDefault();
+            Assert.IsNotNull(actual);
+            Assert.IsNotNull(actual.Orders);
+            Assert.AreEqual(0, actual.Orders.Count);
+        }
 
         [Test]
         public void SelfJoinShouldNotThrowException()

@@ -11,7 +11,7 @@ namespace Simple.Data.Ado
         private readonly DatabaseSchema _schema;
         private readonly SimpleReferenceFormatter _simpleReferenceFormatter;
 
-        public ExpressionFormatter(ICommandBuilder commandBuilder, DatabaseSchema schema)
+        public ExpressionFormatter(ICommandBuilder commandBuilder, DatabaseSchema schema) : base(() => schema.Operators)
         {
             _commandBuilder = commandBuilder;
             _schema = schema;

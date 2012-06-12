@@ -29,19 +29,19 @@ namespace Simple.Data.Ado
             get { return _index; }
         }
 
-        public IDbCommand GetDbCommand(IDbConnection connection, IEnumerable<object> parameterValues)
+        public IDbCommand GetDbCommand(AdoAdapter adapter, IDbConnection connection, IEnumerable<object> parameterValues)
         {
             var command = connection.CreateCommand();
             command.CommandText = _commandText;
 
-            foreach (var parameter in CreateParameters(command, parameterValues))
+            foreach (var parameter in CreateParameters(adapter.GetSchema(), command, parameterValues))
             {
                 command.Parameters.Add(parameter);
             }
             return command;
         }
 
-        private IEnumerable<IDbDataParameter> CreateParameters(IDbCommand command, IEnumerable<object> parameterValues)
+        private IEnumerable<IDbDataParameter> CreateParameters(DatabaseSchema schema, IDbCommand command, IEnumerable<object> parameterValues)
         {
             var fixedParameters = _parameters.Where(pt => pt.Type == ParameterType.FixedValue).ToArray();
             if ((!parameterValues.Any(pv => pv != null)) && fixedParameters.Length == 0) yield break;
@@ -55,14 +55,14 @@ namespace Simple.Data.Ado
             var columnParameters = _parameters.Where(pt => pt.Type != ParameterType.FixedValue).ToArray();
 
             foreach (var parameter in parameterValues.Any(o => o is IEnumerable && !(o is string)) || parameterValues.Any(o => o is IRange)
-                       ? parameterValues.SelectMany((v, i) => CreateParameters(command, columnParameters[i], v))
+                       ? parameterValues.SelectMany((v, i) => CreateParameters(schema, command, columnParameters[i], v))
                        : parameterValues.Select((v, i) => CreateParameter(command, columnParameters[i], v)))
             {
                 yield return parameter;
             }
         }
 
-        private IEnumerable<IDbDataParameter> CreateParameters(IDbCommand command, ParameterTemplate parameterTemplate, object value)
+        private IEnumerable<IDbDataParameter> CreateParameters(DatabaseSchema schema, IDbCommand command, ParameterTemplate parameterTemplate, object value)
         {
             if (value == null || TypeHelper.IsKnownType(value.GetType()) || parameterTemplate.DbType == DbType.Binary)
             {
@@ -75,7 +75,7 @@ namespace Simple.Data.Ado
                 {
                     yield return CreateParameter(command, parameterTemplate, range.Start, "_start");
                     yield return CreateParameter(command, parameterTemplate, range.End, "_end");
-                    CommandBuilder.SetBetweenInCommandText(command, parameterTemplate.Name);
+                    new CommandBuilder(schema).SetBetweenInCommandText(command, parameterTemplate.Name);
                 }
                 else
                 {
@@ -89,7 +89,7 @@ namespace Simple.Data.Ado
                             builder.AppendFormat(",{0}_{1}", parameterTemplate.Name, i);
                             yield return CreateParameter(command, parameterTemplate, array[i], "_" + i);
                         }
-                        RewriteSqlEqualityToInClause(command, parameterTemplate, builder);
+                        RewriteSqlEqualityToInClause(schema, command, parameterTemplate, builder);
                     }
                     else
                     {
@@ -99,19 +99,19 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static void RewriteSqlEqualityToInClause(IDbCommand command, ParameterTemplate parameterTemplate, StringBuilder builder)
+        private static void RewriteSqlEqualityToInClause(DatabaseSchema schema, IDbCommand command, ParameterTemplate parameterTemplate, StringBuilder builder)
         {
             if (command.CommandText.Contains("!= " + parameterTemplate.Name))
             {
                 command.CommandText = command.CommandText.Replace("!= " + parameterTemplate.Name,
-                                                                  "NOT IN (" +
+                                                                  schema.Operators.NotIn + " (" +
                                                                   builder.ToString().Substring(1) +
                                                                   ")");
             }
             else
             {
                 command.CommandText = command.CommandText.Replace("= " + parameterTemplate.Name,
-                                                                  "IN (" +
+                                                                  schema.Operators.In + " (" +
                                                                   builder.ToString().Substring(1) +
                                                                   ")");
             }
