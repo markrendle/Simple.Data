@@ -161,5 +161,22 @@ namespace Simple.Data
         {
             return _dataStrategy.Run.Find(_tableName, null).Select(dict => new SimpleRecord(dict, _tableName, _dataStrategy));
         }
+
+        public AllColumnsSpecialReference AllColumns()
+        {
+            return new AllColumnsSpecialReference(this.ToObjectReference());
+        }
+
+        public AllColumnsSpecialReference Star()
+        {
+            return AllColumns();
+        }
+
+        internal ObjectReference ToObjectReference()
+        {
+            if (_schema == null) return new ObjectReference(_tableName, _dataStrategy);
+            var schemaReference = new ObjectReference(_schema.GetName(), _dataStrategy);
+            return new ObjectReference(_tableName, schemaReference, _dataStrategy);
+        }
     }
 }
