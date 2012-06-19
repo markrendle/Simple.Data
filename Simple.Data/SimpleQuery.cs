@@ -150,6 +150,25 @@
             return new SimpleQuery(this, _clauses.Where(c => !(c is SelectClause)).Append(new SelectClause(columns)).ToArray());
         }
 
+        /// <summary>
+        /// Alters the query to lock the rows for update. 
+        /// </summary>
+        /// <param name="skipLockedRows">Indicates whether the selection should skip rows already locked</param>
+        /// <returns>A new <see cref="SimpleQuery"/> which will perform locking on the selected rows</returns>
+        public SimpleQuery ForUpdate(bool skipLockedRows)
+        {
+            return new SimpleQuery(this, _clauses.Where(c => !(c is ForUpdateClause)).Append(new ForUpdateClause(skipLockedRows)).ToArray());
+        }
+
+        /// <summary>
+        /// Removes any specified ForUpdate from the Query
+        /// </summary>
+        /// <returns>A new <see cref="SimpleQuery"/> with any specified ForUpdate removed</returns>
+        public SimpleQuery ClearForUpdate()
+        {
+            return new SimpleQuery(this, _clauses.Where(c => !(c is ForUpdateClause)).ToArray());
+        }
+
         private void ThrowIfThereIsAlreadyASelectClause()
         {
             if (_clauses.OfType<SelectClause>().Any())

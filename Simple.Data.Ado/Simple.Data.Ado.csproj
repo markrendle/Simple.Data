@@ -98,6 +98,7 @@
     <Compile Include="ICommandBuilder.cs" />
     <Compile Include="IConnectionProvider.cs" />
     <Compile Include="ICustomInserter.cs" />
+    <Compile Include="ICustomQueryBuilder.cs" />
     <Compile Include="IDbParameterFactory.cs" />
     <Compile Include="IExpressionFormatter.cs" />
     <Compile Include="IFunctionNameConverter.cs" />
@@ -121,6 +122,7 @@
     </Compile>
     <Compile Include="ProviderHelper.cs" />
     <Compile Include="QueryBuilder.cs" />
+    <Compile Include="QueryBuilderBase.cs" />
     <Compile Include="SimpleReferenceFormatter.cs" />
     <Compile Include="SchemaResolutionException.cs" />
     <Compile Include="Schema\AmbiguousObjectNameException.cs" />
