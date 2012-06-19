@@ -49,7 +49,7 @@ namespace Simple.Data.Commands
             var dict = record as IDictionary<string, object>;
             if (dict == null) throw new InvalidOperationException("Could not resolve data from passed object.");
             var key = dataStrategy.GetAdapter().GetKey(table.GetQualifiedName(), dict);
-
+            if (key == null) throw new InvalidOperationException(string.Format("No key columns defined for table \"{0}\"",table.GetQualifiedName()));
             var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), key);
             return dataStrategy.Run.Upsert(table.GetQualifiedName(), dict, criteria, isResultRequired);
         }
