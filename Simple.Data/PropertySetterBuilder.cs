@@ -125,7 +125,7 @@ namespace Simple.Data
             var isDictionaryCollection = BuildComplexTypeCollectionPopulator(collection, genericType, addMethod, createCollection, creatorInstance, out dictionaryBlock);
 
             BlockExpression objectBlock;
-            var isObjectcollection = BuildSimpleTypeCollectionPopulator(collection, genericType, addMethod, createCollection, out objectBlock);
+            var isObjectcollection = BuildSimpleTypeCollectionPopulator(collection, genericType, addMethod, createCollection, creatorInstance, out objectBlock);
 
             return Expression.IfThenElse(isDictionaryCollection, dictionaryBlock,
                 Expression.IfThen(isObjectcollection, objectBlock));
@@ -176,8 +176,9 @@ namespace Simple.Data
 
         private TypeBinaryExpression BuildSimpleTypeCollectionPopulator(ParameterExpression collection, Type genericType,
                                                              MethodInfo addMethod, BinaryExpression createCollection, 
-                                                             out BlockExpression block)
+                                                             ConcreteTypeCreator creatorInstance, out BlockExpression block)
         {
+            var creator = Expression.Constant(creatorInstance);
             var array = Expression.Variable(typeof(object[]));
             var i = Expression.Variable(typeof(int));
             var current = Expression.Variable(typeof(object));
@@ -196,8 +197,14 @@ namespace Simple.Data
                     Expression.LessThan(i, Expression.Property(array, ArrayObjectLengthProperty)),
                     Expression.Block(
                         Expression.Assign(current, Expression.ArrayIndex(array, i)),
-                        Expression.Call(collection, addMethod,
-                                        Expression.Convert(current, genericType)),
+                        Expression.IfThenElse(
+                            Expression.TypeIs(current, typeof(IDictionary<string,object>)),
+                            Expression.Call(collection, addMethod,
+                                        Expression.Convert(Expression.Call(creator, CreatorCreateMethod, 
+                                                Expression.Convert(current, typeof(IDictionary<string,object>))), 
+                                            genericType)),
+                            Expression.Call(collection, addMethod,
+                                            Expression.Convert(current, genericType))),
                         Expression.PreIncrementAssign(i)
                         ),
                     Expression.Break(label)
