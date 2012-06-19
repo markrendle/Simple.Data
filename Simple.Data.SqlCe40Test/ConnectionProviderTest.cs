@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Simple.Data.SqlCe40Test
 {
+    using System.Diagnostics;
     using Ado;
     using NUnit.Framework;
     using SqlCe40;
@@ -25,6 +26,17 @@ namespace Simple.Data.SqlCe40Test
         {
             IConnectionProvider target = new SqlCe40ConnectionProvider();
             Assert.IsFalse(target.SupportsCompoundStatements);
+        }
+    }
+
+    [SetUpFixture]
+    public class Setup
+    {
+        [SetUp]
+        public void ForceLoadOfSimpleDataSqlCe40()
+        {
+            var provider = new SqlCe40.SqlCe40ConnectionProvider();
+            Trace.Write("Loaded provider.");
         }
     }
 }

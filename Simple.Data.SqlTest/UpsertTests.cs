@@ -176,6 +176,7 @@ namespace Simple.Data.SqlTest
                                 new User { Name = "Wowbagger", Password = "teatime", Age = int.MaxValue }
                             };
 
+            //IList<User> actuals = db.Users.Upsert(users).ToList<User>();
             db.Users.Upsert(users);
 
             var slartibartfast = db.Users.FindByName("Slartibartfast");

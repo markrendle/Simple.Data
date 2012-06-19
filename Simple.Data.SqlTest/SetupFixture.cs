@@ -8,12 +8,17 @@ using NUnit.Framework;
 
 namespace Simple.Data.SqlTest
 {
+    using System.Diagnostics;
+
     [SetUpFixture]
     public class SetupFixture
     {
         [SetUp]
         public void CreateStoredProcedures()
         {
+            var provider = new SqlServer.SqlConnectionProvider();
+            Trace.Write("Loaded provider " + provider.GetType().Name);
+
             using (var cn = new SqlConnection(Properties.Settings.Default.ConnectionString))
             {
                 cn.Open();

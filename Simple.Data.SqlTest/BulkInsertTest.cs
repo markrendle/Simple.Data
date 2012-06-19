@@ -1,6 +1,7 @@
 ﻿namespace Simple.Data.SqlTest
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using NUnit.Framework;
 
     [TestFixture]

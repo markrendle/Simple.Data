@@ -24,6 +24,7 @@ namespace Simple.Data.SqlTest
 
         public static void Reset()
         {
+            var provider = new SqlServer.SqlConnectionProvider();
             using (var cn = new SqlConnection(ConnectionString))
             {
                 cn.Open();

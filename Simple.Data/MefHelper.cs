@@ -12,9 +12,19 @@ namespace Simple.Data
 
     class MefHelper : Composer
     {
+        private static readonly Assembly ThisAssembly = typeof (MefHelper).Assembly;
+
         public override T Compose<T>()
         {
-            using (var container = CreateContainer())
+            using (var container = CreateAppDomainContainer())
+            {
+                var exports = container.GetExports<T>().ToList();
+                if (exports.Count == 1)
+                {
+                    return exports.Single().Value;
+                }
+            }
+            using (var container = CreateFolderContainer())
             {
                 var exports = container.GetExports<T>().ToList();
                 if (exports.Count == 0) throw new SimpleDataException("No ADO Provider found.");
@@ -27,7 +37,15 @@ namespace Simple.Data
         {
             try
             {
-                using (var container = CreateContainer())
+                using (var container = CreateAppDomainContainer())
+                {
+                    var exports = container.GetExports<T>(contractName).ToList();
+                    if (exports.Count == 1)
+                    {
+                        return exports.Single().Value;
+                    }
+                }
+                using (var container = CreateFolderContainer())
                 {
                     var exports = container.GetExports<T>(contractName).ToList();
                     if (exports.Count == 0) throw new SimpleDataException("No ADO Provider found.");
@@ -55,7 +73,7 @@ namespace Simple.Data
 
         static string GetThisAssemblyPath()
         {
-            var path = Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "").Replace("file://", "//");
+            var path = ThisAssembly.CodeBase.Replace("file:///", "").Replace("file://", "//");
             path = Path.GetDirectoryName(path);
             if (path == null) throw new ArgumentException("Unrecognised file.");
             if (!Path.IsPathRooted(path))
@@ -65,17 +83,27 @@ namespace Simple.Data
             return path;
         }
 
-        private static CompositionContainer CreateContainer()
+        private static CompositionContainer CreateFolderContainer()
         {
 			var path = GetThisAssemblyPath ();
 
-            var assemblyCatalog = new AssemblyCatalog(Assembly.GetExecutingAssembly());
+            var assemblyCatalog = new AssemblyCatalog(ThisAssembly);
 			var aggregateCatalog = new AggregateCatalog(assemblyCatalog);
 			foreach (string file in System.IO.Directory.GetFiles(path, "Simple.Data.*.dll"))
 			{
 				var catalog = new AssemblyCatalog(file);
 				aggregateCatalog.Catalogs.Add(catalog);
 			}
+            return new CompositionContainer(aggregateCatalog);
+        }
+
+        private static CompositionContainer CreateAppDomainContainer()
+        {
+            var aggregateCatalog = new AggregateCatalog();
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.GlobalAssemblyCache))
+            {
+                aggregateCatalog.Catalogs.Add(new AssemblyCatalog(assembly));
+            }
             return new CompositionContainer(aggregateCatalog);
         }
     }
