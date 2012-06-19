@@ -94,6 +94,7 @@
                 .ClearTake()
                 .ClearOrderBy()
                 .ClearWith()
+                .ClearForUpdate()
                 .ReplaceSelect(new CountSpecialReference());
             var unhandledClausesList = new List<IEnumerable<SimpleQueryClauseBase>>
                                            {

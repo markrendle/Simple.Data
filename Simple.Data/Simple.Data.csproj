@@ -88,6 +88,7 @@
     <Compile Include="DatabaseRunner.cs" />
     <Compile Include="DictionaryCloner.cs" />
     <Compile Include="ErrorCallback.cs" />
+    <Compile Include="ForUpdateClause.cs" />
     <Compile Include="FunctionSignature.cs" />
     <Compile Include="InMemoryAdapter.cs" />
     <Compile Include="InMemoryAdapterIAdapterWithTransactions.cs" />

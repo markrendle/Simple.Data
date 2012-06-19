@@ -5,16 +5,22 @@ namespace Simple.Data.Ado
     using System.Text;
     using Schema;
 
-    class SimpleReferenceFormatter
+    public class SimpleReferenceFormatter
     {
-        private readonly IFunctionNameConverter _functionNameConverter = new FunctionNameConverter();
+        private readonly IFunctionNameConverter _functionNameConverter;
         private readonly DatabaseSchema _schema;
         private readonly ICommandBuilder _commandBuilder;
 
-        public SimpleReferenceFormatter(DatabaseSchema schema, ICommandBuilder commandBuilder)
+        public SimpleReferenceFormatter(DatabaseSchema schema, ICommandBuilder commandBuilder) : this(schema, commandBuilder, null)
+        {
+
+        }
+
+        public SimpleReferenceFormatter(DatabaseSchema schema, ICommandBuilder commandBuilder, IFunctionNameConverter functionNameConverter)
         {
             _schema = schema;
             _commandBuilder = commandBuilder;
+            _functionNameConverter = functionNameConverter ?? new FunctionNameConverter();
         }
 
         public string FormatColumnClause(SimpleReference reference)

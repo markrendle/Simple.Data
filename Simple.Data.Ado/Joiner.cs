@@ -8,7 +8,7 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data.Ado
 {
-    class Joiner
+    public class Joiner
     {
         private readonly JoinType _joinType;
         private readonly DatabaseSchema _schema;

@@ -431,5 +431,21 @@ namespace Simple.Data.SqlTest
 
             Assert.GreaterOrEqual(customers.Count, 200);
         }
+
+        [Test]
+        public void QueryWithForUpdateFalseShouldReturnCorrectResult()
+        {
+            var db = DatabaseHelper.Open();
+            var actual = db.Users.QueryById(1).Select(db.Users.Name).ForUpdate(false).First();
+            Assert.AreEqual("Bob", actual.Name);
+        }
+
+        [Test]
+        public void QueryWithForUpdateTrueShouldReturnCorrectResult()
+        {
+            var db = DatabaseHelper.Open();
+            var actual = db.Users.QueryById(1).Select(db.Users.Name).ForUpdate(true).First();
+            Assert.AreEqual("Bob", actual.Name);
+        }
     }
 }
