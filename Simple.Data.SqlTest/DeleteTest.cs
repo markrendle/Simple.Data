@@ -11,6 +11,12 @@ namespace Simple.Data.SqlTest
     [TestFixture]
     public class DeleteTest
     {
+        [TestFixtureSetUp]
+        public void Setup()
+        {
+            DatabaseHelper.Reset();
+        }
+
         [Test]
         public void TestDeleteByColumn()
         {

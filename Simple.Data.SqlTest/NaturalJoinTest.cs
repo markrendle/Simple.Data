@@ -10,6 +10,12 @@ namespace Simple.Data.SqlTest
     [TestFixture]
     public class NaturalJoinTest
     {
+        [TestFixtureSetUp]
+        public void Setup()
+        {
+            DatabaseHelper.Reset();
+        }
+
         [Test]
         public void CustomerDotOrdersDotOrderDateShouldReturnOneRow()
         {
