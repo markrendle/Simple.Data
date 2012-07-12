@@ -152,6 +152,31 @@ namespace Simple.Data.IntegrationTest
             Assert.AreEqual(1, mockDatabase.Parameters[3]);
             Assert.IsTrue(MockDbTransaction.CommitCalled);
         }
+        
+        [Test]
+        public void TestBulkUpdateWithStaticObject()
+        {
+            var mockDatabase = new MockDatabase();
+            dynamic database = CreateDatabase(mockDatabase);
+            var user = new User
+                           {
+                               Id = 1,
+                               Name = "Steve",
+                               Age = 50
+                           };
+            var users = new[] {user};
+            using (var transaction = database.BeginTransaction())
+            {
+                transaction.Users.Update(users);
+                transaction.Commit();
+            }
+            Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
+            Assert.AreEqual(DBNull.Value, mockDatabase.Parameters[1]);
+            Assert.AreEqual(50, mockDatabase.Parameters[2]);
+            Assert.AreEqual(1, mockDatabase.Parameters[3]);
+            Assert.IsTrue(MockDbTransaction.CommitCalled);
+        }
 
         [Test]
         public void TestUpdateByWithStaticObject()

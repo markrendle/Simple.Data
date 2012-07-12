@@ -37,6 +37,10 @@ namespace Simple.Data.Ado
             using (connection.MaybeDisposable())
             using (var command = commandBuilder.GetRepeatableCommand(connection))
             {
+                if (transaction != null)
+                {
+                    command.Transaction = transaction;
+                }
                 connection.OpenIfClosed();
                 var propertyToParameterMap = CreatePropertyToParameterMap(data, table, command);
 
