@@ -10,7 +10,7 @@
 
     public partial class AdoAdapter : IAdapterWithTransactions
     {
-        public IAdapterTransaction BeginTransaction(IsolationLevel isolationLevel)
+        public IAdapterTransaction BeginTransaction(IsolationLevel isolationLevel = IsolationLevel.Unspecified)
         {
             IDbConnection connection = CreateConnection();
             connection.OpenIfClosed();
@@ -18,7 +18,7 @@
             return new AdoAdapterTransaction(transaction, _sharedConnection != null);
         }
 
-        public IAdapterTransaction BeginTransaction(IsolationLevel isolationLevel, string name)
+        public IAdapterTransaction BeginTransaction(string name, IsolationLevel isolationLevel = IsolationLevel.Unspecified)
         {
             IDbConnection connection = CreateConnection();
             connection.OpenIfClosed();
@@ -71,25 +71,25 @@
                                       ((AdoAdapterTransaction)adapterTransaction).DbTransaction);
         }
 
-        public IAdapterTransaction BeginTransaction()
-        {
-            IDbConnection connection = CreateConnection();
-            connection.OpenIfClosed();
-            IDbTransaction transaction = connection.BeginTransaction();
-            return new AdoAdapterTransaction(transaction, _sharedConnection != null);
-        }
+        //public IAdapterTransaction BeginTransaction()
+        //{
+        //    IDbConnection connection = CreateConnection();
+        //    connection.OpenIfClosed();
+        //    IDbTransaction transaction = connection.BeginTransaction();
+        //    return new AdoAdapterTransaction(transaction, _sharedConnection != null);
+        //}
 
-        public IAdapterTransaction BeginTransaction(string name)
-        {
-            IDbConnection connection = CreateConnection();
-            connection.OpenIfClosed();
-            var sqlConnection = connection as SqlConnection;
-            IDbTransaction transaction = sqlConnection != null
-                                             ? sqlConnection.BeginTransaction(name)
-                                             : connection.BeginTransaction();
+        //public IAdapterTransaction BeginTransaction(string name)
+        //{
+        //    IDbConnection connection = CreateConnection();
+        //    connection.OpenIfClosed();
+        //    var sqlConnection = connection as SqlConnection;
+        //    IDbTransaction transaction = sqlConnection != null
+        //                                     ? sqlConnection.BeginTransaction(name)
+        //                                     : connection.BeginTransaction();
 
-            return new AdoAdapterTransaction(transaction, name, _sharedConnection != null);
-        }
+        //    return new AdoAdapterTransaction(transaction, name, _sharedConnection != null);
+        //}
 
         public IDictionary<string,object> Get(string tableName, IAdapterTransaction transaction, params object[] parameterValues)
         {

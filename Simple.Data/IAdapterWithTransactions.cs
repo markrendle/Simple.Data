@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 
@@ -7,8 +8,8 @@ namespace Simple.Data
 {
     public interface IAdapterWithTransactions
     {
-        IAdapterTransaction BeginTransaction();
-        IAdapterTransaction BeginTransaction(string name);
+        IAdapterTransaction BeginTransaction(IsolationLevel isolationLevel = IsolationLevel.Unspecified);
+        IAdapterTransaction BeginTransaction(string name, IsolationLevel isolationLevel = IsolationLevel.Unspecified);
 
         /// <summary>
         ///  Finds data from the specified "table".

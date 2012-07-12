@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 
@@ -38,12 +39,12 @@ namespace Simple.Data
             }
         }
 
-        public IAdapterTransaction BeginTransaction()
+        public IAdapterTransaction BeginTransaction(IsolationLevel isolationLevel = IsolationLevel.Unspecified)
         {
             return new InMemoryAdapterTransaction();
         }
 
-        public IAdapterTransaction BeginTransaction(string name)
+        public IAdapterTransaction BeginTransaction(string name, IsolationLevel isolationLevel = IsolationLevel.Unspecified)
         {
             return new InMemoryAdapterTransaction(name);
         }

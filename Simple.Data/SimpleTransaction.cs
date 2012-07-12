@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Text;
@@ -13,17 +14,19 @@ namespace Simple.Data
     public sealed class SimpleTransaction : DataStrategy, IDisposable
     {
         private readonly Database _database;
+        private readonly IsolationLevel _isolationLevel;
 
         private readonly IAdapterWithTransactions _adapter;
         private TransactionRunner _transactionRunner;
         private IAdapterTransaction _adapterTransaction;
 
-        private SimpleTransaction(IAdapterWithTransactions adapter, Database database)
+        private SimpleTransaction(IAdapterWithTransactions adapter, Database database, IsolationLevel isolationLevel)
         {
             if (adapter == null) throw new ArgumentNullException("adapter");
             if (database == null) throw new ArgumentNullException("database");
             _adapter = adapter;
             _database = database;
+            _isolationLevel = isolationLevel;
         }
 
         private SimpleTransaction(SimpleTransaction copy) : base(copy)
@@ -60,11 +63,18 @@ namespace Simple.Data
             return transaction;
         }
 
-        private static SimpleTransaction CreateTransaction(Database database)
+        public static SimpleTransaction Begin(Database database, IsolationLevel isolationLevel)
+        {
+            var transaction = CreateTransaction(database, isolationLevel);
+            transaction.Begin();
+            return transaction;
+        }
+
+        private static SimpleTransaction CreateTransaction(Database database, IsolationLevel isolationLevel = IsolationLevel.Unspecified)
         {
             var adapterWithTransactions = database.GetAdapter() as IAdapterWithTransactions;
             if (adapterWithTransactions == null) throw new NotSupportedException();
-            return new SimpleTransaction(adapterWithTransactions, database);
+            return new SimpleTransaction(adapterWithTransactions, database, isolationLevel);
         }
 
 
@@ -103,7 +113,6 @@ namespace Simple.Data
             _adapterTransaction.Rollback();
         }
 
-        
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.

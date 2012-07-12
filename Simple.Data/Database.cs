@@ -68,8 +68,6 @@ namespace Simple.Data
             get { return DatabaseOpener.OpenDefault(); }
         }
 
-        
-
         public SimpleTransaction BeginTransaction()
         {
             return SimpleTransaction.Begin(this);
@@ -78,6 +76,11 @@ namespace Simple.Data
         public SimpleTransaction BeginTransaction(string name)
         {
             return SimpleTransaction.Begin(this, name);
+        }
+
+        public SimpleTransaction BeginTransaction(IsolationLevel isolationLevel)
+        {
+            return SimpleTransaction.Begin(this, isolationLevel);
         }
 
         protected override bool ExecuteFunction(out object result, Commands.ExecuteFunctionCommand command)
