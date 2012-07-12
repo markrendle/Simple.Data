@@ -77,10 +77,10 @@ namespace Simple.Data.Ado
                                      FormatObject(mathReference.RightOperand));
             }
 
-            return string.Format("{0} {1} {2} AS {3}", FormatObject(mathReference.LeftOperand),
+            return string.Format("({0} {1} {2}) AS {3}", FormatObject(mathReference.LeftOperand),
                                  MathOperatorToString(mathReference.Operator),
                                  FormatObject(mathReference.RightOperand),
-                                 mathReference.GetAlias());
+                                 _schema.QuoteObjectName(mathReference.GetAlias()));
 
         }
 

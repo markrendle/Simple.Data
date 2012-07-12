@@ -71,6 +71,15 @@ namespace Simple.Data.IntegrationTest
                 .ToList();
             GeneratedSqlIs("select [dbo].[users].[name],[dbo].[users].[password] as [supersecretpassword] from [dbo].[users]");
         }
+        
+        [Test]
+        public void SpecifyingColumnMathsWithAliasShouldAddAsClause()
+        {
+            _db.Users.All()
+                .Select(_db.Users.Name, (_db.Users.Id + _db.Users.Age).As("Nonsense"))
+                .ToList();
+            GeneratedSqlIs("select [dbo].[users].[name],([dbo].[users].[id] + [dbo].[users].[age]) as [nonsense] from [dbo].[users]");
+        }
 
         [Test]
         public void SpecifyingColumnsFromOtherTablesShouldAddJoin()

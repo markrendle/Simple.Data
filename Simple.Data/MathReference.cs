@@ -18,6 +18,13 @@ namespace Simple.Data
             _operator = @operator;
         }
 
+        private MathReference(object leftOperand, object rightOperand, MathOperator @operator, string alias) : base(alias)
+        {
+            _leftOperand = leftOperand;
+            _rightOperand = rightOperand;
+            _operator = @operator;
+        }
+
         public MathOperator Operator
         {
             get { return _operator; }
@@ -31,6 +38,11 @@ namespace Simple.Data
         public object LeftOperand
         {
             get { return _leftOperand; }
+        }
+
+        public MathReference As(string alias)
+        {
+            return new MathReference(_leftOperand, _rightOperand, _operator, alias);
         }
 
         /// <summary>
