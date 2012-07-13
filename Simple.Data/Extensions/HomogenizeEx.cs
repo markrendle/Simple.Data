@@ -8,7 +8,7 @@ namespace Simple.Data.Extensions
     {
         private static readonly ConcurrentDictionary<string, string> Cache
             = new ConcurrentDictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
-        private static readonly Regex HomogenizeRegex = new Regex("[^a-z0-9]");
+        private static Regex _homogenizeRegex = new Regex("[^a-z0-9]");
 
         /// <summary>
         /// Downshift a string and remove all non-alphanumeric characters.
@@ -22,7 +22,17 @@ namespace Simple.Data.Extensions
 
         private static string HomogenizeImpl(string source)
         {
-            return string.Intern(HomogenizeRegex.Replace(source.ToLowerInvariant(), string.Empty));
+            return string.Intern(_homogenizeRegex.Replace(source.ToLowerInvariant(), string.Empty));
+        }
+
+        /// <summary>
+        /// Sets the regular expression to be used for homogenizing object names.
+        /// </summary>
+        /// <param name="regex">A regular expression matching all non-comparing characters. The default is &quot;[^a-z0-9]&quot;.</param>
+        /// <remarks>Homogenized strings are always forced to lower-case.</remarks>
+        public static void SetRegularExpression(Regex regex)
+        {
+            _homogenizeRegex = regex;
         }
     }
 }
