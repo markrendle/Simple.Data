@@ -92,6 +92,7 @@
     <Compile Include="FunctionSignature.cs" />
     <Compile Include="InMemoryAdapter.cs" />
     <Compile Include="InMemoryAdapterIAdapterWithTransactions.cs" />
+    <Compile Include="BadExpressionException.cs" />
     <Compile Include="JoinType.cs" />
     <Compile Include="OfTypeEnumerable.cs" />
     <Compile Include="OptimizingDelegateFactory.cs" />

@@ -36,7 +36,7 @@ namespace Simple.Data.Commands
                 return data != null ? new SimpleRecord(data, table.GetQualifiedName(), dataStrategy) : null;
             }
 
-            return null;
+            throw new BadExpressionException("Find only accepts a criteria expression.");
         }
 
         public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)

@@ -35,7 +35,7 @@ namespace Simple.Data.Commands
                 return new SimpleQuery(dataStrategy, table.GetQualifiedName()).Where((SimpleExpression)args[0]);
             }
 
-            return null;
+            throw new BadExpressionException("FindAll only accepts a criteria expression.");
         }
     }
 }

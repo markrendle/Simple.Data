@@ -209,6 +209,18 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void FindAllWithNoParametersThrowsBadExpressionException()
+        {
+            Assert.Throws<BadExpressionException>(() => _db.Users.FindAll().ToList());
+        }
+
+        [Test]
+        public void FindAllWithStringParameterThrowsBadExpressionException()
+        {
+            Assert.Throws<BadExpressionException>(() => _db.Users.FindAll("Answer").ToList());
+        }
+
+        [Test]
         public void TestFindAllWithNotLike()
         {
             _db.Users.FindAll(_db.Users.Name.NotLike("Foo")).ToList();
