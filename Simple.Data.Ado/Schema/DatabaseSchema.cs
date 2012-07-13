@@ -74,11 +74,19 @@ namespace Simple.Data.Ado.Schema
 
         public Procedure FindProcedure(string procedureName)
         {
+            if (!string.IsNullOrWhiteSpace(DefaultSchema) && !(procedureName.Contains(".")))
+            {
+                procedureName = DefaultSchema + "." + procedureName;
+            }
             return _lazyProcedures.Value.Find(procedureName);
         }
 
         public Procedure FindProcedure(ObjectName procedureName)
         {
+            if (string.IsNullOrWhiteSpace(procedureName.Schema) && !string.IsNullOrWhiteSpace(DefaultSchema))
+            {
+                procedureName = new ObjectName(DefaultSchema, procedureName.Name);
+            }
             return _lazyProcedures.Value.Find(procedureName);
         }
 
