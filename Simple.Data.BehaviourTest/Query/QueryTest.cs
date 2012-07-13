@@ -228,7 +228,5 @@ namespace Simple.Data.IntegrationTest
             GeneratedSqlIs("select [dbo].[userbio].[userid],[dbo].[userbio].[text] from [dbo].[userbio]" +
                 " join [dbo].[users] on ([dbo].[users].[id] = [dbo].[userbio].[userid]) where [dbo].[users].[id] = @p1");
         }
-
-        
     }
 }

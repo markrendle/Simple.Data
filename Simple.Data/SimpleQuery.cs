@@ -183,6 +183,7 @@
 
         public SimpleQuery Where(SimpleExpression criteria)
         {
+            if (criteria == null) throw new ArgumentNullException("criteria");
             return new SimpleQuery(this, _clauses.Append(new WhereClause(criteria)));
         }
 
@@ -333,7 +334,7 @@
             }
             try
             {
-                var methodInfo = typeof(SimpleQuery).GetMethod(binder.Name);
+                var methodInfo = typeof(SimpleQuery).GetMethod(binder.Name, args.Select(a => (a ?? new object()).GetType()).ToArray());
                 if (methodInfo != null)
                 {
                     methodInfo.Invoke(this, args);
@@ -341,6 +342,11 @@
             }
             catch (AmbiguousMatchException)
             {
+            }
+
+            if (binder.Name.Equals("where", StringComparison.InvariantCultureIgnoreCase) || binder.Name.Equals("replacewhere", StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new BadExpressionException("Where methods require a single criteria expression.");
             }
 
             return false;
