@@ -53,6 +53,7 @@ namespace Simple.Data.Extensions
 
         internal static bool IsAnonymous(this object obj)
         {
+            if (obj == null) return false;
             return obj.GetType().Namespace == null;
         }
     }

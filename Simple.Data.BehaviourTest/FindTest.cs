@@ -135,6 +135,13 @@ namespace Simple.Data.IntegrationTest
             GeneratedSqlIs("select " + UsersColumns + " from [dbo].[Users] where [dbo].[Users].[name] = @p1");
             Parameter(0).Is("Foo");
         }
+        
+        [Test]
+        public void TestFindByNamedParameterSingleColumnNullValue()
+        {
+            _db.Users.FindBy(Name: null);
+            GeneratedSqlIs("select " + UsersColumns + " from [dbo].[Users] where [dbo].[Users].[name] is null");
+        }
 
         [Test]
         public void TestFindByNamedParameterTwoColumns()
