@@ -363,7 +363,7 @@ namespace Simple.Data
         internal static T? SafeConvertNullable<T>(object source)
             where T : struct 
         {
-            if (ReferenceEquals(source, null)) return default(T);
+            if (ReferenceEquals(source, null)) return default(T?);
             return (T) source;
         }
 

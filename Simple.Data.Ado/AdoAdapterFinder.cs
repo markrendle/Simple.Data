@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
-
-namespace Simple.Data.Ado
+﻿namespace Simple.Data.Ado
 {
-    using System.Data.SqlClient;
     using System.Dynamic;
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Data;
+    using System.Data.Common;
+    using System.Linq;
 
     class AdoAdapterFinder
     {
