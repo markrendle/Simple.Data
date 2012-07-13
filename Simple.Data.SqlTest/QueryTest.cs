@@ -83,6 +83,14 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void MissingColumnShouldHaveColumnNotFoundMessage()
+        {
+            var db = DatabaseHelper.Open();
+            var actual = db.Users.QueryById(1).Select(db.Users.Name).First();
+            Assert.Throws<UnresolvableObjectException>(() => Console.WriteLine(actual.Bobbins), "Column not found.");
+        }
+
+        [Test]
         public void ShouldSelectFromOneToTen()
         {
             var db = DatabaseHelper.Open();

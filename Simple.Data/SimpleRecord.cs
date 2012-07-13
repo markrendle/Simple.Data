@@ -64,11 +64,18 @@ namespace Simple.Data
 
             if (_database != null)
             {
-                var relatedAdapter = _database.GetAdapter() as IAdapterWithRelation;
-                if (relatedAdapter != null && relatedAdapter.IsValidRelation(_tableName, binder.Name))
+                try
                 {
-                    result = GetRelatedData(binder, relatedAdapter);
-                    return true;
+                    var relatedAdapter = _database.GetAdapter() as IAdapterWithRelation;
+                    if (relatedAdapter != null && relatedAdapter.IsValidRelation(_tableName, binder.Name))
+                    {
+                        result = GetRelatedData(binder, relatedAdapter);
+                        return true;
+                    }
+                }
+                catch (UnresolvableObjectException)
+                {
+                    throw new UnresolvableObjectException("Column not found.");
                 }
             }
             return base.TryGetMember(binder, out result);
