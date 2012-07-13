@@ -14,7 +14,8 @@ namespace Simple.Data.Ado
         public OptimizedDictionary(IDictionary<TKey, int> index, IEnumerable<TValue> values)
         {
             _index = index;
-            _values = new List<TValue>(values);
+            _values = new List<TValue>(_index.Count);
+            _values.AddRange(values);
         }
 
         /// <summary>
@@ -217,6 +218,10 @@ namespace Simple.Data.Ado
                 catch (KeyNotFoundException)
                 {
                     throw new KeyNotFoundException();
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    return default(TValue);
                 }
             }
             set
