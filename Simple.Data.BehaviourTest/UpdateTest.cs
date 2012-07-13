@@ -63,6 +63,16 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestUpdateWithNamedArgumentsUsingDifferentCase()
+        {
+            _db.Users.UpdateById(id: 1, Name: "Steve", Age: 50);
+            GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
+            Parameter(0).Is("Steve");
+            Parameter(1).Is(50);
+            Parameter(2).Is(1);
+        }
+
+        [Test]
         public void TestUpdateWithNamedArgumentsUsingExpression()
         {
             _db.Users.UpdateAll(Age: _db.Users.Age + 1);

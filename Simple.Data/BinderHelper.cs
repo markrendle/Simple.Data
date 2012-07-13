@@ -16,7 +16,7 @@ namespace Simple.Data
                 .Reverse()
                 .Zip(args.Reverse(), (k, v) => new KeyValuePair<string, object>(k, v))
                 .Reverse()
-                .ToDictionary();
+                .ToDictionary(StringComparer.InvariantCultureIgnoreCase);
         }
 
         private static IDictionary<string, object> ArgumentsToDictionary(IEnumerable<String> argumentNames, IEnumerable<object> args)
@@ -29,7 +29,7 @@ namespace Simple.Data
                 .Zip(argumentNames.Reverse().ExtendInfinite(), (v, k) => new KeyValuePair<string, object>(k, v))
                 .Reverse()
                 .Select((kvp, i) => kvp.Key == null ? new KeyValuePair<string, object>("_" + i.ToString(), kvp.Value) : kvp)
-                .ToDictionary();
+                .ToDictionary(StringComparer.InvariantCultureIgnoreCase);
         }
 
         internal static IDictionary<string, object> NamedArgumentsToDictionary(this InvokeMemberBinder binder, IEnumerable<object> args)
