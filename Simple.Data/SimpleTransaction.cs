@@ -39,13 +39,13 @@ namespace Simple.Data
 
         private void Begin()
         {
-            _adapterTransaction = _adapter.BeginTransaction();
+            _adapterTransaction = _adapter.BeginTransaction(_isolationLevel);
             _transactionRunner = new TransactionRunner(_adapter, _adapterTransaction);
         }
 
         private void Begin(string name)
         {
-            _adapterTransaction = _adapter.BeginTransaction(name);
+            _adapterTransaction = _adapter.BeginTransaction(name, _isolationLevel);
             _transactionRunner = new TransactionRunner(_adapter, _adapterTransaction);
         }
 

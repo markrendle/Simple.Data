@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdapterFactoryTest.cs" />
+    <Compile Include="BeginTransactionWithIsolataionLevelTest.cs" />
     <Compile Include="BinderHelperTest.cs" />
     <Compile Include="ComposerTest.cs" />
     <Compile Include="ConcreteCollectionTypeCreatorTest.cs" />
