@@ -39,6 +39,15 @@ namespace Simple.Data.Ado.Test
             Assert.IsInstanceOf(typeof(IQueryPager), actual);
         }
 
+        [Test]
+        public void ShouldFindProviderUsingAssemblyAttribute()
+        {
+            IConnectionProvider provider;
+            Assert.True(ProviderHelper.TryLoadAssemblyUsingAttribute("Test", null, out provider));
+            Assert.IsNotNull(provider);
+            Assert.IsInstanceOf<StubConnectionProvider>(provider);
+        }
+
         public class StubConnectionAndServiceProvider : IConnectionProvider, IServiceProvider
         {
             public void SetConnectionString(string connectionString)

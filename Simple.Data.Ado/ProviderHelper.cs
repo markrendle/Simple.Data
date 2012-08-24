@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Configuration;
 using System.Data.OleDb;
+using System.Linq;
 using System.Reflection;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -99,7 +101,14 @@ namespace Simple.Data.Ado
 
         private static IConnectionProvider LoadProviderByConnectionToken(ConnectionToken token)
         {
-            var provider = ComposeProvider(token.ProviderName);
+            IConnectionProvider provider;
+
+            if (TryLoadAssemblyUsingAttribute(token.ConnectionString, token.ProviderName, out provider))
+            {
+                return provider;
+            }
+
+            provider = ComposeProvider(token.ProviderName);
             if (provider == null)
             {
                 throw new InvalidOperationException("Provider could not be resolved.");
@@ -150,6 +159,75 @@ namespace Simple.Data.Ado
                     return container.GetExportedValueOrDefault<T>();
                 }
             }
+        }
+
+        internal static bool TryLoadAssemblyUsingAttribute(string connectionString, string providerName, out IConnectionProvider connectionProvider)
+        {
+            var attributes = LoadAssemblyAttributes();
+            if (attributes.Count == 0)
+            {
+                connectionProvider = null;
+                return false;
+            }
+            if (!string.IsNullOrWhiteSpace(providerName))
+            {
+                attributes = attributes.Where(a => a.IsForProviderName(providerName)).ToList();
+            }
+            if (attributes.Count == 0)
+            {
+                connectionProvider = null;
+                return false;
+            }
+
+            return LoadUsingAssemblyAttribute(connectionString, attributes, out connectionProvider);
+        }
+
+        private static bool LoadUsingAssemblyAttribute(string connectionString, ICollection<ProviderAssemblyAttributeBase> attributes,
+                                                       out IConnectionProvider connectionProvider)
+        {
+            if (attributes.Count == 0)
+            {
+                {
+                    connectionProvider = null;
+                    return true;
+                }
+            }
+
+            foreach (var attribute in attributes)
+            {
+                Exception exception;
+                if (attribute.TryGetProvider(connectionString, out connectionProvider, out exception))
+                {
+                    return true;
+                }
+            }
+            connectionProvider = null;
+            return false;
+        }
+
+        private static List<ProviderAssemblyAttributeBase> LoadAssemblyAttributes()
+        {
+            var attributes = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => !a.GlobalAssemblyCache)
+                .SelectMany(ProviderAssemblyAttributeBase.Get)
+                .ToList();
+
+            if (attributes.Count == 0)
+            {
+                foreach (var file in Directory.EnumerateFiles(Composer.GetSimpleDataAssemblyPath(), "*.dll"))
+                {
+                    Assembly assembly;
+                    if (Composer.TryLoadAssembly(file, out assembly))
+                    {
+                        if (ProviderAssemblyAttributeBase.Get(assembly).Any())
+                        {
+                            assembly = Assembly.LoadFrom(file);
+                            attributes.AddRange(ProviderAssemblyAttributeBase.Get(assembly));
+                        }
+                    }
+                }
+            }
+            return attributes;
         }
 
         private class ConnectionToken : IEquatable<ConnectionToken>

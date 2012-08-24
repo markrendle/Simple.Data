@@ -661,5 +661,27 @@
             var exception = Assert.Throws<InvalidOperationException>(() => db.Test.Upsert(Id: 1, HasTowel: true));
             Assert.AreEqual("No key columns defined for table \"Test\"", exception.Message);
         }
+
+        [Test]
+        public void JoinTest()
+        {
+            Guid masterId = Guid.NewGuid();
+            InMemoryAdapter adapter = new InMemoryAdapter();
+            adapter.Join.Master("Master", "Id").Detail("Detail", "MasterId");
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            db.Master.Insert(Id: masterId);
+            db.Detail.Insert(Id: Guid.NewGuid(), MasterId: masterId, Box: 999);
+            // Act
+            IEnumerable<dynamic> list = db.Detail.All()
+                .Join(db.Master).On(db.Master.Id == db.Detail.MasterId)
+                .Select(db.Master.Id, db.Detail.Box)
+                        .Cast<dynamic>();
+            // Assert
+            dynamic detail = list.FirstOrDefault();
+            Assert.NotNull(detail);
+            Assert.That(detail.Id, Is.EqualTo(masterId));
+            Assert.That(detail.Box, Is.EqualTo(999));
+        }
     }
 }

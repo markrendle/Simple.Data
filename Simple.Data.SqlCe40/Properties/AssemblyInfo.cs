@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Permissions;
+using Simple.Data.SqlCe40;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -16,3 +17,5 @@ using System.Security.Permissions;
 [assembly: InternalsVisibleTo("Simple.Data.SqlCe40Test")]
 [assembly: SecurityRules(SecurityRuleSet.Level2, SkipVerificationInFullTrust = true)]
 [assembly: AllowPartiallyTrustedCallers]
+
+[assembly: SqlCe40Provider]

@@ -69,6 +69,7 @@
     <Compile Include="SqlQueryBuilder.cs" />
     <Compile Include="SqlQueryPager.cs" />
     <Compile Include="SqlSchemaProvider.cs" />
+    <Compile Include="SqlServerProviderAttribute.cs" />
     <Compile Include="SqlTypeResolver.cs" />
   </ItemGroup>
   <ItemGroup>

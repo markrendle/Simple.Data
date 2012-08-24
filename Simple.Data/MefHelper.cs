@@ -12,8 +12,6 @@ namespace Simple.Data
 
     class MefHelper : Composer
     {
-        private static readonly Assembly ThisAssembly = typeof (MefHelper).Assembly;
-
         public override T Compose<T>()
         {
             using (var container = CreateAppDomainContainer())
@@ -48,7 +46,7 @@ namespace Simple.Data
                 using (var container = CreateFolderContainer())
                 {
                     var exports = container.GetExports<T>(contractName).ToList();
-                    if (exports.Count == 0) throw new SimpleDataException("No ADO Provider found.");
+                    if (exports.Count == 0) throw new SimpleDataException(string.Format("No {0} Provider found.", contractName));
                     if (exports.Count > 1) throw new SimpleDataException("Multiple ADO Providers found; specify provider name or remove unwanted assemblies.");
                     return exports.Single().Value;
                 }
@@ -71,21 +69,9 @@ namespace Simple.Data
             }
         }
 
-        static string GetThisAssemblyPath()
-        {
-            var path = ThisAssembly.CodeBase.Replace("file:///", "").Replace("file://", "//");
-            path = Path.GetDirectoryName(path);
-            if (path == null) throw new ArgumentException("Unrecognised file.");
-            if (!Path.IsPathRooted(path))
-            {
-                path = Path.DirectorySeparatorChar + path;
-            }
-            return path;
-        }
-
         private static CompositionContainer CreateFolderContainer()
         {
-			var path = GetThisAssemblyPath ();
+			var path = GetSimpleDataAssemblyPath ();
 
             var assemblyCatalog = new AssemblyCatalog(ThisAssembly);
 			var aggregateCatalog = new AggregateCatalog(assemblyCatalog);
