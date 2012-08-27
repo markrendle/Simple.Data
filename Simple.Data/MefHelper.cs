@@ -86,11 +86,16 @@ namespace Simple.Data
         private static CompositionContainer CreateAppDomainContainer()
         {
             var aggregateCatalog = new AggregateCatalog();
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.GlobalAssemblyCache))
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(IsSimpleDataAssembly))
             {
                 aggregateCatalog.Catalogs.Add(new AssemblyCatalog(assembly));
             }
             return new CompositionContainer(aggregateCatalog);
+        }
+
+        private static bool IsSimpleDataAssembly(Assembly assembly)
+        {
+            return assembly.GetName().Name.StartsWith("Simple.Data.", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

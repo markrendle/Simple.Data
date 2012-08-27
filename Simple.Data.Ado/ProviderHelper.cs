@@ -208,13 +208,13 @@ namespace Simple.Data.Ado
         private static List<ProviderAssemblyAttributeBase> LoadAssemblyAttributes()
         {
             var attributes = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => !a.GlobalAssemblyCache)
+                .Where(a => a.GetName().Name.StartsWith("Simple.Data.", StringComparison.OrdinalIgnoreCase))
                 .SelectMany(ProviderAssemblyAttributeBase.Get)
                 .ToList();
 
             if (attributes.Count == 0)
             {
-                foreach (var file in Directory.EnumerateFiles(Composer.GetSimpleDataAssemblyPath(), "*.dll"))
+                foreach (var file in Directory.EnumerateFiles(Composer.GetSimpleDataAssemblyPath(), "Simple.Data.*.dll"))
                 {
                     Assembly assembly;
                     if (Composer.TryLoadAssembly(file, out assembly))
