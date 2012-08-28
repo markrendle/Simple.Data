@@ -11,7 +11,7 @@ namespace Simple.Data.Ado
     {
         public static IDisposable MaybeDisposable(this IDbConnection connection)
         {
-            if (connection.State == ConnectionState.Open) return ActionDisposable.NoOp;
+            if (connection == null || connection.State == ConnectionState.Open) return ActionDisposable.NoOp;
             return new ActionDisposable(connection.Dispose);
         }
     }

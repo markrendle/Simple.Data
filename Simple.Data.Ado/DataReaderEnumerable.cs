@@ -147,17 +147,9 @@ namespace Simple.Data.Ado
 
             private void ExecuteReader()
             {
-                try
-                {
-                    _command.WriteTrace();
-                    _command.Connection.OpenIfClosed();
-                    _reader = _command.ExecuteReader();
-                    CreateIndexIfNecessary();
-                }
-                catch (DbException ex)
-                {
-                    throw new AdoAdapterException(ex.Message, ex);
-                }
+                _command.Connection.OpenIfClosed();
+                _reader = _command.TryExecuteReader();
+                CreateIndexIfNecessary();
             }
 
             private void CreateIndexIfNecessary()

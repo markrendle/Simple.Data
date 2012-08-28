@@ -26,8 +26,6 @@ namespace Simple.Data.Commands
         /// <param name="args">The arguments from the <see cref="DynamicTable"/> method invocation.</param>
         /// <returns></returns>
         object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args);
-
-
     }
 
     interface IQueryCompatibleCommand

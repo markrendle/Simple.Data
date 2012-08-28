@@ -19,7 +19,7 @@ namespace Simple.Data.Ado
         public override IEnumerable<IDictionary<string, object>> InsertRowsWithSeparateStatements(string insertSql, string selectSql, Func<IDictionary<string, object>, Exception, bool> onError)
         {
             var insertCommand = new CommandHelper(Adapter).Create(_transaction.Connection, insertSql);
-            var selectCommand = _transaction.Connection.CreateCommand();
+            var selectCommand = _transaction.Connection.CreateCommand(Adapter.AdoOptions);
             selectCommand.CommandText = selectSql;
             insertCommand.Transaction = _transaction;
             selectCommand.Transaction = _transaction;

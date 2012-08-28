@@ -10,7 +10,7 @@ namespace Simple.Data.Ado
 {
     using System.Linq;
 
-    internal class CommandHelper
+    public class CommandHelper
     {
         private readonly AdoAdapter _adapter;
         private readonly ISchemaProvider _schemaProvider;
@@ -23,7 +23,7 @@ namespace Simple.Data.Ado
 
         internal IDbCommand Create(IDbConnection connection, string sql, IList<object> values)
         {
-            var command = connection.CreateCommand();
+            var command = connection.CreateCommand(_adapter.AdoOptions);
 
             command.CommandText = PrepareCommand(sql, command);
             command.ClearParameterValues();
@@ -34,7 +34,7 @@ namespace Simple.Data.Ado
 
         internal IDbCommand Create(IDbConnection connection, CommandBuilder commandBuilder)
         {
-            var command = connection.CreateCommand();
+            var command = connection.CreateCommand(_adapter.AdoOptions);
             command.CommandText = commandBuilder.Text;
             PrepareCommand(commandBuilder, command);
             return command;
@@ -50,8 +50,8 @@ namespace Simple.Data.Ado
             {
                 if (c == '?')
                 {
-                    var parameter = command.CreateParameter();
-                    parameter.ParameterName = _schemaProvider.NameParameter("p" + index);
+                    var parameter = parameterFactory.CreateParameter(_schemaProvider.NameParameter("p" + index));
+                    //parameter.ParameterName = _schemaProvider.NameParameter("p" + index);
                     command.Parameters.Add(parameter);
                     
                     sqlBuilder.Append(parameter.ParameterName);
@@ -122,7 +122,7 @@ namespace Simple.Data.Ado
 
         public IDbCommand Create(IDbConnection connection, string insertSql)
         {
-            var command = connection.CreateCommand();
+            var command = connection.CreateCommand(_adapter.AdoOptions);
             command.CommandText = PrepareCommand(insertSql, command);
             return command;
 
@@ -130,16 +130,16 @@ namespace Simple.Data.Ado
 
         public IDbCommand CreateInsert(IDbConnection connection, string insertSql, IEnumerable<Column> columns)
         {
-            var command = connection.CreateCommand();
+            var command = connection.CreateCommand(_adapter.AdoOptions);
             command.CommandText = PrepareInsertCommand(insertSql, command, columns);
             command.ClearParameterValues();
             return command;
 
         }
 
-        internal IDbCommand CreateInsert(IDbConnection connection, string sql, IEnumerable<Column> columns, IList<object> values)
+        public IDbCommand CreateInsert(IDbConnection connection, string sql, IEnumerable<Column> columns, IList<object> values)
         {
-            var command = connection.CreateCommand();
+            var command = connection.CreateCommand(_adapter.AdoOptions);
 
             command.CommandText = PrepareInsertCommand(sql, command, columns);
             command.ClearParameterValues();

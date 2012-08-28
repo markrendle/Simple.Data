@@ -37,7 +37,7 @@
                     new CommandBuilder(_adapter.GetSchema()).CreateCommand(
                         _adapter.ProviderHelper.GetCustomProvider<IDbParameterFactory>(_adapter.SchemaProvider),
                         commandBuilders,
-                        connection);
+                        connection, _adapter.AdoOptions);
 
                 if (_transaction != null)
                 {
@@ -51,7 +51,7 @@
             }
             else
             {
-                result = commandBuilders.SelectMany(cb => cb.GetCommand(connection).ToEnumerable(_adapter.CreateConnection));
+                result = commandBuilders.SelectMany(cb => cb.GetCommand(connection, _adapter.AdoOptions).ToEnumerable(_adapter.CreateConnection));
             }
 
             if (query.Clauses.OfType<WithClause>().Any())
@@ -70,7 +70,7 @@
         {
             IDbConnection connection = _adapter.CreateConnection();
             return new QueryBuilder(_adapter).Build(query, out unhandledClauses)
-                .GetCommand(connection)
+                .GetCommand(connection, _adapter.AdoOptions)
                 .ToObservable(connection, _adapter);
         }
 
@@ -240,7 +240,7 @@
                 IDbCommand command =
                     new CommandBuilder(_adapter.GetSchema()).CreateCommand(
                         _adapter.ProviderHelper.GetCustomProvider<IDbParameterFactory>(_adapter.SchemaProvider),
-                        commandBuilders.ToArray(), connection);
+                        commandBuilders.ToArray(), connection, _adapter.AdoOptions);
                 if (_transaction != null)
                 {
                     command.Transaction = _transaction.DbTransaction;

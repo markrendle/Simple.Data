@@ -35,7 +35,7 @@ namespace Simple.Data.Ado
 
             var connection = adapter.CreateConnection();
             using (connection.MaybeDisposable())
-            using (var command = commandBuilder.GetRepeatableCommand(connection))
+            using (var command = commandBuilder.GetRepeatableCommand(connection, adapter.Options as AdoOptions))
             {
                 if (transaction != null)
                 {
@@ -53,7 +53,7 @@ namespace Simple.Data.Ado
                             propertyToParameterMap[kvp.Key].Value = kvp.Value ?? DBNull.Value;
                         }
                     }
-                    count += command.ExecuteNonQuery();
+                    count += command.TryExecuteNonQuery();
                 }
             }
 

@@ -60,11 +60,11 @@
                 var commandBuilder = new UpdateHelper(_adapter.GetSchema()).GetUpdateCommand(tableName, updateData, criteria);
                 if (_transaction == null)
                 {
-                    AdoAdapter.Execute(commandBuilder, connection);
+                    _adapter.Execute(commandBuilder, connection);
                 }
                 else
                 {
-                    AdoAdapter.Execute(commandBuilder, _transaction);
+                    _adapter.Execute(commandBuilder, _transaction);
                 }
                 return resultRequired ? finder.FindOne(tableName, criteria) : null;
             }

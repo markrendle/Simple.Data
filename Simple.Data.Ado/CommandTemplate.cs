@@ -31,7 +31,7 @@ namespace Simple.Data.Ado
 
         public IDbCommand GetDbCommand(AdoAdapter adapter, IDbConnection connection, IEnumerable<object> parameterValues)
         {
-            var command = connection.CreateCommand();
+            var command = connection.CreateCommand(adapter.AdoOptions);
             command.CommandText = _commandText;
 
             foreach (var parameter in CreateParameters(adapter.GetSchema(), command, parameterValues))

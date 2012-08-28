@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Linq;
 using System.Text;
 using Simple.Data.Extensions;
@@ -56,7 +55,7 @@ namespace Simple.Data.Ado
             var customInserter = _adapter.ProviderHelper.GetCustomProvider<ICustomInserter>(_adapter.ConnectionProvider);
             if (customInserter != null)
             {
-                return customInserter.Insert(_adapter, tableName, dataArray.ToDictionary(), _transaction);
+                return customInserter.Insert(_adapter, tableName, dataArray.ToDictionary(), _transaction, resultRequired);
             }
 
             var dataDictionary = dataArray.Where(kvp => table.HasColumn(kvp.Key) && table.FindColumn(kvp.Key).IsWriteable)
@@ -129,7 +128,7 @@ namespace Simple.Data.Ado
             {
                 var command = new CommandHelper(_adapter).CreateInsert(_transaction.Connection, insertSql, columns, values.ToArray());
                 command.Transaction = _transaction;
-                TryExecute(command);
+                command.TryExecuteNonQuery();
                 command.CommandText = selectSql;
                 command.Parameters.Clear();
                 return TryExecuteSingletonQuery(command);
@@ -141,7 +140,7 @@ namespace Simple.Data.Ado
                 using (var command = new CommandHelper(_adapter).CreateInsert(connection, insertSql, columns, values.ToArray()))
                 {
                     connection.OpenIfClosed();
-                    TryExecute(command);
+                    command.TryExecuteNonQuery();
                     command.CommandText = selectSql;
                     command.Parameters.Clear();
                     return TryExecuteSingletonQuery(command);
@@ -151,20 +150,12 @@ namespace Simple.Data.Ado
 
         private static IDictionary<string, object> TryExecuteSingletonQuery(IDbCommand command)
         {
-            command.WriteTrace();
-            try
+            using (var reader = command.TryExecuteReader())
             {
-                using (var reader = command.ExecuteReader())
+                if (reader.Read())
                 {
-                    if (reader.Read())
-                    {
-                        return reader.ToDictionary();
-                    }
+                    return reader.ToDictionary();
                 }
-            }
-            catch (DbException ex)
-            {
-                throw new AdoAdapterException(ex.Message, command);
             }
 
             return null;
@@ -176,7 +167,7 @@ namespace Simple.Data.Ado
             {
                 var command = new CommandHelper(_adapter).CreateInsert(_transaction.Connection, sql, columns, values.ToArray());
                 command.Transaction = _transaction;
-                return TryExecute(command);
+                return command.TryExecuteNonQuery();
             }
             var connection = _connection ?? _adapter.CreateConnection();
             using (connection.MaybeDisposable())
@@ -184,21 +175,8 @@ namespace Simple.Data.Ado
                 using (var command = new CommandHelper(_adapter).CreateInsert(connection, sql, columns, values.ToArray()))
                 {
                     connection.OpenIfClosed();
-                    return TryExecute(command);
+                    return command.TryExecuteNonQuery();
                 }
-            }
-        }
-
-        private static int TryExecute(IDbCommand command)
-        {
-            command.WriteTrace();
-            try
-            {
-                return command.ExecuteNonQuery();
-            }
-            catch (DbException ex)
-            {
-                throw new AdoAdapterException(ex.Message, command);
             }
         }
     }

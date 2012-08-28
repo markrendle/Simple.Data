@@ -83,7 +83,7 @@ namespace Simple.Data
             return SimpleTransaction.Begin(this, isolationLevel);
         }
 
-        protected override bool ExecuteFunction(out object result, Commands.ExecuteFunctionCommand command)
+        protected internal override bool ExecuteFunction(out object result, Commands.ExecuteFunctionCommand command)
         {
             return command.Execute(out result);
         }

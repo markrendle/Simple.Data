@@ -45,7 +45,7 @@ namespace Simple.Data.Ado
 
             var cn = transaction == null ? _adapter.CreateConnection() : transaction.Connection;
             using (cn.MaybeDisposable())
-            using (var command = cn.CreateCommand())
+            using (var command = cn.CreateCommand(_adapter.AdoOptions))
             {
                 command.Transaction = transaction;
                 command.CommandText = procedure.QualifiedName;
@@ -77,9 +77,8 @@ namespace Simple.Data.Ado
 
         public IEnumerable<ResultSet> ExecuteReader(IDbCommand command)
         {
-            command.WriteTrace();
             command.Connection.OpenIfClosed();
-            using (var reader = command.ExecuteReader())
+            using (var reader = command.TryExecuteReader())
             {
                 // Reader isn't always returned - added check to stop NullReferenceException
                 if ((reader != null) && (reader.FieldCount > 0))
@@ -95,12 +94,11 @@ namespace Simple.Data.Ado
 
         private static IEnumerable<ResultSet> ExecuteNonQuery(IDbCommand command)
         {
-            command.WriteTrace();
 #if(DEBUG)
             Trace.TraceInformation("ExecuteNonQuery", "Simple.Data.SqlTest");
 #endif
             command.Connection.OpenIfClosed();
-            command.ExecuteNonQuery();
+            command.TryExecuteNonQuery();
             return Enumerable.Empty<ResultSet>();
         }
 

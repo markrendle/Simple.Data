@@ -103,17 +103,21 @@ namespace Simple.Data.Ado
             get { return _text.ToString(); }
         }
 
-        public IDbCommand GetCommand(IDbConnection connection)
+        public IDbCommand GetCommand(IDbConnection connection, AdoOptions options)
         {
-            var command = connection.CreateCommand();
+            var command = connection.CreateCommand(options);
             command.CommandText = Text;
             SetParameters(command, string.Empty);
+            if (options != null)
+            {
+                command.CommandTimeout = options.CommandTimeout;
+            }
             return command;
         }
 
-        public IDbCommand GetRepeatableCommand(IDbConnection connection)
+        public IDbCommand GetRepeatableCommand(IDbConnection connection, AdoOptions options)
         {
-            var command = connection.CreateCommand();
+            var command = connection.CreateCommand(options);
             command.CommandText = Text;
 
             var parameterFactory = CreateParameterFactory(command);
@@ -121,6 +125,10 @@ namespace Simple.Data.Ado
             foreach (var parameter in _parameters.Keys)
             {
                 command.Parameters.Add(parameterFactory.CreateParameter(parameter.Name, parameter.Column));
+            }
+            if (options != null)
+            {
+                command.CommandTimeout = options.CommandTimeout;
             }
             return command;
         }
@@ -292,9 +300,9 @@ namespace Simple.Data.Ado
             return parameter;
         }
 
-        internal IDbCommand CreateCommand(IDbParameterFactory parameterFactory, ICommandBuilder[] commandBuilders, IDbConnection connection)
+        internal IDbCommand CreateCommand(IDbParameterFactory parameterFactory, ICommandBuilder[] commandBuilders, IDbConnection connection, AdoOptions options)
         {
-            var command = connection.CreateCommand();
+            var command = connection.CreateCommand(options);
             parameterFactory = parameterFactory ?? new GenericDbParameterFactory(command);
             for (int i = 0; i < commandBuilders.Length; i++)
             {
@@ -305,9 +313,9 @@ namespace Simple.Data.Ado
             return command;
         }
 
-        internal IDbCommand CreateCommand(ICommandBuilder[] commandBuilders, IDbConnection connection)
+        internal IDbCommand CreateCommand(ICommandBuilder[] commandBuilders, IDbConnection connection, AdoOptions options)
         {
-            var command = connection.CreateCommand();
+            var command = connection.CreateCommand(options);
             for (int i = 0; i < commandBuilders.Length; i++)
             {
                 if (!string.IsNullOrWhiteSpace(command.CommandText)) command.CommandText += "; ";

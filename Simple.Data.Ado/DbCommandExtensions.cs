@@ -8,7 +8,7 @@
     using System.Dynamic;
     using System.Linq;
 
-    static class DbCommandExtensions
+    public static class DbCommandExtensions
     {
         public static IEnumerable<IDictionary<string, object>> ToEnumerable(this IDbCommand command, Func<IDbConnection> createConnection)
         {
@@ -57,7 +57,7 @@
             return value;
         }
 
-        public static IDataReader ExecuteReaderWithExceptionWrap(this IDbCommand command)
+        public static IDataReader TryExecuteReader(this IDbCommand command)
         {
             command.WriteTrace();
             try
@@ -66,10 +66,28 @@
             }
             catch (DbException ex)
             {
-                throw new AdoAdapterException(ex.Message, command.CommandText,
-                    command.Parameters.Cast<IDbDataParameter>()
-                    .ToDictionary(p => p.ParameterName, p => p.Value));
+                throw CreateAdoAdapterException(command, ex);
             }
+        }
+
+        public static int TryExecuteNonQuery(this IDbCommand command)
+        {
+            command.WriteTrace();
+            try
+            {
+                return command.ExecuteNonQuery();
+            }
+            catch (DbException ex)
+            {
+                throw CreateAdoAdapterException(command, ex);
+            }
+        }
+
+        private static AdoAdapterException CreateAdoAdapterException(IDbCommand command, DbException ex)
+        {
+            return new AdoAdapterException(ex.Message, command.CommandText,
+                                           command.Parameters.Cast<IDbDataParameter>()
+                                               .ToDictionary(p => p.ParameterName, p => p.Value));
         }
 
         internal static void DisposeCommandAndReader(IDbConnection connection, IDbCommand command, IDataReader reader)

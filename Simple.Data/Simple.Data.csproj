@@ -86,6 +86,7 @@
     <Compile Include="Database.Open.cs" />
     <Compile Include="DatabaseOpenerMethods.cs" />
     <Compile Include="DatabaseRunner.cs" />
+    <Compile Include="DataStrategyWithOptions.cs" />
     <Compile Include="DictionaryCloner.cs" />
     <Compile Include="ErrorCallback.cs" />
     <Compile Include="ForUpdateClause.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="JoinType.cs" />
     <Compile Include="OfTypeEnumerable.cs" />
     <Compile Include="OptimizingDelegateFactory.cs" />
+    <Compile Include="OptionsBase.cs" />
     <Compile Include="PropertySetterBuilder.cs" />
     <Compile Include="QueryPolyfills\AggregateValueResolver.cs" />
     <Compile Include="QueryPolyfills\DictionaryCreatorFactory.cs" />

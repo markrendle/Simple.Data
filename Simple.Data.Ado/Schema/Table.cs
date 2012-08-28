@@ -92,6 +92,18 @@ namespace Simple.Data.Ado.Schema
             }
         }
 
+        public bool TryFindColumn(string columnName, out Column column)
+        {
+            var columns = _lazyColumns.Value;
+            if (columns.Contains(columnName))
+            {
+                column = columns.Find(columnName);
+                return true;
+            }
+            column = null;
+            return false;
+        }
+
         public bool HasColumn(string columnName)
         {
             return _lazyColumns.Value.Contains(columnName);

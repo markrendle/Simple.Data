@@ -3,7 +3,6 @@ namespace Simple.Data.Ado
     using System;
     using System.Collections.Generic;
     using System.Data;
-    using System.Data.Common;
     using System.Diagnostics;
     using System.Linq;
     using Schema;
@@ -47,7 +46,7 @@ namespace Simple.Data.Ado
             using (connection.MaybeDisposable())
             {
                 using (var insertCommand = new CommandHelper(Adapter).CreateInsert(connection, insertSql, _columns))
-                using (var selectCommand = connection.CreateCommand())
+                using (var selectCommand = connection.CreateCommand(Adapter.AdoOptions))
                 {
                     selectCommand.CommandText = selectSql;
                     connection.OpenIfClosed();
@@ -97,7 +96,7 @@ namespace Simple.Data.Ado
 
             try
             {
-                return TryExecute(command);
+                return command.TryExecuteNonQuery();
             }
             catch (Exception ex)
             {
@@ -113,7 +112,7 @@ namespace Simple.Data.Ado
 
             try
             {
-                if (TryExecute(insertCommand) == 1)
+                if (insertCommand.TryExecuteNonQuery() == 1)
                     return TryExecuteSingletonQuery(selectCommand);
             }
             catch (Exception ex)
@@ -126,36 +125,15 @@ namespace Simple.Data.Ado
 
         private static IDictionary<string, object> TryExecuteSingletonQuery(IDbCommand command)
         {
-            command.WriteTrace();
-            try
+            using (var reader = command.TryExecuteReader())
             {
-                using (var reader = command.ExecuteReader())
+                if (reader.Read())
                 {
-                    if (reader.Read())
-                    {
-                        return reader.ToDictionary();
-                    }
+                    return reader.ToDictionary();
                 }
-            }
-            catch (DbException ex)
-            {
-                throw new AdoAdapterException(ex.Message, command);
             }
 
             return null;
-        }
-
-        private static int TryExecute(IDbCommand command)
-        {
-            command.WriteTrace();
-            try
-            {
-                return command.ExecuteNonQuery();
-            }
-            catch (DbException ex)
-            {
-                throw new AdoAdapterException(ex.Message, command);
-            }
         }
 
         private static void TryPrepare(params IDbCommand[] commands)

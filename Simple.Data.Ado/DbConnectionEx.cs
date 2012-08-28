@@ -16,5 +16,14 @@ namespace Simple.Data.Ado
                 connection.Open();
             }
         }
+
+        public static IDbCommand CreateCommand(this IDbConnection connection, AdoOptions options)
+        {
+            if (options == null || options.CommandTimeout < 0) return connection.CreateCommand();
+
+            var command = connection.CreateCommand();
+            command.CommandTimeout = options.CommandTimeout;
+            return command;
+        }
     }
 }

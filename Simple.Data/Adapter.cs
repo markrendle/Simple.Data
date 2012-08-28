@@ -49,6 +49,8 @@
             OnSetup();
         }
 
+        public OptionsBase Options { get; set; }
+
         /// <summary>
         /// Called when the <see cref="Setup(object)"/> method is called, after the settings have been set.
         /// </summary>
@@ -102,6 +104,7 @@
         ///  Inserts a record into the specified "table".
         ///  </summary><param name="tableName">Name of the table.</param>
         /// <param name="data">The values to insert.</param>
+        /// <param name="resultRequired"><c>true</c> if the insert call uses a return value; otherwise, <c>false</c>.</param>
         /// <returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
         public abstract IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, bool resultRequired);
 
@@ -150,7 +153,7 @@
         /// <param name="onError">A Func to call when there is an error. It this func returns true, carry on, otherwise abort.</param>
         /// <param name="resultRequired"><c>true</c> if the result of the insert is used in code; otherwise, <c>false</c>.</param>
         /// <returns>If possible, return the newly inserted rows, including any automatically-set values such as primary keys or timestamps.</returns>
-        /// <remarks>This method has a default implementation based on the <see cref="Insert(string,IDictionary{TKey,TValue},bool)"/> method.
+        /// <remarks>This method has a default implementation based on the <see cref="Insert(string,IDictionary{string,object},bool)"/> method.
         /// You should override this method if your adapter can optimize the operation.</remarks>
         public virtual IEnumerable<IDictionary<string, object>> InsertMany(string tableName,
                                                                            IEnumerable<IDictionary<string, object>> dataList,
@@ -367,7 +370,7 @@
 
         private OptimizingDelegateFactory CreateOptimizingDelegateFactory()
         {
-            return MefHelper.GetAdjacentComponent<OptimizingDelegateFactory>(this.GetType()) ?? new DefaultOptimizingDelegateFactory();
+            return MefHelper.GetAdjacentComponent<OptimizingDelegateFactory>(GetType()) ?? new DefaultOptimizingDelegateFactory();
         }
 
         public virtual IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired)
@@ -488,7 +491,18 @@
             foreach (var row in list)
             {
                 var criteria = GetCriteria(tableName, criteriaFields, row);
-                transactionAdapter.Upsert(tableName, row, criteria, true, transaction);
+                try
+                {
+                    transactionAdapter.Upsert(tableName, row, criteria, true, transaction);
+                }
+                catch (Exception ex)
+                {
+                    if (errorCallback(row, ex))
+                    {
+                        continue;
+                    }
+                    throw;
+                }
             }
         }
 

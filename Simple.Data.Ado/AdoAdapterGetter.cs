@@ -41,7 +41,7 @@ namespace Simple.Data.Ado
 
             var commandBuilder = new GetHelper(_adapter.GetSchema()).GetCommand(_adapter.GetSchema().FindTable(tableName), keyValues);
 
-            var command = commandBuilder.GetCommand(_adapter.CreateConnection());
+            var command = commandBuilder.GetCommand(_adapter.CreateConnection(), _adapter.AdoOptions);
             command = _adapter.CommandOptimizer.OptimizeFindOne(command);
 
             var commandTemplate =
@@ -77,24 +77,16 @@ namespace Simple.Data.Ado
 
         private static IDictionary<string, object> TryExecuteSingletonQuery(IDbConnection connection, IDbCommand command, IDictionary<string, int> index)
         {
-            command.WriteTrace();
             using (connection.MaybeDisposable())
             using (command)
             {
-                try
+                connection.OpenIfClosed();
+                using (var reader = command.TryExecuteReader())
                 {
-                    connection.OpenIfClosed();
-                    using (var reader = command.ExecuteReader())
+                    if (reader.Read())
                     {
-                        if (reader.Read())
-                        {
-                            return reader.ToDictionary(index);
-                        }
+                        return reader.ToDictionary(index);
                     }
-                }
-                catch (DbException ex)
-                {
-                    throw new AdoAdapterException(ex.Message, command);
                 }
             }
             return null;
@@ -121,7 +113,7 @@ namespace Simple.Data.Ado
 
             var commandBuilder = new GetHelper(_adapter.GetSchema()).GetCommand(_adapter.GetSchema().FindTable(tableName), parameterValues);
 
-            var command = commandBuilder.GetCommand(_adapter.CreateConnection());
+            var command = commandBuilder.GetCommand(_adapter.CreateConnection(), _adapter.AdoOptions);
             command = _adapter.CommandOptimizer.OptimizeFindOne(command);
 
             var commandTemplate =

@@ -134,7 +134,7 @@ namespace Simple.Data
             return _adapter as Adapter;
         }
 
-        protected override bool ExecuteFunction(out object result, ExecuteFunctionCommand command)
+        protected internal override bool ExecuteFunction(out object result, ExecuteFunctionCommand command)
         {
             return command.Execute(out result, _adapterTransaction);
         }

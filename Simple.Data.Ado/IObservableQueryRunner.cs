@@ -25,7 +25,7 @@ namespace Simple.Data.Ado
             {
                 throw new AdoAdapterException(ex.Message, ex);
             }
-            var reader = command.ExecuteReaderWithExceptionWrap();
+            var reader = command.TryExecuteReader();
             if (index == null) index = reader.CreateDictionaryIndex();
 
             return ColdObservable.Create<IDictionary<string, object>>(o => RunObservable(command, connection, reader, index, o));

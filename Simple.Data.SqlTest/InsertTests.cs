@@ -2,6 +2,7 @@
 using System.Dynamic;
 using System.Linq;
 using NUnit.Framework;
+using Simple.Data.Ado;
 using Simple.Data.SqlTest.Resources;
 
 namespace Simple.Data.SqlTest
@@ -26,6 +27,27 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual("Ford", user.Name);
             Assert.AreEqual("hoopy", user.Password);
             Assert.AreEqual(29, user.Age);
+        }
+
+        [Test]
+        public void TestInsertWithIdentityInsertOn()
+        {
+            var db = DatabaseHelper.Open().WithOptions(new AdoOptions(identityInsert: true));
+            var user = db.Users.Insert(Id: 42, Name: "Arthur", Password: "Tea", Age: 30);
+            Assert.IsNotNull(user);
+            Assert.AreEqual(42, user.Id);
+        }
+
+        [Test]
+        public void TestInsertWithIdentityInsertOnThenOffAgain()
+        {
+            var db = DatabaseHelper.Open().WithOptions(new AdoOptions(identityInsert: true));
+            var user = db.Users.Insert(Id: 2267709, Name: "Douglas", Password: "dirk", Age: 49);
+            Assert.IsNotNull(user);
+            Assert.AreEqual(2267709, user.Id);
+            db.ClearOptions();
+            user = db.Users.Insert(Name: "Frak", Password: "true", Age: 200);
+            Assert.Less(2267709, user.Id);
         }
 
         [Test]

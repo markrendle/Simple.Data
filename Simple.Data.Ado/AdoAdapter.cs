@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Data;
-using System.Data.Common;
 using System.Linq;
 using Simple.Data.Ado.Schema;
 
@@ -18,6 +17,7 @@ namespace Simple.Data.Ado
         private Lazy<AdoAdapterRelatedFinder> _relatedFinder;
         private DatabaseSchema _schema;
         private IDbConnection _sharedConnection;
+        private Func<IDbConnection, IDbConnection> _connectionModifier = connection => connection;
 
         public AdoAdapter()
         {
@@ -41,6 +41,11 @@ namespace Simple.Data.Ado
             _providerHelper = providerHelper;
             _relatedFinder = relatedFinder;
             _schema = schema;
+        }
+
+        public AdoOptions AdoOptions
+        {
+            get { return Options as AdoOptions; }
         }
 
         public CommandOptimizer CommandOptimizer
@@ -84,7 +89,7 @@ namespace Simple.Data.Ado
 
         public object Clone()
         {
-            return new AdoAdapter(_connectionProvider);
+            return new AdoAdapter(_connectionProvider) {_connectionModifier = _connectionModifier};
         }
 
         #endregion
@@ -176,11 +181,6 @@ namespace Simple.Data.Ado
                     && args[0] is string);
         }
 
-        private static bool FunctionIsCount(string functionName, object[] args)
-        {
-            return (functionName.Equals("count", StringComparison.OrdinalIgnoreCase) && args.Length == 0);
-        }
-
         public override IObservable<IDictionary<string, object>> RunQueryAsObservable(SimpleQuery query,
                                                                                       out
                                                                                           IEnumerable
@@ -245,56 +245,53 @@ namespace Simple.Data.Ado
             return _schema.FindTable(tableName).PrimaryKey.AsEnumerable().ToList();
         }
 
+        public void SetConnectionModifier(Func<IDbConnection, IDbConnection> connectionModifer)
+        {
+            _connectionModifier = connectionModifer;
+        }
+
+        public void ClearConnectionModifier()
+        {
+            _connectionModifier = connection => connection;
+        }
+
         private int Execute(ICommandBuilder commandBuilder)
         {
             IDbConnection connection = CreateConnection();
             using (connection.MaybeDisposable())
             {
-                using (IDbCommand command = commandBuilder.GetCommand(connection))
+                using (IDbCommand command = commandBuilder.GetCommand(connection, AdoOptions))
                 {
                     connection.OpenIfClosed();
-                    return TryExecute(command);
+                    return command.TryExecuteNonQuery();
                 }
             }
         }
 
-        internal static int Execute(ICommandBuilder commandBuilder, IDbConnection connection)
+        internal int Execute(ICommandBuilder commandBuilder, IDbConnection connection)
         {
             using (connection.MaybeDisposable())
             {
-                using (IDbCommand command = commandBuilder.GetCommand(connection))
+                using (IDbCommand command = commandBuilder.GetCommand(connection, AdoOptions))
                 {
                     connection.OpenIfClosed();
-                    return TryExecute(command);
+                    return command.TryExecuteNonQuery();
                 }
             }
         }
 
-        internal static int Execute(ICommandBuilder commandBuilder, IAdapterTransaction transaction)
+        internal int Execute(ICommandBuilder commandBuilder, IAdapterTransaction transaction)
         {
             IDbTransaction dbTransaction = ((AdoAdapterTransaction) transaction).DbTransaction;
             return Execute(commandBuilder, dbTransaction);
         }
 
-        internal static int Execute(ICommandBuilder commandBuilder, IDbTransaction dbTransaction)
+        internal int Execute(ICommandBuilder commandBuilder, IDbTransaction dbTransaction)
         {
-            using (IDbCommand command = commandBuilder.GetCommand(dbTransaction.Connection))
+            using (IDbCommand command = commandBuilder.GetCommand(dbTransaction.Connection, AdoOptions))
             {
                 command.Transaction = dbTransaction;
-                return TryExecute(command);
-            }
-        }
-
-        private static int TryExecute(IDbCommand command)
-        {
-            command.WriteTrace();
-            try
-            {
-                return command.ExecuteNonQuery();
-            }
-            catch (DbException ex)
-            {
-                throw new AdoAdapterException(ex.Message, command);
+                return command.TryExecuteNonQuery();
             }
         }
 
@@ -310,7 +307,7 @@ namespace Simple.Data.Ado
 
         public IDbConnection CreateConnection()
         {
-            return _sharedConnection ?? _connectionProvider.CreateConnection();
+            return _sharedConnection ?? _connectionModifier(_connectionProvider.CreateConnection());
         }
 
         public DatabaseSchema GetSchema()
@@ -325,7 +322,8 @@ namespace Simple.Data.Ado
 
         public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
         {
-            return new AdoAdapterUpserter(this).UpsertMany(tableName, list, isResultRequired, errorCallback);
+            var upserter = new AdoAdapterUpserter(this);
+            return upserter.UpsertMany(tableName, list, isResultRequired, errorCallback);
         }
 
         public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)

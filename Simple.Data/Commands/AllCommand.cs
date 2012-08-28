@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq;
-using System.Text;
 
 namespace Simple.Data.Commands
 {
@@ -31,8 +28,6 @@ namespace Simple.Data.Commands
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             return new SimpleQuery(dataStrategy, table.GetQualifiedName());
-            //return new SimpleResultSet(dataStrategy.Find(table.GetQualifiedName(), null)
-            //    .Select(dict => new SimpleRecord(dict, table.GetQualifiedName(), dataStrategy)));
         }
     }
 }

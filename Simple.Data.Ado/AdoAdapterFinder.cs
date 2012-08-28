@@ -54,7 +54,7 @@
             var commandBuilder = new FindHelper(_adapter.GetSchema())
                 .GetFindByCommand(_adapter.GetSchema().BuildObjectName(tableName), criteria);
 
-            var command = commandBuilder.GetCommand(_adapter.CreateConnection());
+            var command = commandBuilder.GetCommand(_adapter.CreateConnection(), _adapter.AdoOptions);
             command = _adapter.CommandOptimizer.OptimizeFindOne(command);
 
             var commandTemplate =
@@ -169,37 +169,19 @@
 
         private static IDictionary<string, object> TryExecuteSingletonQuery(IDbConnection connection, IDbCommand command, IDictionary<string, int> index)
         {
-            command.WriteTrace();
             using (connection.MaybeDisposable())
             using (command)
             {
-                try
+                connection.OpenIfClosed();
+                using (var reader = command.TryExecuteReader())
                 {
-                    connection.OpenIfClosed();
-                    using (var reader = command.ExecuteReader())
+                    if (reader.Read())
                     {
-                        if (reader.Read())
-                        {
-                            return reader.ToDictionary(index);
-                        }
+                        return reader.ToDictionary(index);
                     }
-                }
-                catch (DbException ex)
-                {
-                    throw new AdoAdapterException(ex.Message, command);
                 }
             }
             return null;
-        }
-
-        private static IDisposable DisposeWrap(IDbConnection connection)
-        {
-            if (connection.State == ConnectionState.Open)
-            {
-                return ActionDisposable.NoOp;
-            }
-
-            return new ActionDisposable(connection.Dispose);
         }
 
         private static object FixObjectType(object value)

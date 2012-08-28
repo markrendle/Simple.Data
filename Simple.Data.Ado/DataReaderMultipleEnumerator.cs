@@ -51,16 +51,9 @@ namespace Simple.Data.Ado
 
         private void ExecuteReader()
         {
-            try
-            {
-                _connection.OpenIfClosed();
-                _reader = _command.ExecuteReader();
-                _index = _index ?? _reader.CreateDictionaryIndex();
-            }
-            catch (DbException ex)
-            {
-                throw new AdoAdapterException(ex.Message, ex);
-            }
+            _connection.OpenIfClosed();
+            _reader = _command.TryExecuteReader();
+            _index = _index ?? _reader.CreateDictionaryIndex();
         }
 
         public void Reset()

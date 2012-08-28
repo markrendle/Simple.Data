@@ -64,11 +64,11 @@ namespace Simple.Data
             return false;
         }
 
-        protected abstract bool ExecuteFunction(out object result, ExecuteFunctionCommand command);
+        protected internal abstract bool ExecuteFunction(out object result, ExecuteFunctionCommand command);
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
-            if (this.TryInvokeFunction(binder.Name, () => binder.ArgumentsToDictionary(args), out result)) return true;
+            if (TryInvokeFunction(binder.Name, () => binder.ArgumentsToDictionary(args), out result)) return true;
 
             if (new AdapterMethodDynamicInvoker(GetAdapter()).TryInvokeMember(binder, args, out result)) return true;
 
@@ -128,5 +128,15 @@ namespace Simple.Data
         }
 
         protected internal abstract DataStrategy Clone();
+
+        public dynamic WithOptions(OptionsBase options)
+        {
+            return new DataStrategyWithOptions(this, options);
+        }
+        
+        public virtual dynamic ClearOptions()
+        {
+            return this;
+        }
     }
 }
