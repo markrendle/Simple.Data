@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 
@@ -426,6 +427,20 @@ namespace Simple.Data.SqlTest
             var kingsSubordinates = employees.Where(e => e.Manager == "Alice").ToList();
 
             Assert.AreEqual(1, kingsSubordinates.Count);
+        }
+        
+        [Test]
+        public void OrderByOnJoinedColumnShouldUseJoinedColumn()
+        {
+            var traceListener = new TestTraceListener();
+            Trace.Listeners.Add(traceListener);
+            var db = DatabaseHelper.Open();
+
+            var q = db.Employees.Query().LeftJoin(db.Employees.As("Manager"), Id: db.Employees.ManagerId);
+            q = q.Select(db.Employees.Name, q.Manager.Name.As("Manager"));
+            List<dynamic> employees = q.OrderBy(q.Manager.Name).ToList();
+            Trace.Listeners.Remove(traceListener);
+            Assert.Greater(traceListener.Output.IndexOf("order by [manager].[name]", StringComparison.OrdinalIgnoreCase), 0);
         }
 
         [Test]

@@ -303,13 +303,19 @@ namespace Simple.Data.Ado
         protected string ToOrderByDirective(OrderByClause item)
         {
             string name;
-            if (_columns.Any(r => (!string.IsNullOrWhiteSpace(r.GetAlias())) && r.GetAlias().Equals(item.Reference.GetName())))
+            if (!string.IsNullOrWhiteSpace(item.Reference.GetOwner().GetAlias()))
+            {
+                name = string.Format("{0}.{1}", _schema.QuoteObjectName(item.Reference.GetOwner().GetAlias()),
+                                     _schema.QuoteObjectName(item.Reference.GetName()));
+            }
+            else if (_columns.Any(r => (!string.IsNullOrWhiteSpace(r.GetAlias())) && r.GetAlias().Equals(item.Reference.GetName())))
             {
                 name = item.Reference.GetName();
             }
             else
             {
-                name = _table.FindColumn(item.Reference.GetName()).QualifiedName;
+                var table = _schema.FindTable(item.Reference.GetOwner().GetName());
+                name = table.FindColumn(item.Reference.GetName()).QualifiedName;
             }
 
             var direction = item.Direction == OrderByDirection.Descending ? " DESC" : string.Empty;
