@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CastTask.cs" />
     <Compile Include="FindAllByTask.cs" />
     <Compile Include="FindByTask.cs" />
     <Compile Include="IProfileTask.cs" />

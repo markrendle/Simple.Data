@@ -31,7 +31,7 @@ DECLARE @PostId AS INT
 DECLARE @PostIdStr AS NVARCHAR(3)
 DECLARE @Loop AS INT
 SET @PostId = 1
-WHILE @PostId <= 100
+WHILE @PostId <= 2500
 BEGIN
 	SET @PostIdStr = CAST(@PostId AS NVARCHAR(3))
 	INSERT INTO [dbo].[Post] ([Id], [Title], [Content], [Created]) VALUES (@PostId, 'Post ' + @PostIdStr, 'This is post number ' + @PostIdStr, GETDATE())

@@ -106,7 +106,57 @@
                 result = Cast<dynamic>();
                 return true;
             }
+
+            var collectionType = binder.Type.GetInterface("ICollection`1");
+            if (collectionType != null)
+            {
+                if (TryConvertToGenericCollection(binder, out result, collectionType)) return true;
+            }
+
+            if (binder.Type.Name.Equals("IEnumerable`1"))
+            {
+                var genericArguments = binder.Type.GetGenericArguments();
+                var cast =
+                    typeof (SimpleQuery).GetMethod("Cast").MakeGenericMethod(genericArguments);
+                result = cast.Invoke(this, null);
+                return true;
+            }
+
             return base.TryConvert(binder, out result);
+        }
+
+        private bool TryConvertToGenericCollection(ConvertBinder binder, out object result, Type collectionType)
+        {
+            var genericArguments = collectionType.GetGenericArguments();
+            var enumerableConstructor =
+                binder.Type.GetConstructor(new[]
+                                               {
+                                                   typeof (IEnumerable<>).MakeGenericType(
+                                                       genericArguments)
+                                               });
+            if (enumerableConstructor != null)
+            {
+                var cast =
+                    typeof (SimpleQuery).GetMethod("Cast").MakeGenericMethod(genericArguments);
+                result = Activator.CreateInstance(binder.Type, cast.Invoke(this, null));
+                return true;
+            }
+
+            var defaultConstructor = binder.Type.GetConstructor(new Type[0]);
+            if (defaultConstructor != null)
+            {
+                result = Activator.CreateInstance(binder.Type);
+                var add = binder.Type.GetMethod("Add", genericArguments);
+                var cast =
+                    typeof (SimpleQuery).GetMethod("Cast").MakeGenericMethod(genericArguments);
+                foreach (var item in (IEnumerable) cast.Invoke(this, null))
+                {
+                    add.Invoke(result, new[] {item});
+                }
+                return true;
+            }
+            result = null;
+            return false;
         }
 
         /// <summary>

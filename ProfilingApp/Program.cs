@@ -12,9 +12,9 @@ namespace ProfilingApp
     {
         static void Main(string[] args)
         {
-            ResetDatabase();
+            //ResetDatabase();
 
-            new FindByTask().Run();
+            new CastTask().Run();
         }
 
         private static void ResetDatabase()
