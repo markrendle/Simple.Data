@@ -10,12 +10,12 @@ namespace Simple.Data.QueryPolyfills
     {
         private readonly Dictionary<SimpleExpressionType, Func<SimpleExpression, Func<IDictionary<string, object>, bool>>> _expressionFormatters;
 
-                private readonly WhereClause _whereClause;
+        private readonly WhereClause _whereClause;
 
         public WhereClauseHandler(WhereClause whereClause)
         {
             _whereClause = whereClause;
-            _expressionFormatters = new Dictionary<SimpleExpressionType, Func<SimpleExpression, Func<IDictionary<string,object>, bool>>>
+            _expressionFormatters = new Dictionary<SimpleExpressionType, Func<SimpleExpression, Func<IDictionary<string, object>, bool>>>
                                         {
                                             {SimpleExpressionType.And, LogicalExpressionToWhereClause},
                                             {SimpleExpressionType.Or, LogicalExpressionToWhereClause},
@@ -95,16 +95,24 @@ namespace Simple.Data.QueryPolyfills
             {
                 return
                     d =>
-                    Resolve(d, arg.LeftOperand).OfType<IEnumerable>().Any(
-                        o => o.Cast<object>().SequenceEqual(((IEnumerable) arg.RightOperand).Cast<object>()));
+                        {
+                            var resolvedLeftOperand = Resolve(d, arg.LeftOperand);
+                            if (resolvedLeftOperand.OfType<IEnumerable>().Any())
+                            {
+                                return resolvedLeftOperand.OfType<IEnumerable>().Any(
+                                    o => o.Cast<object>().SequenceEqual(((IEnumerable)arg.RightOperand).Cast<object>()));
+                            }
+                            return resolvedLeftOperand.Any(
+                                o => ((IEnumerable)arg.RightOperand).Cast<object>().Contains(o));
+                        };
             }
 
             return d => Resolve(d, arg.LeftOperand).Contains(arg.RightOperand);
         }
 
-        private Func<IDictionary<string,object>, bool> Format(SimpleExpression expression)
+        private Func<IDictionary<string, object>, bool> Format(SimpleExpression expression)
         {
-            Func<SimpleExpression, Func<IDictionary<string,object>,bool>> formatter;
+            Func<SimpleExpression, Func<IDictionary<string, object>, bool>> formatter;
 
             if (_expressionFormatters.TryGetValue(expression.Type, out formatter))
             {
@@ -116,8 +124,8 @@ namespace Simple.Data.QueryPolyfills
 
         private Func<IDictionary<string, object>, bool> LogicalExpressionToWhereClause(SimpleExpression arg)
         {
-            var left = Format((SimpleExpression) arg.LeftOperand);
-            var right = Format((SimpleExpression) arg.RightOperand);
+            var left = Format((SimpleExpression)arg.LeftOperand);
+            var right = Format((SimpleExpression)arg.RightOperand);
 
             if (arg.Type == SimpleExpressionType.Or)
             {
@@ -140,7 +148,7 @@ namespace Simple.Data.QueryPolyfills
             }
 
             if (dict.ContainsKey(key))
-                return new[] {dict[key]};
+                return new[] { dict[key] };
 
             return new object[0];
         }
@@ -151,12 +159,12 @@ namespace Simple.Data.QueryPolyfills
 
             if (dict.ContainsKey(objectReference.GetName()))
             {
-                var master = dict[objectReference.GetName()] as IDictionary<string,object>;
+                var master = dict[objectReference.GetName()] as IDictionary<string, object>;
                 if (master != null)
                 {
                     if (master.ContainsKey(key))
                     {
-                        return new[] {master[key]};
+                        return new[] { master[key] };
                     }
                 }
 
