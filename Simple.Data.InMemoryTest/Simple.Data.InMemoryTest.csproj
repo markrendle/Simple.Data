@@ -60,6 +60,7 @@
     <Compile Include="InMemoryTests.cs" />
     <Compile Include="NameResolutionTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SimpleQueryConversionTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

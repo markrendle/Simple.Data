@@ -151,7 +151,7 @@
                 }
                 else
                 {
-                    ApplyPaging(commandBuilders, mainCommandBuilder, skipClause, takeClause, queryPager);
+                    ApplyPaging(commandBuilders, mainCommandBuilder, skipClause, takeClause, query.Clauses.OfType<WithClause>().Any(), queryPager);
                 }
             }
             return commandBuilders.ToArray();
@@ -168,21 +168,20 @@
             commandBuilders.Add(commandBuilder);
         }
 
-        private void ApplyPaging(List<ICommandBuilder> commandBuilders, ICommandBuilder mainCommandBuilder, SkipClause skipClause,
-                                 TakeClause takeClause, IQueryPager queryPager)
+        private void ApplyPaging(List<ICommandBuilder> commandBuilders, ICommandBuilder mainCommandBuilder, SkipClause skipClause, TakeClause takeClause, bool hasWithClause, IQueryPager queryPager)
         {
             const int maxInt = 2147483646;
 
             IEnumerable<string> commandTexts;
-            if (skipClause == null)
+            if (skipClause == null && !hasWithClause)
             {
                 commandTexts = queryPager.ApplyLimit(mainCommandBuilder.Text, takeClause.Count);
             }
             else
             {
-                if (takeClause == null) takeClause = new TakeClause(maxInt);
-                commandTexts = queryPager.ApplyPaging(mainCommandBuilder.Text, skipClause.Count,
-                                                      takeClause.Count);
+                int skip = skipClause == null ? 0 : skipClause.Count;
+                int take = takeClause == null ? maxInt : takeClause.Count;
+                commandTexts = queryPager.ApplyPaging(mainCommandBuilder.Text, skip, take);
             }
 
             commandBuilders.AddRange(
