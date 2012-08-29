@@ -16,7 +16,7 @@ namespace Simple.Data
     /// </summary>
     public sealed partial class Database : DataStrategy
     {
-        private static readonly SimpleDataConfigurationSection Configuration;
+        private static SimpleDataConfigurationSection _configuration;
 
         private static readonly IDatabaseOpener DatabaseOpener;
         private static IPluralizer _pluralizer;
@@ -26,10 +26,23 @@ namespace Simple.Data
         static Database()
         {
             DatabaseOpener = new DatabaseOpener();
-            Configuration =
-                (SimpleDataConfigurationSection) ConfigurationManager.GetSection("simpleData/simpleDataConfiguration")
-                ?? new SimpleDataConfigurationSection();
-            TraceLevel = Configuration.TraceLevel;
+            LoadTraceLevelFromConfig();
+        }
+
+        private static void LoadTraceLevelFromConfig()
+        {
+            _configuration =
+                (SimpleDataConfigurationSection) ConfigurationManager.GetSection("simpleData/simpleDataConfiguration");
+            if (_configuration != null)
+            {
+                Trace.TraceWarning("SimpleDataConfiguration section is obsolete; use system.diagnostics switches instead.");
+                TraceLevel = _configuration.TraceLevel;
+            }
+            else
+            {
+                var traceSwitch = new TraceSwitch("Simple.Data", "", TraceLevel.Info.ToString());
+                TraceLevel = traceSwitch.Level;
+            }
         }
 
         /// <summary>
@@ -127,7 +140,7 @@ namespace Simple.Data
         private static TraceLevel? _traceLevel;
         public static TraceLevel TraceLevel
         {
-            get { return _traceLevel ?? Configuration.TraceLevel; }
+            get { return _traceLevel ?? _configuration.TraceLevel; }
             set { _traceLevel = value; }
         }
 
