@@ -31,9 +31,10 @@ namespace Simple.Data
 
         public object Create(IDictionary<string, object> source)
         {
-            return _func.Value(source);
+            var func = _func.Value;
+            return func(source);
         }
-        
+
         public bool TryCreate(IDictionary<string,object> source, out object result)
         {
             try

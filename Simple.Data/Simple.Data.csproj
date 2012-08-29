@@ -57,6 +57,7 @@
     <Compile Include="AdapterWithFunctionsExtensions.cs" />
     <Compile Include="AdoCompatibleComparer.cs" />
     <Compile Include="AllColumnsSpecialReference.cs" />
+    <Compile Include="AssemblyEx.cs" />
     <Compile Include="BinderHelper.cs" />
     <Compile Include="CachingAdapterFactory.cs" />
     <Compile Include="CastEnumerable.cs" />

@@ -208,7 +208,7 @@ namespace Simple.Data.Ado
         private static List<ProviderAssemblyAttributeBase> LoadAssemblyAttributes()
         {
             var attributes = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => a.GetName().Name.StartsWith("Simple.Data.", StringComparison.OrdinalIgnoreCase))
+                .Where(a => a.GetFullName().StartsWith("Simple.Data.", StringComparison.OrdinalIgnoreCase))
                 .SelectMany(ProviderAssemblyAttributeBase.Get)
                 .ToList();
 

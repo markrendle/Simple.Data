@@ -298,7 +298,7 @@ namespace Simple.Data
                 var changeTypeMethod = typeof (PropertySetterBuilder).GetMethod("SafeConvert",
                                                                                 BindingFlags.Static | BindingFlags.NonPublic);
                 callConvert = Expression.Call(changeTypeMethod, _itemProperty,
-                                              Expression.Constant(_property.PropertyType.GetEnumUnderlyingType()));
+                                              Expression.Constant(_property.PropertyType.GetEnumUnderlyingType(), typeof(Type)));
             }
             else if (_property.PropertyType.IsGenericType && _property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
@@ -313,7 +313,7 @@ namespace Simple.Data
                 var changeTypeMethod = typeof (PropertySetterBuilder).GetMethod("SafeConvert",
                                                                                 BindingFlags.Static | BindingFlags.NonPublic);
                 callConvert = Expression.Call(changeTypeMethod, _itemProperty,
-                                              Expression.Constant(_property.PropertyType));
+                                              Expression.Constant(_property.PropertyType, typeof(Type)));
             }
 
             var assign = Expression.Assign(_nameProperty, Expression.Convert(callConvert, _property.PropertyType));
@@ -323,7 +323,7 @@ namespace Simple.Data
                     Expression.IfThenElse(Expression.TypeIs(_itemProperty, typeof (string)),
                                           Expression.Assign(_nameProperty,
                                                             Expression.Convert(Expression.Call(typeof (Enum).GetMethod("Parse", new[] {typeof(Type), typeof(string), typeof(bool)}),
-                                                                                               Expression.Constant(_property.PropertyType),
+                                                                                               Expression.Constant(_property.PropertyType, typeof(Type)),
                                                                                                Expression.Call(_itemProperty, typeof(object).GetMethod("ToString")), Expression.Constant(true)), _property.PropertyType)),
                                           assign), Expression.Catch(typeof(Exception), Expression.Empty()));
             }
@@ -344,7 +344,7 @@ namespace Simple.Data
                 Expression.IfThenElse(Expression.TypeIs(_itemProperty, typeof (string)),
                                       Expression.Assign(_nameProperty,
                                                         Expression.Convert(Expression.Call(typeof (Enum).GetMethod("Parse", new[] {typeof(Type), typeof(string), typeof(bool)}),
-                                                                                           Expression.Constant(_property.PropertyType),
+                                                                                           Expression.Constant(_property.PropertyType, typeof(Type)),
                                                                                            Expression.Call(_itemProperty, typeof(object).GetMethod("ToString")), Expression.Constant(true)), _property.PropertyType)),
                                       assign), Expression.Catch(typeof(Exception), Expression.Empty()));
         }

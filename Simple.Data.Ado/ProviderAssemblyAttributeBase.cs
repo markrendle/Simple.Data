@@ -40,7 +40,7 @@ namespace Simple.Data.Ado
             {
                 foreach (var referencedAssembly in assembly.GetReferencedAssemblies())
                 {
-                    if (AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies().All(a => a.GetName().FullName != referencedAssembly.FullName))
+                    if (AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies().All(a => a.GetFullName() != referencedAssembly.FullName))
                     {
                         try
                         {
@@ -56,7 +56,7 @@ namespace Simple.Data.Ado
                     cad => typeof (ProviderAssemblyAttributeBase).IsAssignableFrom(cad.Constructor.DeclaringType));
                 if (hasAttribute)
                 {
-                    assembly = Assembly.Load(assembly.GetName());
+                    assembly = Assembly.Load(assembly.GetFullName());
                 }
                 else
                 {

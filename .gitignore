@@ -25,3 +25,16 @@ Simple.Data/Simple.Data.idc
 .DS_Store
 mono-release-*
 *ncrunch*
+MediumTrustApp
+nohup.out
+packages/EntityFramework.5.0.0/
+packages/Microsoft.AspNet.Mvc.3.0.20105.1/
+packages/Microsoft.AspNet.Providers.Core.1.1/
+packages/Microsoft.AspNet.Providers.LocalDB.1.1/
+packages/Microsoft.AspNet.Razor.1.0.20105.408/
+packages/Microsoft.AspNet.WebPages.1.0.20105.408/
+packages/Microsoft.Web.Infrastructure.1.0.0.0/
+packages/Modernizr.2.5.3/
+packages/jQuery.1.7.1.1/
+packages/jQuery.UI.Combined.1.8.20.1/
+packages/jQuery.Validation.1.9.0.1/
