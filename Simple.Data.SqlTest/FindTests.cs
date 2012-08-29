@@ -57,6 +57,14 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void TestFindAllByNameArray()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<User> users = db.Users.FindAllByName(new[] { "Bob", "UnknownUser" }).Cast<User>();
+            Assert.AreEqual(1, users.Count());
+        }
+
+        [Test]
         public void TestFindAllByNameAsIEnumerableOfDynamic()
         {
             var db = DatabaseHelper.Open();
