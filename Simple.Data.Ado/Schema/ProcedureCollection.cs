@@ -9,14 +9,16 @@ namespace Simple.Data.Ado.Schema
 {
     class ProcedureCollection : Collection<Procedure>
     {
+        private readonly string _defaultSchema;
+
         public ProcedureCollection()
         {
             
         }
 
-        public ProcedureCollection(IEnumerable<Procedure> procedures) : base(procedures.ToList())
+        public ProcedureCollection(IEnumerable<Procedure> procedures, string defaultSchema) : base(procedures.ToList())
         {
-            
+            _defaultSchema = defaultSchema;
         }
 
         /// <summary>
@@ -27,15 +29,7 @@ namespace Simple.Data.Ado.Schema
         /// <returns>A <see cref="Procedure"/> if a match is found; otherwise, <c>null</c>.</returns>
         public Procedure Find(string procedureName)
         {
-            if (procedureName.Contains('.'))
-            {
-                var schemaDotprocedure = procedureName.Split('.');
-                if (schemaDotprocedure.Length != 2) throw new InvalidOperationException("Could not resolve qualified procedure name.");
-                return Find(schemaDotprocedure[1], schemaDotprocedure[0]);
-            }
-            var procedure = FindprocedureWithName(procedureName.Homogenize())
-                   ?? FindprocedureWithPluralName(procedureName.Homogenize())
-                   ?? FindprocedureWithSingularName(procedureName.Homogenize());
+            var procedure = FindImpl(procedureName);
 
             if (procedure == null)
             {
@@ -47,15 +41,31 @@ namespace Simple.Data.Ado.Schema
 
         public bool IsProcedure(string procedureName)
         {
+            try
+            {
+                return FindImpl(procedureName) != null;
+            }
+            catch (UnresolvableObjectException)
+            {
+                return false;
+            }
+        }
+
+        private Procedure FindImpl(string procedureName)
+        {
             if (procedureName.Contains('.'))
             {
                 var schemaDotprocedure = procedureName.Split('.');
                 if (schemaDotprocedure.Length != 2) throw new InvalidOperationException("Could not resolve qualified procedure name.");
-                return Find(schemaDotprocedure[1], schemaDotprocedure[0]) != null;
+                return Find(schemaDotprocedure[1], schemaDotprocedure[0]);
             }
-            return (FindprocedureWithName(procedureName.Homogenize())
+            if (!string.IsNullOrWhiteSpace(_defaultSchema))
+            {
+                return Find(procedureName, _defaultSchema);
+            }
+            return FindprocedureWithName(procedureName.Homogenize())
                    ?? FindprocedureWithPluralName(procedureName.Homogenize())
-                   ?? FindprocedureWithSingularName(procedureName.Homogenize())) != null;
+                   ?? FindprocedureWithSingularName(procedureName.Homogenize());
         }
 
         /// <summary>
@@ -91,16 +101,12 @@ namespace Simple.Data.Ado.Schema
 
         private Procedure FindprocedureWithName(string procedureName, string schemaName)
         {
-            return this
-                .Where(sp => sp.HomogenizedName.Equals(procedureName) && (sp.Schema == null || sp.Schema.Homogenize().Equals(schemaName)))
-                .SingleOrDefault();
+            return this.SingleOrDefault(sp => sp.HomogenizedName.Equals(procedureName) && (sp.Schema == null || sp.Schema.Homogenize().Equals(schemaName)));
         }
 
         private Procedure FindprocedureWithName(string procedureName)
         {
-            return this
-                .Where(t => t.HomogenizedName.Equals(procedureName))
-                .SingleOrDefault();
+            return this.SingleOrDefault(t => t.HomogenizedName.Equals(procedureName));
         }
 
         private Procedure FindprocedureWithPluralName(string procedureName)

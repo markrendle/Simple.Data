@@ -136,6 +136,31 @@ namespace Simple.Data
                 return result;
             }
         }
+
+        public static MathReference operator +(MathReference column, object value)
+        {
+            return new MathReference(column, value, MathOperator.Add);
+        }
+
+        public static MathReference operator -(MathReference column, object value)
+        {
+            return new MathReference(column, value, MathOperator.Subtract);
+        }
+
+        public static MathReference operator *(MathReference column, object value)
+        {
+            return new MathReference(column, value, MathOperator.Multiply);
+        }
+
+        public static MathReference operator /(MathReference column, object value)
+        {
+            return new MathReference(column, value, MathOperator.Divide);
+        }
+
+        public static MathReference operator %(MathReference column, object value)
+        {
+            return new MathReference(column, value, MathOperator.Modulo);
+        }
     }
 
     public enum MathOperator

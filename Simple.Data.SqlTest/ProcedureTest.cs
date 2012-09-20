@@ -49,6 +49,24 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, results.ReturnValue);
         }
 
+        [Test]
+        public void SchemaUnqualifiedProcedureResolutionTest()
+        {
+            var db = DatabaseHelper.Open();
+            var actual = db.SchemaProc().FirstOrDefault();
+            Assert.IsNotNull(actual);
+            Assert.AreEqual("dbo.SchemaProc", actual.Actual);
+        }
+
+        [Test]
+        public void SchemaQualifiedProcedureResolutionTest()
+        {
+            var db = DatabaseHelper.Open();
+            var actual = db.test.SchemaProc().FirstOrDefault();
+            Assert.IsNotNull(actual);
+            Assert.AreEqual("test.SchemaProc", actual.Actual);
+        }
+
 #if DEBUG // Trace is only written for DEBUG build
         [Test]
         public void GetCustomerCountSecondCallExecutesNonQueryTest()

@@ -107,7 +107,7 @@ namespace Simple.Data.Ado.Schema
                                                      .Select(
                                                          proc =>
                                                          new Procedure(proc.Name, proc.SpecificName, proc.Schema,
-                                                                             this)));
+                                                                             this)), _schemaProvider.GetDefaultSchema());
         }
 
         public string QuoteObjectName(string unquotedName)

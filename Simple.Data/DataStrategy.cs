@@ -113,7 +113,7 @@ namespace Simple.Data
             return (DynamicSchema) _members[reference.GetName()];
         }
 
-        protected internal abstract Database GetDatabase();
+        protected internal abstract DataStrategy GetDatabase();
 
         internal bool IsExpressionFunction(string name, object[] args)
         {

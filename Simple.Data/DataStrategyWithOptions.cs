@@ -1,4 +1,5 @@
-﻿using Simple.Data.Commands;
+﻿using System.Data;
+using Simple.Data.Commands;
 
 namespace Simple.Data
 {
@@ -21,12 +22,27 @@ namespace Simple.Data
             return adapter;
         }
 
+        public SimpleTransaction BeginTransaction()
+        {
+            return SimpleTransaction.Begin(this);
+        }
+
+        public SimpleTransaction BeginTransaction(string name)
+        {
+            return SimpleTransaction.Begin(this, name);
+        }
+
+        public SimpleTransaction BeginTransaction(IsolationLevel isolationLevel)
+        {
+            return SimpleTransaction.Begin(this, isolationLevel);
+        }
+
         protected internal override bool ExecuteFunction(out object result, ExecuteFunctionCommand command)
         {
             return _wrappedStrategy.ExecuteFunction(out result, command);
         }
 
-        protected internal override Database GetDatabase()
+        protected internal override DataStrategy GetDatabase()
         {
             return _wrappedStrategy.GetDatabase();
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Simple.Data.Commands;
 
@@ -92,9 +93,23 @@ namespace Simple.Data
         {
             if (_dataStrategy != null)
             {
+                if (TryInvokeDataStrategyMethod(args, out result)) return true;
+
                 if (_dataStrategy.TryInvokeFunction(_name, () => binder.ArgumentsToDictionary(args), out result)) return true;
             }
             throw new InvalidOperationException();
+        }
+
+        private bool TryInvokeDataStrategyMethod(object[] args, out object result)
+        {
+            var methodInfo = _dataStrategy.GetType().GetMethod(_name, args.Select(a => (a ?? new object()).GetType()).ToArray());
+            if (methodInfo != null)
+            {
+                result = methodInfo.Invoke(_dataStrategy, args);
+                return true;
+            }
+            result = null;
+            return false;
         }
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)

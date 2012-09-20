@@ -76,7 +76,7 @@ namespace Simple.Data.IntegrationTest
         public void TestUpdateWithNamedArgumentsUsingExpression()
         {
             _db.Users.UpdateAll(Age: _db.Users.Age + 1);
-            GeneratedSqlIs("update [dbo].[Users] set [Age] = [dbo].[Users].[Age] + @p1");
+            GeneratedSqlIs("update [dbo].[Users] set [Age] = ([dbo].[Users].[Age] + @p1)");
             Parameter(0).Is(1);
         }
 

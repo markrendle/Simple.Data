@@ -27,10 +27,6 @@ namespace Simple.Data.SqlServer
                 insertSql.AppendFormat("SET IDENTITY_INSERT {0} ON; ", table.QualifiedName);
             }
             insertSql.AppendFormat("INSERT INTO {0} ({1})", table.QualifiedName, columnList);
-            if (resultRequired)
-            {
-                insertSql.Append(" OUTPUT INSERTED.*");
-            }
             insertSql.AppendFormat(" VALUES ({0})", valueList);
             
             if (identityInsert)
@@ -40,8 +36,14 @@ namespace Simple.Data.SqlServer
 
             if (resultRequired)
             {
-                return ExecuteSingletonQuery(adapter, insertSql.ToString(), dataDictionary.Keys,
-                                             dataDictionary.Values, transaction);
+                var identityColumn = table.Columns.FirstOrDefault(c => c.IsIdentity);
+                if (identityColumn != null)
+                {
+                    insertSql.AppendFormat(" SELECT * FROM {0} WHERE {1} = SCOPE_IDENTITY()", table.QualifiedName,
+                                           identityColumn.QuotedName);
+                    return ExecuteSingletonQuery(adapter, insertSql.ToString(), dataDictionary.Keys,
+                                                 dataDictionary.Values, transaction);
+                }
             }
             Execute(adapter, insertSql.ToString(), dataDictionary.Keys, dataDictionary.Values, transaction);
             return null;

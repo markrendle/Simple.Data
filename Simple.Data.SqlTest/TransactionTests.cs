@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Simple.Data.Ado;
 
 namespace Simple.Data.SqlTest
 {
@@ -52,6 +53,19 @@ namespace Simple.Data.SqlTest
             }
             Assert.AreEqual(1, db.Orders.All().ToList().Count);
             Assert.AreEqual(1, db.OrderItems.All().ToList().Count);
+        }
+
+        [Test]
+        public void TestWithOptionsTransaction()
+        {
+            var dbWithOptions = DatabaseHelper.Open().WithOptions(new AdoOptions(commandTimeout: 60000));
+            using (var tx = dbWithOptions.BeginTransaction())
+            {
+                tx.Orders.Insert(CustomerId: 1, OrderDate: DateTime.Today);
+                tx.Rollback();
+            }
+
+            Assert.Pass();
         }
 
         [Test]

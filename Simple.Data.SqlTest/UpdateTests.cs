@@ -106,7 +106,6 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
-        [Ignore]
         public void TestUpdateWithJoinCriteriaOnCompoundKeyTable()
         {
             var db = DatabaseHelper.Open();

@@ -101,7 +101,7 @@ namespace Simple.Data
             return command.Execute(out result);
         }
 
-        protected internal override Database GetDatabase()
+        protected internal override DataStrategy GetDatabase()
         {
             return this;
         }

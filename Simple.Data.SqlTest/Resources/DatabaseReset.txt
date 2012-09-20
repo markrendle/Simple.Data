@@ -1,5 +1,9 @@
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[TestReset]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[TestReset]
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SchemaProc]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[SchemaProc]
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[test].[SchemaProc]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [test].[SchemaProc]
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GetCustomers]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[GetCustomers]
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[CreateCustomer]') AND type in (N'P', N'PC'))
@@ -327,6 +331,20 @@ AS
 BEGIN
     SET NOCOUNT ON;
     RETURN 1
+END
+GO
+CREATE PROCEDURE [dbo].[SchemaProc]
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT 'dbo.SchemaProc' AS [Actual]
+END
+GO
+CREATE PROCEDURE [test].[SchemaProc]
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT 'test.SchemaProc' AS [Actual]
 END
 GO
 CREATE PROCEDURE ReturnStrings(@Strings AS [dbo].[StringList] READONLY)

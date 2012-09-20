@@ -72,7 +72,7 @@ namespace Simple.Data.Ado
 
             if (excludeAlias || mathReference.GetAlias() == null)
             {
-                return string.Format("{0} {1} {2}", FormatObject(mathReference.LeftOperand),
+                return string.Format("({0} {1} {2})", FormatObject(mathReference.LeftOperand),
                                      MathOperatorToString(mathReference.Operator),
                                      FormatObject(mathReference.RightOperand));
             }

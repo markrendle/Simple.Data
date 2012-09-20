@@ -13,14 +13,14 @@ namespace Simple.Data
     /// </summary>
     public sealed class SimpleTransaction : DataStrategy, IDisposable
     {
-        private readonly Database _database;
+        private readonly DataStrategy _database;
         private readonly IsolationLevel _isolationLevel;
 
         private readonly IAdapterWithTransactions _adapter;
         private TransactionRunner _transactionRunner;
         private IAdapterTransaction _adapterTransaction;
 
-        private SimpleTransaction(IAdapterWithTransactions adapter, Database database, IsolationLevel isolationLevel)
+        private SimpleTransaction(IAdapterWithTransactions adapter, DataStrategy database, IsolationLevel isolationLevel)
         {
             if (adapter == null) throw new ArgumentNullException("adapter");
             if (database == null) throw new ArgumentNullException("database");
@@ -49,38 +49,40 @@ namespace Simple.Data
             _transactionRunner = new TransactionRunner(_adapter, _adapterTransaction);
         }
 
-        internal static SimpleTransaction Begin(Database database)
+        internal static SimpleTransaction Begin(DataStrategy database)
         {
             SimpleTransaction transaction = CreateTransaction(database);
             transaction.Begin();
             return transaction;
         }
 
-        internal static SimpleTransaction Begin(Database database, string name)
+        internal static SimpleTransaction Begin(DataStrategy database, string name)
         {
             SimpleTransaction transaction = CreateTransaction(database);
             transaction.Begin(name);
             return transaction;
         }
 
-        public static SimpleTransaction Begin(Database database, IsolationLevel isolationLevel)
+        public static SimpleTransaction Begin(DataStrategy database, IsolationLevel isolationLevel)
         {
             var transaction = CreateTransaction(database, isolationLevel);
             transaction.Begin();
             return transaction;
         }
 
-        private static SimpleTransaction CreateTransaction(Database database, IsolationLevel isolationLevel = IsolationLevel.Unspecified)
+        private static SimpleTransaction CreateTransaction(DataStrategy database, IsolationLevel isolationLevel = IsolationLevel.Unspecified)
         {
             var adapterWithTransactions = database.GetAdapter() as IAdapterWithTransactions;
             if (adapterWithTransactions == null) throw new NotSupportedException();
             return new SimpleTransaction(adapterWithTransactions, database, isolationLevel);
         }
 
-
-        internal Database Database
+        internal DataStrategy Database
         {
-            get { return _database; }
+            get
+            {
+                return _database;
+            }
         }
 
         /// <summary>
@@ -139,7 +141,7 @@ namespace Simple.Data
             return command.Execute(out result, _adapterTransaction);
         }
 
-        protected internal override Database GetDatabase()
+        protected internal override DataStrategy GetDatabase()
         {
             return _database;
         }

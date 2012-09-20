@@ -9,12 +9,12 @@ namespace Simple.Data.Commands
 {
     public class ExecuteFunctionCommand
     {
-        private readonly Database _database;
+        private readonly DataStrategy _database;
         private readonly IAdapterWithFunctions _adapter;
         private readonly string _functionName;
         private readonly IDictionary<string, object> _arguments;
 
-        public ExecuteFunctionCommand(Database database, IAdapterWithFunctions adapter, string functionName, IDictionary<string,object> arguments)
+        public ExecuteFunctionCommand(DataStrategy database, IAdapterWithFunctions adapter, string functionName, IDictionary<string, object> arguments)
         {
             _database = database;
             _adapter = adapter;
