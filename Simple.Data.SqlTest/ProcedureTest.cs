@@ -67,6 +67,14 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual("test.SchemaProc", actual.Actual);
         }
 
+        [Test]
+        public void GetCustomerCountAsOutputTest()
+        {
+            var db = DatabaseHelper.Open();
+            var actual = db.GetCustomerCountAsOutput();
+            Assert.AreEqual(42, actual.OutputValues["Count"]);
+        }
+
 #if DEBUG // Trace is only written for DEBUG build
         [Test]
         public void GetCustomerCountSecondCallExecutesNonQueryTest()

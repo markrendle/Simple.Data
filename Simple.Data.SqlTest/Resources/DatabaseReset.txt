@@ -12,6 +12,8 @@ IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GetCu
 DROP PROCEDURE [dbo].[GetCustomerAndOrders]
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GetCustomerCount]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[GetCustomerCount]
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GetCustomerCountAsOutput]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[GetCustomerCountAsOutput]
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[ReturnStrings]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[ReturnStrings]
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[VarcharAndReturnInt]'))
@@ -350,6 +352,13 @@ GO
 CREATE PROCEDURE ReturnStrings(@Strings AS [dbo].[StringList] READONLY)
 AS
 SELECT Value FROM @Strings
+GO
+CREATE PROCEDURE [dbo].[GetCustomerCountAsOutput](@Count INT = NULL OUTPUT)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET @Count = 42
+END
 GO
 CREATE FUNCTION [dbo].[VarcharAndReturnInt] (@AValue varchar(50)) RETURNS INT AS BEGIN
   IF ISNUMERIC(@AValue) = 1
