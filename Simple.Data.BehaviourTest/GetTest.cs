@@ -37,6 +37,14 @@ namespace Simple.Data.IntegrationTest
         }
 
         [Test]
+        public void TestSchemaQualifiedGetWithSingleColumn()
+        {
+            _db.dbo.Users.Get(1);
+            GeneratedSqlIs("select " + UsersColumns + " from [dbo].[users] where [id] = @p1");
+            Parameter(0).Is(1);
+        }
+
+        [Test]
         public void TestGetWithTwoColumns()
         {
             _db.MyTable.Get(1,2);

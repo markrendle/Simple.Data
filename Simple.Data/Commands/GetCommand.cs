@@ -39,7 +39,7 @@ namespace Simple.Data.Commands
             if (dataStrategy is SimpleTransaction) return null;
 
             var func = dataStrategy.GetAdapter().OptimizingDelegateFactory.CreateGetDelegate(dataStrategy.GetAdapter(),
-                                                                                         table.GetName(), args);
+                                                                                         table.GetQualifiedName(), args);
                 return a =>
                            {
                                var data = func(a);
