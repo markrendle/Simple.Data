@@ -57,7 +57,7 @@ namespace Simple.Data.Ado
         private string EqualExpressionToWhereClause(SimpleExpression expression)
         {
             if (expression.RightOperand == null) return string.Format("{0} {1}", FormatObject(expression.LeftOperand, null), Operators.IsNull);
-            if (CommonTypes.Contains(expression.RightOperand.GetType())) return FormatAsComparison(expression, "=");
+            if (CommonTypes.Contains(expression.RightOperand.GetType())) return FormatAsComparison(expression, Operators.Equal);
 
             return FormatAsComparison(expression, Operators.Equal);
         }
@@ -65,7 +65,7 @@ namespace Simple.Data.Ado
         private string NotEqualExpressionToWhereClause(SimpleExpression expression)
         {
             if (expression.RightOperand == null) return string.Format("{0} {1}", FormatObject(expression.LeftOperand, null), Operators.IsNotNull);
-            if (CommonTypes.Contains(expression.RightOperand.GetType())) return FormatAsComparison(expression, "!=");
+            if (CommonTypes.Contains(expression.RightOperand.GetType())) return FormatAsComparison(expression, Operators.NotEqual);
 
             return FormatAsComparison(expression, Operators.NotEqual);
         }
