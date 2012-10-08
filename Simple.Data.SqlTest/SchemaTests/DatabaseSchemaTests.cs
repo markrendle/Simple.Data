@@ -78,7 +78,8 @@ namespace Simple.Data.SqlTest.SchemaTests
                 cmd.CommandText = @"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[RuntimeTable]') AND type in (N'U'))
 DROP TABLE [dbo].[RuntimeTable]";
                 cmd.ExecuteNonQuery();
-                cmd.CommandText = "CREATE TABLE [dbo].[RuntimeTable] ([Id] int)";
+                cmd.CommandText = @"CREATE TABLE [dbo].[RuntimeTable] ([Id] int,
+	CONSTRAINT [PK_RuntimeTable] PRIMARY KEY CLUSTERED ( [Id] ASC))";
                 cmd.ExecuteNonQuery();
             }
 

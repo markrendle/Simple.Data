@@ -21,6 +21,11 @@ namespace Simple.Data.SqlTest
         [Test]
         public void OpenNamedConnectionTest()
         {
+            if (Environment.GetEnvironmentVariable("SIMPLETESTDB") != null)
+            {
+                Assert.Ignore();
+                return;
+            }
             var db = Database.OpenNamedConnection("Test");
             Assert.IsNotNull(db);
             var user = db.Users.FindById(1);
@@ -30,7 +35,7 @@ namespace Simple.Data.SqlTest
         [Test]
         public void TestProviderIsSqlProvider()
         {
-            var provider = new ProviderHelper().GetProviderByConnectionString(Properties.Settings.Default.ConnectionString);
+            var provider = new ProviderHelper().GetProviderByConnectionString(DatabaseHelper.ConnectionString);
             Assert.IsInstanceOf(typeof(SqlConnectionProvider), provider);
         }
 
@@ -45,7 +50,7 @@ namespace Simple.Data.SqlTest
         [Test]
         public void TestProviderIsSqlProviderFromOpenConnection()
         {
-            Database db = Database.OpenConnection(Properties.Settings.Default.ConnectionString);
+            Database db = Database.OpenConnection(DatabaseHelper.ConnectionString);
             Assert.IsInstanceOf(typeof(AdoAdapter), db.GetAdapter());
             Assert.IsInstanceOf(typeof(SqlConnectionProvider), ((AdoAdapter)db.GetAdapter()).ConnectionProvider);
         }

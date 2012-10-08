@@ -19,7 +19,7 @@ namespace Simple.Data.SqlTest
             var provider = new SqlServer.SqlConnectionProvider();
             Trace.Write("Loaded provider " + provider.GetType().Name);
 
-            using (var cn = new SqlConnection(Properties.Settings.Default.ConnectionString))
+            using (var cn = new SqlConnection(DatabaseHelper.ConnectionString))
             {
                 cn.Open();
                 using (var cmd = cn.CreateCommand())

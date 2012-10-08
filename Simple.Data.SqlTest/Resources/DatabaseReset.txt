@@ -87,7 +87,7 @@ BEGIN
 	);
 
 	ALTER TABLE [dbo].[Users]
-		ADD CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
+		ADD CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED ([Id] ASC) ;
 
 	CREATE TABLE [dbo].[UsersWithChar] (
 		[Id]       INT            IDENTITY (1, 1) NOT NULL,
@@ -97,7 +97,7 @@ BEGIN
 	);
 
 	ALTER TABLE [dbo].[UsersWithChar]
-		ADD CONSTRAINT [PK_UsersWithChar] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
+		ADD CONSTRAINT [PK_UsersWithChar] PRIMARY KEY CLUSTERED ([Id] ASC) ;
 
 	CREATE TABLE [dbo].[Employee](
 		[Id] [int] IDENTITY(1,1) NOT NULL,
@@ -114,7 +114,7 @@ BEGIN
 	);
 
 	ALTER TABLE [dbo].[Orders]
-		ADD CONSTRAINT [PK_Orders] PRIMARY KEY CLUSTERED ([OrderId] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
+		ADD CONSTRAINT [PK_Orders] PRIMARY KEY CLUSTERED ([OrderId] ASC) ;
 
 	CREATE TABLE [dbo].[OrderItems] (
 		[OrderItemId] INT IDENTITY (1, 1) NOT NULL,
@@ -124,7 +124,7 @@ BEGIN
 	);
 
 	ALTER TABLE [dbo].[OrderItems]
-		ADD CONSTRAINT [PK_OrderItems] PRIMARY KEY CLUSTERED ([OrderItemId] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
+		ADD CONSTRAINT [PK_OrderItems] PRIMARY KEY CLUSTERED ([OrderItemId] ASC) ;
 
     CREATE TABLE [dbo].[Images](
 	    [Id] [int] NOT NULL,
@@ -132,7 +132,7 @@ BEGIN
     );
 
     ALTER TABLE [dbo].[Images]
-		ADD CONSTRAINT [PK_Images] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
+		ADD CONSTRAINT [PK_Images] PRIMARY KEY CLUSTERED ([Id] ASC) ;
 
 	CREATE TABLE [dbo].[Items] (
 		[ItemId] INT            IDENTITY (1, 1) NOT NULL,
@@ -141,7 +141,7 @@ BEGIN
 	);
 
 	ALTER TABLE [dbo].[Items]
-		ADD CONSTRAINT [PK_Items] PRIMARY KEY CLUSTERED ([ItemId] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
+		ADD CONSTRAINT [PK_Items] PRIMARY KEY CLUSTERED ([ItemId] ASC) ;
 
 	CREATE TABLE [dbo].[Customers] (
 		[CustomerId] INT            IDENTITY (1, 1) NOT NULL,
@@ -150,15 +150,17 @@ BEGIN
 	);
 
 	ALTER TABLE [dbo].[Customers]
-		ADD CONSTRAINT [PK_Customers] PRIMARY KEY CLUSTERED ([CustomerId] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
+		ADD CONSTRAINT [PK_Customers] PRIMARY KEY CLUSTERED ([CustomerId] ASC) ;
 
 	CREATE TABLE [dbo].[Notes](
 		[NoteId] [int] IDENTITY(1,1) NOT NULL,
 		[CustomerId] [int] NOT NULL,
 		[Text] [nvarchar](50) NOT NULL,
-	CONSTRAINT [PK_Notes] PRIMARY KEY CLUSTERED ( [NoteId] ASC) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]) ON [PRIMARY]
+	CONSTRAINT [PK_Notes] PRIMARY KEY CLUSTERED ( [NoteId] ASC) )
 	    
-	CREATE TABLE [dbo].[PagingTest] ([Id] int not null, [Dummy] int);
+	CREATE TABLE [dbo].[PagingTest] ([Id] int not null, [Dummy] int)
+
+	CREATE CLUSTERED INDEX [ci_azure_fixup_dbo_PagingTest] ON [dbo].[PagingTest] ( [Id] ASC )
 
 	CREATE TABLE [dbo].[Blobs](
 		[Id] [int] NOT NULL,
@@ -187,6 +189,8 @@ BEGIN
 		[Id] [int] IDENTITY (1, 1) NOT NULL,
 		[Value] [decimal](20,6) NOT NULL
 	)
+
+	CREATE CLUSTERED INDEX [ci_azure_fixup_dbo_DecimalTest] ON [dbo].[DecimalTest] ([Id] ASC)
 
 	CREATE TABLE [dbo].[GeographyTest](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
@@ -293,6 +297,8 @@ GO
 
 CREATE TABLE [dbo].[SchemaTable] ([Id] int not null, [Description] nvarchar(100) not null);
 GO
+CREATE CLUSTERED INDEX [ci_azure_fixup_dbo_SchemaTable] ON [dbo].[SchemaTable] ( [Id] ASC)
+GO
 INSERT INTO [dbo].[SchemaTable] VALUES (1, 'Pass')
 GO
 
@@ -300,6 +306,8 @@ CREATE SCHEMA [test] AUTHORIZATION [dbo]
 GO
 
 CREATE TABLE [test].[SchemaTable] ([Id] int not null, [Description] nvarchar(100) not null);
+GO
+CREATE CLUSTERED INDEX [ci_azure_fixup_test_SchemaTable] ON [test].[SchemaTable] ( [Id] ASC)
 GO
 INSERT INTO [test].[SchemaTable] VALUES (2, 'Pass')
 GO
@@ -374,7 +382,7 @@ CREATE TABLE [dbo].[GroupTestMaster] (
 	);
 
 ALTER TABLE [dbo].[GroupTestMaster]
-	ADD CONSTRAINT [PK_GroupTestMaster] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
+	ADD CONSTRAINT [PK_GroupTestMaster] PRIMARY KEY CLUSTERED ([Id] ASC) ;
 GO
 CREATE TABLE [dbo].[GroupTestDetail] (
 		[Id]    INT      IDENTITY (1, 1) NOT NULL,
@@ -384,7 +392,7 @@ CREATE TABLE [dbo].[GroupTestDetail] (
 	);
 
 ALTER TABLE [dbo].[GroupTestDetail]
-	ADD CONSTRAINT [PK_GroupTestDetail] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON, PAD_INDEX = OFF, IGNORE_DUP_KEY = OFF, STATISTICS_NORECOMPUTE = OFF);
+	ADD CONSTRAINT [PK_GroupTestDetail] PRIMARY KEY CLUSTERED ([Id] ASC) ;
 
 ALTER TABLE [dbo].[GroupTestDetail] WITH NOCHECK
 	ADD CONSTRAINT [FK_GroupTestDetail_GroupTestMaster] FOREIGN KEY ([MasterId]) REFERENCES [dbo].[GroupTestMaster] ([Id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
