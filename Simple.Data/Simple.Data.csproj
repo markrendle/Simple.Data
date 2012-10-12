@@ -93,6 +93,7 @@
     <Compile Include="ForUpdateClause.cs" />
     <Compile Include="FunctionSignature.cs" />
     <Compile Include="InMemoryAdapter.cs" />
+    <Compile Include="InMemoryAdapterIAdapterWithRelation.cs" />
     <Compile Include="InMemoryAdapterIAdapterWithTransactions.cs" />
     <Compile Include="BadExpressionException.cs" />
     <Compile Include="JoinType.cs" />

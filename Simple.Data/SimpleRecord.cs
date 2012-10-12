@@ -95,9 +95,8 @@ namespace Simple.Data
             {
                 result = related is IDictionary<string, object>
                              ? (object) new SimpleRecord(related as IDictionary<string, object>, binder.Name, _database)
-                             : new SimpleResultSet(
-                                   ((IEnumerable<IDictionary<string, object>>) related).Select(
-                                       dict => new SimpleRecord(dict, binder.Name, _database)));
+                             : ((IEnumerable<IDictionary<string, object>>) related).Select(
+                                       dict => new SimpleRecord(dict, binder.Name, _database)).ToList<dynamic>();
 
             }
             return result;
