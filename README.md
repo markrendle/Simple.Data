@@ -28,7 +28,7 @@ why not just write
 
 	public User FindUserByEmail(string email)
 	{
-		return Database.Open().Users.FindByEmail(email);
+		return Database.Open().Users.FindAllByEmail(email).FirstOrDefault();
 	}
 
 and take the rest of the morning off?
