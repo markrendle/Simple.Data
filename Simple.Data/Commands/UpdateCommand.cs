@@ -71,7 +71,7 @@ namespace Simple.Data.Commands
             var dictionary = obj as IDictionary<string, object>;
             if (dictionary != null)
             {
-                return dictionary;
+                return new Dictionary<string,object>(dictionary, HomogenizedEqualityComparer.DefaultInstance);
             }
 
             var list = obj as IEnumerable;
