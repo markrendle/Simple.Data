@@ -414,5 +414,49 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, actual.Id);
             Assert.IsNotNull(actual.Name);
         }
+
+        [Test]
+        public void TestUpsertUserBySecondaryField()
+        {
+          var db = DatabaseHelper.Open();
+
+          var id = db.Users.UpsertByName(new User() { Age = 20, Name = "Black sheep", Password = "Bah" }).Id;
+          User actual = db.Users.FindById(id);
+
+          Assert.AreEqual(id, actual.Id);
+          Assert.AreEqual("Black sheep", actual.Name);
+          Assert.AreEqual("Bah", actual.Password);
+          Assert.AreEqual(20, actual.Age);
+        }
+
+        [Test]
+        public void TestUpsertUserByTwoSecondaryFields()
+        {
+          var db = DatabaseHelper.Open();
+
+          var id = db.Users.UpsertByNameAndPassword(new User() { Age = 20, Name = "Black sheep", Password = "Bah" }).Id;
+          User actual = db.Users.FindById(id);
+
+          Assert.AreEqual(id, actual.Id);
+          Assert.AreEqual("Black sheep", actual.Name);
+          Assert.AreEqual("Bah", actual.Password);
+          Assert.AreEqual(20, actual.Age);
+        }
+
+        [Test]
+        public void TestUpsertExisting()
+        {
+          var db = DatabaseHelper.Open();
+
+          var id = db.Users.UpsertByNameAndPassword(new User() { Age = 20, Name = "Black sheep", Password = "Bah" }).Id;
+          db.Users.UpsertById(new User() { Id = id, Age = 12, Name = "Dog", Password = "Bark" });
+
+          User actual = db.Users.FindById(id);
+
+          Assert.AreEqual(id, actual.Id);
+          Assert.AreEqual("Dog", actual.Name);
+          Assert.AreEqual("Bark", actual.Password);
+          Assert.AreEqual(12, actual.Age);
+        }
     }
 }
