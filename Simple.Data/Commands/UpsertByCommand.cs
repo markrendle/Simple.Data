@@ -62,7 +62,6 @@ namespace Simple.Data.Commands
                 }
 
                 criteria.Add(keyFieldName, keyValuePair.Value);
-                record.Remove(keyValuePair);
             }
             return criteria;
         }
