@@ -96,7 +96,7 @@ namespace Simple.Data.Ado
                                                var table1 = _schema.FindTable(table1Name);
                                                var table2 = _schema.FindTable(table2Name);
                                                var foreignKey = GetForeignKey(table1, table2);
-                                               return MakeJoinText(table2, table2Name.Alias, foreignKey, joinType);
+                                               return MakeJoinText(table1, table1Name.Alias, table2, table2Name.Alias, foreignKey, joinType);
                                            });
         }
 
@@ -115,18 +115,20 @@ namespace Simple.Data.Ado
             return foreignKey;
         }
 
-        private string MakeJoinText(Table rightTable, string alias, ForeignKey foreignKey, JoinType joinType)
+        private string MakeJoinText(Table leftTable, string leftTableAlias, Table rightTable, string rightTableAlias, ForeignKey foreignKey, JoinType joinType)
         {
+            var leftTableName = string.IsNullOrWhiteSpace(leftTableAlias) ? leftTable.QualifiedName : _schema.QuoteObjectName(leftTableAlias);
+            var rightTableName = string.IsNullOrWhiteSpace(rightTableAlias) ? rightTable.QualifiedName : _schema.QuoteObjectName(rightTableAlias);
             var builder = new StringBuilder(JoinKeywordFor(joinType));
             builder.AppendFormat(" JOIN {0}", rightTable.QualifiedName);
-            if (!string.IsNullOrWhiteSpace(alias)) builder.Append(" " + _schema.QuoteObjectName(alias));
+            if (!string.IsNullOrWhiteSpace(rightTableAlias)) builder.Append(" " + rightTableName);
             builder.Append(" ON (");
-            builder.Append(FormatJoinExpression(foreignKey, 0, alias));
+            builder.Append(FormatJoinExpression(foreignKey, 0, leftTableName, rightTableName));
 
             for (int i = 1; i < foreignKey.Columns.Length; i++)
             {
                 builder.Append(" AND ");
-                builder.Append(FormatJoinExpression(foreignKey, i, alias));
+                builder.Append(FormatJoinExpression(foreignKey, i, leftTableName, rightTableName));
             }
             builder.Append(")");
             return builder.ToString();
@@ -167,13 +169,13 @@ namespace Simple.Data.Ado
             return masterObjectReference == detailObjectReference;
         }
 
-        private string FormatJoinExpression(ForeignKey foreignKey, int columnIndex, string alias)
+        private string FormatJoinExpression(ForeignKey foreignKey, int columnIndex, string leftTableName, string rightTableName)
         {
-            var leftTable = string.IsNullOrWhiteSpace(alias)
-                                ? _schema.QuoteObjectName(foreignKey.MasterTable)
-                                : _schema.QuoteObjectName(alias);
-            return string.Format("{0}.{1} = {2}.{3}", leftTable, _schema.QuoteObjectName(foreignKey.UniqueColumns[columnIndex]),
-                                 _schema.QuoteObjectName(foreignKey.DetailTable), _schema.QuoteObjectName(foreignKey.Columns[columnIndex]));
+            return string.Format("{0}.{1} = {2}.{3}", 
+                leftTableName,
+                _schema.QuoteObjectName(foreignKey.UniqueColumns[columnIndex]),
+                rightTableName,
+                _schema.QuoteObjectName(foreignKey.Columns[columnIndex]));
         }
 
         private string JoinKeyword
