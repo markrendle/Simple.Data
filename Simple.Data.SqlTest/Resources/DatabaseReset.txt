@@ -160,7 +160,8 @@ BEGIN
 	    
 	CREATE TABLE [dbo].[PagingTest] ([Id] int not null, [Dummy] int)
 
-	CREATE CLUSTERED INDEX [ci_azure_fixup_dbo_PagingTest] ON [dbo].[PagingTest] ( [Id] ASC )
+	ALTER TABLE [dbo].[PagingTest]
+		ADD CONSTRAINT [PK_PagingTest] PRIMARY KEY CLUSTERED ([Id] ASC) ;
 
 	CREATE TABLE [dbo].[Blobs](
 		[Id] [int] NOT NULL,

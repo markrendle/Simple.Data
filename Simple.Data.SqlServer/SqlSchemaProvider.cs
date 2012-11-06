@@ -109,7 +109,12 @@ namespace Simple.Data.SqlServer
         public Key GetPrimaryKey(Table table)
         {
             if (table == null) throw new ArgumentNullException("table");
-            return new Key(GetPrimaryKeys(table.ActualName).AsEnumerable()
+            var primaryKeys = GetPrimaryKeys(table.ActualName);
+            if (primaryKeys == null)
+            {
+                return new Key(Enumerable.Empty<string>());
+            }
+            return new Key(primaryKeys.AsEnumerable()
                 .Where(
                     row =>
                     row["TABLE_SCHEMA"].ToString() == table.Schema && row["TABLE_NAME"].ToString() == table.ActualName)
@@ -176,8 +181,21 @@ where object_id = object_id(@tableName, 'TABLE') or object_id = object_id(@table
         private DataTable GetPrimaryKeys(string tableName)
         {
             var primaryKeys = GetPrimaryKeys();
-            var dataTable = primaryKeys.AsEnumerable().Where(row => row["TABLE_NAME"].ToString().Equals(tableName, StringComparison.InvariantCultureIgnoreCase)).CopyToDataTable();
-            return dataTable;
+            try
+            {
+                var dataTable =
+                    primaryKeys.AsEnumerable()
+                               .Where(
+                                   row =>
+                                   row["TABLE_NAME"].ToString()
+                                                    .Equals(tableName, StringComparison.InvariantCultureIgnoreCase))
+                               .CopyToDataTable();
+                return dataTable;
+            }
+            catch (InvalidOperationException)
+            {
+                return null;
+            }
         }
 
         private EnumerableRowCollection<DataRow> GetForeignKeys(string tableName)

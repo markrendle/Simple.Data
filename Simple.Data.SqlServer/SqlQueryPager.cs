@@ -19,7 +19,7 @@ namespace Simple.Data.SqlServer
             yield return SelectMatch.Replace(sql, match => match.Value + " TOP " + take + " ");
         }
 
-        public IEnumerable<string> ApplyPaging(string sql, int skip, int take)
+        public IEnumerable<string> ApplyPaging(string sql, string[] keys, int skip, int take)
         {
             var builder = new StringBuilder("WITH __Data AS (SELECT ");
 
@@ -27,18 +27,29 @@ namespace Simple.Data.SqlServer
             var columns = match.Groups[1].Value.Trim();
             var fromEtc = match.Groups[2].Value.Trim();
 
-            builder.Append(columns);
+            builder.Append(string.Join(",", keys));
 
-            var orderBy = ExtractOrderBy(columns, ref fromEtc);
+            var orderBy = ExtractOrderBy(columns, keys, ref fromEtc);
 
             builder.AppendFormat(", ROW_NUMBER() OVER({0}) AS [_#_]", orderBy);
             builder.AppendLine();
             builder.Append(fromEtc);
             builder.AppendLine(")");
-            builder.AppendFormat("SELECT {0} FROM __Data WHERE [_#_] BETWEEN {1} AND {2}", DequalifyColumns(columns),
-                                 skip + 1, skip + take);
+            builder.AppendFormat("SELECT {0} FROM __Data ", columns);
+            builder.AppendFormat("JOIN {0} ON ",
+                                 keys[0].Substring(0, keys[0].LastIndexOf(".", StringComparison.OrdinalIgnoreCase)));
+            builder.AppendFormat(string.Join(" ", keys.Select(MakeDataJoin)));
+            var rest = Regex.Replace(fromEtc, @"^from (\[.*?\]\.\[.*?\])", @"");
+            builder.Append(rest);
+            
+            builder.AppendFormat(" AND [_#_] BETWEEN {0} AND {1}", skip + 1, skip + take);
 
             yield return builder.ToString();
+        }
+
+        private static string MakeDataJoin(string key)
+        {
+            return key + " = __Data" + key.Substring(key.LastIndexOf(".", StringComparison.OrdinalIgnoreCase));
         }
 
         private static string DequalifyColumns(string original)
@@ -48,7 +59,7 @@ namespace Simple.Data.SqlServer
             return string.Join(",", q);
         }
 
-        private static string ExtractOrderBy(string columns, ref string fromEtc)
+        private static string ExtractOrderBy(string columns, string[] keys, ref string fromEtc)
         {
             string orderBy;
             int index = fromEtc.IndexOf("ORDER BY", StringComparison.InvariantCultureIgnoreCase);
@@ -59,14 +70,7 @@ namespace Simple.Data.SqlServer
             }
             else
             {
-                orderBy = "ORDER BY " + columns.Split(',').First().Trim();
-
-                var aliasIndex = orderBy.IndexOf(" AS [", StringComparison.InvariantCultureIgnoreCase);
-
-                if (aliasIndex > -1)
-                {
-                    orderBy = orderBy.Substring(0, aliasIndex);
-                }
+                orderBy = "ORDER BY " + string.Join(", ", keys);
             }
             return orderBy;
         }

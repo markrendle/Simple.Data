@@ -105,7 +105,7 @@ namespace Simple.Data.Ado.Test
                 throw new NotImplementedException();
             }
 
-            public IEnumerable<string> ApplyPaging(string sql, int skip, int take)
+            public IEnumerable<string> ApplyPaging(string sql, string[] keys, int skip, int take)
             {
                 throw new NotImplementedException();
             }

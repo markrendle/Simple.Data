@@ -414,6 +414,21 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void WithClauseContainingAliasShouldReturnResults()
+        {
+            var db = DatabaseHelper.Open();
+            var actual = db.Customers
+                           .With(db.Customers.Orders.As("Orders_1"))
+                           .With(db.Customers.Orders.As("Orders_2"))
+                           .FirstOrDefault();
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(1, actual.Orders_1.Single().OrderId);
+            Assert.AreEqual(1, actual.Orders_2.Single().OrderId);
+            Assert.AreEqual(new DateTime(2010, 10, 10), actual.Orders_1.Single().OrderDate);
+            Assert.AreEqual(new DateTime(2010, 10, 10), actual.Orders_2.Single().OrderDate);
+        }
+
+        [Test]
         public void SelfJoinShouldNotThrowException()
         {
             var db = DatabaseHelper.Open();

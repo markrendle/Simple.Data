@@ -19,7 +19,7 @@ namespace Simple.Data.SqlCe40
             yield return SelectMatch.Replace(sql, match => match.Value + " TOP(" + take + ") ");
         }
 
-        public IEnumerable<string> ApplyPaging(string sql, int skip, int take)
+        public IEnumerable<string> ApplyPaging(string sql, string[] keys, int skip, int take)
         {
             if (sql.IndexOf("order by", StringComparison.InvariantCultureIgnoreCase) < 0)
             {

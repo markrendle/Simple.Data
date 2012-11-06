@@ -121,12 +121,12 @@ namespace Simple.Data.Ado
             builder.AppendFormat(" JOIN {0}", rightTable.QualifiedName);
             if (!string.IsNullOrWhiteSpace(alias)) builder.Append(" " + _schema.QuoteObjectName(alias));
             builder.Append(" ON (");
-            builder.Append(FormatJoinExpression(foreignKey, 0, alias));
+            builder.Append(FormatJoinExpression(foreignKey, 0, rightTable, alias));
 
             for (int i = 1; i < foreignKey.Columns.Length; i++)
             {
                 builder.Append(" AND ");
-                builder.Append(FormatJoinExpression(foreignKey, i, alias));
+                builder.Append(FormatJoinExpression(foreignKey, i, rightTable, alias));
             }
             builder.Append(")");
             return builder.ToString();
@@ -167,13 +167,25 @@ namespace Simple.Data.Ado
             return masterObjectReference == detailObjectReference;
         }
 
-        private string FormatJoinExpression(ForeignKey foreignKey, int columnIndex, string alias)
+        private string FormatJoinExpression(ForeignKey foreignKey, int columnIndex, Table rightTable, string alias)
         {
-            var leftTable = string.IsNullOrWhiteSpace(alias)
-                                ? _schema.QuoteObjectName(foreignKey.MasterTable)
-                                : _schema.QuoteObjectName(alias);
-            return string.Format("{0}.{1} = {2}.{3}", leftTable, _schema.QuoteObjectName(foreignKey.UniqueColumns[columnIndex]),
-                                 _schema.QuoteObjectName(foreignKey.DetailTable), _schema.QuoteObjectName(foreignKey.Columns[columnIndex]));
+            if (rightTable.ActualName == foreignKey.MasterTable.Name &&
+                rightTable.Schema == foreignKey.MasterTable.Schema)
+            {
+                var rightTableName = string.IsNullOrWhiteSpace(alias)
+                                    ? _schema.QuoteObjectName(foreignKey.MasterTable)
+                                    : _schema.QuoteObjectName(alias);
+                return string.Format("{0}.{1} = {2}.{3}",
+                    rightTableName, _schema.QuoteObjectName(foreignKey.UniqueColumns[columnIndex]),
+                    _schema.QuoteObjectName(foreignKey.DetailTable), _schema.QuoteObjectName(foreignKey.Columns[columnIndex])
+                    );
+            }
+
+            var leftTableName = string.IsNullOrWhiteSpace(alias)
+                                    ? _schema.QuoteObjectName(foreignKey.DetailTable)
+                                    : _schema.QuoteObjectName(alias);
+            return string.Format("{0}.{1} = {2}.{3}", _schema.QuoteObjectName(foreignKey.MasterTable), _schema.QuoteObjectName(foreignKey.UniqueColumns[columnIndex]),
+                                 leftTableName, _schema.QuoteObjectName(foreignKey.Columns[columnIndex]));
         }
 
         private string JoinKeyword

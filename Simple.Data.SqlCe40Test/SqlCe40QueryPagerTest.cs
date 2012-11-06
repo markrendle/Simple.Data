@@ -29,7 +29,7 @@ namespace Simple.Data.SqlCe40Test
             var expected = new[]{
                 "select a,b,c from d where a = 1 order by c offset 5 rows fetch next 10 rows only"};
 
-            var pagedSql = new SqlCe40QueryPager().ApplyPaging(sql, 5, 10);
+            var pagedSql = new SqlCe40QueryPager().ApplyPaging(sql, new string[0], 5, 10);
             var modified = pagedSql.Select(x=> Normalize.Replace(x, " ").ToLowerInvariant());
 
             Assert.IsTrue(expected.SequenceEqual(modified));
@@ -42,7 +42,7 @@ namespace Simple.Data.SqlCe40Test
             var expected = new[]{
                 "select a,b,c from d where a = 1 order by a offset 10 rows fetch next 20 rows only"};
 
-            var pagedSql = new SqlCe40QueryPager().ApplyPaging(sql, 10, 20);
+            var pagedSql = new SqlCe40QueryPager().ApplyPaging(sql, new string[0], 10, 20);
             var modified = pagedSql.Select(x => Normalize.Replace(x, " ").ToLowerInvariant());
 
             Assert.IsTrue(expected.SequenceEqual(modified));

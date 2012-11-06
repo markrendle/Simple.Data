@@ -151,7 +151,7 @@
                 }
                 else
                 {
-                    ApplyPaging(commandBuilders, mainCommandBuilder, skipClause, takeClause, query.Clauses.OfType<WithClause>().Any(), queryPager);
+                    ApplyPaging(query, commandBuilders, mainCommandBuilder, skipClause, takeClause, query.Clauses.OfType<WithClause>().Any(), queryPager);
                 }
             }
             return commandBuilders.ToArray();
@@ -168,7 +168,7 @@
             commandBuilders.Add(commandBuilder);
         }
 
-        private void ApplyPaging(List<ICommandBuilder> commandBuilders, ICommandBuilder mainCommandBuilder, SkipClause skipClause, TakeClause takeClause, bool hasWithClause, IQueryPager queryPager)
+        private void ApplyPaging(SimpleQuery query, List<ICommandBuilder> commandBuilders, ICommandBuilder mainCommandBuilder, SkipClause skipClause, TakeClause takeClause, bool hasWithClause, IQueryPager queryPager)
         {
             const int maxInt = 2147483646;
 
@@ -179,9 +179,17 @@
             }
             else
             {
+                var table = _adapter.GetSchema().FindTable(query.TableName);
+                if (table.PrimaryKey == null || table.PrimaryKey.Length == 0)
+                {
+                    throw new AdoAdapterException("Cannot apply paging to a table with no primary key.");
+                }
+                var keys = table.PrimaryKey.AsEnumerable()
+                     .Select(k => string.Format("{0}.{1}", table.QualifiedName, _adapter.GetSchema().QuoteObjectName(k)))
+                     .ToArray();
                 int skip = skipClause == null ? 0 : skipClause.Count;
                 int take = takeClause == null ? maxInt : takeClause.Count;
-                commandTexts = queryPager.ApplyPaging(mainCommandBuilder.Text, skip, take);
+                commandTexts = queryPager.ApplyPaging(mainCommandBuilder.Text, keys,  skip, take);
             }
 
             commandBuilders.AddRange(
