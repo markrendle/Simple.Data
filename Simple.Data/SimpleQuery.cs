@@ -635,15 +635,11 @@
             {
                 throw new SimpleDataException("Query returned no rows; cannot return scalar value.");
             }
-            if (data.Length != 1)
+            if (data[0].Count == 0)
             {
-                throw new SimpleDataException("Query returned multiple rows; cannot return scalar value.");
+                throw new SimpleDataException("Selected row contains no values; cannot return scalar value.");
             }
-            if (data[0].Count > 1)
-            {
-                throw new SimpleDataException("Selected row contains multiple values; cannot return scalar value.");
-            }
-            return data[0].Single().Value;
+            return data[0].First().Value;
         }
 
         public dynamic ToScalarOrDefault()
@@ -653,15 +649,11 @@
             {
                 return null;
             }
-            if (data.Length != 1)
+            if (data[0].Count == 0)
             {
-                throw new SimpleDataException("Query returned multiple rows; cannot return scalar value.");
+                return null;
             }
-            if (data[0].Count > 1)
-            {
-                throw new SimpleDataException("Selected row contains multiple values; cannot return scalar value.");
-            }
-            return data[0].Single().Value;
+            return data[0].First().Value;
         }
 
         public IList ToScalarList()
