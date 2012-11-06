@@ -698,22 +698,22 @@
 
         public dynamic First()
         {
-            return Run().First();
+            return Take(1).Run().First();
         }
 
         public dynamic FirstOrDefault()
         {
-            return Run().FirstOrDefault();
+            return Take(1).Run().FirstOrDefault();
         }
 
         public T First<T>()
         {
-            return Cast<T>().First();
+            return Take(1).Cast<T>().First();
         }
 
         public T FirstOrDefault<T>()
         {
-            return Cast<T>().FirstOrDefault();
+            return Take(1).Cast<T>().FirstOrDefault();
         }
 
         public T First<T>(Func<T, bool> predicate)
@@ -728,22 +728,22 @@
 
         public dynamic Single()
         {
-            return Run().First();
+            return Take(1).Run().First();
         }
 
         public dynamic SingleOrDefault()
         {
-            return Run().FirstOrDefault();
+            return Take(1).Run().FirstOrDefault();
         }
 
         public T Single<T>()
         {
-            return Cast<T>().Single();
+            return Take(1).Cast<T>().Single();
         }
 
         public T SingleOrDefault<T>()
         {
-            return Cast<T>().SingleOrDefault();
+            return Take(1).Cast<T>().SingleOrDefault();
         }
 
         public T Single<T>(Func<T, bool> predicate)

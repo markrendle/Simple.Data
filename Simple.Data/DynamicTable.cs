@@ -137,6 +137,15 @@ namespace Simple.Data
             return true;
         }
 
+        public override bool TrySetMember(SetMemberBinder binder, object value)
+        {
+            if (base.TrySetMember(binder, value))
+            {
+                return true;
+            }
+            throw new BadExpressionException("Cannot assign values to table columns.");
+        }
+
         public ObjectReference As(string alias)
         {
             return new ObjectReference(_tableName, (_schema != null ? new ObjectReference(_schema.GetName()) : null), _dataStrategy, alias);

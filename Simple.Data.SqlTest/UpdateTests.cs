@@ -138,5 +138,23 @@ namespace Simple.Data.SqlTest
             row = db.TimestampTest.Get(row.Id);
             Assert.AreEqual("Updated", row.Description);
         }
+
+        [Test]
+        public void TestUpdateByInputIsNotMutated()
+        {
+            var db = DatabaseHelper.Open();
+            var user = new Dictionary<string, object>() {
+              {"Id", 0},
+              {"Age", 1},
+              {"Name", "X"},
+              {"Password", "P"}
+            };
+
+            user["Id"] = db.Users.Insert(user).Id;
+
+            db.Users.UpdateById(user);
+
+            Assert.AreEqual(4, user.Keys.Count);
+        }
     }
 }

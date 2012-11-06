@@ -69,6 +69,7 @@
     <Compile Include="DeleteTest.cs" />
     <Compile Include="ExceptionsTesting.cs" />
     <Compile Include="FindTest.cs" />
+    <Compile Include="GetCountTest.cs" />
     <Compile Include="GetTest.cs" />
     <Compile Include="InsertTest.cs" />
     <Compile Include="NaturalNamingTest.cs" />

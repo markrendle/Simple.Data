@@ -32,12 +32,24 @@ namespace Simple.Data.Commands
         {
             var query = new SimpleQuery(dataStrategy, table.GetQualifiedName());
 
-            if (args.Length == 1 && args[0] is SimpleExpression)
+            if (args.Length == 1)
             {
-                query = query.Where((SimpleExpression)args[0]);
+                var expression = args[0] as SimpleExpression;
+                if (expression != null)
+                {
+                    return query.Where(expression).Count();
+                }
+                else
+                {
+                    throw new BadExpressionException("GetCount expects an expression or no parameters.");
+                }
+            }
+            else if (args.Length == 0)
+            {
+                return query.Count();
             }
 
-            return query.Count();
+            throw new ArgumentException("GetCount expects an expression or no parameters.");
         }
     }
 }

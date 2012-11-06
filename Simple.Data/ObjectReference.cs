@@ -175,6 +175,15 @@ namespace Simple.Data
             return true;
         }
 
+        public override bool TrySetMember(SetMemberBinder binder, object value)
+        {
+            if (base.TrySetMember(binder, value))
+            {
+                return true;
+            }
+            throw new BadExpressionException("Cannot assign values to object references.");
+        }
+
         public dynamic this[string name]
         {
             get { return new ObjectReference(name, this); }
