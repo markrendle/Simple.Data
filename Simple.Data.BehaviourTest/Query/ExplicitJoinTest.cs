@@ -276,6 +276,20 @@ namespace Simple.Data.IntegrationTest.Query
                 "WHERE (([dbo].[Activity].[ID_Trip] = @p1 AND [dbo].[Activity].[Activity_Time] = @p2) AND [dbo].[Activity].[Is_Public] = @p3)");
         }
 
+        [Test]
+        public void PassingTrueToOnThrowsBadExpressionException()
+        {
+            Assert.Throws<BadExpressionException>(
+                () => _db.Activity.All().Join(_db.Location).On(true));
+        }
+
+        [Test]
+        public void PassingObjectReferenceToOnThrowsBadExpressionException()
+        {
+            Assert.Throws<BadExpressionException>(
+                () => _db.Activity.All().Join(_db.Location).On(_db.Location.ID_Location));
+        }
+
         class Activity
         {
             public int ID_Activity { get; set; }

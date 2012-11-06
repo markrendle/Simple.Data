@@ -514,7 +514,13 @@
         public SimpleQuery On(SimpleExpression joinExpression)
         {
             if (_tempJoinWaitingForOn == null)
+            {
                 throw new InvalidOperationException("Call to On must be preceded by call to JoinInfo.");
+            }
+            if (ReferenceEquals(joinExpression, null))
+            {
+                throw new BadExpressionException("On expects an expression or named parameters.");
+            }
             return AddNewJoin(new JoinClause(_tempJoinWaitingForOn.Table, _tempJoinWaitingForOn.JoinType, joinExpression));
         }
 
@@ -561,9 +567,16 @@
         private SimpleQuery ParseOn(InvokeMemberBinder binder, IEnumerable<object> args)
         {
             if (_tempJoinWaitingForOn == null)
+            {
                 throw new InvalidOperationException("Call to On must be preceded by call to JoinInfo.");
+            }
+            var namedArguments = binder.NamedArgumentsToDictionary(args);
+            if (namedArguments == null || namedArguments.Count == 0)
+            {
+                throw new BadExpressionException("On expects an expression or named parameters.");
+            }
             var joinExpression = ExpressionHelper.CriteriaDictionaryToExpression(_tempJoinWaitingForOn.Table,
-                                                                                 binder.NamedArgumentsToDictionary(args));
+                                                                                 namedArguments);
             return AddNewJoin(new JoinClause(_tempJoinWaitingForOn.Table, _tempJoinWaitingForOn.JoinType, joinExpression));
         }
 
