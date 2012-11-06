@@ -27,7 +27,14 @@ namespace Simple.Data.Commands
         /// <returns></returns>
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
+            if (binder.Name.Equals("GetCountBy") || binder.Name.Equals("get_count_by"))
+            {
+                ArgumentHelper.CheckFindArgs(args, binder);
+            }
+
+            var criteriaDictionary = ArgumentHelper.CreateCriteriaDictionary(binder, args, "GetCountBy", "get_count_by");
+            var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(),
+                                                                                                  criteriaDictionary);
             return new SimpleQuery(dataStrategy, table.GetQualifiedName()).Where(criteria).Count();
         }
     }

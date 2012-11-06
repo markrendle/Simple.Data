@@ -25,6 +25,20 @@
         }
 
         [Test]
+        public void GetCountByBasic()
+        {
+            EatException<SimpleDataException>(() => _db.Users.GetCountByAge(42));
+            GeneratedSqlIs("select count(*) from [dbo].[users] where [dbo].[users].[age] = @p1");
+        }
+
+        [Test]
+        public void GetCountByNamedParameters()
+        {
+            EatException<SimpleDataException>(() => _db.Users.GetCountBy(Age: 42));
+            GeneratedSqlIs("select count(*) from [dbo].[users] where [dbo].[users].[age] = @p1");
+        }
+
+        [Test]
         public void GetCountWithColumnThrowsException()
         {
             Assert.Throws<BadExpressionException>(() => _db.Users.GetCount(_db.Users.Id));
