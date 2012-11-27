@@ -12,7 +12,7 @@ namespace Simple.Data.SqlCe40
     public class SqlCe40QueryPager : IQueryPager
     {
         private static readonly Regex ColumnExtract = new Regex(@"SELECT\s*(.*)\s*(FROM.*)", RegexOptions.Multiline | RegexOptions.IgnoreCase);
-        private static readonly Regex SelectMatch = new Regex(@"^SELECT\s*", RegexOptions.IgnoreCase);
+        private static readonly Regex SelectMatch = new Regex(@"^SELECT\s*(DISTINCT)?", RegexOptions.IgnoreCase);
 
         public IEnumerable<string> ApplyLimit(string sql, int take)
         {

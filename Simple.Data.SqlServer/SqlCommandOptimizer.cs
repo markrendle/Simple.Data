@@ -15,7 +15,7 @@ namespace Simple.Data.SqlServer
     {
         public override System.Data.IDbCommand OptimizeFindOne(System.Data.IDbCommand command)
         {
-            command.CommandText = Regex.Replace(command.CommandText, "^SELECT ", "SELECT TOP 1 ",
+            command.CommandText = Regex.Replace(command.CommandText, @"^SELECT\s*(DISTINCT)?", "SELECT $1 TOP 1 ",
                                                 RegexOptions.IgnoreCase);
             return command;
         }
