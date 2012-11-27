@@ -28,6 +28,10 @@ IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GroupT
 DROP TABLE [dbo].[GroupTestDetail]
 IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GroupTestMaster]') AND type in (N'U'))
 DROP TABLE [dbo].[GroupTestMaster]
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[CompoundKeyDetail]') AND type in (N'U'))
+DROP TABLE [dbo].[CompoundKeyDetail]
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[CompoundKeyMaster]') AND type in (N'U'))
+DROP TABLE [dbo].[CompoundKeyMaster]
 GO
 IF EXISTS (SELECT * FROM sys.schemas WHERE name = N'test')
 DROP SCHEMA [test]
@@ -282,6 +286,7 @@ BEGIN
 
 	ALTER TABLE [dbo].[OrderItems] WITH NOCHECK
 		ADD CONSTRAINT [FK_OrderItems_Orders] FOREIGN KEY ([OrderId]) REFERENCES [dbo].[Orders] ([OrderId]) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
 END
 GO
 
@@ -405,3 +410,31 @@ INSERT INTO [dbo].[GroupTestDetail] VALUES ('2000-1-1',2,1)
 INSERT INTO [dbo].[GroupTestDetail] VALUES ('2001-1-1',3,1)
 INSERT INTO [dbo].[GroupTestDetail] VALUES ('2010-1-1',2,2)
 INSERT INTO [dbo].[GroupTestDetail] VALUES ('2011-1-1',3,2)
+
+CREATE TABLE [dbo].[CompoundKeyMaster](
+	[IdPart1] [int] NOT NULL,
+	[IdPart2] [int] NOT NULL,
+	[Description] [nvarchar](50) NOT NULL,
+CONSTRAINT [PK_CompoundKeyMaster] PRIMARY KEY CLUSTERED 
+(
+	[IdPart1] ASC,
+	[IdPart2] ASC
+))
+
+CREATE TABLE [dbo].[CompoundKeyDetail](
+	[Id] [int] NOT NULL,
+	[MasterIdPart1] [int] NOT NULL,
+	[MasterIdPart2] [int] NOT NULL,
+	[Value] [int] NOT NULL,
+CONSTRAINT [PK_CompoundKeyDetail] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+))
+
+INSERT INTO [dbo].[CompoundKeyMaster] (IdPart1, IdPart2,[Description]) VALUES (1,1,'Original')
+INSERT INTO [dbo].[CompoundKeyDetail] (Id, MasterIdPart1, MasterIdPart2, Value) VALUES (1,1,1,1)
+
+ALTER TABLE [dbo].[CompoundKeyDetail]  WITH CHECK ADD  CONSTRAINT [FK_CompoundKeyDetail_CompoundKeyMaster] FOREIGN KEY([MasterIdPart1], [MasterIdPart2])
+REFERENCES [dbo].[CompoundKeyMaster] ([IdPart1], [IdPart2])
+
+ALTER TABLE [dbo].[CompoundKeyDetail] CHECK CONSTRAINT [FK_CompoundKeyDetail_CompoundKeyMaster]
