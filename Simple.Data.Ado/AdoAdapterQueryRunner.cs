@@ -160,8 +160,8 @@
         private void DeferPaging(ref SimpleQuery query, ICommandBuilder mainCommandBuilder, List<ICommandBuilder> commandBuilders,
                                  List<SimpleQueryClauseBase> unhandledClausesList)
         {
-            unhandledClausesList.AddRange(query.OfType<SkipClause>());
-            unhandledClausesList.AddRange(query.OfType<TakeClause>());
+            unhandledClausesList.AddRange(query.Clauses.OfType<SkipClause>());
+            unhandledClausesList.AddRange(query.Clauses.OfType<TakeClause>());
             query = query.ClearSkip().ClearTake();
             var commandBuilder = new CommandBuilder(mainCommandBuilder.Text, _adapter.GetSchema(),
                                                     mainCommandBuilder.Parameters);
