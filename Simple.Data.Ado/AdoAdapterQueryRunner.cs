@@ -110,7 +110,9 @@
                     throw new InvalidOperationException();
                 }
                 IDictionary<string, object> countRow = enumerator.Current.Single();
-                withCountClause.SetCount((int) countRow.First().Value);
+                var value = countRow.First().Value;
+                int count = value is int ? (int) value : Convert.ToInt32(value);
+                withCountClause.SetCount(count);
                 if (!enumerator.MoveNext())
                 {
                     throw new InvalidOperationException();

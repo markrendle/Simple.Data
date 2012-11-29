@@ -95,7 +95,7 @@
                 yield return result;
             }
         }
-
+        
         public IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IList<string> keyFieldNames, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
         {
             foreach (var row in list)

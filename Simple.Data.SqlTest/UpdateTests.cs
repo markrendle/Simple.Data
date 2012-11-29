@@ -1,7 +1,6 @@
 ﻿using System.Dynamic;
 using System.Linq;
 using NUnit.Framework;
-using Simple.Data.SqlTest.Resources;
 
 namespace Simple.Data.SqlTest
 {
@@ -143,7 +142,8 @@ namespace Simple.Data.SqlTest
         public void TestUpdateByInputIsNotMutated()
         {
             var db = DatabaseHelper.Open();
-            var user = new Dictionary<string, object>() {
+            var user = new Dictionary<string, object>
+                           {
               {"Id", 0},
               {"Age", 1},
               {"Name", "X"},
