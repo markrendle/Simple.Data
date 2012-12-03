@@ -16,7 +16,7 @@ namespace Simple.Data.SqlServer
                                                                             {"date", typeof (DateTime)},
                                                                             {"time", typeof (DateTime)},
                                                                             {"datetime2", typeof (DateTime)},
-                                                                            {"datetimeoffset", typeof (DateTime)},
+                                                                            {"datetimeoffset", typeof (DateTimeOffset)},
                                                                             {"tinyint", typeof (byte)},
                                                                             {"smallint", typeof (short)},
                                                                             {"int", typeof (int)},

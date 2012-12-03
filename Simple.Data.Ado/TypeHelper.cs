@@ -23,6 +23,7 @@ namespace Simple.Data.Ado
                                                                   typeof (double),
                                                                   typeof (decimal),
                                                                   typeof (DateTime),
+                                                                  typeof (DateTimeOffset),
                                                                   typeof (string),
                                                                   typeof (byte[]),
                                                                   typeof (Guid),
@@ -49,14 +50,14 @@ namespace Simple.Data.Ado
                                                                                       {DbType.StringFixedLength, typeof(string)},
                                                                                       {DbType.AnsiStringFixedLength, typeof(string)},
                                                                                       {DbType.Xml, typeof(string)},
-                                                                                      {DbType.DateTimeOffset, typeof(DateTime)},
                                                                                       {DbType.DateTime2, typeof(DateTime)},
                                                                                       {DbType.VarNumeric, typeof(double)},
                                                                                       {DbType.UInt16, typeof(ushort)},
                                                                                       {DbType.String, typeof(string)},
                                                                                       {DbType.Time, typeof(TimeSpan)},
                                                                                       {DbType.UInt64, typeof(ulong)},
-                                                                                      {DbType.UInt32, typeof(uint)}
+                                                                                      {DbType.UInt32, typeof(uint)},
+                                                                                      {DbType.DateTimeOffset, typeof(DateTimeOffset)},
                                                                                   };
         
         public static bool IsKnownType(Type type)

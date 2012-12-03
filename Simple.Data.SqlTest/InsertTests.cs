@@ -7,6 +7,8 @@ using Simple.Data.SqlTest.Resources;
 
 namespace Simple.Data.SqlTest
 {
+    using System;
+
     [TestFixture]
     public class InsertTests
     {
@@ -292,6 +294,17 @@ namespace Simple.Data.SqlTest
             var row = db.TimestampTest.Insert(Description: "Foo");
             Assert.IsNotNull(row);
             Assert.IsInstanceOf<byte[]>(row.Version);
+        }
+
+        [Test]
+        public void TestInsertWithDateTimeOffsetColumn()
+        {
+            var db = DatabaseHelper.Open();
+            dynamic entry = new ExpandoObject();
+            var time = DateTimeOffset.Now;
+            entry.time = time;
+            var inserted = db.DateTimeOffsetTest.Insert(entry);
+            Assert.AreEqual(time, inserted.time);
         }
     }
 }

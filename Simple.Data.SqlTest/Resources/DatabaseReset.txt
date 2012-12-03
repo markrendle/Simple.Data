@@ -70,6 +70,8 @@ BEGIN
 	DROP TABLE [dbo].[Blobs]
 	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EnumTest]') AND type in (N'U'))
 	DROP TABLE [dbo].[EnumTest]
+	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[DateTimeOffsetTest]') AND type in (N'U'))
+	DROP TABLE [dbo].[DateTimeOffsetTest]
 	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[DeleteTest]') AND type in (N'U'))
 	DROP TABLE [dbo].[DeleteTest]
 	IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[DecimalTest]') AND type in (N'U'))
@@ -189,6 +191,14 @@ BEGIN
 
 	ALTER TABLE [dbo].[DeleteTest]
 		ADD CONSTRAINT [PK_DeleteTest] PRIMARY KEY CLUSTERED ([Id] ASC)	
+
+    CREATE TABLE [dbo].[DateTimeOffsetTest](
+		[Id] [int] IDENTITY(1,1) NOT NULL,
+		[Time] [datetimeoffset]
+	)
+
+	ALTER TABLE [dbo].[DateTimeOffsetTest]
+		ADD CONSTRAINT [PK_DateTimeOffsetTest] PRIMARY KEY CLUSTERED ([Id] ASC)	
 
 	CREATE TABLE [dbo].[DecimalTest](
 		[Id] [int] IDENTITY (1, 1) NOT NULL,
