@@ -17,20 +17,22 @@
                         { typeof(OrderByClause), (c, d) => new OrderByClauseHandler((OrderByClause)c).Run(d) }
                     };
 
+        private readonly string _mainTableName;
         private readonly IEnumerable<IDictionary<string, object>> _source;
         private readonly IList<SimpleQueryClauseBase> _clauses;
         private readonly WithCountClause _withCountClause;
 
-        public DictionaryQueryRunner(IEnumerable<IDictionary<string, object>> source, IEnumerable<SimpleQueryClauseBase> clauses)
+        public DictionaryQueryRunner(string mainTableName, IEnumerable<IDictionary<string, object>> source, IEnumerable<SimpleQueryClauseBase> clauses)
         {
+            _mainTableName = mainTableName;
             _source = source;
             _clauses = clauses.ToList();
             _withCountClause = _clauses.OfType<WithCountClause>().FirstOrDefault();
             if (_withCountClause != null) _clauses.Remove(_withCountClause);
         }
 
-        public DictionaryQueryRunner(IEnumerable<IDictionary<string, object>> source, params SimpleQueryClauseBase[] clauses)
-            : this(source, clauses.AsEnumerable())
+        public DictionaryQueryRunner(string mainTableName, IEnumerable<IDictionary<string, object>> source, params SimpleQueryClauseBase[] clauses)
+            : this(mainTableName, source, clauses.AsEnumerable())
         {
         }
 
@@ -63,7 +65,7 @@
         {
             foreach (var whereClause in _clauses.OfType<WhereClause>())
             {
-                source = new WhereClauseHandler(whereClause).Run(source);
+                source = new WhereClauseHandler(_mainTableName, whereClause).Run(source);
             }
             return source;
         }
@@ -99,7 +101,7 @@
             {
                 var criteria = HavingToWhere(clause.Criteria, selectReferences);
                 source = new SelectClauseHandler(new SelectClause(selectReferences)).Run(source).ToList();
-                source = new WhereClauseHandler(new WhereClause(criteria)).Run(source);
+                source = new WhereClauseHandler(_mainTableName, new WhereClause(criteria)).Run(source);
                 source = source.Select(d => d.Where(kvp => !kvp.Key.StartsWith(AutoColumnPrefix)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
             }
 

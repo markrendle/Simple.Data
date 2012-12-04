@@ -14,7 +14,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void DistinctShouldRemoveDuplicateRows()
         {
-            var runner = new DictionaryQueryRunner(DuplicatingSource(), new DistinctClause());
+            var runner = new DictionaryQueryRunner("FooTable", DuplicatingSource(), new DistinctClause());
             var actual = runner.Run().ToList();
             Assert.AreEqual(2, actual.Count);
             Assert.AreEqual(1, actual.Count(d => d.ContainsKey("Foo") && (string)d["Foo"] == "bar"));
@@ -24,7 +24,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void ShouldNotRemoveDistinctRows()
         {
-            var runner = new DictionaryQueryRunner(NonDuplicatingSource(), new DistinctClause());
+            var runner = new DictionaryQueryRunner("FooTable", NonDuplicatingSource(), new DistinctClause());
             var actual = runner.Run().ToList();
             Assert.AreEqual(2, actual.Count);
             Assert.AreEqual(1, actual.Count(d => d.ContainsKey("Foo") && (string)d["Foo"] == "bar"));
@@ -34,7 +34,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void SkipShouldSkip()
         {
-            var runner = new DictionaryQueryRunner(SkipTakeSource(), new SkipClause(1));
+            var runner = new DictionaryQueryRunner("FooTable", SkipTakeSource(), new SkipClause(1));
             var actual = runner.Run().ToList();
             Assert.AreEqual(2, actual.Count);
             Assert.AreEqual(1, actual[0]["Row"]);
@@ -44,7 +44,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void TakeShouldTake()
         {
-            var runner = new DictionaryQueryRunner(SkipTakeSource(), new TakeClause(2));
+            var runner = new DictionaryQueryRunner("FooTable", SkipTakeSource(), new TakeClause(2));
             var actual = runner.Run().ToList();
             Assert.AreEqual(2, actual.Count);
             Assert.AreEqual(0, actual[0]["Row"]);
@@ -54,7 +54,7 @@ namespace Simple.Data.UnitTest
         [Test]
         public void SkipAndTakeShouldSkipAndTake()
         {
-            var runner = new DictionaryQueryRunner(SkipTakeSource(), new SkipClause(1), new TakeClause(1));
+            var runner = new DictionaryQueryRunner("FooTable", SkipTakeSource(), new SkipClause(1), new TakeClause(1));
             var actual = runner.Run().ToList();
             Assert.AreEqual(1, actual.Count);
             Assert.AreEqual(1, actual[0]["Row"]);
@@ -64,7 +64,7 @@ namespace Simple.Data.UnitTest
         public void SkipAndTakeWithCountShouldSkipAndTakeAndGiveCount()
         {
             int count = 0;
-            var runner = new DictionaryQueryRunner(SkipTakeSource(), new WithCountClause(n => count = n), new SkipClause(1), new TakeClause(1));
+            var runner = new DictionaryQueryRunner("FooTable", SkipTakeSource(), new WithCountClause(n => count = n), new SkipClause(1), new TakeClause(1));
             var actual = runner.Run().ToList();
             Assert.AreEqual(3, count);
             Assert.AreEqual(1, actual.Count);
@@ -76,7 +76,7 @@ namespace Simple.Data.UnitTest
         {
             var tableRef = new ObjectReference("FooTable");
             var selectClause = new SelectClause(new SimpleReference[] { new ObjectReference("Id", tableRef), new ObjectReference("Name", tableRef) });
-            var runner = new DictionaryQueryRunner(SelectSource(), selectClause);
+            var runner = new DictionaryQueryRunner("FooTable", SelectSource(), selectClause);
             var actual = runner.Run().ToList();
             Assert.AreEqual(4, actual.Count);
             Assert.AreEqual(2, actual[0].Count);
@@ -99,7 +99,7 @@ namespace Simple.Data.UnitTest
             var tableRef = new ObjectReference("FooTable");
             var function = new FunctionReference("Length", new ObjectReference("Name", tableRef)).As("NameLength");
             var selectClause = new SelectClause(new SimpleReference[] { new ObjectReference("Name", tableRef), function });
-            var runner = new DictionaryQueryRunner(SelectSource(), selectClause);
+            var runner = new DictionaryQueryRunner("FooTable", SelectSource(), selectClause);
             var actual = runner.Run().ToList();
             Assert.AreEqual(4, actual.Count);
             Assert.AreEqual(2, actual[0].Count);
@@ -121,7 +121,7 @@ namespace Simple.Data.UnitTest
         {
             var tableRef = new ObjectReference("FooTable");
             var whereClause = new WhereClause(new ObjectReference("Name", tableRef) == "Alice");
-            var runner = new DictionaryQueryRunner(SelectSource(), whereClause);
+            var runner = new DictionaryQueryRunner("FooTable", SelectSource(), whereClause);
             var actual = runner.Run().ToList();
             Assert.AreEqual(1, actual.Count);
             Assert.AreEqual("Alice", actual[0]["Name"]);
@@ -143,7 +143,7 @@ namespace Simple.Data.UnitTest
                                        {"Name", "Dave"}, { "Value", 42 }
                                    },
                            };
-            var runner = new DictionaryQueryRunner(data, whereClause);
+            var runner = new DictionaryQueryRunner("FooTable", data, whereClause);
             var actual = runner.Run().ToList();
             Assert.AreEqual(1, actual.Count);
             Assert.AreEqual("Steve", actual[0]["Name"]);
@@ -165,7 +165,7 @@ namespace Simple.Data.UnitTest
                                        {"Name", "Dave"}, { "Value", 42 }
                                    },
                            };
-            var runner = new DictionaryQueryRunner(data, whereClause);
+            var runner = new DictionaryQueryRunner("FooTable", data, whereClause);
             var actual = runner.Run().ToList();
             Assert.AreEqual(1, actual.Count);
             Assert.AreEqual("Steve", actual[0]["Name"]);
@@ -187,7 +187,7 @@ namespace Simple.Data.UnitTest
                                        {"Name", "Dave"}, { "Array", new byte[] { 2, 3, 4}}
                                    },
                            };
-            var runner = new DictionaryQueryRunner(data, whereClause);
+            var runner = new DictionaryQueryRunner("FooTable", data, whereClause);
             var actual = runner.Run().ToList();
             Assert.AreEqual(1, actual.Count);
             Assert.AreEqual("Steve", actual[0]["Name"]);
@@ -198,7 +198,7 @@ namespace Simple.Data.UnitTest
         {
             var tableRef = new ObjectReference("FooTable");
             var whereClause = new WhereClause(new ObjectReference("Name", tableRef) != "Alice");
-            var runner = new DictionaryQueryRunner(SelectSource(), whereClause);
+            var runner = new DictionaryQueryRunner("FooTable", SelectSource(), whereClause);
             var actual = runner.Run().ToList();
             Assert.AreEqual(3, actual.Count);
             Assert.False(actual.Any(a => (string)a["Name"] == "Alice"));
@@ -220,7 +220,7 @@ namespace Simple.Data.UnitTest
                                        {"Name", "Dave"}, { "Value", 42 }
                                    },
                            };
-            var runner = new DictionaryQueryRunner(data, whereClause);
+            var runner = new DictionaryQueryRunner("FooTable", data, whereClause);
             var actual = runner.Run().ToList();
             Assert.AreEqual(1, actual.Count);
             Assert.AreEqual("Dave", actual[0]["Name"]);
@@ -242,7 +242,7 @@ namespace Simple.Data.UnitTest
                                        {"Name", "Dave"}, { "Array", new byte[] { 2, 3, 4}}
                                    },
                            };
-            var runner = new DictionaryQueryRunner(data, whereClause);
+            var runner = new DictionaryQueryRunner("FooTable", data, whereClause);
             var actual = runner.Run().ToList();
             Assert.AreEqual(1, actual.Count);
             Assert.AreEqual("Dave", actual[0]["Name"]);
@@ -253,7 +253,7 @@ namespace Simple.Data.UnitTest
         {
             var tableRef = new ObjectReference("FooTable");
             var whereClause = new WhereClause(new ObjectReference("Weight", tableRef) > 200M);
-            var runner = new DictionaryQueryRunner(SelectSource(), whereClause);
+            var runner = new DictionaryQueryRunner("FooTable", SelectSource(), whereClause);
             var actual = runner.Run().ToList();
             Assert.AreEqual(1, actual.Count);
             Assert.AreEqual("David", actual[0]["Name"]);
@@ -264,7 +264,7 @@ namespace Simple.Data.UnitTest
         {
             var tableRef = new ObjectReference("FooTable");
             var whereClause = new WhereClause(new ObjectReference("Weight", tableRef) < 150M);
-            var runner = new DictionaryQueryRunner(SelectSource(), whereClause);
+            var runner = new DictionaryQueryRunner("FooTable", SelectSource(), whereClause);
             var actual = runner.Run().ToList();
             Assert.AreEqual(1, actual.Count);
             Assert.AreEqual("Alice", actual[0]["Name"]);
@@ -275,7 +275,7 @@ namespace Simple.Data.UnitTest
         {
             var tableRef = new ObjectReference("FooTable");
             var whereClause = new WhereClause(new ObjectReference("Weight", tableRef) >= 250M);
-            var runner = new DictionaryQueryRunner(SelectSource(), whereClause);
+            var runner = new DictionaryQueryRunner("FooTable", SelectSource(), whereClause);
             var actual = runner.Run().ToList();
             Assert.AreEqual(1, actual.Count);
             Assert.AreEqual("David", actual[0]["Name"]);
@@ -286,7 +286,7 @@ namespace Simple.Data.UnitTest
         {
             var tableRef = new ObjectReference("FooTable");
             var whereClause = new WhereClause(new ObjectReference("Weight", tableRef) <= 100M);
-            var runner = new DictionaryQueryRunner(SelectSource(), whereClause);
+            var runner = new DictionaryQueryRunner("FooTable", SelectSource(), whereClause);
             var actual = runner.Run().ToList();
             Assert.AreEqual(1, actual.Count);
             Assert.AreEqual("Alice", actual[0]["Name"]);
@@ -299,7 +299,7 @@ namespace Simple.Data.UnitTest
             dynamic objRef = new ObjectReference("Name", tableRef);
             var expression = new SimpleExpression(objRef, new SimpleFunction("like", new[] {"A%"}), SimpleExpressionType.Function);
             var whereClause = new WhereClause(expression);
-            var runner = new DictionaryQueryRunner(SelectSource(), whereClause);
+            var runner = new DictionaryQueryRunner("FooTable", SelectSource(), whereClause);
             var actual = runner.Run().ToList();
             Assert.AreEqual(1, actual.Count);
             Assert.AreEqual("Alice", actual[0]["Name"]);

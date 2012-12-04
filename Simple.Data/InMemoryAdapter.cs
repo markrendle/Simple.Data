@@ -64,7 +64,7 @@
 
         public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
-            var whereClauseHandler = new WhereClauseHandler(new WhereClause(criteria));
+            var whereClauseHandler = new WhereClauseHandler(tableName, new WhereClause(criteria));
             return whereClauseHandler.Run(GetTable(tableName));
         }
 

@@ -312,7 +312,7 @@
                 var unhandledClausesList = unhandledClauses.ToList();
                 if (unhandledClausesList.Count > 0)
                 {
-                    result = new DictionaryQueryRunner(result, unhandledClausesList).Run();
+                    result = new DictionaryQueryRunner(_tableName, result, unhandledClausesList).Run();
                 }
             }
 
@@ -511,6 +511,55 @@
             return this;
         }
 
+        public SimpleQuery Join(DynamicTable dynamicTable, JoinType joinType)
+        {
+            if (ReferenceEquals(dynamicTable, null)) throw new ArgumentNullException("dynamicTable");
+            _tempJoinWaitingForOn = new JoinClause(dynamicTable.ToObjectReference(), joinType, null);
+
+            return this;
+        }
+
+        public SimpleQuery Join(DynamicTable dynamicTable, out dynamic queryObjectReference)
+        {
+            return Join(dynamicTable, JoinType.Inner, out queryObjectReference);
+        }
+
+        public SimpleQuery Join(DynamicTable dynamicTable, JoinType joinType, out dynamic queryObjectReference)
+        {
+            if (ReferenceEquals(dynamicTable, null)) throw new ArgumentNullException("dynamicTable");
+            var newJoin = new JoinClause(dynamicTable.ToObjectReference(), null);
+            _tempJoinWaitingForOn = newJoin;
+            queryObjectReference = dynamicTable.ToObjectReference();
+
+            return this;
+        }
+
+        public SimpleQuery LeftJoin(DynamicTable dynamicTable)
+        {
+            return OuterJoin(dynamicTable);
+        }
+
+        public SimpleQuery LeftJoin(DynamicTable dynamicTable, out dynamic queryObjectReference)
+        {
+            return OuterJoin(dynamicTable, out queryObjectReference);
+        }
+
+        public SimpleQuery OuterJoin(DynamicTable dynamicTable)
+        {
+            if (ReferenceEquals(dynamicTable, null)) throw new ArgumentNullException("dynamicTable");
+            _tempJoinWaitingForOn = new JoinClause(dynamicTable.ToObjectReference(), JoinType.Outer);
+
+            return this;
+        }
+
+        public SimpleQuery OuterJoin(DynamicTable dynamicTable, out dynamic queryObjectReference)
+        {
+            _tempJoinWaitingForOn = new JoinClause(dynamicTable.ToObjectReference(), JoinType.Outer);
+            queryObjectReference = dynamicTable;
+
+            return this;
+        }
+
         public SimpleQuery On(SimpleExpression joinExpression)
         {
             if (_tempJoinWaitingForOn == null)
@@ -542,6 +591,14 @@
         private SimpleQuery ParseJoin(InvokeMemberBinder binder, object[] args)
         {
             var tableToJoin = args[0] as ObjectReference;
+            if (ReferenceEquals(tableToJoin, null))
+            {
+                var dynamicTable = args[0] as DynamicTable;
+                if (!ReferenceEquals(dynamicTable, null))
+                {
+                    tableToJoin = dynamicTable.ToObjectReference();
+                }
+            }
             if (tableToJoin == null) throw new InvalidOperationException();
 
             SimpleExpression joinExpression = null;

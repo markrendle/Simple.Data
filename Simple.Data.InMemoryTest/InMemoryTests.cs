@@ -697,5 +697,31 @@
             Assert.That(detail.Id, Is.EqualTo(masterId));
             Assert.That(detail.Box, Is.EqualTo(999));
         }
+
+        [Test]
+        public void LeftJoinTest()
+        {
+            var adapter = new InMemoryAdapter();
+            adapter.SetKeyColumn("Events", "Id");
+            adapter.SetAutoIncrementColumn("Events", "Id");
+            adapter.SetKeyColumn("Doors", "Id");
+            adapter.SetAutoIncrementColumn("Doors", "Id");
+            adapter.Join.Master("Events", "Id").Detail("Doors", "EventId");
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            db.Events.Insert(Id: 1, Code: "CodeMash2013", Name: "CodeMash 2013");
+            db.Events.Insert(Id: 2, Code: "SomewhereElse", Name: "Some Other Conf");
+            db.Doors.Insert(Id: 1, Code: "F7E08AC9-5E75-417D-A7AA-60E88B5B99AD", EventID: 1);
+            db.Doors.Insert(Id: 2, Code: "0631C802-2748-4C63-A6D9-CE8C803002EB", EventID: 1);
+            db.Doors.Insert(Id: 3, Code: "281ED88F-677D-49B9-84FA-4FAE022BBC73", EventID: 1);
+            db.Doors.Insert(Id: 4, Code: "9DF7E964-1ECE-42E3-8211-1F2BF7054A0D", EventID: 2);
+            db.Doors.Insert(Id: 5, Code: "9418123D-312A-4E8C-8807-59F0A63F43B9", EventID: 2);
+
+            List<dynamic> actual = db.Doors.FindAll(db.Doors.Events.Code == "CodeMash2013")
+                           .Select(db.Doors.Id, db.Events.Name)
+                           .ToList();
+
+            Assert.AreEqual(3, actual.Count);
+        }
     }
 }

@@ -5,15 +5,18 @@ namespace Simple.Data.QueryPolyfills
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using Extensions;
 
     internal class WhereClauseHandler
     {
         private readonly Dictionary<SimpleExpressionType, Func<SimpleExpression, Func<IDictionary<string, object>, bool>>> _expressionFormatters;
 
+        private readonly string _mainTableName;
         private readonly WhereClause _whereClause;
 
-        public WhereClauseHandler(WhereClause whereClause)
+        public WhereClauseHandler(string mainTableName, WhereClause whereClause)
         {
+            _mainTableName = mainTableName;
             _whereClause = whereClause;
             _expressionFormatters = new Dictionary<SimpleExpressionType, Func<SimpleExpression, Func<IDictionary<string, object>, bool>>>
                                         {
@@ -145,6 +148,21 @@ namespace Simple.Data.QueryPolyfills
             if (keys.Length > 2)
             {
                 return ResolveSubs(dict, objectReference.GetOwner(), key).ToList();
+            }
+
+            if (keys.Length == 2 && !HomogenizedEqualityComparer.DefaultInstance.Equals(keys[0].Singularize(), _mainTableName.Singularize()))
+            {
+                var joinedDict = dict[keys[0]] as IDictionary<string, object>;
+                if (joinedDict != null && joinedDict.ContainsKey(keys[1]))
+                {
+                    return new[] { joinedDict[keys[1]] };
+                }
+
+                var joinedDicts = dict[keys[0]] as IEnumerable<IDictionary<string, object>>;
+                if (joinedDicts != null)
+                {
+                    return joinedDicts.Select(d => d.ContainsKey(keys[1]) ? d[keys[1]] : null).ToArray();
+                }
             }
 
             if (dict.ContainsKey(key))
