@@ -307,7 +307,14 @@ namespace Simple.Data.Ado
 
         public IDbConnection CreateConnection()
         {
-            return _sharedConnection ?? _connectionModifier(_connectionProvider.CreateConnection());
+            if (_sharedConnection != null) return _sharedConnection;
+            var connection = _connectionModifier(_connectionProvider.CreateConnection());
+            var args = ConnectionCreated.Raise(this, () => new ConnectionCreatedEventArgs(connection));
+            if (args != null && args.OverriddenConnection != null)
+            {
+                return args.OverriddenConnection;
+            }
+            return connection;
         }
 
         public DatabaseSchema GetSchema()
@@ -340,6 +347,30 @@ namespace Simple.Data.Ado
         {
             DatabaseSchema.ClearCache();
             _schema = DatabaseSchema.Get(_connectionProvider, _providerHelper);
+        }
+
+        public static event EventHandler<ConnectionCreatedEventArgs> ConnectionCreated;
+    }
+
+    public class ConnectionCreatedEventArgs : EventArgs
+    {
+        private readonly IDbConnection _connection;
+
+        public ConnectionCreatedEventArgs(IDbConnection connection)
+        {
+            _connection = connection;
+        }
+
+        public IDbConnection Connection
+        {
+            get { return _connection; }
+        }
+
+        internal IDbConnection OverriddenConnection { get; private set; }
+
+        public void OverrideConnection(IDbConnection overridingConnection)
+        {
+            OverriddenConnection = overridingConnection;
         }
     }
 }
