@@ -8,6 +8,8 @@ IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GetCu
 DROP PROCEDURE [dbo].[GetCustomers]
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[CreateCustomer]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[CreateCustomer]
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AddCustomer]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[AddCustomer]
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GetCustomerAndOrders]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[GetCustomerAndOrders]
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GetCustomerCount]') AND type in (N'P', N'PC'))
@@ -344,6 +346,15 @@ BEGIN
     SELECT * FROM Customers WHERE CustomerId = SCOPE_IDENTITY()
 END
 GO
+CREATE PROCEDURE [dbo].[AddCustomer] (@Name nvarchar(100), @Address nvarchar(200))
+AS
+BEGIN
+    SET NOCOUNT ON;
+	INSERT INTO Customers (Name, Address) VALUES (@Name, @Address);
+    SELECT * FROM Customers WHERE CustomerId = SCOPE_IDENTITY()
+END
+GO
+
 CREATE PROCEDURE [dbo].[GetCustomerAndOrders] (@CustomerId int)
 AS
 BEGIN

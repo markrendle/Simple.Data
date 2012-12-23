@@ -104,7 +104,29 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, order.OrderId);
         }
 
-        [Test]
+		[Test]
+		public void AddCustomerTest()
+		{
+			var db = DatabaseHelper.Open();
+			Customer customer;
+			customer = db.AddCustomer("Peter", "Address").FirstOrDefault();
+			Assert.IsNotNull(customer);
+			customer = db.Customers.FindByCustomerId(customer.CustomerId);
+			Assert.IsNotNull(customer);
+		}
+
+		[Test]
+		public void AddCustomerNullAddressTest()
+		{
+			var db = DatabaseHelper.Open();
+			Customer customer;
+			customer = db.AddCustomer("Peter", null).FirstOrDefault();
+			Assert.IsNotNull(customer);
+			customer = db.Customers.FindByCustomerId(customer.CustomerId);
+			Assert.IsNotNull(customer);
+		}
+
+		[Test]
         public void GetCustomerAndOrdersStillWorksAfterZeroRecordCallTest()
         {
             var db = DatabaseHelper.Open();
