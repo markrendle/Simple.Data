@@ -28,7 +28,7 @@ namespace Simple.Data
             return argsArray.Reverse()
                 .Zip(argumentNames.Reverse().ExtendInfinite(), (v, k) => new KeyValuePair<string, object>(k, v))
                 .Reverse()
-                .Select((kvp, i) => kvp.Key == null ? new KeyValuePair<string, object>("_" + i.ToString(), kvp.Value) : kvp)
+                .Select((kvp, i) => kvp.Key == null ? new KeyValuePair<string, object>("_" + i.ToString(), kvp.Value ?? DBNull.Value) : kvp)
                 .ToDictionary(StringComparer.InvariantCultureIgnoreCase);
         }
 
