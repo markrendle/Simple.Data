@@ -352,12 +352,12 @@ namespace Simple.Data.SqlTest
             var db = DatabaseHelper.Open();
             var result = db.Customers.FindAllByCustomerId(1).With(db.Customers.Orders).With(db.Customers.Orders.OrderItems).FirstOrDefault() as IDictionary<string, object>;
             Assert.IsNotNull(result);
-            Assert.Contains("Orders", (ICollection)result.Keys);
+            Assert.Contains("Orders", result.Keys.ToArray());
             var orders = result["Orders"] as IList<IDictionary<string, object>>;
             Assert.IsNotNull(orders);
             Assert.AreEqual(1, orders.Count);
             var order = orders[0];
-            Assert.Contains("OrderItems", (ICollection)order.Keys);
+            Assert.Contains("OrderItems", order.Keys.ToArray());
         }
 
         [Test]

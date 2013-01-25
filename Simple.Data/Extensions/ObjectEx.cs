@@ -14,9 +14,21 @@ namespace Simple.Data.Extensions
         private static readonly ConcurrentDictionary<Type, Func<object, IDictionary<string, object>>> Converters =
             new ConcurrentDictionary<Type, Func<object, IDictionary<string, object>>>();
 
+        public static IDictionary<string, object> AnonymousObjectToDictionary(this object obj)
+        {
+            return obj.GetType().GetProperties().ToDictionary(p => p.Name, p => p.GetValue(obj, null));
+        }
+
         public static IDictionary<string, object> ObjectToDictionary(this object obj)
         {
             if (obj == null) return new Dictionary<string, object>();
+
+            var alreadyADictionary = obj as IDictionary<string,object>;
+
+            if (alreadyADictionary != null)
+            {
+                return new Dictionary<string, object>(alreadyADictionary);
+            }
 
             return Converters.GetOrAdd(obj.GetType(), MakeToDictionaryFunc)(obj);
         }
@@ -26,7 +38,8 @@ namespace Simple.Data.Extensions
             var param = Expression.Parameter(typeof(object));
             var typed = Expression.Variable(type);
             var newDict = Expression.New(typeof(Dictionary<string, object>));
-            var listInit = Expression.ListInit(newDict, GetElementInitsForType(type, typed));
+            var elementInitsForType = GetElementInitsForType(type, typed);
+            var listInit = Expression.ListInit(newDict, elementInitsForType);
 
             var block = Expression.Block(new[] { typed },
                                          Expression.Assign(typed, Expression.Convert(param, type)),

@@ -26,7 +26,7 @@ namespace Simple.Data
 
         public Adapter Create(string adapterName, object settings)
         {
-            return Create(adapterName, settings.ObjectToDictionary());
+            return Create(adapterName, settings.AnonymousObjectToDictionary());
         }
 
         public Adapter Create(IEnumerable<KeyValuePair<string,object>> settings)
