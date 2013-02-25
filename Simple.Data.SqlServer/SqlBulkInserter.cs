@@ -25,16 +25,17 @@ namespace Simple.Data.SqlServer
 
             SqlConnection connection;
             SqlBulkCopy bulkCopy;
+            var sqlBulkCopyOptions = BuildBulkCopyOptions(adapter);
 
             if (transaction != null)
             {
                 connection = (SqlConnection) transaction.Connection;
-                bulkCopy = new SqlBulkCopy(connection, SqlBulkCopyOptions.Default, (SqlTransaction)transaction);
+                bulkCopy = new SqlBulkCopy(connection, sqlBulkCopyOptions, (SqlTransaction)transaction);
             }
             else
             {
                 connection = (SqlConnection) adapter.CreateConnection();
-                bulkCopy = new SqlBulkCopy(connection);
+                bulkCopy = new SqlBulkCopy(connection, sqlBulkCopyOptions, null);
             }
 
             bulkCopy.DestinationTableName = adapter.GetSchema().FindTable(tableName).QualifiedName;
@@ -65,6 +66,20 @@ namespace Simple.Data.SqlServer
             }
 
             return null;
+        }
+
+        private SqlBulkCopyOptions BuildBulkCopyOptions(AdoAdapter adapter)
+        {
+            var options = SqlBulkCopyOptions.Default;
+
+            if (adapter.AdoOptions != null)
+            {
+                options |= (adapter.AdoOptions.FireTriggersOnBulkInserts
+                                ? SqlBulkCopyOptions.FireTriggers
+                                : SqlBulkCopyOptions.Default);
+            }
+
+            return options;
         }
 
         private DataTable CreateDataTable(AdoAdapter adapter, string tableName, ICollection<string> keys, SqlBulkCopy bulkCopy)
