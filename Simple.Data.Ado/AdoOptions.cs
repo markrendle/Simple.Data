@@ -4,11 +4,13 @@
     {
         private readonly int _commandTimeout;
         private readonly bool _identityInsert;
+        private bool _fireTriggersOnBulkInserts;
 
-        public AdoOptions(int commandTimeout = -1, bool identityInsert = false)
+        public AdoOptions(int commandTimeout = -1, bool identityInsert = false, bool fireTriggersOnBulkInserts = false)
         {
             _commandTimeout = commandTimeout;
             _identityInsert = identityInsert;
+            _fireTriggersOnBulkInserts = fireTriggersOnBulkInserts;
         }
 
         public int CommandTimeout
@@ -19,6 +21,11 @@
         public bool IdentityInsert
         {
             get { return _identityInsert; }
+        }
+
+        public bool FireTriggersOnBulkInserts
+        {
+            get { return _fireTriggersOnBulkInserts; }
         }
     }
 }
