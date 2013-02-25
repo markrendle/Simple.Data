@@ -1,4 +1,6 @@
-﻿namespace Simple.Data.SqlTest
+﻿using Simple.Data.Ado;
+
+namespace Simple.Data.SqlTest
 {
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -29,6 +31,25 @@
             }
             Assert.AreEqual(1000, count.Value);
             Assert.AreEqual(1000, list.Count);
+        }
+
+        [Test]
+        public void BulkInsertUsesSchemaAndFireTriggers()
+        {
+            var db = DatabaseHelper.Open();
+
+            using (var tx = db.BeginTransaction())
+            {
+                tx.WithOptions(new AdoOptions(commandTimeout: 60000, fireTriggersOnBulkInserts: true));
+                tx.test.SchemaTable.DeleteAll();
+                tx.test.SchemaTable.Insert(GenerateItems());
+
+                tx.Commit();
+            }
+
+            int rowsWhichWhereUpdatedByTrigger = db.test.SchemaTable.GetCountBy(Optional: "Modified By Trigger");
+
+            Assert.AreEqual(1000, rowsWhichWhereUpdatedByTrigger);
         }
 
         private static IEnumerable<SchemaItem> GenerateItems()
