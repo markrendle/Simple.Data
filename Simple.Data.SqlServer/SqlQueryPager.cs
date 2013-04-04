@@ -38,7 +38,10 @@ namespace Simple.Data.SqlServer
             builder.AppendFormat("SELECT {0} FROM __Data ", columns);
             builder.AppendFormat("JOIN {0} ON ",
                                  keys[0].Substring(0, keys[0].LastIndexOf(".", StringComparison.OrdinalIgnoreCase)));
-            builder.AppendFormat(string.Join(" ", keys.Select(MakeDataJoin)));
+            if (keys.Length > 1)
+                builder.AppendFormat(string.Join(" AND ", keys.Select(MakeDataJoin)));
+            else
+                builder.AppendFormat(string.Join(" ", keys.Select(MakeDataJoin)));
             var rest = Regex.Replace(fromEtc, @"^from (\[.*?\]\.\[.*?\])", @"");
             builder.Append(rest);
             
