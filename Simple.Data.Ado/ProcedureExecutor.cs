@@ -40,7 +40,7 @@ namespace Simple.Data.Ado
             var procedure = _adapter.GetSchema().FindProcedure(_procedureName);
             if (procedure == null)
             {
-                throw new UnresolvableObjectException(_procedureName.ToString());
+                throw new UnresolvableObjectException(_procedureName.ToString(), string.Format("Procedure '{0}' not found.", _procedureName));
             }
 
             var cn = transaction == null ? _adapter.CreateConnection() : transaction.Connection;

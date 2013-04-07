@@ -33,7 +33,7 @@ namespace Simple.Data.Ado.Schema
 
             if (procedure == null)
             {
-                throw new UnresolvableObjectException(procedureName, "No matching procedure found, or insufficient permissions.");
+                throw new UnresolvableObjectException(procedureName, string.Format("Procedure '{0}' not found, or insufficient permissions.", procedureName));
             }
 
             return procedure;
@@ -83,7 +83,8 @@ namespace Simple.Data.Ado.Schema
 
             if (procedure == null)
             {
-                throw new UnresolvableObjectException(schemaName + '.' + procedureName, "No matching procedure found, or insufficient permissions.");
+                string fullProcedureName = schemaName + '.' + procedureName;
+                throw new UnresolvableObjectException(fullProcedureName, string.Format("Procedure '{0}' not found, or insufficient permissions.", fullProcedureName));
             }
 
             return procedure;

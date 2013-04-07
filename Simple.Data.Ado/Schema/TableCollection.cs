@@ -36,7 +36,7 @@ namespace Simple.Data.Ado.Schema
 
             if (table == null)
             {
-                throw new UnresolvableObjectException(tableName, "No matching table found, or insufficient permissions.");
+                throw new UnresolvableObjectException(tableName, string.Format("Table '{0}' not found, or insufficient permissions.", tableName));
             }
 
             return table;
@@ -66,7 +66,8 @@ namespace Simple.Data.Ado.Schema
 
             if (table == null)
             {
-                throw new UnresolvableObjectException(schemaName + '.' + tableName, "No matching table found, or insufficient permissions.");
+                string fullTableName = schemaName + '.' + tableName;
+                throw new UnresolvableObjectException(fullTableName, string.Format("Table '{0}' not found, or insufficient permissions.", fullTableName));
             }
 
             return table;

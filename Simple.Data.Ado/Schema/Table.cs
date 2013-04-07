@@ -88,7 +88,8 @@ namespace Simple.Data.Ado.Schema
             }
             catch (UnresolvableObjectException ex)
             {
-                throw new UnresolvableObjectException(_actualName + "." + ex.ObjectName, "Column not found", ex);
+                string fullColumnName = _actualName + "." + ex.ObjectName;
+                throw new UnresolvableObjectException(fullColumnName, string.Format("Column '{0}' not found.", fullColumnName), ex);
             }
         }
 
