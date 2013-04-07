@@ -139,7 +139,7 @@
             }
             catch (DbException ex)
             {
-                throw new AdoAdapterException(ex.Message, command);
+                throw new AdoAdapterException(ex.Message, command, ex);
             }
         }
 
@@ -151,7 +151,7 @@
             }
             catch (DbException ex)
             {
-                throw new AdoAdapterException(ex.Message, command);
+                throw new AdoAdapterException(ex.Message, command, ex);
             }
         }
 

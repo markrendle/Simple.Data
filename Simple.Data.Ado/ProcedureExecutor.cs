@@ -61,7 +61,7 @@ namespace Simple.Data.Ado
                 }
                 catch (DbException ex)
                 {
-                    throw new AdoAdapterException(ex.Message, command);
+                    throw new AdoAdapterException(ex.Message, command, ex);
                 }
             }
         }

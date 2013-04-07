@@ -30,7 +30,7 @@ namespace Simple.Data.Ado
         public object FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName)
         {
             var join = TryJoin(tableName, relatedTableName);
-            if (join == null) throw new AdoAdapterException("Could not resolve relationship.");
+            if (join == null) throw new AdoAdapterException(string.Format("Could not resolve relationship of tables '{0}' and '{1}'.", tableName, relatedTableName));
 
             if (join.Master == _adapter.GetSchema().FindTable(tableName))
             {

@@ -185,7 +185,7 @@
                 var table = _adapter.GetSchema().FindTable(query.TableName);
                 if (table.PrimaryKey == null || table.PrimaryKey.Length == 0)
                 {
-                    throw new AdoAdapterException("Cannot apply paging to a table with no primary key.");
+                    throw new AdoAdapterException(string.Format("Cannot apply paging to table '{0}' with no primary key.", table.ActualName));
                 }
                 var keys = table.PrimaryKey.AsEnumerable()
                      .Select(k => string.Format("{0}.{1}", table.QualifiedName, _adapter.GetSchema().QuoteObjectName(k)))
