@@ -148,7 +148,8 @@
                 var queryPager = _adapter.ProviderHelper.GetCustomProvider<IQueryPager>(_adapter.ConnectionProvider);
                 if (queryPager == null)
                 {
-                    Trace.TraceWarning("There is no database-specific query paging in your current Simple.Data Provider. Paging will be done in memory.");
+                    SimpleDataTraceSources.TraceSource.TraceEvent(TraceEventType.Warning, SimpleDataTraceSources.PerformanceWarningMessageId,
+                        "There is no database-specific query paging in your current Simple.Data Provider. Paging will be done in memory.");
                     DeferPaging(ref query, mainCommandBuilder, commandBuilders, unhandledClausesList);
                 }
                 else

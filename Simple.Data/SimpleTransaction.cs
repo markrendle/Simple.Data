@@ -127,7 +127,8 @@ namespace Simple.Data
             }
             catch (Exception ex)
             {
-                Trace.WriteLine("IAdapterTransaction Dispose threw exception: " + ex.Message);
+                SimpleDataTraceSources.TraceSource.TraceEvent(TraceEventType.Error, SimpleDataTraceSources.GenericErrorMessageId,
+                    "IAdapterTransaction Dispose threw exception: {0}", ex.Message);
             }
         }
 

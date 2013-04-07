@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
@@ -8,26 +7,28 @@ using System.Text;
 
 namespace Simple.Data.Ado
 {
-    using System.Security;
-
     public static class TraceHelper
     {
-        public static void WriteTrace(this IDbCommand command)
+        private static readonly string EOL = Environment.NewLine;
+
+        public static void WriteTrace (this IDbCommand command)
         {
-            if (Database.TraceLevel < TraceLevel.Info) return;
+            if (!SimpleDataTraceSources.TraceSource.Switch.Level.HasFlag(SourceLevels.Information))
+                return;
             try
             {
-                var str = new StringBuilder();
-                str.AppendLine();
-                str.AppendLine(command.CommandType.ToString());
-                str.AppendLine(command.CommandText);
-                foreach (var parameter in command.Parameters.OfType<DbParameter>())
+                var sb = new StringBuilder();
+                sb.AppendFormat("SQL command (CommandType={0}):{1}  {2}", command.CommandType, EOL, command.CommandText);
+                if (command.Parameters.Count > 0)
                 {
-                    str.AppendFormat("{0} ({1}) = {2}", parameter.ParameterName, parameter.DbType, parameter.Value);
-                    str.AppendLine();
+                    sb.AppendFormat("Parameters:{0}", EOL);
+                    foreach (var parameter in command.Parameters.OfType<DbParameter>())
+                    {
+                        object strValue = parameter.Value is string ? string.Format("\"{0}\"", parameter.Value) : parameter.Value;
+                        sb.AppendFormat("  {0} ({1}) = {2}{3}", parameter.ParameterName, parameter.DbType, strValue, EOL);
+                    }
                 }
-
-                Trace.WriteLine(str.ToString(), "Simple.Data.Ado");
+                SimpleDataTraceSources.TraceSource.TraceEvent(TraceEventType.Information, SimpleDataTraceSources.SqlMessageId, sb.ToString());
             }
             catch (Exception)
             {
