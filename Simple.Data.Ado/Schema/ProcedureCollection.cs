@@ -56,7 +56,7 @@ namespace Simple.Data.Ado.Schema
             if (procedureName.Contains('.'))
             {
                 var schemaDotprocedure = procedureName.Split('.');
-                if (schemaDotprocedure.Length != 2) throw new InvalidOperationException("Could not resolve qualified procedure name.");
+                if (schemaDotprocedure.Length != 2) throw new InvalidOperationException(string.Format("Could not resolve qualified procedure name '{0}'.", procedureName));
                 return Find(schemaDotprocedure[1], schemaDotprocedure[0]);
             }
             if (!string.IsNullOrWhiteSpace(_defaultSchema))

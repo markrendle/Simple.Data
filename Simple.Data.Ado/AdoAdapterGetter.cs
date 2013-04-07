@@ -35,7 +35,7 @@ namespace Simple.Data.Ado
         public Func<object[],IDictionary<string,object>> CreateGetDelegate(string tableName, params object[] keyValues)
         {
             var primaryKey = _adapter.GetSchema().FindTable(tableName).PrimaryKey;
-            if (primaryKey == null) throw new InvalidOperationException("Table has no primary key.");
+            if (primaryKey == null) throw new InvalidOperationException(string.Format("Table '{0}' has no primary key.", tableName));
             if (primaryKey.Length != keyValues.Length) throw new ArgumentException("Incorrect number of values for key.");
 
 
@@ -107,7 +107,7 @@ namespace Simple.Data.Ado
         public IDictionary<string, object> Get(string tableName, object[] parameterValues)
         {
             var primaryKey = _adapter.GetSchema().FindTable(tableName).PrimaryKey;
-            if (primaryKey == null) throw new InvalidOperationException("Table has no primary key.");
+            if (primaryKey == null) throw new InvalidOperationException(string.Format("Table '{0}' has no primary key.", tableName));
             if (primaryKey.Length != parameterValues.Length) throw new ArgumentException("Incorrect number of values for key.");
 
 

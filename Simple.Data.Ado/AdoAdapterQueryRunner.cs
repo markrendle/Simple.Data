@@ -83,10 +83,10 @@
             {
                 withCountClause = query.Clauses.OfType<WithCountClause>().First();
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
                 // Rethrow with meaning.
-                throw new InvalidOperationException("No WithCountClause specified.");
+                throw new InvalidOperationException("No WithCountClause specified.", e);
             }
 
             query = query.ClearWithTotalCount();

@@ -22,7 +22,7 @@ namespace Simple.Data.QueryPolyfills
             if (value is byte) return (byte)value + 1;
             if (value is sbyte) return (sbyte)value + 1;
 
-            throw new ArgumentException("Cannot increment object type.");
+            throw new ArgumentException(string.Format("Cannot increment object of type '{0}'.", value.GetType().FullName));
         }
 
         public static object Add(object value1, object value2)
@@ -43,11 +43,13 @@ namespace Simple.Data.QueryPolyfills
             if (value1 is byte) return (byte)value1 + (byte)value2;
             if (value1 is sbyte) return (sbyte)value1 + (sbyte)value2;
 
-            throw new ArgumentException("Cannot add object types.");
+            throw new ArgumentException(string.Format("Cannot add object of types '{0}' and '{1}'.", value1.GetType().FullName, value2.GetType().FullName));
         }
 
         public static object Divide(object value, int divisor)
         {
+            if (ReferenceEquals(value, null)) throw new ArgumentNullException("value");
+
             if (value is long) return (long)value / divisor;
             if (value is int) return (int)value / divisor;
             if (value is short) return (short)value / divisor;
@@ -60,7 +62,7 @@ namespace Simple.Data.QueryPolyfills
             if (value is byte) return (byte)value / divisor;
             if (value is sbyte) return (sbyte)value / divisor;
 
-            throw new ArgumentException("Cannot divide object type.");
+            throw new ArgumentException(string.Format("Cannot divide object of type '{0}'.", value.GetType()));
         }
     }
 }

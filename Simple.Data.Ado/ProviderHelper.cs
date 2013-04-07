@@ -68,7 +68,7 @@ namespace Simple.Data.Ado
         {
             var extension = Path.GetExtension(filename);
 
-            if (extension == null) throw new ArgumentException("Unrecognised file.");
+            if (extension == null) throw new ArgumentException(string.Format("Unrecognised file name '{0}': no extension.", filename), "filename");
             return extension.TrimStart('.').ToLower();
         }
 
@@ -111,7 +111,7 @@ namespace Simple.Data.Ado
             provider = ComposeProvider(token.ProviderName);
             if (provider == null)
             {
-                throw new InvalidOperationException("Provider could not be resolved.");
+                throw new InvalidOperationException(string.Format("Provider '{0}' could not be resolved.", token.ProviderName));
             }
 
             provider.SetConnectionString(token.ConnectionString);
