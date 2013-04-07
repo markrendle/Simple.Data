@@ -78,7 +78,7 @@ namespace Simple.Data.IntegrationTest
         class EntityPluralizer : IPluralizer
         {
             private readonly PluralizationService _pluralizationService =
-                PluralizationService.CreateService(CultureInfo.CurrentCulture);
+                PluralizationService.CreateService(CultureInfo.GetCultureInfo("en-us")); // only English is supported
 
             public bool IsPlural(string word)
             {
