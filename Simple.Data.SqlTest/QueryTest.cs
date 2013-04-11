@@ -347,6 +347,20 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void FindAllWithClauseWithNestedDetailTable()
+        {
+            var db = DatabaseHelper.Open();
+            var result = db.Customers.FindAllByCustomerId(1).With(db.Customers.Orders).With(db.Customers.Orders.OrderItems).FirstOrDefault() as IDictionary<string, object>;
+            Assert.IsNotNull(result);
+            Assert.Contains("Orders", result.Keys.ToArray());
+            var orders = result["Orders"] as IList<IDictionary<string, object>>;
+            Assert.IsNotNull(orders);
+            Assert.AreEqual(1, orders.Count);
+            var order = orders[0];
+            Assert.Contains("OrderItems", order.Keys.ToArray());
+        }
+
+        [Test]
         public void GetWithClauseWithJoinCriteriaShouldPreselectDetailTableAsCollection()
         {
             var db = DatabaseHelper.Open();

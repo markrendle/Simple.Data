@@ -50,6 +50,7 @@ namespace Simple.Data.Commands
             if (dict == null) throw new InvalidOperationException("Could not resolve data from passed object.");
             var key = dataStrategy.GetAdapter().GetKey(table.GetQualifiedName(), dict);
             if (key == null) throw new InvalidOperationException(string.Format("No key columns defined for table \"{0}\"",table.GetQualifiedName()));
+            if (key.Count == 0) return dataStrategy.Run.Insert(table.GetQualifiedName(), dict, isResultRequired);
             var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), key);
             return dataStrategy.Run.Upsert(table.GetQualifiedName(), dict, criteria, isResultRequired);
         }

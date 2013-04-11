@@ -7,6 +7,8 @@ using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado
 {
+    using Extensions;
+
     [Export("Ado", typeof (Adapter))]
     public partial class AdoAdapter : Adapter, ICloneable
     {
@@ -81,8 +83,10 @@ namespace Simple.Data.Ado
         public override IDictionary<string, object> GetKey(string tableName, IDictionary<string, object> record)
         {
             var homogenizedRecord = new Dictionary<string, object>(record, HomogenizedEqualityComparer.DefaultInstance);
-            return GetKeyNames(tableName).ToDictionary(key => key,
-                                                            key => homogenizedRecord.ContainsKey(key) ? homogenizedRecord[key] : null);
+            return GetKeyNames(tableName)
+                .Select(k => k.Homogenize())
+                .Where(homogenizedRecord.ContainsKey)
+                .ToDictionary(key => key, key => homogenizedRecord[key]);
         }
 
         #region ICloneable Members

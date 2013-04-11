@@ -14,6 +14,7 @@ namespace Simple.Data.IntegrationTest.Query
                                      new[] { "dbo", "Activity", "BASE TABLE" },
                                      new[] { "dbo", "Customer", "BASE TABLE" },
                                      new[] { "dbo", "Order", "BASE TABLE" },
+                                     new[] { "dbo", "Item", "BASE TABLE" },
                                      new[] { "dbo", "Note", "BASE TABLE" },
                                      new[] { "dbo", "Activity_Join", "BASE TABLE" },
                                      new[] { "dbo", "Location", "BASE_TABLE" });
@@ -29,6 +30,9 @@ namespace Simple.Data.IntegrationTest.Query
                                       new[] { "dbo", "Order", "Id" },
                                       new[] { "dbo", "Order", "CustomerId" },
                                       new[] { "dbo", "Order", "Description" },
+                                      new[] { "dbo", "Item", "Id" },
+                                      new[] { "dbo", "Item", "OrderId" },
+                                      new[] { "dbo", "Item", "Description" },
                                       new[] { "dbo", "Note", "Id" },
                                       new[] { "dbo", "Note", "CustomerId" },
                                       new[] { "dbo", "Note", "Text" },
@@ -44,6 +48,7 @@ namespace Simple.Data.IntegrationTest.Query
                                           new object[] {"dbo", "Department", "Id", 0},
                                           new object[] {"dbo", "Customer", "Id", 0},
                                           new object[] {"dbo", "Order", "Id", 0},
+                                          new object[] {"dbo", "Item", "Id", 0},
                                           new object[] {"dbo", "Note", "Id", 0}
                                           );
 
@@ -52,6 +57,7 @@ namespace Simple.Data.IntegrationTest.Query
                 new object[] { "FK_Activity_Join_Activity", "dbo", "Activity_Join", "ID_Activity", "dbo", "Activity", "ID", 0 },
                 new object[] { "FK_Activity_Join_Location", "dbo", "Activity_Join", "ID_Location", "dbo", "Location", "ID", 0 },
                 new object[] { "FK_Order_Customer", "dbo", "Order", "CustomerId", "dbo", "Customer", "Id", 0 },
+                new object[] { "FK_Item_Order", "dbo", "Item", "OrderId", "dbo", "Order", "Id", 0 },
                 new object[] { "FK_Note_Customer", "dbo", "Note", "CustomerId", "dbo", "Customer", "Id", 0 }
                 );
 // ReSharper restore CoVariantArrayConversion
@@ -227,6 +233,22 @@ namespace Simple.Data.IntegrationTest.Query
                                        " left join [dbo].[note] on ([dbo].[customer].[id] = [dbo].[note].[customerid])";
 
             var q = _db.Customers.All().WithOrders().WithNotes();
+            EatException(() => q.ToList());
+
+            GeneratedSqlIs(expectedSql);
+        }
+
+        [Test]
+        public void CustomerWithOrdersWithItems()
+        {
+            const string expectedSql = "select [dbo].[Customer].[Id],[dbo].[Customer].[Name]," +
+                "[dbo].[Order].[Id] AS [__withn__Orders__Id],[dbo].[Order].[CustomerId] AS [__withn__Orders__CustomerId]," +
+                "[dbo].[Order].[Description] AS [__withn__Orders__Description],[dbo].[Item].[Id] AS [__withn__Items__Id]," +
+                "[dbo].[Item].[OrderId] AS [__withn__Items__OrderId],[dbo].[Item].[Description] AS [__withn__Items__Description]" +
+                " from [dbo].[Customer] LEFT JOIN [dbo].[Order] ON ([dbo].[Customer].[Id] = [dbo].[Order].[CustomerId])" +
+                " LEFT JOIN [dbo].[Item] ON ([dbo].[Order].[Id] = [dbo].[Item].[OrderId])";
+
+            var q = _db.Customers.All().With(_db.Customers.Orders).With(_db.Customers.Orders.Items);
             EatException(() => q.ToList());
 
             GeneratedSqlIs(expectedSql);

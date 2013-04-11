@@ -285,6 +285,17 @@ BEGIN
 	END
 	
 	INSERT INTO [dbo].[DecimalTest] ([Value]) VALUES (1.234567)
+
+	IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SchemaTable]') AND type in (N'U'))
+	TRUNCATE TABLE [dbo].[SchemaTable]
+	IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SchemaTable]') AND type in (N'U'))
+	INSERT INTO [dbo].[SchemaTable] VALUES (1, 'Pass')
+
+	IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[test].[SchemaTable]') AND type in (N'U'))
+	TRUNCATE TABLE [test].[SchemaTable]
+	IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[test].[SchemaTable]') AND type in (N'U'))
+	INSERT INTO [test].[SchemaTable] VALUES (2, 'Pass', null)
+
 	COMMIT TRANSACTION
 
 	ALTER TABLE [dbo].[Notes] WITH NOCHECK
@@ -323,11 +334,11 @@ GO
 CREATE SCHEMA [test] AUTHORIZATION [dbo]
 GO
 
-CREATE TABLE [test].[SchemaTable] ([Id] int not null, [Description] nvarchar(100) not null);
+CREATE TABLE [test].[SchemaTable] ([Id] int not null, [Description] nvarchar(100) not null, [Optional] nvarchar(100));
 GO
 CREATE CLUSTERED INDEX [ci_azure_fixup_test_SchemaTable] ON [test].[SchemaTable] ( [Id] ASC)
 GO
-INSERT INTO [test].[SchemaTable] VALUES (2, 'Pass')
+INSERT INTO [test].[SchemaTable] VALUES (2, 'Pass', null)
 GO
 
 CREATE PROCEDURE [dbo].[GetCustomers]
@@ -402,6 +413,13 @@ CREATE FUNCTION [dbo].[VarcharAndReturnInt] (@AValue varchar(50)) RETURNS INT AS
   END
   RETURN 42
 END
+GO
+CREATE TRIGGER [test].trg_schematable_after_insert ON [Simple.Data].[test].[SchemaTable] AFTER INSERT
+AS 
+BEGIN
+	SET NOCOUNT ON;
+	UPDATE [Simple.Data].[test].[SchemaTable] SET [Optional] = 'Modified By Trigger' WHERE [Id] in (select Id from inserted)
+END         
 GO
 CREATE TABLE [dbo].[GroupTestMaster] (
 		[Id]       INT            IDENTITY (1, 1) NOT NULL,

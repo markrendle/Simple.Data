@@ -147,6 +147,14 @@ namespace Simple.Data.QueryPolyfills
 
             if (keys.Length > 2)
             {
+                if (_mainTableName.Contains("."))
+                {
+                    keys = keys.Skip(1).ToArray();
+                    keys[0] = _mainTableName;
+                }
+            }
+            if (keys.Length > 2)
+            {
                 return ResolveSubs(dict, objectReference.GetOwner(), key).ToList();
             }
 

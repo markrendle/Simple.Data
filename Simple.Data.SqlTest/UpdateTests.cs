@@ -156,5 +156,23 @@ namespace Simple.Data.SqlTest
 
             Assert.AreEqual(4, user.Keys.Count);
         }
+
+        [Test]
+        public void TestUpdatingACriteriaColumn()
+        {
+            var db = DatabaseHelper.Open();
+            var user = db.Users.Insert(Age: 42, Name: "Z1", Password: "argh");
+            db.Users.UpdateAll(db.Users.Name == "Z1", Name: "1Z");
+        }
+
+        [Test]
+        public void TestUpdateWithOriginalUsingAnonymousObjects()
+        {
+            var db = DatabaseHelper.Open();
+            var user = db.Users.Insert(Age: 54, Name: "YZ1", Password: "argh");
+            db.Users.Update(new {Name = "2YZ"}, new {Name = "YZ1"});
+            var actual = db.Users.FindById(user.Id);
+            Assert.AreEqual("2YZ", actual.Name);
+        }
     }
 }

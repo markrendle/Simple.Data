@@ -82,9 +82,17 @@
                 IDictionary<string, object> result;
                 try
                 {
-                    var criteria = ExpressionHelper.CriteriaDictionaryToExpression(tableName,
-                                                                               _adapter.GetKey(tableName, row));
-                    result = Upsert(tableName, row, criteria, isResultRequired);
+                    var key = _adapter.GetKey(tableName, row);
+                    if (key.Count == 0)
+                    {
+                        result = new AdoAdapterInserter(_adapter).Insert(tableName, row, isResultRequired);
+                    }
+                    else
+                    {
+                        var criteria = ExpressionHelper.CriteriaDictionaryToExpression(tableName,
+                                                                                       key);
+                        result = Upsert(tableName, row, criteria, isResultRequired);
+                    }
                 }
                 catch (Exception ex)
                 {
