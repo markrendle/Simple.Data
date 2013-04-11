@@ -13,7 +13,26 @@
 
         private readonly Dictionary<string, List<IDictionary<string, object>>> _tables;
 
-        private readonly Dictionary<string, Delegate> _functions = new Dictionary<string, Delegate>(); 
+        [Flags]
+        private enum FunctionFlags
+        {
+            None = 0x00000000,
+            PassThru = 0x00000001
+        }
+
+        private class FunctionInfo
+        {
+            public FunctionInfo(Delegate func, FunctionFlags flags)
+            {
+                Delegate = func;
+                Flags = flags;
+            }
+
+            public Delegate Delegate { get; private set; }
+            public FunctionFlags Flags { get; private set; }
+        }
+
+        private readonly Dictionary<string, FunctionInfo> _functions = new Dictionary<string, FunctionInfo>(); 
 
         private readonly ICollection<JoinInfo> _joins = new Collection<JoinInfo>();
 
@@ -338,32 +357,37 @@
 
         public void AddFunction<TResult>(string functionName, Func<TResult> function)
         {
-            _functions.Add(functionName, function);
+            _functions.Add(functionName, new FunctionInfo(function, FunctionFlags.None));
         }
 
         public void AddFunction<T,TResult>(string functionName, Func<T,TResult> function)
         {
-            _functions.Add(functionName, function);
+            _functions.Add(functionName, new FunctionInfo(function, FunctionFlags.None));
         }
 
         public void AddFunction<T1,T2,TResult>(string functionName, Func<T1,T2,TResult> function)
         {
-            _functions.Add(functionName, function);
+            _functions.Add(functionName, new FunctionInfo(function, FunctionFlags.None));
         }
 
         public void AddFunction<T1,T2,T3,TResult>(string functionName, Func<T1,T2,T3,TResult> function)
         {
-            _functions.Add(functionName, function);
+            _functions.Add(functionName, new FunctionInfo(function, FunctionFlags.None));
         }
 
         public void AddFunction<T1, T2, T3, T4, TResult>(string functionName, Func<T1, T2, T3, T4, TResult> function)
         {
-            _functions.Add(functionName, function);
+            _functions.Add(functionName, new FunctionInfo(function, FunctionFlags.None));
         }
 
         public void AddDelegate(string functionName, Delegate function)
         {
-            _functions.Add(functionName, function);
+            _functions.Add(functionName, new FunctionInfo(function, FunctionFlags.None));
+        }
+
+        public void AddFunction<TResult>(string functionName, Func<IDictionary<string, object>, TResult> function)
+        {
+            _functions.Add(functionName, new FunctionInfo(function, FunctionFlags.PassThru));
         }
 
         public bool IsValidFunction(string functionName)
@@ -374,7 +398,9 @@
         public IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> Execute(string functionName, IDictionary<string, object> parameters)
         {
             if (!_functions.ContainsKey(functionName)) throw new InvalidOperationException("No function found with that name.");
-            var obj = _functions[functionName].DynamicInvoke(parameters.Values.ToArray());
+            var obj = ((_functions[functionName].Flags & FunctionFlags.PassThru) == FunctionFlags.PassThru) ?
+                            _functions[functionName].Delegate.DynamicInvoke(parameters) :
+                            _functions[functionName].Delegate.DynamicInvoke(parameters.Values.ToArray());
 
             var dict = obj as IDictionary<string, object>;
             if (dict != null) return new List<IEnumerable<IDictionary<string, object>>> { new List<IDictionary<string, object>> { dict } };
