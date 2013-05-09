@@ -40,7 +40,7 @@ namespace Simple.Data.Ado
             var procedure = _adapter.GetSchema().FindProcedure(_procedureName);
             if (procedure == null)
             {
-                throw new UnresolvableObjectException(_procedureName.ToString());
+                throw new UnresolvableObjectException(_procedureName.ToString(), string.Format("Procedure '{0}' not found.", _procedureName));
             }
 
             var cn = transaction == null ? _adapter.CreateConnection() : transaction.Connection;
@@ -61,7 +61,7 @@ namespace Simple.Data.Ado
                 }
                 catch (DbException ex)
                 {
-                    throw new AdoAdapterException(ex.Message, command);
+                    throw new AdoAdapterException(ex.Message, command, ex);
                 }
             }
         }
@@ -95,7 +95,7 @@ namespace Simple.Data.Ado
         private static IEnumerable<ResultSet> ExecuteNonQuery(IDbCommand command)
         {
 #if(DEBUG)
-            Trace.TraceInformation("ExecuteNonQuery", "Simple.Data.SqlTest");
+            SimpleDataTraceSources.TraceSource.TraceEvent(TraceEventType.Verbose, SimpleDataTraceSources.DebugMessageId, "Simple.Data.SqlTest ExecuteNonQuery");
 #endif
             command.Connection.OpenIfClosed();
             command.TryExecuteNonQuery();

@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace Simple.Data.Ado
 {
     using System;
@@ -99,7 +101,7 @@ namespace Simple.Data.Ado
                 case MathOperator.Modulo:
                     return _schema.Operators.Modulo;
                 default:
-                    throw new InvalidOperationException("Invalid MathOperator specified.");
+                    throw new InvalidEnumArgumentException("Invalid MathOperator specified.");
             }
         }
 

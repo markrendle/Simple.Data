@@ -87,7 +87,7 @@
         {
             return new AdoAdapterException(ex.Message, command.CommandText,
                                            command.Parameters.Cast<IDbDataParameter>()
-                                               .ToDictionary(p => p.ParameterName, p => p.Value));
+                                               .ToDictionary(p => p.ParameterName, p => p.Value), ex);
         }
 
         internal static void DisposeCommandAndReader(IDbConnection connection, IDbCommand command, IDataReader reader)

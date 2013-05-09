@@ -58,7 +58,7 @@
         public int Update(string tableName, IDictionary<string, object> data, IAdapterTransaction adapterTransaction)
         {
             string[] keyFieldNames = GetKeyNames(tableName).ToArray();
-            if (keyFieldNames.Length == 0) throw new AdoAdapterException("No Primary Key found for implicit update");
+            if (keyFieldNames.Length == 0) throw new AdoAdapterException(string.Format("No primary key found for implicit update of table '{0}'.", tableName));
             return Update(tableName, data, GetCriteria(tableName, keyFieldNames, data), adapterTransaction);
         }
 

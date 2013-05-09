@@ -373,7 +373,7 @@
 
         public IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> Execute(string functionName, IDictionary<string, object> parameters)
         {
-            if (!_functions.ContainsKey(functionName)) throw new InvalidOperationException("No function found with that name.");
+            if (!_functions.ContainsKey(functionName)) throw new InvalidOperationException(string.Format("Function '{0}' not found.", functionName));
             var obj = _functions[functionName].DynamicInvoke(parameters.Values.ToArray());
 
             var dict = obj as IDictionary<string, object>;

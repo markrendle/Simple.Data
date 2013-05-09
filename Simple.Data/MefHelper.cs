@@ -53,7 +53,8 @@ namespace Simple.Data
             }
             catch (ReflectionTypeLoadException ex)
             {
-                Trace.WriteLine(ex.Message);
+                SimpleDataTraceSources.TraceSource.TraceEvent(TraceEventType.Error, SimpleDataTraceSources.GenericErrorMessageId,
+                    "Compose failed: {0}", ex.Message);
                 throw;
             }
         }
@@ -71,15 +72,15 @@ namespace Simple.Data
 
         private static CompositionContainer CreateFolderContainer()
         {
-			var path = GetSimpleDataAssemblyPath ();
+            var path = GetSimpleDataAssemblyPath ();
 
             var assemblyCatalog = new AssemblyCatalog(ThisAssembly);
-			var aggregateCatalog = new AggregateCatalog(assemblyCatalog);
-			foreach (string file in System.IO.Directory.GetFiles(path, "Simple.Data.*.dll"))
-			{
-				var catalog = new AssemblyCatalog(file);
-				aggregateCatalog.Catalogs.Add(catalog);
-			}
+            var aggregateCatalog = new AggregateCatalog(assemblyCatalog);
+            foreach (string file in System.IO.Directory.GetFiles(path, "Simple.Data.*.dll"))
+            {
+                var catalog = new AssemblyCatalog(file);
+                aggregateCatalog.Catalogs.Add(catalog);
+            }
             return new CompositionContainer(aggregateCatalog);
         }
 

@@ -26,7 +26,7 @@ namespace Simple.Data.Ado.Schema
         public Column Find(string columnName)
         {
             var column = FindColumnWithName(columnName);
-            if (column == null) throw new UnresolvableObjectException(columnName);
+            if (column == null) throw new UnresolvableObjectException(columnName, string.Format("Column '{0}' not found.", columnName));
             return column;
         }
 

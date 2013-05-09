@@ -73,9 +73,9 @@ namespace Simple.Data
                         return true;
                     }
                 }
-                catch (UnresolvableObjectException)
+                catch (UnresolvableObjectException e)
                 {
-                    throw new UnresolvableObjectException("Column not found.");
+                    throw new UnresolvableObjectException(e.ObjectName, string.Format("Column '{0}' not found.", e.ObjectName), e);
                 }
             }
             return base.TryGetMember(binder, out result);

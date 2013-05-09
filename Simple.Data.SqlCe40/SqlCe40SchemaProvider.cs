@@ -112,7 +112,7 @@ namespace Simple.Data.SqlCe40
         public string NameParameter(string baseName)
         {
             if (baseName == null) throw new ArgumentNullException("baseName");
-            if (baseName.Length == 0) throw new ArgumentException("Base name must be provided");
+            if (baseName.Length == 0) throw new ArgumentException("Base name must be provided", "baseName");
             return (baseName.StartsWith("@")) ? baseName : "@" + baseName;
         }
 
