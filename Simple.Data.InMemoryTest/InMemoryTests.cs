@@ -250,7 +250,25 @@
             var records = db.Test.All().OrderByIdDescending().ToList();
             Assert.AreEqual(9, records[0].Id);
         }
+	
+	[Test]
+        public void TestOrderByThenBy()
+        {
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
 
+            db.Test.Insert(Id: 3, Company: "B", Name: "Alfred");
+            db.Test.Insert(Id: 2, Company: "A", Name: "Bob");
+            db.Test.Insert(Id: 4, Company: "B", Name: "Steve");
+            db.Test.Insert(Id: 1, Company: "A", Name: "Alice");
+
+            var records = db.Test.All().OrderByCompany().ThenByName().ToList();
+            Assert.AreEqual("Alice", records[0].Name);
+            Assert.AreEqual("Bob", records[1].Name);
+            Assert.AreEqual("Alfred", records[2].Name);
+            Assert.AreEqual("Steve", records[3].Name);
+        }
+	
         [Test]
         public void TestSkip()
         {

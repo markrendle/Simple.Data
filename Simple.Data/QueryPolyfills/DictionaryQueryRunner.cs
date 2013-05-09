@@ -1,4 +1,4 @@
-﻿namespace Simple.Data.QueryPolyfills
+namespace Simple.Data.QueryPolyfills
 {
     using System;
     using System.Collections.Generic;
@@ -13,8 +13,7 @@
                     {
                         { typeof(DistinctClause), (c,d) => d.Distinct(new DictionaryEqualityComparer()) },
                         { typeof(SkipClause), (c,d) => d.Skip(((SkipClause)c).Count) },
-                        { typeof(TakeClause), (c,d) => d.Take(((TakeClause)c).Count) },
-                        { typeof(OrderByClause), (c, d) => new OrderByClauseHandler((OrderByClause)c).Run(d) }
+                        { typeof(TakeClause), (c,d) => d.Take(((TakeClause)c).Count) }
                     };
 
         private readonly string _mainTableName;
@@ -47,6 +46,8 @@
                 source = list;
             }
 
+            source = RunOrderByClauses(source);
+
             foreach (var clause in _clauses)
             {
                 Func<SimpleQueryClauseBase, IEnumerable<IDictionary<string, object>>, IEnumerable<IDictionary<string, object>>> handler;
@@ -55,9 +56,19 @@
                     source = handler(clause, source);
                 }
             }
-
+            
             source = RunHavingClauses(source);
             source = RunSelectClauses(source);
+            return source;
+        }
+
+        private IEnumerable<IDictionary<string, object>> RunOrderByClauses(IEnumerable<IDictionary<string, object>> source)
+        {
+            var orderByClauses = _clauses.OfType<OrderByClause>().Reverse();
+            foreach (var orderByClause in orderByClauses)
+            {
+                source = new OrderByClauseHandler(orderByClause).Run(source);
+            }
             return source;
         }
 
