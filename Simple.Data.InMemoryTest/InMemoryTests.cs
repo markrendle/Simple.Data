@@ -657,6 +657,23 @@
         }
 
         [Test]
+        public void CanSimulateProcedureWithOutputParameters()
+        {
+            const string key = "outparam";
+            const string value = "outParamValue";
+            var adapter = new InMemoryAdapter();
+            adapter.AddFunction("Test", p =>
+                {
+                    p.Add(key, value);
+                    return p;
+                });
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            var result = db.Test();
+            Assert.That(result.OutputValues[key], Is.EqualTo(value));
+        }
+
+        [Test]
         public void UpsertShouldAddNewRecord()
         {
             var adapter = new InMemoryAdapter();
