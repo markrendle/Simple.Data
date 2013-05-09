@@ -414,11 +414,11 @@ CREATE FUNCTION [dbo].[VarcharAndReturnInt] (@AValue varchar(50)) RETURNS INT AS
   RETURN 42
 END
 GO
-CREATE TRIGGER [test].trg_schematable_after_insert ON [Simple.Data].[test].[SchemaTable] AFTER INSERT
+CREATE TRIGGER [test].trg_schematable_after_insert ON [test].[SchemaTable] AFTER INSERT
 AS 
 BEGIN
 	SET NOCOUNT ON;
-	UPDATE [Simple.Data].[test].[SchemaTable] SET [Optional] = 'Modified By Trigger' WHERE [Id] in (select Id from inserted)
+	UPDATE [test].[SchemaTable] SET [Optional] = 'Modified By Trigger' WHERE [Id] in (select Id from inserted)
 END         
 GO
 CREATE TABLE [dbo].[GroupTestMaster] (

@@ -346,7 +346,7 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, orderItems.Count);
         }
 
-        [Test]
+        [Test, Ignore]
         public void FindAllWithClauseWithNestedDetailTable()
         {
             var db = DatabaseHelper.Open();
