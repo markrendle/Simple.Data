@@ -83,10 +83,10 @@
             {
                 withCountClause = query.Clauses.OfType<WithCountClause>().First();
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
                 // Rethrow with meaning.
-                throw new InvalidOperationException("No WithCountClause specified.");
+                throw new InvalidOperationException("No WithCountClause specified.", e);
             }
 
             query = query.ClearWithTotalCount();
@@ -148,7 +148,8 @@
                 var queryPager = _adapter.ProviderHelper.GetCustomProvider<IQueryPager>(_adapter.ConnectionProvider);
                 if (queryPager == null)
                 {
-                    Trace.TraceWarning("There is no database-specific query paging in your current Simple.Data Provider. Paging will be done in memory.");
+                    SimpleDataTraceSources.TraceSource.TraceEvent(TraceEventType.Warning, SimpleDataTraceSources.PerformanceWarningMessageId,
+                        "There is no database-specific query paging in your current Simple.Data Provider. Paging will be done in memory.");
                     DeferPaging(ref query, mainCommandBuilder, commandBuilders, unhandledClausesList);
                 }
                 else
@@ -184,7 +185,7 @@
                 var table = _adapter.GetSchema().FindTable(query.TableName);
                 if (table.PrimaryKey == null || table.PrimaryKey.Length == 0)
                 {
-                    throw new AdoAdapterException("Cannot apply paging to a table with no primary key.");
+                    throw new AdoAdapterException(string.Format("Cannot apply paging to table '{0}' with no primary key.", table.ActualName));
                 }
                 var keys = table.PrimaryKey.AsEnumerable()
                      .Select(k => string.Format("{0}.{1}", table.QualifiedName, _adapter.GetSchema().QuoteObjectName(k)))

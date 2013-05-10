@@ -111,7 +111,7 @@ namespace Simple.Data.Ado
 
             if (foreignKey == null)
                 throw new SchemaResolutionException(
-                    string.Format("Could not join '{0}' and '{1}'", table1.ActualName, table2.ActualName));
+                    string.Format("Could not join tables '{0}' and '{1}', foreign key not found.", table1.ActualName, table2.ActualName));
             return foreignKey;
         }
 

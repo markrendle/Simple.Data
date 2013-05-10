@@ -33,7 +33,7 @@ namespace Simple.Data.Ado.Schema
 
             if (procedure == null)
             {
-                throw new UnresolvableObjectException(procedureName, "No matching procedure found, or insufficient permissions.");
+                throw new UnresolvableObjectException(procedureName, string.Format("Procedure '{0}' not found, or insufficient permissions.", procedureName));
             }
 
             return procedure;
@@ -56,7 +56,7 @@ namespace Simple.Data.Ado.Schema
             if (procedureName.Contains('.'))
             {
                 var schemaDotprocedure = procedureName.Split('.');
-                if (schemaDotprocedure.Length != 2) throw new InvalidOperationException("Could not resolve qualified procedure name.");
+                if (schemaDotprocedure.Length != 2) throw new InvalidOperationException(string.Format("Could not resolve qualified procedure name '{0}'.", procedureName));
                 return Find(schemaDotprocedure[1], schemaDotprocedure[0]);
             }
             if (!string.IsNullOrWhiteSpace(_defaultSchema))
@@ -83,7 +83,8 @@ namespace Simple.Data.Ado.Schema
 
             if (procedure == null)
             {
-                throw new UnresolvableObjectException(schemaName + '.' + procedureName, "No matching procedure found, or insufficient permissions.");
+                string fullProcedureName = schemaName + '.' + procedureName;
+                throw new UnresolvableObjectException(fullProcedureName, string.Format("Procedure '{0}' not found, or insufficient permissions.", fullProcedureName));
             }
 
             return procedure;

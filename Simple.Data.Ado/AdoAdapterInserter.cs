@@ -98,7 +98,7 @@ namespace Simple.Data.Ado
 
             if (!data.Any())
             {
-                throw new SimpleDataException("No properties were found which could be mapped to the database.");
+                throw new SimpleDataException(string.Format("No properties were found which could be mapped to table '{0}'.", table.ActualName));
             }
         }
 

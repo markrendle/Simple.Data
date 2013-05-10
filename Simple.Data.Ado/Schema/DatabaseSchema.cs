@@ -139,7 +139,7 @@ namespace Simple.Data.Ado.Schema
             if (text == null) throw new ArgumentNullException("text");
             if (!text.Contains('.')) return new ObjectName(this.DefaultSchema, text);
             var schemaDotTable = text.Split('.');
-            if (schemaDotTable.Length != 2) throw new InvalidOperationException("Could not parse table name.");
+            if (schemaDotTable.Length != 2) throw new InvalidOperationException(string.Format("Could not parse table name '{0}'.", text));
             return new ObjectName(schemaDotTable[0], schemaDotTable[1]);
         }
 

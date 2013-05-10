@@ -137,6 +137,7 @@
     <Compile Include="RunStrategy.cs" />
     <Compile Include="SelectClause.cs" />
     <Compile Include="SimpleDataConfigurationSection.cs" />
+    <Compile Include="SimpleDataTraceSources.cs" />
     <Compile Include="SimpleEmptyExpression.cs" />
     <Compile Include="SimpleFunction.cs" />
     <Compile Include="SimpleList.cs" />

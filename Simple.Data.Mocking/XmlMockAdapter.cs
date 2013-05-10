@@ -144,7 +144,7 @@ namespace Simple.Data.Mocking
         private XElement GetTableElement(string tableName)
         {
             XElement tableElement = Data.Element(tableName);
-            if (tableElement == null) throw new UnresolvableObjectException(tableName);
+            if (tableElement == null) throw new UnresolvableObjectException(tableName, string.Format("Table '{0}' not found.", tableName));
             return tableElement;
         }
 

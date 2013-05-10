@@ -144,9 +144,10 @@ namespace Simple.Data.Ado
                 {
                     command.Prepare();
                 }
-                catch (InvalidOperationException)
+                catch (InvalidOperationException e)
                 {
-                    Trace.TraceWarning("Could not prepare command.");
+                    SimpleDataTraceSources.TraceSource.TraceEvent(TraceEventType.Warning, SimpleDataTraceSources.GenericWarningMessageId,
+                        "Could not prepare command: {0}", e.Message);
                 }
             }
         }

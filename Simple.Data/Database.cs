@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Threading;
+using System.Configuration;
+using System.Data;
+using System.Diagnostics;
+using Simple.Data.Commands;
+using Simple.Data.Extensions;
 
 namespace Simple.Data
 {
-    using System.Configuration;
-    using System.Data;
-    using System.Diagnostics;
-
     /// <summary>
     /// The entry class for Simple.Data. Provides static methods for opening databases,
     /// and implements runtime dynamic functionality for resolving database-level objects.
@@ -20,28 +17,66 @@ namespace Simple.Data
 
         private static readonly IDatabaseOpener DatabaseOpener;
         private static IPluralizer _pluralizer;
+        private static bool _loadedConfig;
         private readonly Adapter _adapter;
         private readonly DatabaseRunner _databaseRunner;
 
         static Database()
         {
             DatabaseOpener = new DatabaseOpener();
-            LoadTraceLevelFromConfig();
         }
 
-        private static void LoadTraceLevelFromConfig()
+        private static void EnsureLoadedTraceLevelFromConfig()
         {
-            _configuration =
-                (SimpleDataConfigurationSection) ConfigurationManager.GetSection("simpleData/simpleDataConfiguration");
+            if (_loadedConfig)
+                return;
+            _loadedConfig = true;
+            _configuration = (SimpleDataConfigurationSection)ConfigurationManager.GetSection("simpleData/simpleDataConfiguration");
             if (_configuration != null)
             {
-                Trace.TraceWarning("SimpleDataConfiguration section is obsolete; use system.diagnostics switches instead.");
-                TraceLevel = _configuration.TraceLevel;
+                SimpleDataTraceSources.TraceSource.TraceEvent(TraceEventType.Warning, SimpleDataTraceSources.ObsoleteWarningMessageId,
+                    "SimpleDataConfiguration section is obsolete; use system.diagnostics switches instead.");
+                SimpleDataTraceSources.TraceSource.Switch.Level = TraceLevelToSourceLevels(_configuration.TraceLevel);
             }
-            else
+        }
+
+        private static SourceLevels TraceLevelToSourceLevels(TraceLevel traceLevel)
+        {
+            switch (traceLevel)
             {
-                var traceSwitch = new TraceSwitch("Simple.Data", "", TraceLevel.Info.ToString());
-                TraceLevel = traceSwitch.Level;
+                case TraceLevel.Off:
+                    return SourceLevels.Off;
+                case TraceLevel.Error:
+                    return SourceLevels.Error;
+                case TraceLevel.Warning:
+                    return SourceLevels.Warning;
+                case TraceLevel.Info:
+                    return SourceLevels.Information;
+                case TraceLevel.Verbose:
+                    return SourceLevels.Verbose;
+                default:
+                    throw new ArgumentOutOfRangeException("traceLevel");
+            }
+        }
+
+        private static TraceLevel SourceLevelsToTraceLevel(SourceLevels sourceLevels)
+        {
+            switch (sourceLevels)
+            {
+                case SourceLevels.Off:
+                    return TraceLevel.Off;
+                case SourceLevels.Critical:
+                case SourceLevels.Error:
+                    return TraceLevel.Error;
+                case SourceLevels.Warning:
+                    return TraceLevel.Warning;
+                case SourceLevels.Information:
+                    return TraceLevel.Info;
+                case SourceLevels.Verbose:
+                case SourceLevels.All:
+                    return TraceLevel.Verbose;
+                default:
+                    return TraceLevel.Off; // happens if SourceLevel is assigned and TraceLevel is read, which is very unlikely
             }
         }
 
@@ -96,7 +131,7 @@ namespace Simple.Data
             return SimpleTransaction.Begin(this, isolationLevel);
         }
 
-        protected internal override bool ExecuteFunction(out object result, Commands.ExecuteFunctionCommand command)
+        protected internal override bool ExecuteFunction(out object result, ExecuteFunctionCommand command)
         {
             return command.Execute(out result);
         }
@@ -114,7 +149,7 @@ namespace Simple.Data
         public static void SetPluralizer(IPluralizer pluralizer)
         {
             _pluralizer = pluralizer;
-            Extensions.StringExtensions.SetPluralizer(pluralizer);
+            StringExtensions.SetPluralizer(pluralizer);
         }
 
         public static void ClearAdapterCache()
@@ -137,11 +172,15 @@ namespace Simple.Data
             Data.DatabaseOpener.StopUsingMock();
         }
 
-        private static TraceLevel? _traceLevel;
+        [Obsolete("Use SimpleDataTraceSources.TraceSource.Switch.Level instead.")]
         public static TraceLevel TraceLevel
         {
-            get { return _traceLevel ?? _configuration.TraceLevel; }
-            set { _traceLevel = value; }
+            get
+            {
+                EnsureLoadedTraceLevelFromConfig();
+                return SourceLevelsToTraceLevel(SimpleDataTraceSources.TraceSource.Switch.Level);
+            }
+            set { SimpleDataTraceSources.TraceSource.Switch.Level = TraceLevelToSourceLevels(value); }
         }
 
         internal override RunStrategy Run

@@ -129,7 +129,8 @@ namespace Simple.Data
         {
             if (binder.Name == "All")
             {
-                Trace.WriteLine("The dynamic 'All' property is deprecated; use the 'All()' method instead.");
+                SimpleDataTraceSources.TraceSource.TraceEvent(TraceEventType.Warning, SimpleDataTraceSources.ObsoleteWarningMessageId,
+                    "The dynamic 'All' property is deprecated; use the 'All()' method instead.");
                 result = GetAll().ToList();
                 return true;
             }
