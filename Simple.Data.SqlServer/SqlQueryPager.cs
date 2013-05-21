@@ -11,7 +11,7 @@ namespace Simple.Data.SqlServer
     [Export(typeof(IQueryPager))]
     public class SqlQueryPager : IQueryPager
     {
-        private static readonly Regex ColumnExtract = new Regex(@"SELECT\s*(.*)\s*(FROM.*)", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+        private static readonly Regex ColumnExtract = new Regex(@"SELECT\s*(.*)\s*(\sFROM.*)", RegexOptions.Multiline | RegexOptions.IgnoreCase);
         private static readonly Regex SelectMatch = new Regex(@"^SELECT\s*(DISTINCT)?", RegexOptions.IgnoreCase);
 
         public IEnumerable<string> ApplyLimit(string sql, int take)
@@ -21,6 +21,7 @@ namespace Simple.Data.SqlServer
 
         public IEnumerable<string> ApplyPaging(string sql, string[] keys, int skip, int take)
         {
+            sql = sql.Replace(Environment.NewLine, " ");
             var builder = new StringBuilder("WITH __Data AS (SELECT ");
 
             var match = ColumnExtract.Match(sql);

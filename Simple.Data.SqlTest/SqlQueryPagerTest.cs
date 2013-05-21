@@ -78,5 +78,20 @@ namespace Simple.Data.SqlTest
 
             Assert.AreEqual(expected[0], modified[0]);
         }
+
+        [Test]
+        public void ShouldCopeWithColumnsThatEndInFrom()
+        {
+            const string sql = @"SELECT [dbo].[PromoPosts].[Id],[dbo].[PromoPosts].[ActiveFrom],[dbo].[PromoPosts].[ActiveTo],[dbo].[PromoPosts].[Created],[dbo].[PromoPosts].[Updated] 
+    from [dbo].[PromoPosts] 
+    ORDER BY [dbo].[PromoPosts].[ActiveFrom]";
+
+            var expected = @"WITH __Data AS (SELECT [dbo].[PromoPosts].[Id],[dbo].[PromoPosts].[ActiveFrom],[dbo].[PromoPosts].[ActiveTo],[dbo].[PromoPosts].[Created],[dbo].[PromoPosts].[Updated],ROW_NUMBER() OVER(ORDER BY [dbo].[PromoPosts].[ActiveFrom]) AS [_#_] from [dbo].[PromoPosts]) SELECT [Id],[ActiveFrom],[ActiveTo],[Created],[Updated] FROM __Data WHERE [_#_] BETWEEN 1 AND 25";
+            expected = expected.ToLowerInvariant();
+
+            var pagedSql = new SqlQueryPager().ApplyPaging(sql, new[] {"[dbo].[PromoPosts].[Id]"}, 0, 25).Single();
+            var modified = Normalize.Replace(pagedSql, " ").ToLowerInvariant();
+            Assert.AreEqual(expected, modified);
+        }
     }
 }
