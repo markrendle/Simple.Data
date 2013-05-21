@@ -112,6 +112,11 @@ namespace Simple.Data.Ado
                     if (_reader == null) return false;
                 }
 
+                if (_reader.IsClosed)
+                {
+                    return false;
+                }
+
                 return _reader.Read() ? SetCurrent() : EndRead();
             }
 
