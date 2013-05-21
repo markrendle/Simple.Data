@@ -270,7 +270,7 @@
 
         private void ThrowIfNoOrderByClause(string message)
         {
-            if (!_clauses.OfType<OrderByClause>().Any())
+            if (_clauses == null || !_clauses.OfType<OrderByClause>().Any())
             {
                 throw new InvalidOperationException(message);
             }
@@ -278,12 +278,7 @@
 
         public SimpleQuery ThenByDescending(ObjectReference reference)
         {
-            if (!_clauses.OfType<OrderByClause>().Any())
-            {
-                throw new InvalidOperationException("ThenBy requires an existing OrderBy");
-            }
-
-            return new SimpleQuery(this, _clauses.Append(new OrderByClause(reference, OrderByDirection.Descending)));
+            return ThenBy(reference, OrderByDirection.Descending);
         }
 
         public SimpleQuery Skip(int skip)
@@ -686,6 +681,7 @@
 
         private SimpleQuery ParseThenBy(string methodName)
         {
+            ThrowIfNoOrderByClause("Must call OrderBy before ThenBy");
             methodName = Regex.Replace(methodName, "^then_?by_?", "", RegexOptions.IgnoreCase);
             if (methodName.EndsWith("descending", StringComparison.OrdinalIgnoreCase))
             {
