@@ -369,16 +369,21 @@
             }
             if (binder.Name.Equals("having", StringComparison.OrdinalIgnoreCase))
             {
-                var expression = args.SingleOrDefault() as SimpleExpression;
+                SimpleExpression expression;
+                try
+                {
+                    expression = args.SingleOrDefault() as SimpleExpression;
+                }
+                catch (InvalidOperationException)
+                {
+                    throw new ArgumentException("Having requires an expression");
+                }
                 if (expression != null)
                 {
                     result = new SimpleQuery(this, _clauses.Append(new HavingClause(expression)));
                     return true;
                 }
-                else
-                {
-                    throw new ArgumentException("Having requires an expression");
-                }
+                throw new ArgumentException("Having requires an expression");
             }
             if (binder.Name.StartsWith("with", StringComparison.OrdinalIgnoreCase) && !binder.Name.Equals("WithTotalCount", StringComparison.OrdinalIgnoreCase))
             {
