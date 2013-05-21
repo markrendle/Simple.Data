@@ -458,6 +458,10 @@
             }
 
             var objectName = binder.Name.Substring(4);
+            if (string.IsNullOrWhiteSpace(objectName))
+            {
+                throw new ArgumentException("With requires a Table reference");
+            }
             var withClause = new WithClause(new ObjectReference(objectName, new ObjectReference(_tableName, _dataStrategy), _dataStrategy));
             return new SimpleQuery(this, _clauses.Append(withClause));
         }
