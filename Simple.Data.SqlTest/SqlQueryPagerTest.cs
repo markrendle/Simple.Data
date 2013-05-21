@@ -93,5 +93,24 @@ namespace Simple.Data.SqlTest
             var modified = Normalize.Replace(pagedSql, " ").ToLowerInvariant();
             Assert.AreEqual(expected, modified);
         }
+
+        [Test]
+        public void ShouldExcludeLeftJoinedTablesFromSubSelect()
+        {
+            const string sql = @"SELECT [dbo].[MainClass].[ID],
+    [dbo].[MainClass].[SomeProperty],
+    [dbo].[MainClass].[SomeProperty2],
+    [dbo].[MainClass].[SomeProperty3],
+    [dbo].[MainClass].[SomeProperty4],
+    [dbo].[ChildClass].[ID] AS [__withn__ChildClass__ID],
+    [dbo].[ChildClass].[SomeProperty] AS [__withn__ChildClass__SomeProperty],
+    [dbo].[ChildClass].[SomeProperty2] AS [__withn__ChildClass__SomeProperty2] FROM [dbo].[MainClass] LEFT JOIN [dbo].[JoinTable] ON ([dbo].[MainClass].[ID] = [dbo].[JoinTable].[MainClassID]) LEFT JOIN [dbo].[ChildClass] ON ([dbo].[ChildClass].[ID] = [dbo].[JoinTable].[ChildClassID]) WHERE ([dbo].[MainClass].[SomeProperty] > @p1 AND [dbo].[MainClass].[SomeProperty] <= @p2)";
+
+            const string expected = @"with __data as (select [dbo].[promoposts].[id], row_number() over(order by [dbo].[promoposts].[id]) as [_#_] from [dbo].[mainclass] where ([dbo].[mainclass].[someproperty] > @p1 and [dbo].[mainclass].[someproperty] <= @p2)) select [dbo].[mainclass].[id], [dbo].[mainclass].[someproperty], [dbo].[mainclass].[someproperty2], [dbo].[mainclass].[someproperty3], [dbo].[mainclass].[someproperty4], [dbo].[childclass].[id] as [__withn__childclass__id], [dbo].[childclass].[someproperty] as [__withn__childclass__someproperty], [dbo].[childclass].[someproperty2] as [__withn__childclass__someproperty2] from __data join [dbo].[promoposts] on [dbo].[promoposts].[id] = __data.[id]from [dbo].[mainclass] left join [dbo].[jointable] on ([dbo].[mainclass].[id] = [dbo].[jointable].[mainclassid]) left join [dbo].[childclass] on ([dbo].[childclass].[id] = [dbo].[jointable].[childclassid]) where ([dbo].[mainclass].[someproperty] > @p1 and [dbo].[mainclass].[someproperty] <= @p2) and [_#_] between 1 and 25";
+
+            var pagedSql = new SqlQueryPager().ApplyPaging(sql, new[] {"[dbo].[PromoPosts].[Id]"}, 0, 25).Single();
+            var modified = Normalize.Replace(pagedSql, " ").ToLowerInvariant();
+            Assert.AreEqual(expected, modified);
+        }
     }
 }

@@ -13,6 +13,7 @@ namespace Simple.Data.SqlServer
     {
         private static readonly Regex ColumnExtract = new Regex(@"SELECT\s*(.*)\s*(\sFROM.*)", RegexOptions.Multiline | RegexOptions.IgnoreCase);
         private static readonly Regex SelectMatch = new Regex(@"^SELECT\s*(DISTINCT)?", RegexOptions.IgnoreCase);
+        private static readonly Regex LeftJoinMatch = new Regex(@"\sLEFT JOIN .*? ON \(.*?\)", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
         public IEnumerable<string> ApplyLimit(string sql, int take)
         {
@@ -34,7 +35,7 @@ namespace Simple.Data.SqlServer
 
             builder.AppendFormat(", ROW_NUMBER() OVER({0}) AS [_#_]", orderBy);
             builder.AppendLine();
-            builder.Append(fromEtc);
+            builder.Append(LeftJoinMatch.Replace(fromEtc, ""));
             builder.AppendLine(")");
             builder.AppendFormat("SELECT {0} FROM __Data ", columns);
             builder.AppendFormat("JOIN {0} ON ",
