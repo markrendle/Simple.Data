@@ -375,6 +375,10 @@
                     result = new SimpleQuery(this, _clauses.Append(new HavingClause(expression)));
                     return true;
                 }
+                else
+                {
+                    throw new ArgumentException("Having requires an expression");
+                }
             }
             if (binder.Name.StartsWith("with", StringComparison.OrdinalIgnoreCase) && !binder.Name.Equals("WithTotalCount", StringComparison.OrdinalIgnoreCase))
             {
