@@ -345,6 +345,10 @@
             }
             if (binder.Name.StartsWith("then", StringComparison.OrdinalIgnoreCase))
             {
+                if (args.Length != 0)
+                {
+                    throw new ArgumentException("ThenByColumn form does not accept parameters");
+                }
                 result = ParseThenBy(binder.Name);
                 return true;
             }
