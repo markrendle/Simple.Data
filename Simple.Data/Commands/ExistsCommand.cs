@@ -29,9 +29,21 @@ namespace Simple.Data.Commands
         {
             var query = new SimpleQuery(dataStrategy, table.GetQualifiedName());
 
-            if (args.Length == 1 && args[0] is SimpleExpression)
+            if (args.Length == 1)
             {
-                query = query.Where((SimpleExpression)args[0]);
+                var criteria = args[0] as SimpleExpression;
+                if (criteria != null)
+                {
+                    query = query.Where(criteria);
+                }
+                else
+                {
+                    throw new BadExpressionException(binder.Name + " requires an expression.");
+                }
+            }
+            else if (args.Length != 0)
+            {
+                throw new BadExpressionException(binder.Name + " requires an expression.");
             }
 
             return query.Exists();

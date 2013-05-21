@@ -25,6 +25,13 @@
         }
 
         [Test]
+        public void QueryCountBasic()
+        {
+            EatException<SimpleDataException>(() => _db.Users.All().Count());
+            GeneratedSqlIs("select count(*) from [dbo].[users]");
+        }
+
+        [Test]
         public void GetCountByBasic()
         {
             EatException<SimpleDataException>(() => _db.Users.GetCountByAge(42));

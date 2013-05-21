@@ -293,7 +293,7 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void PassingTablesWrongWayRoundThrowsBadExpressionException()
         {
-            Assert.Throws<BadExpressionException>(
+            Assert.Throws<BadJoinExpressionException>(
                 () => _db.Activity.All().Join(_db.Activity, LocationId: _db.Location.ID_Location));
         }
 
