@@ -137,10 +137,17 @@ namespace Simple.Data
 
                 // Or it could be a schema reference...
                 var schema = new DynamicSchema(_name, _dataStrategy);
-                if (schema.TryInvokeMember(binder, args, out result))
+                try
                 {
-                    _dataStrategy.SetMemberAsSchema(this); 
-                    return true;
+                    if (schema.TryInvokeMember(binder, args, out result))
+                    {
+                        _dataStrategy.SetMemberAsSchema(this);
+                        return true;
+                    }
+                }
+                catch (KeyNotFoundException)
+                {
+                    throw new InvalidOperationException(string.Format("Method {0} not recognised", binder.Name));
                 }
             }
 
