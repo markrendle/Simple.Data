@@ -42,7 +42,7 @@ namespace Simple.Data.SqlServer
             if (keys.Length > 1)
                 builder.AppendFormat(string.Join(" AND ", keys.Select(MakeDataJoin)));
             else
-                builder.AppendFormat(string.Join(" ", keys.Select(MakeDataJoin)));
+                builder.AppendFormat(MakeDataJoin(keys[0]));
             var rest = Regex.Replace(fromEtc, @"^from (\[.*?\]\.\[.*?\])", @"");
             builder.Append(rest);
             
