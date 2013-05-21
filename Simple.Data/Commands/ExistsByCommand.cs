@@ -30,7 +30,10 @@ namespace Simple.Data.Commands
         /// <returns></returns>
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), MethodNameParser.ParseFromBinder(binder, args));
+            var criteriaDictionary = ArgumentHelper.CreateCriteriaDictionary(binder, args, "ExistsBy", "exists_by", "AnyBy", "any_by");
+            if (criteriaDictionary == null) return null;
+
+            var criteria  = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), criteriaDictionary);
             return new SimpleQuery(dataStrategy, table.GetQualifiedName()).Where(criteria).Exists();
         }
     }

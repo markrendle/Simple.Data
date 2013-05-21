@@ -532,6 +532,36 @@
             // Assert
             Assert.AreEqual(false, bobExists);
         }
+        
+        [Test]
+        public void ExistsByNameParameterShouldReturnTrueForExistingData()
+        {
+            // Arrange
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            db.Users.Insert(Id: 1, Name: "Bob", Age: 30);
+
+            // Act
+            var bobExists = db.Users.ExistsBy(Name: "Bob");
+
+            // Assert
+            Assert.AreEqual(true, bobExists);
+        }
+
+        [Test]
+        public void ExistsByNameParameterShouldReturnFalseForNonExistingData()
+        {
+            // Arrange
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            db.Users.Insert(Id: 1, Name: "Alice", Age: 30);
+
+            // Act
+            var bobExists = db.Users.ExistsBy(Name: "Bob");
+
+            // Assert
+            Assert.AreEqual(false, bobExists);
+        }
 
         [Test]
         public void BulkInsertWithCallbackShouldWork()
