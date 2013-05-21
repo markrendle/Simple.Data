@@ -455,6 +455,8 @@
                 {
                     return With(args, WithType.Many);
                 }
+
+                throw new ArgumentException("WithTable form does not accept parameters");
             }
 
             var objectName = binder.Name.Substring(4);
