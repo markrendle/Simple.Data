@@ -100,7 +100,9 @@ namespace Simple.Data
                 return true;
             }
 
-            return base.TryInvokeMember(binder, args, out result);
+            if (base.TryInvokeMember(binder, args, out result)) return true;
+
+            throw new InvalidOperationException(string.Format("Method {0} not recognised", binder.Name));
         }
 
         private Func<object[],object> CreateMemberDelegate(string signature, InvokeMemberBinder binder, object[] args)

@@ -119,10 +119,20 @@ namespace Simple.Data
             if (_dataStrategy != null)
             {
                 var table = new DynamicTable(_name, _dataStrategy);
-                if (table.TryInvokeMember(binder, args, out result))
+                try
                 {
-                    _dataStrategy.SetMemberAsTable(this, table);
-                    return true;
+                    if (table.TryInvokeMember(binder, args, out result))
+                    {
+                        _dataStrategy.SetMemberAsTable(this, table);
+                        return true;
+                    }
+                }
+                catch (InvalidOperationException ex)
+                {
+                    if (!ex.Message.StartsWith("Method"))
+                    {
+                        throw;
+                    }
                 }
 
                 // Or it could be a schema reference...
@@ -140,9 +150,16 @@ namespace Simple.Data
                 var command = CommandFactory.GetCommandFor(binder.Name);
                 if (command != null)
                 {
-                    var schema = dataStrategy.SetMemberAsSchema(_owner);
-                    var table = schema.GetTable(_name);
-                    table.TryInvokeMember(binder, args, out result);
+                    if (!ReferenceEquals(_owner, null))
+                    {
+                        var schema = dataStrategy.SetMemberAsSchema(_owner);
+                        var table = schema.GetTable(_name);
+                        table.TryInvokeMember(binder, args, out result);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(string.Format("Method {0} not recognised", binder.Name));
+                    }
                     //result = command.Execute(dataStrategy, table, binder, args);
                 }
                 else
@@ -158,7 +175,7 @@ namespace Simple.Data
                 }
                 return true;
             }
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(string.Format("Method {0} not recognised", binder.Name));
         }
 
         /// <summary>

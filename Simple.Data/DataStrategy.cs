@@ -101,7 +101,7 @@ namespace Simple.Data
 
         internal DynamicSchema SetMemberAsSchema(ObjectReference reference)
         {
-            if (reference == null) throw new ArgumentNullException("reference");
+            if (ReferenceEquals(reference, null)) throw new ArgumentNullException("reference");
             _members.TryUpdate(reference.GetName(), new DynamicSchema(reference.GetName(), this), reference);
             return (DynamicSchema) _members[reference.GetName()];
         }

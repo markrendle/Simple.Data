@@ -750,7 +750,7 @@
         }
 
         [Test]
-        public void UpsertWithoutDefinedKeyColumnsSHouldThrowMeaningfulException()
+        public void UpsertWithoutDefinedKeyColumnsShouldThrowMeaningfulException()
         {
             var adapter = new InMemoryAdapter();
             Database.UseMockAdapter(adapter);
