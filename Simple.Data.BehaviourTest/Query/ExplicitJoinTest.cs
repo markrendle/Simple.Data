@@ -290,6 +290,13 @@ namespace Simple.Data.IntegrationTest.Query
                 () => _db.Activity.All().Join(_db.Location).On(_db.Location.ID_Location));
         }
 
+        [Test]
+        public void PassingTablesWrongWayRoundThrowsBadExpressionException()
+        {
+            Assert.Throws<BadExpressionException>(
+                () => _db.Activity.All().Join(_db.Activity, LocationId: _db.Location.ID_Location));
+        }
+
         class Activity
         {
             public int ID_Activity { get; set; }

@@ -86,7 +86,7 @@ namespace Simple.Data.SqlTest
     from [dbo].[PromoPosts] 
     ORDER BY [dbo].[PromoPosts].[ActiveFrom]";
 
-            var expected = @"WITH __Data AS (SELECT [dbo].[PromoPosts].[Id],[dbo].[PromoPosts].[ActiveFrom],[dbo].[PromoPosts].[ActiveTo],[dbo].[PromoPosts].[Created],[dbo].[PromoPosts].[Updated],ROW_NUMBER() OVER(ORDER BY [dbo].[PromoPosts].[ActiveFrom]) AS [_#_] from [dbo].[PromoPosts]) SELECT [Id],[ActiveFrom],[ActiveTo],[Created],[Updated] FROM __Data WHERE [_#_] BETWEEN 1 AND 25";
+            var expected = @"with __data as (select [dbo].[promoposts].[id], row_number() over(order by [dbo].[promoposts].[activefrom]) as [_#_] from [dbo].[promoposts]) select [dbo].[promoposts].[id],[dbo].[promoposts].[activefrom],[dbo].[promoposts].[activeto],[dbo].[promoposts].[created],[dbo].[promoposts].[updated] from __data join [dbo].[promoposts] on [dbo].[promoposts].[id] = __data.[id] and [_#_] between 1 and 25";
             expected = expected.ToLowerInvariant();
 
             var pagedSql = new SqlQueryPager().ApplyPaging(sql, new[] {"[dbo].[PromoPosts].[Id]"}, 0, 25).Single();

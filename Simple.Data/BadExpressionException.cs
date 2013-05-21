@@ -18,4 +18,20 @@ namespace Simple.Data
         protected BadExpressionException(SerializationInfo info, StreamingContext context) : base(info, context)
         {}
     }
+    
+    [Serializable]
+    public class BadJoinExpressionException : BadExpressionException
+    {
+        public BadJoinExpressionException()
+        {}
+
+        public BadJoinExpressionException(string message) : base(message)
+        {}
+
+        public BadJoinExpressionException(string message, Exception inner) : base(message, inner)
+        {}
+
+        protected BadJoinExpressionException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {}
+    }
 }

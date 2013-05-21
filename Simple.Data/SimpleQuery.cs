@@ -599,7 +599,11 @@
                     tableToJoin = dynamicTable.ToObjectReference();
                 }
             }
-            if (tableToJoin == null) throw new InvalidOperationException();
+            if (tableToJoin == null) throw new BadJoinExpressionException("Incorrect join table specified");
+            if (HomogenizedEqualityComparer.DefaultInstance.Equals(tableToJoin.GetAliasOrName(), _tableName))
+            {
+                throw new BadJoinExpressionException("Cannot join unaliased table to itself.");
+            }
 
             SimpleExpression joinExpression = null;
 
@@ -613,7 +617,7 @@
                 joinExpression = args[1] as SimpleExpression;
             }
 
-            if (joinExpression == null) throw new InvalidOperationException();
+            if (joinExpression == null) throw new BadJoinExpressionException("Could not create join expression");
 
             var type = binder.Name.Equals("join", StringComparison.OrdinalIgnoreCase) ? JoinType.Inner : JoinType.Outer;
             var newJoin = new JoinClause(tableToJoin, type, joinExpression);
