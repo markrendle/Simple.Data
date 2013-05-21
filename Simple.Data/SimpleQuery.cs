@@ -242,6 +242,20 @@
             return new SimpleQuery(this, _clauses.Append(new OrderByClause(reference, direction)));
         }
 
+        public SimpleQuery OrderBy(params ObjectReference[] references)
+        {
+            if (references.Length == 0)
+            {
+                throw new ArgumentException("OrderBy requires parameters");
+            }
+            var q = this.OrderBy(references[0]);
+            foreach (var reference in references.Skip(1))
+            {
+                q = q.ThenBy(reference);
+            }
+            return q;
+        }
+
         public SimpleQuery OrderByDescending(ObjectReference reference)
         {
             return new SimpleQuery(this, _clauses.Append(new OrderByClause(reference, OrderByDirection.Descending)));
@@ -327,6 +341,10 @@
             }
             if (binder.Name.StartsWith("order", StringComparison.OrdinalIgnoreCase))
             {
+                if (args.Length != 0)
+                {
+                    throw new ArgumentException("OrderByColumn form does not accept parameters");
+                }
                 result = ParseOrderBy(binder.Name);
                 return true;
             }
