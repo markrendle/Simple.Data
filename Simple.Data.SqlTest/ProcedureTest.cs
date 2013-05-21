@@ -79,14 +79,15 @@ namespace Simple.Data.SqlTest
         [Test]
         public void GetCustomerCountSecondCallExecutesNonQueryTest()
         {
+            SimpleDataTraceSources.TraceSource.Switch.Level = SourceLevels.All;
             var listener = new TestTraceListener();
-            Trace.Listeners.Add(listener);
+            SimpleDataTraceSources.TraceSource.Listeners.Add(listener);
             var db = DatabaseHelper.Open();
             db.GetCustomerCount();
             Assert.IsFalse(listener.Output.Contains("ExecuteNonQuery"));
             db.GetCustomerCount();
             Assert.IsTrue(listener.Output.Contains("ExecuteNonQuery"));
-            Trace.Listeners.Remove(listener);
+            SimpleDataTraceSources.TraceSource.Listeners.Remove(listener);
         }
 #endif
 

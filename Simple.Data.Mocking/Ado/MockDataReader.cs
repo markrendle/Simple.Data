@@ -9,6 +9,7 @@ namespace Simple.Data.Mocking.Ado
     class MockDataReader : DbDataReader
     {
         private readonly IEnumerator<IDataRecord> _records;
+        private bool _isClosed = false;
 
         public MockDataReader(IEnumerable<IDataRecord> records)
         {
@@ -21,7 +22,7 @@ namespace Simple.Data.Mocking.Ado
         /// <filterpriority>1</filterpriority>
         public override void Close()
         {
-            
+            _isClosed = true;
         }
 
         /// <summary>
@@ -81,7 +82,7 @@ namespace Simple.Data.Mocking.Ado
         /// <exception cref="T:System.InvalidOperationException">The <see cref="T:System.Data.SqlClient.SqlDataReader"/> is closed. </exception><filterpriority>1</filterpriority>
         public override bool IsClosed
         {
-            get { throw new NotImplementedException(); }
+            get { return _isClosed; }
         }
 
         /// <summary>

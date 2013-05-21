@@ -461,14 +461,16 @@ namespace Simple.Data.SqlTest
         [Test]
         public void OrderByOnJoinedColumnShouldUseJoinedColumn()
         {
+            SimpleDataTraceSources.TraceSource.Switch.Level = SourceLevels.All;
             var traceListener = new TestTraceListener();
+            SimpleDataTraceSources.TraceSource.Listeners.Add(traceListener);
             Trace.Listeners.Add(traceListener);
             var db = DatabaseHelper.Open();
 
             var q = db.Employees.Query().LeftJoin(db.Employees.As("Manager"), Id: db.Employees.ManagerId);
             q = q.Select(db.Employees.Name, q.Manager.Name.As("Manager"));
             List<dynamic> employees = q.OrderBy(q.Manager.Name).ToList();
-            Trace.Listeners.Remove(traceListener);
+            SimpleDataTraceSources.TraceSource.Listeners.Remove(traceListener);
             Assert.Greater(traceListener.Output.IndexOf("order by [manager].[name]", StringComparison.OrdinalIgnoreCase), 0);
         }
 
