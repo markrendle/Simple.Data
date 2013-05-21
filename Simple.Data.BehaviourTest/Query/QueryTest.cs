@@ -228,5 +228,17 @@ namespace Simple.Data.IntegrationTest
             GeneratedSqlIs("select [dbo].[userbio].[userid],[dbo].[userbio].[text] from [dbo].[userbio]" +
                 " join [dbo].[users] on ([dbo].[users].[id] = [dbo].[userbio].[userid]) where [dbo].[users].[id] = @p1");
         }
+
+        [Test]
+        public void SpecifyOrderByWithoutReferenceThrowsException()
+        {
+            Assert.Throws<ArgumentException>(() => _db.Users.All().OrderBy(1));
+        }
+        
+        [Test]
+        public void SpecifyOrderByDescendingWithoutReferenceThrowsException()
+        {
+            Assert.Throws<ArgumentException>(() => _db.Users.All().OrderByDescending(1));
+        }
     }
 }

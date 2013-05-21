@@ -650,9 +650,17 @@
         private SimpleQuery ParseOrderBy(string methodName)
         {
             methodName = Regex.Replace(methodName, "^order_?by_?", "", RegexOptions.IgnoreCase);
+            if (string.IsNullOrWhiteSpace(methodName))
+            {
+                throw new ArgumentException("Invalid arguments to OrderBy");
+            }
             if (methodName.EndsWith("descending", StringComparison.OrdinalIgnoreCase))
             {
                 methodName = Regex.Replace(methodName, "_?descending$", "", RegexOptions.IgnoreCase);
+                if (string.IsNullOrWhiteSpace(methodName))
+                {
+                    throw new ArgumentException("Invalid arguments to OrderByDescending");
+                }
                 return OrderByDescending(ObjectReference.FromString(_tableName + "." + methodName));
             }
             return OrderBy(ObjectReference.FromString(_tableName + "." + methodName));
