@@ -18,7 +18,7 @@ namespace Simple.Data.SqlServer
                                                                             { SqlDbType.Date, typeof(DateTime)},
                                                                             { SqlDbType.DateTime, typeof(DateTime)},
                                                                             { SqlDbType.DateTime2, typeof(DateTime)},
-                                                                            { SqlDbType.DateTimeOffset, typeof(DateTime)},
+                                                                            { SqlDbType.DateTimeOffset, typeof(DateTimeOffset)},
                                                                             { SqlDbType.Decimal, typeof(decimal)},
                                                                             { SqlDbType.Float, typeof(double)},
                                                                             { SqlDbType.Image, typeof(byte[])},
