@@ -44,11 +44,12 @@ namespace Simple.Data.SqlServer
                 builder.AppendFormat(string.Join(" AND ", keys.Select(MakeDataJoin)));
             else
                 builder.AppendFormat(MakeDataJoin(keys[0]));
+            var groupBy = ExtractGroupBy(ref fromEtc);
             var rest = Regex.Replace(fromEtc, @"^from (\[.*?\]\.\[.*?\])", @"");
             builder.Append(rest);
             
-            builder.AppendFormat(" AND [_#_] BETWEEN {0} AND {1}", skip + 1, skip + take);
-
+            builder.AppendFormat(" AND [_#_] BETWEEN {0} AND {1} ", skip + 1, skip + take);
+            builder.Append(groupBy);
             yield return builder.ToString();
         }
 
@@ -78,6 +79,18 @@ namespace Simple.Data.SqlServer
                 orderBy = "ORDER BY " + string.Join(", ", keys);
             }
             return orderBy;
+        }
+
+        private static string ExtractGroupBy(ref string fromEtc)
+        {
+            string groupBy = string.Empty;
+            int index = fromEtc.IndexOf("GROUP BY", StringComparison.InvariantCultureIgnoreCase);
+            if (index > -1)
+            {
+                groupBy = fromEtc.Substring(index).Trim();
+                fromEtc = fromEtc.Remove(index).Trim();
+            }
+            return groupBy;
         }
     }
 }
