@@ -48,8 +48,9 @@ namespace Simple.Data.SqlServer
             var rest = Regex.Replace(fromEtc, @"^from (\[.*?\]\.\[.*?\])", @"");
             builder.Append(rest);
             
-            builder.AppendFormat(" AND [_#_] BETWEEN {0} AND {1} ", skip + 1, skip + take);
-            builder.Append(groupBy);
+            builder.AppendFormat(" AND [_#_] BETWEEN {0} AND {1}", skip + 1, skip + take);
+            if (!string.IsNullOrWhiteSpace(groupBy))
+                builder.AppendFormat(" {0}", groupBy);
             yield return builder.ToString();
         }
 
