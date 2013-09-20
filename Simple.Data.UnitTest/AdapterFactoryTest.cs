@@ -1,4 +1,6 @@
-﻿namespace Simple.Data.UnitTest
+﻿using Simple.Data.Operations;
+
+namespace Simple.Data.UnitTest
 {
     using System;
     using System.Collections.Generic;
@@ -57,12 +59,12 @@
             throw new NotImplementedException();
         }
 
-        public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
+        public override IDictionary<string, object> Get(GetOperation operation)
         {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
+        public override IEnumerable<IDictionary<string, object>> Find(FindOperation operation)
         {
             throw new NotImplementedException();
         }

@@ -1,3 +1,5 @@
+using Simple.Data.Operations;
+
 namespace Simple.Data
 {
     using System;
@@ -55,7 +57,7 @@ namespace Simple.Data
             return _tables[tableName];
         }
 
-        public override IDictionary<string, object> GetKey(string tableName, IDictionary<string, object> record)
+        public override IReadOnlyDictionary<string, object> GetKey(string tableName, IReadOnlyDictionary<string, object> record)
         {
             if (!_keyColumns.ContainsKey(tableName)) return null;
             return _keyColumns[tableName].ToDictionary(key => key, key => record.ContainsKey(key) ? record[key] : null);
@@ -67,21 +69,26 @@ namespace Simple.Data
             return _keyColumns[tableName];
         }
 
-        public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
+        public override IReadOnlyDictionary<string, object> Get(GetOperation operation)
         {
-            if (!_keyColumns.ContainsKey(tableName)) throw new InvalidOperationException("No key specified for In-Memory table.");
-            var keys = _keyColumns[tableName];
-            if (keys.Length != keyValues.Length) throw new ArgumentException("Incorrect number of values for key.");
-            var expression = new ObjectReference(keys[0]) == keyValues[0];
-            for (int i = 1; i < keyValues.Length; i++)
+            if (!_keyColumns.ContainsKey(operation.TableName)) throw new InvalidOperationException("No key specified for In-Memory table.");
+            var keys = _keyColumns[operation.TableName];
+            if (keys.Length != operation.KeyValues.Length) throw new ArgumentException("Incorrect number of values for key.");
+            var expression = new ObjectReference(keys[0]) == operation.KeyValues[0];
+            for (int i = 1; i < operation.KeyValues.Length; i++)
             {
-                expression = expression && new ObjectReference(keys[i]) == keyValues[i];
+                expression = expression && new ObjectReference(keys[i]) == operation.KeyValues[i];
             }
 
-            return Find(tableName, expression).FirstOrDefault();
+            return new ReadOnlyDictionary<string, object>(Find(operation.TableName, expression).FirstOrDefault());
         }
 
-        public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
+        public override IEnumerable<IReadOnlyDictionary<string, object>> Find(FindOperation operation)
+        {
+            return Find(operation.TableName, operation.Criteria).Select(d => new ReadOnlyDictionary<string, object>(d));
+        }
+
+        private IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
             var whereClauseHandler = new WhereClauseHandler(tableName, new WhereClause(criteria));
             return whereClauseHandler.Run(GetTable(tableName));
@@ -95,35 +102,37 @@ namespace Simple.Data
             return GetTable(query.TableName);
         }
 
-        public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, bool resultRequired)
+        public override IEnumerable<IReadOnlyDictionary<string, object>> Insert(InsertOperation operation)
         {
-            data = new Dictionary<string, object>(data, _nameComparer);
-            if (_autoIncrementColumns.ContainsKey(tableName))
+            foreach (var data in operation.Data.Select(d => d.ToDictionary(kvp => kvp.Key, kvp => kvp.Value)))
             {
-                var table = GetTable(tableName);
-                var autoIncrementColumn = _autoIncrementColumns[tableName];
-
-                if(!data.ContainsKey(autoIncrementColumn))
+                if (_autoIncrementColumns.ContainsKey(operation.TableName))
                 {
-                    data.Add(autoIncrementColumn, 0);
+                    var table = GetTable(operation.TableName);
+                    var autoIncrementColumn = _autoIncrementColumns[operation.TableName];
+
+                    if (!data.ContainsKey(autoIncrementColumn))
+                    {
+                        data.Add(autoIncrementColumn, 0);
+                    }
+
+                    object nextVal = 0;
+                    if (table.Count > 0)
+                    {
+                        nextVal = table.Select(d => d[autoIncrementColumn]).Max();
+                    }
+
+                    nextVal = ObjectMaths.Increment(nextVal);
+                    data[autoIncrementColumn] = nextVal;
                 }
 
-                object nextVal = 0;
-                if(table.Count > 0)
-                {
-                    nextVal = table.Select(d => d[autoIncrementColumn]).Max();
-                }
-                
-                nextVal = ObjectMaths.Increment(nextVal);
-                data[autoIncrementColumn] = nextVal;
+                GetTable(operation.TableName).Add(data);
+
+                AddAsDetail(operation.TableName, data);
+                AddAsMaster(operation.TableName, data);
+
+                yield return data;
             }
-
-            GetTable(tableName).Add(data);
-
-            AddAsDetail(tableName, data);
-            AddAsMaster(tableName, data);
-
-            return data;
         }
 
         private void AddAsDetail(string tableName, IDictionary<string, object> data)
@@ -172,7 +181,7 @@ namespace Simple.Data
             }
         }
 
-        public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
+        public override int Update(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria)
         {
             int count = 0;
             foreach (var record in Find(tableName, criteria))
@@ -303,24 +312,14 @@ namespace Simple.Data
             }
         }
 
-        public override IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired, IAdapterTransaction adapterTransaction)
+        public override IEnumerable<IReadOnlyDictionary<string, object>> Upsert(UpsertOperation operation)
         {
-            return Upsert(tableName, dict, criteriaExpression, isResultRequired);
+            throw new NotImplementedException();
         }
 
-        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IDictionary<string,object>,Exception,bool> errorCallback)
+        public IReadOnlyDictionary<string, object> Get(GetOperation operation, IAdapterTransaction transaction)
         {
-            return UpsertMany(tableName, list, keyFieldNames, isResultRequired, errorCallback);
-        }
-
-        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
-        {
-            return UpsertMany(tableName, list, isResultRequired, errorCallback);
-        }
-
-        public IDictionary<string, object> Get(string tableName, IAdapterTransaction transaction, params object[] parameterValues)
-        {
-            return Get(tableName, parameterValues);
+            return Get(operation);
         }
 
         public class JoinConfig
@@ -395,7 +394,7 @@ namespace Simple.Data
             return _functions.ContainsKey(functionName);
         }
 
-        public IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> Execute(string functionName, IDictionary<string, object> parameters)
+        public IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> Execute(string functionName, IReadOnlyDictionary<string, object> parameters)
         {
             if (!_functions.ContainsKey(functionName)) throw new InvalidOperationException(string.Format("Function '{0}' not found.", functionName));
             var obj = ((_functions[functionName].Flags & FunctionFlags.PassThru) == FunctionFlags.PassThru) ?
@@ -411,7 +410,7 @@ namespace Simple.Data
             return obj as IEnumerable<IEnumerable<IDictionary<string, object>>>;
         }
 
-        public IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> Execute(string functionName, IDictionary<string, object> parameters, IAdapterTransaction transaction)
+        public IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> Execute(string functionName, IReadOnlyDictionary<string, object> parameters, IAdapterTransaction transaction)
         {
             return Execute(functionName, parameters);
         }

@@ -1,6 +1,9 @@
+using Simple.Data.Operations;
+
 namespace Simple.Data
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     internal class DatabaseRunner : RunStrategy
     {
@@ -15,22 +18,22 @@ namespace Simple.Data
             get { return _adapter; }
         }
 
-        internal override IDictionary<string, object> FindOne(string tableName, SimpleExpression criteria)
+        internal override IReadOnlyDictionary<string, object> FindOne(FindOperation operation)
         {
-            return _adapter.FindOne(tableName, criteria);
+            return _adapter.FindOne(operation);
         }
 
-        internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList)
+        internal override int UpdateMany(string tableName, IList<IReadOnlyDictionary<string, object>> dataList)
         {
             return _adapter.UpdateMany(tableName, dataList);
         }
 
-        internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IEnumerable<string> criteriaFieldNames)
+        internal override int UpdateMany(string tableName, IList<IReadOnlyDictionary<string, object>> dataList, IEnumerable<string> criteriaFieldNames)
         {
             return _adapter.UpdateMany(tableName, dataList, criteriaFieldNames);
         }
 
-        internal override int UpdateMany(string tableName, IList<IDictionary<string, object>> newValuesList, IList<IDictionary<string, object>> originalValuesList)
+        internal override int UpdateMany(string tableName, IList<IReadOnlyDictionary<string, object>> newValuesList, IList<IReadOnlyDictionary<string, object>> originalValuesList)
         {
             int count = 0;
             for (int i = 0; i < newValuesList.Count; i++)
@@ -40,7 +43,7 @@ namespace Simple.Data
             return count;
         }
 
-        internal override int Update(string tableName, IDictionary<string, object> newValuesDict, IDictionary<string, object> originalValuesDict)
+        internal override int Update(string tableName, IReadOnlyDictionary<string, object> newValuesDict, IReadOnlyDictionary<string, object> originalValuesDict)
         {
             SimpleExpression criteria = CreateCriteriaFromOriginalValues(tableName, newValuesDict, originalValuesDict);
             var changedValuesDict = CreateChangedValuesDict(newValuesDict, originalValuesDict);
@@ -50,61 +53,42 @@ namespace Simple.Data
         /// <summary>
         ///  Finds data from the specified "table".
         ///  </summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <param name="criteria">The criteria. This may be <c>null</c>, in which case all records should be returned.</param>
+        /// <param name="operation">Operation details.</param>
         /// <returns>The list of records matching the criteria. If no records are found, return an empty list.</returns>
-        internal override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
+        internal override IEnumerable<IReadOnlyDictionary<string, object>> Find(FindOperation operation)
         {
-            return _adapter.Find(tableName, criteria);
+            return _adapter.Find(operation);
         }
 
         /// <summary>
         ///  Inserts a record into the specified "table".
         ///  </summary><param name="tableName">Name of the table.</param><param name="data">The values to insert.</param><returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
-        internal override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, bool resultRequired)
+        internal override IEnumerable<IReadOnlyDictionary<string, object>> Insert(InsertOperation operation)
         {
-            return _adapter.Insert(tableName, data, resultRequired);
-        }
-
-        /// <summary>
-        ///  Inserts a record into the specified "table".
-        ///  </summary><param name="tableName">Name of the table.</param><param name="data">The values to insert.</param><returns>If possible, return the newly inserted row, including any automatically-set values such as primary keys or timestamps.</returns>
-        internal override IEnumerable<IDictionary<string, object>> InsertMany(string tableName, IEnumerable<IDictionary<string, object>> data, ErrorCallback onError, bool resultRequired)
-        {
-            return _adapter.InsertMany(tableName, data, (dict, exception) => onError(new SimpleRecord(dict), exception), resultRequired);
+            return _adapter.Insert(operation);
         }
 
         /// <summary>
         ///  Updates the specified "table" according to specified criteria.
         ///  </summary><param name="tableName">Name of the table.</param><param name="data">The new values.</param><param name="criteria">The expression to use as criteria for the update operation.</param><returns>The number of records affected by the update operation.</returns>
-        internal override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
+        internal override int Update(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria)
         {
             return _adapter.Update(tableName, data, criteria);
         }
 
-        public override IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired)
+        public override IEnumerable<IReadOnlyDictionary<string, object>> Upsert(UpsertOperation operation)
         {
-            return _adapter.Upsert(tableName, dict, criteriaExpression, isResultRequired);
+            return _adapter.Upsert(operation);
         }
 
-        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, bool isResultRequired, ErrorCallback errorCallback)
+        public override IReadOnlyDictionary<string, object> Get(GetOperation operation)
         {
-            return _adapter.UpsertMany(tableName, list, isResultRequired, (dict, exception) => errorCallback(new SimpleRecord(dict), exception));
-        }
-
-        public override IDictionary<string, object> Get(string tableName, object[] args)
-        {
-            return _adapter.Get(tableName, args);
+            return _adapter.Get(operation);
         }
 
         public override IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
         {
             return _adapter.RunQuery(query, out unhandledClauses);
-        }
-
-        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, bool isResultRequired, ErrorCallback errorCallback)
-        {
-            return _adapter.UpsertMany(tableName, list, keyFieldNames, isResultRequired, (dict, exception) => errorCallback(new SimpleRecord(dict), exception));
         }
 
         /// <summary>

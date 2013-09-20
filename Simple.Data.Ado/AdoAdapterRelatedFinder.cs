@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Simple.Data.Ado.Schema;
+using Simple.Data.Operations;
 
 namespace Simple.Data.Ado
 {
@@ -63,9 +64,9 @@ namespace Simple.Data.Ado
         private IDictionary<string, object> GetMaster(IDictionary<string, object> row, TableJoin masterJoin)
         {
             var criteria = new Dictionary<string, object> { { masterJoin.MasterColumn.ActualName, row[masterJoin.DetailColumn.HomogenizedName] } };
-            return _adapter.Find(masterJoin.Master.ActualName,
+            return _adapter.Find(new FindOperation(masterJoin.Master.ActualName,
                                        ExpressionHelper.CriteriaDictionaryToExpression(masterJoin.Master.ActualName,
-                                                                                       criteria)).FirstOrDefault();
+                                                                                       criteria))).FirstOrDefault();
         }
 
         private SimpleQuery GetDetail(IDictionary<string, object> row, TableJoin join)

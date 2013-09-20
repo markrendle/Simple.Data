@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using Simple.Data.Operations;
 
 namespace Simple.Data.Commands
 {
@@ -50,7 +51,7 @@ namespace Simple.Data.Commands
 
         private static IEnumerable<KeyValuePair<string, object>> CreateCriteriaDictionary(InvokeMemberBinder binder, IList<object> args)
         {
-            IDictionary<string, object> criteriaDictionary = null;
+            IReadOnlyDictionary<string, object> criteriaDictionary = null;
             if (binder.Name.Equals("FindBy") || binder.Name.Equals("find_by"))
             {
                 if (args.Count == 0) throw new ArgumentException("FindBy requires arguments.");
@@ -76,7 +77,7 @@ namespace Simple.Data.Commands
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(),
                                                                                      CreateCriteriaDictionary(binder,
                                                                                                               args));
-            var data = dataStrategy.Run.FindOne(table.GetQualifiedName(), criteriaExpression);
+            var data = dataStrategy.Run.FindOne(new FindOperation(table.GetQualifiedName(), criteriaExpression));
             return data != null ? new SimpleRecord(data, table.GetQualifiedName(), dataStrategy) : null;
         }
 

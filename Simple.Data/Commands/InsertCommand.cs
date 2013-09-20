@@ -8,6 +8,8 @@ using Simple.Data.Extensions;
 namespace Simple.Data.Commands
 {
     using System.Collections;
+    using System.Collections.ObjectModel;
+    using Operations;
 
     class InsertCommand : ICommand
     {
@@ -43,41 +45,48 @@ namespace Simple.Data.Commands
 
         private static object InsertDictionary(InvokeMemberBinder binder, IEnumerable<object> args, DataStrategy dataStrategy, string tableName)
         {
-            return dataStrategy.Run.Insert(tableName, binder.NamedArgumentsToDictionary(args), !binder.IsResultDiscarded());
+            var operation = new InsertOperation(tableName, Enumerable.Repeat(binder.NamedArgumentsToDictionary(args), 1),
+                !binder.IsResultDiscarded());
+            return dataStrategy.Run.Insert(operation);
         }
 
-        private static object InsertEntity(object entity, DataStrategy dataStrategy, string tableName, ErrorCallback onError, bool resultRequired)
+        private static IEnumerable<IReadOnlyDictionary<string, object>> InsertEntity(object entity, DataStrategy dataStrategy, string tableName, ErrorCallback onError, bool resultRequired)
         {
-            var dictionary = entity as IDictionary<string, object>;
-            if (dictionary != null)
-                return dataStrategy.Run.Insert(tableName, dictionary, resultRequired);
+            var readOnlyDictionary = entity as IReadOnlyDictionary<string, object>;
+            if (readOnlyDictionary != null)
+            {
+                var operation = new InsertOperation(tableName, readOnlyDictionary, resultRequired);
+                return dataStrategy.Run.Insert(operation);
+            }
 
             var list = entity as IEnumerable<IDictionary<string, object>>;
             if (list != null)
-                return dataStrategy.Run.InsertMany(tableName, list, onError, resultRequired);
+            {
+                return dataStrategy.Run.Insert(new InsertOperation(tableName, list, resultRequired, onError));
+            }
 
             var entityList = entity as IEnumerable;
             if (entityList != null)
             {
                 var array = entityList.Cast<object>().ToArray();
-                var rows = new List<IDictionary<string, object>>();
+                var rows = new List<IReadOnlyDictionary<string, object>>();
                 foreach (var o in array)
                 {
-                    dictionary = (o as IDictionary<string, object>) ?? o.ObjectToDictionary();
-                    if (dictionary.Count == 0)
+                    readOnlyDictionary = (o as IReadOnlyDictionary<string, object>) ?? o.ObjectToDictionary();
+                    if (readOnlyDictionary.Count == 0)
                     {
                         throw new SimpleDataException("Could not discover data in object.");
                     }
-                    rows.Add(dictionary);
+                    rows.Add(readOnlyDictionary);
                 }
 
-                return dataStrategy.Run.InsertMany(tableName, rows, onError, resultRequired);
+                return dataStrategy.Run.Insert(new InsertOperation(tableName, rows, resultRequired, onError));
             }
 
-            dictionary = entity.ObjectToDictionary();
-            if (dictionary.Count == 0)
+            readOnlyDictionary = entity.ObjectToDictionary();
+            if (readOnlyDictionary.Count == 0)
                 throw new SimpleDataException("Could not discover data in object.");
-            return dataStrategy.Run.Insert(tableName, dictionary, resultRequired);
+            return dataStrategy.Run.Insert(new InsertOperation(tableName, readOnlyDictionary, resultRequired));
         }
     }
 }

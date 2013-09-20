@@ -13,7 +13,7 @@ namespace Simple.Data
     public interface IAdapterWithFunctions
     {
         bool IsValidFunction(string functionName);
-        IEnumerable<ResultSet> Execute(string functionName, IDictionary<string, object> parameters);
-        IEnumerable<ResultSet> Execute(string functionName, IDictionary<string, object> parameters, IAdapterTransaction transaction);
+        IEnumerable<ResultSet> Execute(string functionName, IReadOnlyDictionary<string, object> parameters);
+        IEnumerable<ResultSet> Execute(string functionName, IReadOnlyDictionary<string, object> parameters, IAdapterTransaction transaction);
     }
 }

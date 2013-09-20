@@ -21,13 +21,13 @@ namespace Simple.Data.Commands
 
         private static SimpleExpression GetCriteriaExpression(InvokeMemberBinder binder, object[] args, DynamicTable table)
         {
-            IDictionary<string, object> criteria;
+            IReadOnlyDictionary<string, object> criteria;
             if (binder.Name.Equals("delete", StringComparison.InvariantCultureIgnoreCase))
             {
                 criteria = binder.NamedArgumentsToDictionary(args);
                 if (criteria.Count == 0 && args.Length == 1)
                 {
-                    criteria = args[0] as IDictionary<string, object> ?? args[0].ObjectToDictionary();
+                    criteria = args[0] as IReadOnlyDictionary<string, object> ?? args[0].ObjectToDictionary();
                 }
             }
             else

@@ -27,6 +27,31 @@ namespace Simple.Data
             _database = database;
         }
 
+        public SimpleRecord(IReadOnlyDictionary<string, object> data)
+            : this(data, null)
+        {
+        }
+
+        public SimpleRecord(IReadOnlyDictionary<string, object> data, string tableName)
+            : this(data, tableName, null)
+        {
+        }
+
+        public SimpleRecord(IReadOnlyDictionary<string, object> data, string tableName, DataStrategy dataStrategy)
+        {
+            _tableName = tableName;
+            _database = dataStrategy;
+            if (data == null)
+            {
+                _data = new Dictionary<string, object>();
+            }
+            else
+            {
+                _data = data as IDictionary<string, object> || data.ToDictionary();
+            }
+        }
+
+
         public SimpleRecord(IDictionary<string, object> data)
             : this(data, null)
         {

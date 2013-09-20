@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using Simple.Data.Operations;
 
 namespace Simple.Data
 {
@@ -49,22 +50,17 @@ namespace Simple.Data
             return new InMemoryAdapterTransaction(name);
         }
 
-        public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria, IAdapterTransaction transaction)
+        public IEnumerable<IReadOnlyDictionary<string, object>> Find(FindOperation operation, IAdapterTransaction transaction)
         {
-            return Find(tableName, criteria);
+            return Find(operation);
         }
 
-        public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, IAdapterTransaction transaction, bool resultRequired)
+        public IEnumerable<IReadOnlyDictionary<string, object>> Insert(InsertOperation operation, IAdapterTransaction transaction)
         {
-            return Insert(tableName, data, resultRequired);
+            return Insert(operation);
         }
 
-        public IEnumerable<IDictionary<string, object>> InsertMany(string tableName, IEnumerable<IDictionary<string, object>> data, IAdapterTransaction transaction, Func<IDictionary<string, object>, Exception, bool> onError, bool resultRequired)
-        {
-            return InsertMany(tableName, data, onError, resultRequired);
-        }
-
-        public int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria, IAdapterTransaction transaction)
+        public int Update(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria, IAdapterTransaction transaction)
         {
             return Update(tableName, data, criteria);
         }
@@ -74,17 +70,17 @@ namespace Simple.Data
             return Delete(tableName, criteria);
         }
 
-        public int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> dataList, IAdapterTransaction adapterTransaction)
+        public int UpdateMany(string tableName, IEnumerable<IReadOnlyDictionary<string, object>> dataList, IAdapterTransaction adapterTransaction)
         {
             return UpdateMany(tableName, dataList);
         }
 
-        public int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> dataList, IAdapterTransaction adapterTransaction, IList<string> keyFields)
+        public int UpdateMany(string tableName, IEnumerable<IReadOnlyDictionary<string, object>> dataList, IAdapterTransaction adapterTransaction, IList<string> keyFields)
         {
             return UpdateMany(tableName, dataList, keyFields);
         }
 
-        public int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IEnumerable<string> criteriaFieldNames, IAdapterTransaction adapterTransaction)
+        public int UpdateMany(string tableName, IList<IReadOnlyDictionary<string, object>> dataList, IEnumerable<string> criteriaFieldNames, IAdapterTransaction adapterTransaction)
         {
             return UpdateMany(tableName, dataList, criteriaFieldNames);
         }
@@ -92,6 +88,12 @@ namespace Simple.Data
         public IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query, IAdapterTransaction transaction, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
         {
             return RunQuery(query, out unhandledClauses);
+        }
+
+        public IEnumerable<IReadOnlyDictionary<string, object>> Upsert(UpsertOperation operation,
+            IAdapterTransaction transaction)
+        {
+            throw new NotImplementedException();
         }
     }
 }

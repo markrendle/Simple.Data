@@ -22,7 +22,7 @@ namespace Simple.Data.Commands
 
         internal static IEnumerable<KeyValuePair<string, object>> CreateCriteriaDictionary(InvokeMemberBinder binder, IList<object> args, params string[] exactNames)
         {
-            IDictionary<string, object> criteriaDictionary = null;
+            IReadOnlyDictionary<string, object> criteriaDictionary = null;
             if (exactNames.Contains(binder.Name))
             {
                 if (binder.CallInfo.ArgumentNames != null && binder.CallInfo.ArgumentNames.Count > 0)

@@ -12,6 +12,8 @@
     <RootNamespace>Simple.Data.IntegrationTest</RootNamespace>
     <AssemblyName>Simple.Data.IntegrationTest</AssemblyName>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release-Mono|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,6 +41,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -101,7 +106,7 @@
       <Name>Simple.Data.Ado</Name>
     </ProjectReference>
     <ProjectReference Include="..\Simple.Data.Mocking\Simple.Data.Mocking.csproj">
-      <Project>{292611F6-BBBD-492D-891C-0D9FB4BF5433}</Project>
+      <Project>{292611f6-bbbd-492d-891c-0d9fb4bf5433}</Project>
       <Name>Simple.Data.Mocking</Name>
     </ProjectReference>
     <ProjectReference Include="..\Simple.Data\Simple.Data.csproj">

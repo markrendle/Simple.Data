@@ -5,6 +5,7 @@ namespace Simple.Data.Commands
     using System.Dynamic;
     using System.Linq;
     using Extensions;
+    using Operations;
 
     class UpsertByCommand : ICommand
     {
@@ -39,8 +40,10 @@ namespace Simple.Data.Commands
         internal static object UpsertByKeyFields(string tableName, DataStrategy dataStrategy, object entity, IEnumerable<string> keyFieldNames, bool isResultRequired, ErrorCallback errorCallback)
         {
             var record = UpdateCommand.ObjectToDictionary(entity);
-            var list = record as IList<IDictionary<string, object>>;
-            if (list != null) return dataStrategy.Run.UpsertMany(tableName, list, keyFieldNames, isResultRequired, errorCallback);
+            var list = record as IList<IReadOnlyDictionary<string, object>>;
+            var operation = new UpsertOperation(tableName, list, isResultRequired, keyFieldNames.ToArray(),
+                errorCallback);
+            if (list != null) return dataStrategy.Run.Upsert(operation);
 
             var dict = record as IDictionary<string, object>;
             var criteria = GetCriteria(keyFieldNames, dict);

@@ -50,7 +50,7 @@ namespace Simple.Data
             return _members.GetOrAdd(name, CreateDynamicReference);
         }
 
-        internal bool TryInvokeFunction(String functionName, Func<IDictionary<String, Object>> getFunctionArguments,
+        internal bool TryInvokeFunction(String functionName, Func<IReadOnlyDictionary<String, Object>> getFunctionArguments,
                                         out object result)
         {
             var adapterWithFunctions = GetAdapter() as IAdapterWithFunctions;

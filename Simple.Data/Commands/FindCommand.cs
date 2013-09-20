@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
+using Simple.Data.Operations;
 
 namespace Simple.Data.Commands
 {
@@ -32,7 +33,7 @@ namespace Simple.Data.Commands
         {
             if (args.Length == 1 && args[0] is SimpleExpression)
             {
-                var data = dataStrategy.Run.FindOne(table.GetQualifiedName(), (SimpleExpression)args[0]);
+                var data = dataStrategy.Run.FindOne(new FindOperation(table.GetQualifiedName(), (SimpleExpression)args[0]));
                 return data != null ? new SimpleRecord(data, table.GetQualifiedName(), dataStrategy) : null;
             }
 

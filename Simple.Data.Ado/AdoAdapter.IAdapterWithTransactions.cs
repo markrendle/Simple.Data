@@ -1,4 +1,6 @@
-﻿namespace Simple.Data.Ado
+﻿using Simple.Data.Operations;
+
+namespace Simple.Data.Ado
 {
     using System;
     using System.Collections.Generic;
@@ -91,10 +93,10 @@
         //    return new AdoAdapterTransaction(transaction, name, _sharedConnection != null);
         //}
 
-        public IDictionary<string,object> Get(string tableName, IAdapterTransaction transaction, params object[] parameterValues)
+        public IDictionary<string,object> Get(GetOperation operation, IAdapterTransaction transaction)
         {
-            return new AdoAdapterGetter(this, ((AdoAdapterTransaction) transaction).DbTransaction).Get(tableName,
-                                                                                                     parameterValues);
+            return new AdoAdapterGetter(this, ((AdoAdapterTransaction) transaction).DbTransaction).Get(operation.TableName,
+                                                                                                     operation.KeyValues);
         }
 
         public IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query, IAdapterTransaction transaction, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
@@ -102,11 +104,11 @@
             return new AdoAdapterQueryRunner(this, (AdoAdapterTransaction)transaction).RunQuery(query, out unhandledClauses);
         }
 
-        public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria,
+        public IEnumerable<IDictionary<string, object>> Find(FindOperation operation,
                                                              IAdapterTransaction transaction)
         {
-            return new AdoAdapterFinder(this, ((AdoAdapterTransaction)transaction).DbTransaction).Find(tableName,
-                                                                                                      criteria);
+            return new AdoAdapterFinder(this, ((AdoAdapterTransaction)transaction).DbTransaction).Find(operation.TableName,
+                                                                                                      operation.Criteria);
         }
 
         public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data,

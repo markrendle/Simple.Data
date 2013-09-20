@@ -6,6 +6,7 @@ namespace Simple.Data.Commands
     using System.Dynamic;
     using System.Linq;
     using Extensions;
+    using Operations;
 
     internal class UpsertCommand : ICommand
     {
@@ -38,21 +39,21 @@ namespace Simple.Data.Commands
         private static object UpsertUsingKeys(DataStrategy dataStrategy, DynamicTable table, object[] args, bool isResultRequired)
         {
             var record = ObjectToDictionary(args[0]);
-            var list = record as IList<IDictionary<string, object>>;
+            var list = record as IList<IReadOnlyDictionary<string, object>>;
             if (list != null)
             {
                 ErrorCallback errorCallback = (args.Length == 2 ? args[1] as ErrorCallback : null) ??
                  ((item, exception) => false);
-                return dataStrategy.Run.UpsertMany(table.GetQualifiedName(), list, isResultRequired, errorCallback);
+                return dataStrategy.Run.Upsert(new UpsertOperation(table.GetQualifiedName(), list, isResultRequired, null, errorCallback));
             }
 
-            var dict = record as IDictionary<string, object>;
+            var dict = record as IReadOnlyDictionary<string, object>;
             if (dict == null) throw new InvalidOperationException("Could not resolve data from passed object.");
             var key = dataStrategy.GetAdapter().GetKey(table.GetQualifiedName(), dict);
             if (key == null) throw new InvalidOperationException(string.Format("No key columns defined for table \"{0}\"",table.GetQualifiedName()));
-            if (key.Count == 0) return dataStrategy.Run.Insert(table.GetQualifiedName(), dict, isResultRequired);
+            if (key.Count == 0) return dataStrategy.Run.Insert(new InsertOperation(table.GetQualifiedName(), dict, isResultRequired));
             var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), key);
-            return dataStrategy.Run.Upsert(table.GetQualifiedName(), dict, criteria, isResultRequired);
+            return dataStrategy.Run.Upsert(new UpsertOperation(table.GetQualifiedName(), dict, isResultRequired));
         }
 
         internal static object ObjectToDictionary(object obj)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Simple.Data.Operations;
 
 namespace Simple.Data
 {
@@ -11,9 +12,9 @@ namespace Simple.Data
             return adapter.CreateFindOneDelegate(tableName, criteria);
         }
 
-        public virtual Func<object[], IDictionary<string,object>> CreateGetDelegate(Adapter adapter, string tableName, object[] keyValues)
+        public virtual Func<object[], IDictionary<string,object>> CreateGetDelegate(Adapter adapter, GetOperation operation)
         {
-            return args => adapter.Get(tableName, args);
+            return args => adapter.Get(operation);
         }
     }
 

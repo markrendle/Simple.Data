@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using NUnit.Framework;
+using Simple.Data.Operations;
 
 namespace Simple.Data.UnitTest
 {
@@ -59,7 +60,7 @@ namespace Simple.Data.UnitTest
 
         #region IAdapterWithTransactions - not implementead
 
-        public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria, IAdapterTransaction transaction)
+        public IEnumerable<IDictionary<string, object>> Find(FindOperation operation, IAdapterTransaction transaction)
         {
             throw new NotImplementedException();
         }
@@ -99,7 +100,7 @@ namespace Simple.Data.UnitTest
             throw new NotImplementedException();
         }
 
-        public IDictionary<string, object> Get(string tableName, IAdapterTransaction transaction, params object[] parameterValues)
+        public IDictionary<string, object> Get(GetOperation operation, IAdapterTransaction transaction)
         {
             throw new NotImplementedException();
         }

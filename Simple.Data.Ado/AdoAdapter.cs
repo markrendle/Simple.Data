@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Data;
 using System.Linq;
 using Simple.Data.Ado.Schema;
+using Simple.Data.Operations;
 
 namespace Simple.Data.Ado
 {
@@ -132,15 +133,15 @@ namespace Simple.Data.Ado
             return new AdoAdapterRelatedFinder(this);
         }
 
-        public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
+        public override IDictionary<string, object> Get(GetOperation operation)
         {
             // We don't need to implement Get because we provide a delegate for this operation...
             throw new NotImplementedException();
         }
 
-        public override IDictionary<string, object> FindOne(string tableName, SimpleExpression criteria)
+        public override IDictionary<string, object> FindOne(FindOperation operation)
         {
-            return _finder.FindOne(tableName, criteria);
+            return _finder.FindOne(operation.TableName, operation.Criteria);
         }
 
         public override Func<object[], IDictionary<string, object>> CreateFindOneDelegate(string tableName,
@@ -149,9 +150,9 @@ namespace Simple.Data.Ado
             return _finder.CreateFindOneDelegate(tableName, criteria);
         }
 
-        public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
+        public override IEnumerable<IDictionary<string, object>> Find(FindOperation operation)
         {
-            return _finder.Find(tableName, criteria);
+            return _finder.Find(operation.TableName, operation.Criteria);
         }
 
         public override IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query,
