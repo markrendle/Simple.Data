@@ -63,10 +63,10 @@ namespace Simple.Data.Ado
 
         private IDictionary<string, object> GetMaster(IDictionary<string, object> row, TableJoin masterJoin)
         {
-            var criteria = new Dictionary<string, object> { { masterJoin.MasterColumn.ActualName, row[masterJoin.DetailColumn.HomogenizedName] } };
-            return _adapter.Find(new FindOperation(masterJoin.Master.ActualName,
-                                       ExpressionHelper.CriteriaDictionaryToExpression(masterJoin.Master.ActualName,
-                                                                                       criteria))).FirstOrDefault();
+            throw new NotImplementedException();
+            //var criteria = new Dictionary<string, object> { { masterJoin.MasterColumn.ActualName, row[masterJoin.DetailColumn.HomogenizedName] } };
+            //return _adapter.RunQuery(new QueryOperation(new QueryOperation(_adapter, masterJoin.Master.ActualName, ExpressionHelper.CriteriaDictionaryToExpression(masterJoin.Master.ActualName,
+            //                                                                           criteria))).FirstOrDefault();
         }
 
         private SimpleQuery GetDetail(IDictionary<string, object> row, TableJoin join)

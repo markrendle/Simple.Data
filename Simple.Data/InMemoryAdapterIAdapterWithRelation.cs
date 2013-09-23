@@ -9,13 +9,13 @@
         {
             return _joins.Any(
                 ji =>
-                _nameComparer.Equals(tableName, ji.MasterTableName) &&
-                _nameComparer.Equals(relatedTableName, ji.MasterPropertyName))
+                _keyComparer.Equals(tableName, ji.MasterTableName) &&
+                _keyComparer.Equals(relatedTableName, ji.MasterPropertyName))
                    ||
                    _joins.Any(
                        ji =>
-                       _nameComparer.Equals(tableName, ji.DetailTableName) &&
-                       _nameComparer.Equals(relatedTableName, ji.DetailPropertyName));
+                       _keyComparer.Equals(tableName, ji.DetailTableName) &&
+                       _keyComparer.Equals(relatedTableName, ji.DetailPropertyName));
         }
 
         public object FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName)
@@ -26,8 +26,8 @@
         private object FindMaster(string tableName, IDictionary<string, object> row, string relatedTableName)
         {
             var master = _joins.FirstOrDefault(ji =>
-                                               _nameComparer.Equals(tableName, ji.MasterTableName) &&
-                                               _nameComparer.Equals(relatedTableName, ji.MasterPropertyName));
+                                               _keyComparer.Equals(tableName, ji.MasterTableName) &&
+                                               _keyComparer.Equals(relatedTableName, ji.MasterPropertyName));
             if (master != null)
             {
                 object result;
@@ -40,8 +40,8 @@
         private object FindDetail(string tableName, IDictionary<string, object> row, string relatedTableName)
         {
             var detail = _joins.FirstOrDefault(ji =>
-                                               _nameComparer.Equals(tableName, ji.DetailTableName) &&
-                                               _nameComparer.Equals(relatedTableName, ji.DetailPropertyName));
+                                               _keyComparer.Equals(tableName, ji.DetailTableName) &&
+                                               _keyComparer.Equals(relatedTableName, ji.DetailPropertyName));
             if (detail != null)
             {
                 object result;

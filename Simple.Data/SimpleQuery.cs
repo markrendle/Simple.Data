@@ -10,6 +10,7 @@
     using System.Threading.Tasks;
     using Commands;
     using Extensions;
+    using Operations;
     using QueryPolyfills;
 
     public class SimpleQuery : DynamicObject, IEnumerable
@@ -314,18 +315,18 @@
         protected IEnumerable<dynamic> Run()
         {
             IEnumerable<SimpleQueryClauseBase> unhandledClauses;
-            var result = _dataStrategy.Run.RunQuery(this, out unhandledClauses);
+            var result = (QueryResult)_dataStrategy.Run.Execute(new QueryOperation(this));
 
-            if (unhandledClauses != null)
+            if (result.UnhandledClauses != null)
             {
-                var unhandledClausesList = unhandledClauses.ToList();
+                var unhandledClausesList = result.UnhandledClauses.ToList();
                 if (unhandledClausesList.Count > 0)
                 {
-                    result = new DictionaryQueryRunner(_tableName, result, unhandledClausesList).Run();
+                    result = new QueryResult(new DictionaryQueryRunner(_tableName, result.Data, unhandledClausesList).Run());
                 }
             }
 
-            return SimpleResultSet.Create(result, _tableName, _dataStrategy).Cast<dynamic>();
+            return SimpleResultSet.Create(result.Data, _tableName, _dataStrategy).Cast<dynamic>();
         }
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
@@ -894,25 +895,7 @@
 
         public IObservable<dynamic> AsObservable()
         {
-            if (_asObservableImplementation != null) return _asObservableImplementation();
-
-            try
-            {
-                _asObservableImplementation = () =>
-                                                  {
-                                                      IEnumerable<SimpleQueryClauseBase> unhandledClauses;
-                                                      return _adapter.RunQueryAsObservable(this, out unhandledClauses)
-                                                          .Map(d => new SimpleRecord(d, _tableName, _dataStrategy));
-                                                  };
-                return _asObservableImplementation();
-            }
-            catch (NotImplementedException)
-            {
-                _asObservableImplementation =
-                    () => Run().Select(d => new SimpleRecord(d, _tableName, _dataStrategy)).ToObservable();
-            }
-
-            return _asObservableImplementation();
+            throw new NotImplementedException();
         }
 
         public Task<IEnumerable<dynamic>> RunTask()

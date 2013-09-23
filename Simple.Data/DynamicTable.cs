@@ -172,7 +172,8 @@ namespace Simple.Data
 
         private IEnumerable<dynamic> GetAll()
         {
-            return _dataStrategy.Run.Find(new FindOperation(_tableName, null)).Select(dict => new SimpleRecord(dict, _tableName, _dataStrategy));
+            var result = (DataResult) _dataStrategy.Run.Execute(new QueryOperation(null));
+            return result.Data.Select(dict => new SimpleRecord(dict, _tableName, _dataStrategy));
         }
 
         public AllColumnsSpecialReference AllColumns()

@@ -4,7 +4,7 @@
     using System.Collections.ObjectModel;
     using System.Linq;
 
-    public class UpsertOperation
+    public class UpsertOperation : IOperation
     {
         private readonly IEnumerable<IReadOnlyDictionary<string, object>> _data;
         private readonly bool _resultRequired;
@@ -67,28 +67,6 @@
         public string[] ByFieldNames
         {
             get { return _byFieldNames; }
-        }
-    }
-
-    public class UpdateOperation
-    {
-        private readonly string _tableName;
-        private readonly IReadOnlyDictionary<string, object> _data;
-
-        public UpdateOperation(string tableName, IReadOnlyDictionary<string, object> data)
-        {
-            _tableName = tableName;
-            _data = data;
-        }
-
-        public string TableName
-        {
-            get { return _tableName; }
-        }
-
-        public IReadOnlyDictionary<string, object> Data
-        {
-            get { return _data; }
         }
     }
 }

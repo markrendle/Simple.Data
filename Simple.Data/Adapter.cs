@@ -62,6 +62,8 @@ namespace Simple.Data
         {
         }
 
+        public abstract IEqualityComparer<string> KeyComparer { get; } 
+
         /// <summary>
         /// Gets the key value(s) for the record.
         /// </summary>
@@ -77,52 +79,7 @@ namespace Simple.Data
         /// <returns>An <c>IList&lt;string&gt;</c> containing the key names that uniquely identify a record in the database.</returns>
         public abstract IList<string> GetKeyNames(string tableName);
 
-        /// <summary>
-        /// Gets a single record from the specified "table" using its default key.
-        /// </summary>
-        /// <param name="operation">Operation object with details of operation.</param>
-        /// <returns>The record matching the supplied key. If no record is found, return <c>null</c>.</returns>
-        public abstract IReadOnlyDictionary<string, object> Get(GetOperation operation);
-
-        /// <summary>
-        /// Finds data from the specified "table".
-        /// </summary>
-        /// <param name="operation">Operation details.</param>
-        /// <returns>The list of records matching the criteria. If no records are found, return an empty list.</returns>
-        public abstract IEnumerable<IReadOnlyDictionary<string, object>> Find(FindOperation operation);
-
-        /// <summary>
-        /// Runs a <see cref="SimpleQuery"/>.
-        /// </summary>
-        /// <param name="query">The <see cref="SimpleQuery"/> to run.</param>
-        /// <param name="unhandledClauses">Use this to return any clauses your adapter is unable to interpret.</param>
-        /// <returns></returns>
-        public abstract IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query,
-                                                                          out IEnumerable<SimpleQueryClauseBase>
-                                                                              unhandledClauses);
-
-        /// <summary>
-        ///  Inserts a record into the specified "table".
-        ///  </summary>
-        /// <param name="operation">Operation details.</param>
-        /// <returns>If possible and required, return the newly inserted row(s), including any automatically-set values such as primary keys or timestamps.</returns>
-        public abstract IEnumerable<IReadOnlyDictionary<string, object>> Insert(InsertOperation operation);
-
-        /// <summary>
-        /// Updates the specified "table" according to specified criteria.
-        /// </summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <param name="data">The new values.</param>
-        /// <param name="criteria">The expression to use as criteria for the update operation.</param>
-        /// <returns>The number of records affected by the update operation.</returns>
-        public abstract int Update(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria);
-
-        /// <summary>
-        ///  Deletes from the specified table.
-        ///  </summary><param name="tableName">Name of the table.</param>
-        /// <param name="criteria">The expression to use as criteria for the delete operation.</param>
-        /// <returns>The number of records which were deleted.</returns>
-        public abstract int Delete(string tableName, SimpleExpression criteria);
+        public abstract OperationResult Execute(IOperation operation);
 
         /// <summary>
         /// Checks to see whether the passed function name is a valid function for the Adapter.
@@ -131,129 +88,6 @@ namespace Simple.Data
         /// <param name="args">The values passed (for overload resolution etc).</param>
         /// <returns><c>true</c> if the name represents a function; otherwise, <c>false</c>.</returns>
         public abstract bool IsExpressionFunction(string functionName, params object[] args);
-
-        /// <summary>
-        /// Finds a single record.
-        /// </summary>
-        /// <param name="operation">Operation details.</param>
-        /// <returns>A dictionary containing the record.</returns>
-        /// <remarks>This method has a default implementation based on the <see cref="Find(FindOperation)"/> method.
-        /// You should override this method if your adapter can optimize the operation.</remarks>
-        public virtual IReadOnlyDictionary<string, object> FindOne(FindOperation operation)
-        {
-            return Find(operation).FirstOrDefault();
-        }
-
-        /// <summary>
-        /// Updates multiple records in a table.
-        /// </summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <param name="data">The data.</param>
-        /// <returns>The total number of records affected by the update operations.</returns>
-        /// <remarks>This method has a default implementation based on the <see cref="Update(string,IDictionary{string, object},SimpleExpression)"/> method.
-        /// You should override this method if your adapter can optimize the operation.</remarks>
-        public virtual int UpdateMany(string tableName, IEnumerable<IReadOnlyDictionary<string, object>> data)
-        {
-            int updateCount = 0;
-            foreach (var row in data)
-            {
-                var key = GetKey(tableName, row);
-                var criteria = ExpressionHelper.CriteriaDictionaryToExpression(tableName, key);
-                updateCount += Update(tableName, row, criteria);
-            }
-            return updateCount;
-        }
-
-        /// <summary>
-        /// Runs the query as an <see cref="IObservable{T}"/>, for Reactive Extension joy.
-        /// </summary>
-        /// <param name="query">The query.</param>
-        /// <param name="unhandledClauses">The unhandled clauses.</param>
-        /// <returns>A cold <see cref="IObservable{T}"/> which will start pushing when subscribed.</returns>
-        /// <remarks>This method has a default implementation based on the <see cref="RunQuery"/> method.
-        /// You should override this method if your adapter can optimize the operation.</remarks>
-        public virtual IObservable<IDictionary<string, object>> RunQueryAsObservable(SimpleQuery query,
-                                                                                     out
-                                                                                         IEnumerable
-                                                                                         <SimpleQueryClauseBase>
-                                                                                         unhandledClauses)
-        {
-            return RunQuery(query, out unhandledClauses).ToObservable();
-        }
-
-        /// <summary>
-        /// Runs multiple queries.
-        /// </summary>
-        /// <param name="queries">The queries.</param>
-        /// <param name="unhandledClauses">The unhandled clauses.</param>
-        /// <returns>A list of lists of dictionaries. Data.</returns>
-        /// <remarks>This method has a default implementation based on the <see cref="RunQuery"/> method.
-        /// You should override this method if your adapter can optimize the operation.</remarks>
-        public virtual IEnumerable<IEnumerable<IDictionary<string, object>>> RunQueries(SimpleQuery[] queries,
-                                                                                         List
-                                                                                             <
-                                                                                             IEnumerable
-                                                                                             <SimpleQueryClauseBase>>
-                                                                                             unhandledClauses)
-        {
-            foreach (var query in queries)
-            {
-                IEnumerable<SimpleQueryClauseBase> unhandledClausesForThisQuery;
-                var result = RunQuery(query, out unhandledClausesForThisQuery);
-                unhandledClauses.Add(unhandledClausesForThisQuery);
-                yield return result;
-            }
-        }
-
-        /// <summary>
-        /// Updates the specified "table" according to default keys (to be handled by adapter).
-        /// </summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <param name="dataList">A list of objects to be updated.</param>
-        /// <param name="criteriaFieldNames">The list of field names to be used for criteria.</param>
-        /// <returns>The number of records affected by the update operation.</returns>
-        /// <remarks>For example, the Ado adapter will fulfil this functionality using Primary Key data.</remarks>
-        /// <remarks>This method has a default implementation based on the
-        /// <see cref="Update(string,System.Collections.Generic.IDictionary{string,object},Simple.Data.SimpleExpression)"/> method.
-        /// You should override this method if your adapter can optimize the operation.</remarks>
-        public virtual int UpdateMany(string tableName, IEnumerable<IReadOnlyDictionary<string, object>> dataList,
-                                      IEnumerable<string> criteriaFieldNames)
-        {
-            int updatedCount = 0;
-            var criteriaFieldNameList = criteriaFieldNames.ToList();
-            foreach (var data in dataList)
-            {
-                var modified = data;
-                var criteria = GetCriteria(tableName, criteriaFieldNameList, ref modified);
-                updatedCount += Update(tableName, modified, criteria);
-            }
-            return updatedCount;
-        }
-
-        /// <summary>
-        /// Creates a delegate which can accept an array of values to use as criteria against a cached template.
-        /// When called, the delegate should return a single record using the passed values as criteria.
-        ///  </summary><param name="tableName">Name of the table.</param>
-        /// <param name="criteria">The criteria to use as a template for the delegate</param>
-        /// <returns>A <c>Func&lt;object[], IDictionary&lt;string, object&gt;&gt;"</c> which finds a record.</returns>
-        public virtual Func<object[], IDictionary<string, object>> CreateFindOneDelegate(string tableName,
-                                                                                         SimpleExpression criteria)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Creates a delegate which can accept an array of values to use as criteria against a cached template.
-        /// When called, the delegate should return zero or more records using the passed values as criteria.
-        ///  </summary><param name="tableName">Name of the table.</param>
-        /// <param name="criteria">The criteria to use as a template for the delegate</param>
-        /// <returns>A <c>Func&lt;object[], IDictionary&lt;string, object&gt;&gt;"</c> which finds a record.</returns>
-        public virtual Func<object[], IEnumerable<IDictionary<string, object>>> CreateFindDelegate(string tableName,
-                                                                                                   SimpleExpression
-                                                                                                       criteria)
-        {
-            throw new NotImplementedException();
-        }
 
         /// <summary>
         /// Creates a criteria expression.
@@ -293,18 +127,9 @@ namespace Simple.Data
         {
         }
 
-        private OptimizingDelegateFactory _optimizingDelegateFactory;
-
-        public OptimizingDelegateFactory OptimizingDelegateFactory
+        public virtual bool IsValidFunction(string functionName)
         {
-            get { return _optimizingDelegateFactory ?? (_optimizingDelegateFactory = CreateOptimizingDelegateFactory()); }
+            return false;
         }
-
-        private OptimizingDelegateFactory CreateOptimizingDelegateFactory()
-        {
-            return MefHelper.GetAdjacentComponent<OptimizingDelegateFactory>(GetType()) ?? new DefaultOptimizingDelegateFactory();
-        }
-
-        public abstract IEnumerable<IReadOnlyDictionary<string, object>> Upsert(UpsertOperation operation);
     }
 }

@@ -9,6 +9,8 @@ using Simple.Data.Extensions;
 namespace Simple.Data.Commands
 {
     using System.Collections;
+    using System.Collections.ObjectModel;
+    using Operations;
 
     internal class UpdateCommand : ICommand
     {
@@ -32,53 +34,52 @@ namespace Simple.Data.Commands
         private static object UpdateUsingOriginalValues(DataStrategy dataStrategy, DynamicTable table, object[] args)
         {
             var newValues = ObjectToDictionary(args[0]);
-            var newValuesList = newValues as IList<IDictionary<string, object>>;
+            var newValuesList = newValues as IList<IReadOnlyDictionary<string, object>>;
             if (newValuesList != null)
             {
-                var originalValuesList = ObjectToDictionary(args[1]) as IList<IDictionary<string, object>>;
+                var originalValuesList = ObjectToDictionary(args[1]) as IList<IReadOnlyDictionary<string, object>>;
                 if (originalValuesList == null) throw new InvalidOperationException("Parameter type mismatch; both parameters to Update should be same type.");
-                return dataStrategy.Run.UpdateMany(table.GetQualifiedName(), newValuesList, originalValuesList);
+                return dataStrategy.Run.Execute(new UpdateEntityOperation(table.GetQualifiedName(), newValuesList, originalValuesList));
             }
 
-            var newValuesDict = newValues as IDictionary<string, object>;
-            var originalValuesDict = ObjectToDictionary(args[1]) as IDictionary<string, object>;
+            var newValuesDict = newValues as IReadOnlyDictionary<string, object>;
+            var originalValuesDict = ObjectToDictionary(args[1]) as IReadOnlyDictionary<string, object>;
             if (originalValuesDict == null) throw new InvalidOperationException("Parameter type mismatch; both parameters to Update should be same type.");
-            return dataStrategy.Run.Update(table.GetQualifiedName(), newValuesDict, originalValuesDict);
+            return dataStrategy.Run.Execute(new UpdateEntityOperation(table.GetQualifiedName(), newValuesDict, originalValuesDict));
         }
 
         private static object UpdateUsingKeys(DataStrategy dataStrategy, DynamicTable table, object[] args)
         {
             var record = ObjectToDictionary(args[0]);
-            var list = record as IList<IDictionary<string, object>>;
-            if (list != null) return dataStrategy.Run.UpdateMany(table.GetQualifiedName(), list);
+            var list = record as IList<IReadOnlyDictionary<string, object>>;
+            if (list != null) return dataStrategy.Run.Execute(new UpdateEntityOperation(table.GetQualifiedName(), list));
 
-            var dict = record as IDictionary<string, object>;
+            var dict = record as IReadOnlyDictionary<string, object>;
             if (dict == null) throw new InvalidOperationException("Could not resolve data from passed object.");
             var key = dataStrategy.GetAdapter().GetKey(table.GetQualifiedName(), dict);
-            dict = dict.Where(kvp => key.All(keyKvp => keyKvp.Key.Homogenize() != kvp.Key.Homogenize())).ToDictionary();
-            var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), key);
-            return dataStrategy.Run.Update(table.GetQualifiedName(), dict, criteria);
+            dict = dict.Where(kvp => key.All(keyKvp => keyKvp.Key.Homogenize() != kvp.Key.Homogenize())).ToReadOnlyDictionary();
+            return dataStrategy.Run.Execute(new UpdateEntityOperation(table.GetQualifiedName(), dict));
         }
 
         internal static object ObjectToDictionary(object obj)
         {
-            var dynamicRecord = obj as SimpleRecord;
-            if (dynamicRecord != null)
+            var readOnlyDictionary = obj as IReadOnlyDictionary<string, object>;
+            if (readOnlyDictionary != null)
             {
-                return new Dictionary<string, object>(dynamicRecord, HomogenizedEqualityComparer.DefaultInstance);
+                return readOnlyDictionary;
             }
 
             var dictionary = obj as IDictionary<string, object>;
             if (dictionary != null)
             {
-                return new Dictionary<string,object>(dictionary, HomogenizedEqualityComparer.DefaultInstance);
+                return dictionary.ToReadOnly();
             }
 
             var list = obj as IEnumerable;
             if (list != null)
             {
                 var originals = list.Cast<object>().ToList();
-                var dictionaries = originals.Select(o => ObjectToDictionary(o) as IDictionary<string,object>).Where(o => o != null && o.Count > 0).ToList();
+                var dictionaries = originals.Select(o => ObjectToDictionary(o) as IReadOnlyDictionary<string,object>).Where(o => o != null && o.Count > 0).ToList();
                 if (originals.Count == dictionaries.Count)
                     return dictionaries;
             }

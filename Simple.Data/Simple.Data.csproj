@@ -65,6 +65,7 @@
     <Compile Include="BinderHelper.cs" />
     <Compile Include="CachingAdapterFactory.cs" />
     <Compile Include="CastEnumerable.cs" />
+    <Compile Include="CommandResult.cs" />
     <Compile Include="Commands\CommandFactory.cs" />
     <Compile Include="Commands\ArgumentHelper.cs" />
     <Compile Include="Commands\GetCommand.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="Database.Open.cs" />
     <Compile Include="DatabaseOpenerMethods.cs" />
     <Compile Include="DatabaseRunner.cs" />
+    <Compile Include="DataResult.cs" />
     <Compile Include="DataStrategyWithOptions.cs" />
     <Compile Include="DictionaryCloner.cs" />
     <Compile Include="ErrorCallback.cs" />
@@ -101,13 +103,17 @@
     <Compile Include="InMemoryAdapterIAdapterWithTransactions.cs" />
     <Compile Include="BadExpressionException.cs" />
     <Compile Include="JoinType.cs" />
+    <Compile Include="MultiDataResult.cs" />
     <Compile Include="OfTypeEnumerable.cs" />
-    <Compile Include="Operations\FindOperation.cs" />
+    <Compile Include="OperationResult.cs" />
+    <Compile Include="Operations\DeleteOperation.cs" />
+    <Compile Include="Operations\QueryOperation.cs" />
     <Compile Include="Operations\GetOperation.cs" />
     <Compile Include="Operations\InsertOperation.cs" />
     <Compile Include="Operations\Operation.cs" />
+    <Compile Include="Operations\UpdateByCriteriaOperation.cs" />
+    <Compile Include="Operations\UpdateEntityOperation.cs" />
     <Compile Include="Operations\UpsertOperation.cs" />
-    <Compile Include="OptimizingDelegateFactory.cs" />
     <Compile Include="OptionsBase.cs" />
     <Compile Include="PropertySetterBuilder.cs" />
     <Compile Include="QueryPolyfills\AggregateValueResolver.cs" />
@@ -141,6 +147,7 @@
     <Compile Include="QueryPolyfills\SelectClauseHandler.cs" />
     <Compile Include="QueryPolyfills\ValueResolver.cs" />
     <Compile Include="QueryPolyfills\WhereClauseHandler.cs" />
+    <Compile Include="QueryResult.cs" />
     <Compile Include="Range.cs" />
     <Compile Include="Range1.cs" />
     <Compile Include="RunStrategy.cs" />
@@ -180,7 +187,6 @@
     <Compile Include="Commands\DeleteByCommand.cs" />
     <Compile Include="IAdapterFactory.cs" />
     <Compile Include="IAdapterTransaction.cs" />
-    <Compile Include="IAdapterWithFunctions.cs" />
     <Compile Include="IAdapterWithRelation.cs" />
     <Compile Include="IAdapterWithTransactions.cs" />
     <Compile Include="MefHelper.cs" />

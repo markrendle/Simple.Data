@@ -82,7 +82,7 @@
                 IDictionary<string, object> result;
                 try
                 {
-                    var key = _adapter.GetKey(tableName, row);
+                    var key = _adapter.GetKey(tableName, row.ToReadOnly());
                     if (key.Count == 0)
                     {
                         result = new AdoAdapterInserter(_adapter).Insert(tableName, row, isResultRequired);

@@ -49,7 +49,12 @@ namespace Simple.Data.UnitTest
 
     class StubAdapter : Adapter
     {
-        public override IDictionary<string, object> GetKey(string tableName, IDictionary<string, object> record)
+        public override IEqualityComparer<string> KeyComparer
+        {
+            get { return StringComparer.OrdinalIgnoreCase; }
+        }
+
+        public override IReadOnlyDictionary<string, object> GetKey(string tableName, IReadOnlyDictionary<string, object> record)
         {
             throw new NotImplementedException();
         }
@@ -59,37 +64,7 @@ namespace Simple.Data.UnitTest
             throw new NotImplementedException();
         }
 
-        public override IDictionary<string, object> Get(GetOperation operation)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override IEnumerable<IDictionary<string, object>> Find(FindOperation operation)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, bool resultRequired)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override int Delete(string tableName, SimpleExpression criteria)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override IEnumerable<IEnumerable<IDictionary<string, object>>> RunQueries(SimpleQuery[] queries, List<IEnumerable<SimpleQueryClauseBase>> unhandledClauses)
+        public override OperationResult Execute(IOperation operation)
         {
             throw new NotImplementedException();
         }

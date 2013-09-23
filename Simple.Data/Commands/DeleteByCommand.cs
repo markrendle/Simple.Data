@@ -5,6 +5,7 @@ using System.Dynamic;
 namespace Simple.Data.Commands
 {
     using Extensions;
+    using Operations;
 
     class DeleteByCommand : ICommand
     {
@@ -16,7 +17,7 @@ namespace Simple.Data.Commands
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             SimpleExpression criteriaExpression = GetCriteriaExpression(binder, args, table);
-            return dataStrategy.Run.Delete(table.GetQualifiedName(), criteriaExpression);
+            return dataStrategy.Run.Execute(new DeleteOperation(table.GetQualifiedName(), criteriaExpression));
         }
 
         private static SimpleExpression GetCriteriaExpression(InvokeMemberBinder binder, object[] args, DynamicTable table)

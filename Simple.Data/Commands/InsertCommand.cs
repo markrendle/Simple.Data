@@ -43,26 +43,26 @@ namespace Simple.Data.Commands
             return InsertDictionary(binder, args, dataStrategy, tableName);
         }
 
-        private static object InsertDictionary(InvokeMemberBinder binder, IEnumerable<object> args, DataStrategy dataStrategy, string tableName)
+        private static DataResult InsertDictionary(InvokeMemberBinder binder, IEnumerable<object> args, DataStrategy dataStrategy, string tableName)
         {
             var operation = new InsertOperation(tableName, Enumerable.Repeat(binder.NamedArgumentsToDictionary(args), 1),
                 !binder.IsResultDiscarded());
-            return dataStrategy.Run.Insert(operation);
+            return (DataResult)dataStrategy.Run.Execute(operation);
         }
 
-        private static IEnumerable<IReadOnlyDictionary<string, object>> InsertEntity(object entity, DataStrategy dataStrategy, string tableName, ErrorCallback onError, bool resultRequired)
+        private static DataResult InsertEntity(object entity, DataStrategy dataStrategy, string tableName, ErrorCallback onError, bool resultRequired)
         {
             var readOnlyDictionary = entity as IReadOnlyDictionary<string, object>;
             if (readOnlyDictionary != null)
             {
                 var operation = new InsertOperation(tableName, readOnlyDictionary, resultRequired);
-                return dataStrategy.Run.Insert(operation);
+                return (DataResult)dataStrategy.Run.Execute(operation);
             }
 
             var list = entity as IEnumerable<IDictionary<string, object>>;
             if (list != null)
             {
-                return dataStrategy.Run.Insert(new InsertOperation(tableName, list, resultRequired, onError));
+                return (DataResult)dataStrategy.Run.Execute(new InsertOperation(tableName, list, resultRequired, onError));
             }
 
             var entityList = entity as IEnumerable;
@@ -80,13 +80,13 @@ namespace Simple.Data.Commands
                     rows.Add(readOnlyDictionary);
                 }
 
-                return dataStrategy.Run.Insert(new InsertOperation(tableName, rows, resultRequired, onError));
+                return (DataResult)dataStrategy.Run.Execute(new InsertOperation(tableName, rows, resultRequired, onError));
             }
 
             readOnlyDictionary = entity.ObjectToDictionary();
             if (readOnlyDictionary.Count == 0)
                 throw new SimpleDataException("Could not discover data in object.");
-            return dataStrategy.Run.Insert(new InsertOperation(tableName, readOnlyDictionary, resultRequired));
+            return (DataResult)dataStrategy.Run.Execute(new InsertOperation(tableName, readOnlyDictionary, resultRequired));
         }
     }
 }

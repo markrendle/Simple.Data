@@ -33,7 +33,8 @@ namespace Simple.Data.Commands
         {
             if (args.Length == 1 && args[0] is SimpleExpression)
             {
-                var data = dataStrategy.Run.FindOne(new FindOperation(table.GetQualifiedName(), (SimpleExpression)args[0]));
+                var result = (DataResult)dataStrategy.Run.Execute(new QueryOperation(dataStrategy, table.GetQualifiedName(), (SimpleExpression)args[0]));
+                var data = result.Data.FirstOrDefault();
                 return data != null ? new SimpleRecord(data, table.GetQualifiedName(), dataStrategy) : null;
             }
 

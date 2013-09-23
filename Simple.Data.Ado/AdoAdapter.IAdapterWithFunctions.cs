@@ -7,7 +7,7 @@ using ResultSet = System.Collections.Generic.IEnumerable<System.Collections.Gene
 
 namespace Simple.Data.Ado
 {
-    public partial class AdoAdapter : IAdapterWithFunctions
+    public partial class AdoAdapter
 	{
 	    private readonly ConcurrentDictionary<string, IProcedureExecutor> _executors = new ConcurrentDictionary<string, IProcedureExecutor>();
 

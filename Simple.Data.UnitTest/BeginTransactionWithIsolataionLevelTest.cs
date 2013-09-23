@@ -58,59 +58,10 @@ namespace Simple.Data.UnitTest
             return null;
         }
 
-        #region IAdapterWithTransactions - not implementead
-
-        public IEnumerable<IDictionary<string, object>> Find(FindOperation operation, IAdapterTransaction transaction)
+        public OperationResult Execute(IOperation operation, IAdapterTransaction transaction)
         {
             throw new NotImplementedException();
         }
-
-        public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, IAdapterTransaction transaction, bool resultRequired)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<IDictionary<string, object>> InsertMany(string tableName, IEnumerable<IDictionary<string, object>> data, IAdapterTransaction transaction, Func<IDictionary<string, object>, Exception, bool> onError, bool resultRequired)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria, IAdapterTransaction transaction)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int Delete(string tableName, SimpleExpression criteria, IAdapterTransaction transaction)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> dataList, IAdapterTransaction adapterTransaction)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> dataList, IAdapterTransaction adapterTransaction, IList<string> keyFields)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int UpdateMany(string tableName, IList<IDictionary<string, object>> dataList, IEnumerable<string> criteriaFieldNames, IAdapterTransaction adapterTransaction)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IDictionary<string, object> Get(GetOperation operation, IAdapterTransaction transaction)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query, IAdapterTransaction transaction, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
     }
 
 }

@@ -4,7 +4,7 @@
     using System.Collections.ObjectModel;
     using System.Linq;
 
-    public class InsertOperation
+    public class InsertOperation : IOperation
     {
         private readonly IEnumerable<IReadOnlyDictionary<string, object>> _data;
         private readonly bool _resultRequired;
