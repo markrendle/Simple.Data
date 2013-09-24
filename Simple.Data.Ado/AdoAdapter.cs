@@ -231,7 +231,7 @@ namespace Simple.Data.Ado
             return new AdoAdapterInserter(this).Insert(tableName, data, resultRequired);
         }
 
-        private int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data,
+        private int UpdateMany(string tableName, IEnumerable<IReadOnlyDictionary<string, object>> data,
                                        IEnumerable<string> criteriaFieldNames)
         {
             IBulkUpdater bulkUpdater = ProviderHelper.GetCustomProvider<IBulkUpdater>(ConnectionProvider) ??
@@ -239,14 +239,14 @@ namespace Simple.Data.Ado
             return bulkUpdater.Update(this, tableName, data.ToList(), criteriaFieldNames, null);
         }
 
-        private int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data)
+        private int UpdateMany(string tableName, IEnumerable<IReadOnlyDictionary<string, object>> data)
         {
             IBulkUpdater bulkUpdater = ProviderHelper.GetCustomProvider<IBulkUpdater>(ConnectionProvider) ??
                                        new BulkUpdater();
             return bulkUpdater.Update(this, tableName, data.ToList(), null);
         }
 
-        private int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
+        private int Update(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria)
         {
             ICommandBuilder commandBuilder = new UpdateHelper(_schema).GetUpdateCommand(tableName, data, criteria);
             return Execute(commandBuilder);
@@ -284,7 +284,7 @@ namespace Simple.Data.Ado
             _connectionModifier = connection => connection;
         }
 
-        private int Execute(ICommandBuilder commandBuilder)
+        public int Execute(ICommandBuilder commandBuilder)
         {
             IDbConnection connection = CreateConnection();
             using (connection.MaybeDisposable())
@@ -351,18 +351,18 @@ namespace Simple.Data.Ado
             return _schema ?? (_schema = DatabaseSchema.Get(_connectionProvider, _providerHelper));
         }
 
-        private IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> data, SimpleExpression criteria, bool resultRequired)
+        private IDictionary<string, object> Upsert(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria, bool resultRequired)
         {
             return new AdoAdapterUpserter(this).Upsert(tableName, data, criteria, resultRequired);
         }
 
-        private IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
+        private IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list, bool isResultRequired, Func<IReadOnlyDictionary<string, object>, Exception, bool> errorCallback)
         {
             var upserter = new AdoAdapterUpserter(this);
             return upserter.UpsertMany(tableName, list, isResultRequired, errorCallback);
         }
 
-        private IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
+        private IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list, IEnumerable<string> keyFieldNames, bool isResultRequired, Func<IReadOnlyDictionary<string, object>, Exception, bool> errorCallback)
         {
             return new AdoAdapterUpserter(this).UpsertMany(tableName, list, keyFieldNames.ToArray(), isResultRequired, errorCallback);
         }

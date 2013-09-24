@@ -10,24 +10,28 @@ namespace Simple.Data.Ado
 
     class BulkUpdater : IBulkUpdater
     {
-        public int Update(AdoAdapter adapter, string tableName, IList<IDictionary<string, object>> data, IDbTransaction transaction)
+        public int Update(AdoAdapter adapter, string tableName, IEnumerable<IReadOnlyDictionary<string, object>> data, IDbTransaction transaction)
         {
             return Update(adapter, tableName, data, adapter.GetKeyNames(tableName).ToList(), transaction);
         }
 
-        public int Update(AdoAdapter adapter, string tableName, IList<IDictionary<string, object>> data, IEnumerable<string> criteriaFieldNames, IDbTransaction transaction)
+        public int Update(AdoAdapter adapter, string tableName, IEnumerable<IReadOnlyDictionary<string, object>> data, IEnumerable<string> criteriaFieldNames, IDbTransaction transaction)
         {
+            if (data == null) return 0;
+
+            var list = data.ToList();
+            if (list.Count == 0) return 0;
+
             int count = 0;
-            if (data == null || !data.Any()) 
-                return count;
 
             var criteriaFieldNameList = criteriaFieldNames.ToList();
             if (criteriaFieldNameList.Count == 0) throw new NotSupportedException("Adapter does not support key-based update for this object.");
 
-            if (!AllRowsHaveSameKeys(data)) throw new SimpleDataException("Records have different structures. Bulk updates are only valid on consistent records.");
+            if (!AllRowsHaveSameKeys(list)) throw new SimpleDataException("Records have different structures. Bulk updates are only valid on consistent records.");
             var table = adapter.GetSchema().FindTable(tableName);
 
-            var exampleRow = new Dictionary<string, object>(data.First(), HomogenizedEqualityComparer.DefaultInstance);
+            var first = list.First().ToDictionary(kvp => kvp.Key, kvp => kvp.Value, HomogenizedEqualityComparer.DefaultInstance);
+            var exampleRow = new Dictionary<string, object>(first, HomogenizedEqualityComparer.DefaultInstance);
 
             var commandBuilder = new UpdateHelper(adapter.GetSchema()).GetUpdateCommand(tableName, exampleRow,
                                                                     ExpressionHelper.CriteriaDictionaryToExpression(
@@ -42,9 +46,9 @@ namespace Simple.Data.Ado
                     command.Transaction = transaction;
                 }
                 connection.OpenIfClosed();
-                var propertyToParameterMap = CreatePropertyToParameterMap(data, table, command);
+                var propertyToParameterMap = CreatePropertyToParameterMap(list, table, command);
 
-                foreach (var row in data)
+                foreach (var row in list)
                 {
                     foreach (var kvp in row)
                     {
@@ -60,7 +64,7 @@ namespace Simple.Data.Ado
             return count;
         }
 
-        private static Dictionary<string, IDbDataParameter> CreatePropertyToParameterMap(IEnumerable<IDictionary<string, object>> data, Table table, IDbCommand command)
+        private static Dictionary<string, IDbDataParameter> CreatePropertyToParameterMap(IEnumerable<IReadOnlyDictionary<string, object>> data, Table table, IDbCommand command)
         {
             return data.First().Select(kvp => new
             {
@@ -87,7 +91,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static bool AllRowsHaveSameKeys(IList<IDictionary<string, object>> data)
+        private static bool AllRowsHaveSameKeys(IEnumerable<IReadOnlyDictionary<string, object>> data)
         {
             var exemplar = new HashSet<string>(data.First().Keys);
 

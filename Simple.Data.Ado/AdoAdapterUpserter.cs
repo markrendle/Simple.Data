@@ -29,7 +29,7 @@
             if (transaction != null) _connection = transaction.Connection;
         }
 
-        public IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> data, SimpleExpression criteria, bool resultRequired)
+        public IDictionary<string, object> Upsert(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria, bool resultRequired)
         {
             var connection = _connection ?? _adapter.CreateConnection();
             using (connection.MaybeDisposable())
@@ -39,7 +39,7 @@
             }
         }
 
-        private IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> data, SimpleExpression criteria, bool resultRequired,
+        private IDictionary<string, object> Upsert(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria, bool resultRequired,
                                    IDbConnection connection)
         {
             var finder = _transaction == null
@@ -51,7 +51,7 @@
             {
                 // Don't update columns used as criteria
                 var keys = criteria.GetOperandsOfType<ObjectReference>().Select(o => o.GetName().Homogenize());
-                var updateData = data.Where(kvp => keys.All(k => k != kvp.Key.Homogenize())).ToDictionary();
+                var updateData = data.Where(kvp => keys.All(k => k != kvp.Key.Homogenize())).ToReadOnlyDictionary();
                 if (updateData.Count == 0)
                 {
                     return existing;
@@ -75,14 +75,14 @@
         }
 
 
-        public IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
+        public IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list, bool isResultRequired, Func<IReadOnlyDictionary<string, object>, Exception, bool> errorCallback)
         {
             foreach (var row in list)
             {
                 IDictionary<string, object> result;
                 try
                 {
-                    var key = _adapter.GetKey(tableName, row.ToReadOnly());
+                    var key = _adapter.GetKey(tableName, row);
                     if (key.Count == 0)
                     {
                         result = new AdoAdapterInserter(_adapter).Insert(tableName, row, isResultRequired);
@@ -104,15 +104,16 @@
             }
         }
         
-        public IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IList<string> keyFieldNames, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
+        public IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list, IList<string> keyFieldNames, bool isResultRequired, Func<IReadOnlyDictionary<string, object>, Exception, bool> errorCallback)
         {
             foreach (var row in list)
             {
                 IDictionary<string, object> result;
                 try
                 {
-                    var criteria = GetCriteria(tableName, keyFieldNames, row);
-                    result = Upsert(tableName, row, criteria, isResultRequired);
+                    var copy = row;
+                    var criteria = GetCriteria(tableName, keyFieldNames, ref copy);
+                    result = Upsert(tableName, copy, criteria, isResultRequired);
                 }
                 catch (Exception ex)
                 {
@@ -125,9 +126,10 @@
         }
 
         private static SimpleExpression GetCriteria(string tableName, IEnumerable<string> criteriaFieldNames,
-                                                      IDictionary<string, object> record)
+                                                      ref IReadOnlyDictionary<string, object> record)
         {
             var criteria = new Dictionary<string, object>();
+            var writeable = record.ToDictionary();
 
             foreach (var criteriaFieldName in criteriaFieldNames)
             {
@@ -139,8 +141,9 @@
                 }
 
                 criteria.Add(criteriaFieldName, keyValuePair.Value);
-                record.Remove(keyValuePair);
+                writeable.Remove(keyValuePair);
             }
+            record = writeable.ToReadOnly();
             return ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteria);
         }
     }

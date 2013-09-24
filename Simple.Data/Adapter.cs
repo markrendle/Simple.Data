@@ -96,7 +96,7 @@ namespace Simple.Data
         /// <param name="criteriaFieldNames">The names of fields to be used for the criteria.</param>
         /// <param name="record">The name/value pairs to be used as criteria.</param>
         /// <returns>A <see cref="SimpleExpression"/> criteria object.</returns>
-        protected static SimpleExpression GetCriteria(string tableName, IEnumerable<string> criteriaFieldNames,
+        public static SimpleExpression GetCriteria(string tableName, IEnumerable<string> criteriaFieldNames,
                                                       ref IReadOnlyDictionary<string, object> record)
         {
             var criteria = new Dictionary<string, object>();
