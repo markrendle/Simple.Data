@@ -10,6 +10,7 @@ namespace Simple.Data.IntegrationTest
     [TestFixture]
     public class TraceSettingsTest
     {
+#pragma warning disable 618
         [Test]
         public void TraceLevelShouldBePickedUpFromConfig()
         {
@@ -23,5 +24,6 @@ namespace Simple.Data.IntegrationTest
             Assert.AreEqual(TraceLevel.Off, Database.TraceLevel);
 
         }
+#pragma warning restore 618
     }
 }

@@ -95,6 +95,7 @@
     <Compile Include="DataResult.cs" />
     <Compile Include="DataStrategyWithOptions.cs" />
     <Compile Include="DictionaryCloner.cs" />
+    <Compile Include="CheckedEnumerable.cs" />
     <Compile Include="ErrorCallback.cs" />
     <Compile Include="ForUpdateClause.cs" />
     <Compile Include="FunctionSignature.cs" />

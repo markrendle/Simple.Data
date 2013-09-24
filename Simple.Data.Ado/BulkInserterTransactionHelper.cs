@@ -10,13 +10,13 @@ namespace Simple.Data.Ado
     {
         private readonly IDbTransaction _transaction;
 
-        public BulkInserterTransactionHelper(AdoAdapter adapter, IEnumerable<IDictionary<string, object>> data, Table table, List<Column> columns, IDbTransaction transaction)
+        public BulkInserterTransactionHelper(AdoAdapter adapter, IEnumerable<IReadOnlyDictionary<string, object>> data, Table table, List<Column> columns, IDbTransaction transaction)
             : base(adapter, data, table, columns)
         {
             _transaction = transaction;
         }
 
-        public override IEnumerable<IDictionary<string, object>> InsertRowsWithSeparateStatements(string insertSql, string selectSql, Func<IDictionary<string, object>, Exception, bool> onError)
+        public override IEnumerable<IDictionary<string, object>> InsertRowsWithSeparateStatements(string insertSql, string selectSql, ErrorCallback onError)
         {
             var insertCommand = new CommandHelper(Adapter).Create(_transaction.Connection, insertSql);
             var selectCommand = _transaction.Connection.CreateCommand(Adapter.AdoOptions);
@@ -26,7 +26,7 @@ namespace Simple.Data.Ado
             return Data.Select(row => InsertRow(row, insertCommand, selectCommand, onError)).ToList();
         }
 
-        public override IEnumerable<IDictionary<string, object>> InsertRowsWithCompoundStatement(string insertSql, string selectSql, Func<IDictionary<string, object>, Exception, bool> onError)
+        public override IEnumerable<IDictionary<string, object>> InsertRowsWithCompoundStatement(string insertSql, string selectSql, ErrorCallback onError)
         {
             insertSql += "; " + selectSql;
             var command = new CommandHelper(Adapter).Create(_transaction.Connection, insertSql);
@@ -34,7 +34,7 @@ namespace Simple.Data.Ado
             return Data.Select(row => InsertRowAndSelect(row, command, onError)).ToList();
         }
 
-        public override void InsertRowsWithoutFetchBack(string insertSql, Func<IDictionary<string, object>, Exception, bool> onError)
+        public override void InsertRowsWithoutFetchBack(string insertSql, ErrorCallback onError)
         {
             using (var insertCommand = new CommandHelper(Adapter).Create(_transaction.Connection, insertSql))
             {

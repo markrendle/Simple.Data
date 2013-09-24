@@ -32,20 +32,6 @@ namespace Simple.Data.Ado
             return new AdoAdapterTransaction(transaction, name, _sharedConnection != null);
         }
 
-        public OperationResult Execute(IOperation operation, IAdapterTransaction transaction)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<IDictionary<string, object>> InsertMany(string tableName,
-                                                                   IEnumerable<IDictionary<string, object>> data,
-                                                                   IAdapterTransaction transaction,
-                                                                   Func<IDictionary<string, object>, Exception, bool> onError, bool resultRequired)
-        {
-            return new AdoAdapterInserter(this, ((AdoAdapterTransaction)transaction).DbTransaction).InsertMany(
-                tableName, data, onError, resultRequired);
-        }
-
         public int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data,
                               IAdapterTransaction transaction)
         {

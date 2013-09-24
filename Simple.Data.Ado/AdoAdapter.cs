@@ -14,6 +14,7 @@ namespace Simple.Data.Ado
     [Export("Ado", typeof (Adapter))]
     public partial class AdoAdapter : Adapter, ICloneable
     {
+        private readonly ExecutorFactory _executorFactory = new ExecutorFactory();
         private readonly AdoAdapterFinder _finder;
         private readonly ProviderHelper _providerHelper = new ProviderHelper();
         private CommandOptimizer _commandOptimizer = new CommandOptimizer();
@@ -141,7 +142,20 @@ namespace Simple.Data.Ado
 
         public override OperationResult Execute(IOperation operation)
         {
-            throw new NotImplementedException();
+            return Execute(operation, null);
+        }
+
+        public OperationResult Execute(IOperation operation, IAdapterTransaction transaction)
+        {
+            if (operation == null) throw new ArgumentNullException("operation");
+
+            Func<IOperation, AdoAdapter, AdoAdapterTransaction, OperationResult> func;
+            if (_executorFactory.TryGet(operation, out func))
+            {
+                return func(operation, this, null);
+            }
+
+            throw new NotSupportedException(string.Format("Operation '{0}' is not supported by the current database.", operation.GetType().Name));
         }
 
         public OperationResult Execute(FunctionOperation operation)
@@ -215,13 +229,6 @@ namespace Simple.Data.Ado
         private IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, bool resultRequired)
         {
             return new AdoAdapterInserter(this).Insert(tableName, data, resultRequired);
-        }
-
-        private IEnumerable<IDictionary<string, object>> InsertMany(string tableName,
-                                                                            IEnumerable<IDictionary<string, object>>
-                                                                                data, Func<IDictionary<string,object>, Exception, bool> onError, bool resultRequired)
-        {
-            return new AdoAdapterInserter(this).InsertMany(tableName, data, onError, resultRequired);
         }
 
         private int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data,

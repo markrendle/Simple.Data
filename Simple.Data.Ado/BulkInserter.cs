@@ -8,7 +8,7 @@
 
     public class BulkInserter : IBulkInserter
     {
-        public IEnumerable<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IEnumerable<IDictionary<string, object>> data, IDbTransaction transaction, Func<IDictionary<string,object>, Exception, bool> onError, bool resultRequired)
+        public IEnumerable<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IEnumerable<IReadOnlyDictionary<string, object>> data, IDbTransaction transaction, ErrorCallback onError, bool resultRequired)
         {
             var table = adapter.GetSchema().FindTable(tableName);
             var columns = table.Columns.Where(c => c.IsWriteable).ToList();
@@ -40,7 +40,7 @@
             return null;
         }
 
-        private static IEnumerable<IDictionary<string, object>> InsertRowsAndReturn(AdoAdapter adapter, string identityFunction, BulkInserterHelper helper, string insertSql, Table table, Func<IDictionary<string, object>, Exception, bool> onError)
+        private static IEnumerable<IDictionary<string, object>> InsertRowsAndReturn(AdoAdapter adapter, string identityFunction, BulkInserterHelper helper, string insertSql, Table table, ErrorCallback onError)
         {
             var identityColumn = table.Columns.FirstOrDefault(col => col.IsIdentity);
 

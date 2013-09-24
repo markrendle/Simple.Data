@@ -13,7 +13,7 @@ namespace Simple.Data.SqlServer
     [Export(typeof(IBulkInserter))]
     public class SqlBulkInserter : IBulkInserter
     {
-        public IEnumerable<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IEnumerable<IDictionary<string, object>> data, IDbTransaction transaction, Func<IDictionary<string, object>, Exception, bool> onError, bool resultRequired)
+        public IEnumerable<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IEnumerable<IReadOnlyDictionary<string, object>> data, IDbTransaction transaction, ErrorCallback onError, bool resultRequired)
         {
             if (resultRequired)
             {
@@ -82,7 +82,7 @@ namespace Simple.Data.SqlServer
             return options;
         }
 
-        private DataTable CreateDataTable(AdoAdapter adapter, string tableName, ICollection<string> keys, SqlBulkCopy bulkCopy)
+        private DataTable CreateDataTable(AdoAdapter adapter, string tableName, IEnumerable<string> keys, SqlBulkCopy bulkCopy)
         {
             var table = adapter.GetSchema().FindTable(tableName);
             var dataTable = new DataTable(table.ActualName);

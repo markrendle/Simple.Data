@@ -32,7 +32,7 @@ namespace Simple.Data.Ado
             if (transaction != null) _connection = transaction.Connection;
         }
 
-        public IEnumerable<IDictionary<string, object>> InsertMany(string tableName, IEnumerable<IDictionary<string, object>> data, Func<IDictionary<string,object>, Exception, bool> onError, bool resultRequired)
+        public IEnumerable<IDictionary<string, object>> InsertMany(string tableName, CheckedEnumerable<IReadOnlyDictionary<string, object>> data, ErrorCallback onError, bool resultRequired)
         {
             if (data == null) throw new ArgumentNullException("data");
             var list = data.ToList();

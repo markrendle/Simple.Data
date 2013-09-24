@@ -93,6 +93,7 @@
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="EagerLoadingEnumerable.cs" />
     <Compile Include="EventHandlerEx.cs" />
+    <Compile Include="ExecutorFactory.cs" />
     <Compile Include="ExpressionFormatter.cs" />
     <Compile Include="ExpressionFormatterBase.cs" />
     <Compile Include="ExpressionHasher.cs" />
