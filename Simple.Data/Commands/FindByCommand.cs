@@ -50,7 +50,8 @@ namespace Simple.Data.Commands
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(),
                                                                                      CreateCriteriaDictionary(binder,
                                                                                                               args));
-            return dataStrategy.Run.Execute(new QueryOperation(dataStrategy, table.GetQualifiedName(), criteriaExpression));
+            var result = (QueryResult)dataStrategy.Run.Execute(new QueryOperation(dataStrategy, table.GetQualifiedName(), criteriaExpression));
+            return result.Data.FirstOrDefault();
         }
 
         public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)

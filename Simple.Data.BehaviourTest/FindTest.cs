@@ -22,7 +22,7 @@ namespace Simple.Data.IntegrationTest
 // ReSharper restore CoVariantArrayConversion
         }
 
-        private const string UsersColumns = "[dbo].[Users].[Id], [dbo].[Users].[Name], [dbo].[Users].[Password], [dbo].[Users].[Age]";
+        private const string UsersColumns = "[dbo].[Users].[Id],[dbo].[Users].[Name],[dbo].[Users].[Password],[dbo].[Users].[Age]";
         [Test]
         public void TestFindEqualWithInt32()
         {

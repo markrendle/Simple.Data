@@ -89,6 +89,7 @@
     <Compile Include="DbConnectionEx.cs" />
     <Compile Include="DbConnectionExtensions.cs" />
     <Compile Include="DelegatingConnectionBase1.cs" />
+    <Compile Include="DeleteExecutor.cs" />
     <Compile Include="DeleteHelper.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="EagerLoadingEnumerable.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="IDbParameterFactory.cs" />
     <Compile Include="IExpressionFormatter.cs" />
     <Compile Include="IFunctionNameConverter.cs" />
+    <Compile Include="InsertExecutor.cs" />
     <Compile Include="IObservableQueryRunner.cs" />
     <Compile Include="IQueryPager.cs" />
     <Compile Include="ISchemaGetter.cs" />
@@ -131,6 +133,7 @@
     <Compile Include="ProviderHelper.cs" />
     <Compile Include="QueryBuilder.cs" />
     <Compile Include="QueryBuilderBase.cs" />
+    <Compile Include="QueryExecutor.cs" />
     <Compile Include="SimpleReferenceFormatter.cs" />
     <Compile Include="SchemaResolutionException.cs" />
     <Compile Include="Schema\AmbiguousObjectNameException.cs" />
@@ -153,6 +156,7 @@
     <Compile Include="TraceHelper.cs" />
     <Compile Include="TupleExtensions.cs" />
     <Compile Include="TypeHelper.cs" />
+    <Compile Include="UpdateEntityExecutor.cs" />
     <Compile Include="UpdateHelper.cs" />
   </ItemGroup>
   <ItemGroup>

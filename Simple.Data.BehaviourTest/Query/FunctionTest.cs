@@ -19,7 +19,7 @@ namespace Simple.Data.IntegrationTest.Query
                                       new[] { "dbo", "Users", "Password" });
         }
 
-        private const string usersColumns = "[dbo].[Users].[Name], [dbo].[Users].[Password]";
+        private const string usersColumns = "[dbo].[Users].[Name],[dbo].[Users].[Password]";
 
         [Test]
         public void SubstringIsEnteredCorrectlyInFindAll()

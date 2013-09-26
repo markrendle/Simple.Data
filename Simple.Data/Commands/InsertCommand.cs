@@ -58,11 +58,24 @@ namespace Simple.Data.Commands
                 var operation = new InsertOperation(tableName, readOnlyDictionary, resultRequired);
                 return (DataResult)dataStrategy.Run.Execute(operation);
             }
-
-            var list = entity as IEnumerable<IDictionary<string, object>>;
-            if (list != null)
+            
+            var dictionary = entity as IDictionary<string, object>;
+            if (dictionary != null)
             {
-                return (DataResult)dataStrategy.Run.Execute(new InsertOperation(tableName, list, resultRequired, onError));
+                var operation = new InsertOperation(tableName, dictionary, resultRequired);
+                return (DataResult)dataStrategy.Run.Execute(operation);
+            }
+
+            var readonlyDictionaryList = entity as IEnumerable<IReadOnlyDictionary<string, object>>;
+            if (readonlyDictionaryList != null)
+            {
+                return (DataResult)dataStrategy.Run.Execute(new InsertOperation(tableName, readonlyDictionaryList, resultRequired, onError));
+            }
+            
+            var dictionaryList = entity as IEnumerable<IDictionary<string, object>>;
+            if (dictionaryList != null)
+            {
+                return (DataResult)dataStrategy.Run.Execute(new InsertOperation(tableName, dictionaryList, resultRequired, onError));
             }
 
             var entityList = entity as IEnumerable;

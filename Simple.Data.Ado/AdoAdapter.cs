@@ -311,6 +311,7 @@ namespace Simple.Data.Ado
 
         internal int Execute(ICommandBuilder commandBuilder, IAdapterTransaction transaction)
         {
+            if (transaction == null) return Execute(commandBuilder);
             IDbTransaction dbTransaction = ((AdoAdapterTransaction) transaction).DbTransaction;
             return Execute(commandBuilder, dbTransaction);
         }
