@@ -27,18 +27,18 @@ namespace Simple.Data.Commands
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), criteria);
             var data = binder.NamedArgumentsToDictionary(args)
                 .Where(kvp => !criteria.ContainsKey(kvp.Key))
-                .ToDictionary();
-            return dataStrategy.Run.Execute(new UpdateEntityOperation(table.GetQualifiedName(), data.ToReadOnly()));
+                .ToReadOnlyDictionary();
+            return dataStrategy.Run.Execute(new UpdateByCriteriaOperation(table.GetQualifiedName(), criteriaExpression, data));
         }
 
         internal static object UpdateByKeyFields(string tableName, DataStrategy dataStrategy, object entity, IEnumerable<string> keyFieldNames)
         {
             var record = UpdateCommand.ObjectToDictionary(entity);
-            var list = record as ICollection<IDictionary<string, object>>;
-            if (list != null) return dataStrategy.Run.Execute(new UpdateEntityOperation(tableName, list.Select(d => d.ToReadOnly()).ToList()));
+            var list = record as ICollection<IReadOnlyDictionary<string, object>>;
+            if (list != null) return dataStrategy.Run.Execute(new UpdateEntityOperation(tableName, list));
 
-            var dict = record as IDictionary<string, object>;
-            return dataStrategy.Run.Execute(new UpdateEntityOperation(tableName, dict.ToReadOnly()));
+            var dict = record as IReadOnlyDictionary<string, object>;
+            return dataStrategy.Run.Execute(new UpdateEntityOperation(tableName, dict));
         }
 
         private static IEnumerable<KeyValuePair<string, object>> GetCriteria(IEnumerable<string> keyFieldNames, IDictionary<string, object> record)

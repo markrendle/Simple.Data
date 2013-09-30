@@ -19,7 +19,7 @@ namespace Simple.Data
                 .ToReadOnlyDictionary(StringComparer.InvariantCultureIgnoreCase);
         }
 
-        private static IReadOnlyDictionary<string, object> ArgumentsToDictionary(IEnumerable<String> argumentNames, IEnumerable<object> args)
+        private static IReadOnlyDictionary<string, object> ArgumentsToReadOnlyDictionary(IEnumerable<String> argumentNames, IEnumerable<object> args)
         {
             var argsArray = args.ToArray();
             if (argsArray.Length == 1 && argsArray[0] is IDictionary<string, object>)
@@ -37,9 +37,14 @@ namespace Simple.Data
             return NamedArgumentsToDictionary(binder.CallInfo.ArgumentNames, args);
         }
 
-        public static IReadOnlyDictionary<string, object> ArgumentsToDictionary(this InvokeMemberBinder binder, IEnumerable<object> args)
+        public static IDictionary<string, object> ArgumentsToDictionary(this InvokeMemberBinder binder, IEnumerable<object> args)
         {
-            return ArgumentsToDictionary(binder.CallInfo.ArgumentNames, args);
+            return ArgumentsToReadOnlyDictionary(binder.CallInfo.ArgumentNames, args).ToDictionary();
+        }
+
+        public static IReadOnlyDictionary<string, object> ArgumentsToReadOnlyDictionary(this InvokeMemberBinder binder, IEnumerable<object> args)
+        {
+            return ArgumentsToReadOnlyDictionary(binder.CallInfo.ArgumentNames, args);
         }
 
         internal static IReadOnlyDictionary<string, object> NamedArgumentsToDictionary(this InvokeBinder binder, IEnumerable<object> args)
@@ -47,9 +52,14 @@ namespace Simple.Data
             return NamedArgumentsToDictionary(binder.CallInfo.ArgumentNames, args);
         }
 
-        public static IReadOnlyDictionary<string, object> ArgumentsToDictionary(this InvokeBinder binder, IEnumerable<object> args)
+        public static IReadOnlyDictionary<string, object> ArgumentsToReadOnlyDictionary(this InvokeBinder binder, IEnumerable<object> args)
         {
-            return ArgumentsToDictionary(binder.CallInfo.ArgumentNames, args);
+            return ArgumentsToReadOnlyDictionary(binder.CallInfo.ArgumentNames, args);
+        }
+        
+        public static IDictionary<string, object> ArgumentsToDictionary(this InvokeBinder binder, IEnumerable<object> args)
+        {
+            return ArgumentsToReadOnlyDictionary(binder.CallInfo.ArgumentNames, args).ToDictionary();
         }
     }
 }

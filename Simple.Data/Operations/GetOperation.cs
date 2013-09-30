@@ -27,19 +27,19 @@
     public class FunctionOperation : IOperation
     {
         private readonly string _functionName;
-        private readonly IReadOnlyDictionary<string, object> _parameters;
+        private readonly IDictionary<string, object> _parameters;
 
         public string FunctionName
         {
             get { return _functionName; }
         }
 
-        public IReadOnlyDictionary<string, object> Parameters
+        public IDictionary<string, object> Parameters
         {
             get { return _parameters; }
         }
 
-        public FunctionOperation(string functionName, IReadOnlyDictionary<string, object> parameters)
+        public FunctionOperation(string functionName, IDictionary<string, object> parameters)
         {
             _functionName = functionName;
             _parameters = parameters;

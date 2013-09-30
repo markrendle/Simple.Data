@@ -18,7 +18,7 @@
                        _keyComparer.Equals(relatedTableName, ji.DetailPropertyName));
         }
 
-        public object FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName)
+        public object FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName, DataStrategy database)
         {
             return FindMaster(tableName, row, relatedTableName) ?? FindDetail(tableName, row, relatedTableName);
         }

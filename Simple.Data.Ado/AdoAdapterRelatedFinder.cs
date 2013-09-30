@@ -28,7 +28,7 @@ namespace Simple.Data.Ado
             return TryJoin(tableName, relatedTableName) != null;
         }
 
-        public object FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName)
+        public object FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName, DataStrategy database)
         {
             var join = TryJoin(tableName, relatedTableName);
             if (join == null) throw new AdoAdapterException(string.Format("Could not resolve relationship of tables '{0}' and '{1}'.", tableName, relatedTableName));
@@ -37,7 +37,7 @@ namespace Simple.Data.Ado
             {
                 return GetDetail(row, join);
             }
-            return GetMaster(row, join);
+            return GetMaster(row, join, database);
         }
 
         private TableJoin TryJoin(string tableName, string relatedTableName)
@@ -61,12 +61,13 @@ namespace Simple.Data.Ado
             return _adapter.GetSchema().FindTable(tableName).GetDetail(relatedTableName);
         }
 
-        private IDictionary<string, object> GetMaster(IDictionary<string, object> row, TableJoin masterJoin)
+        private IDictionary<string, object> GetMaster(IDictionary<string, object> row, TableJoin masterJoin, DataStrategy database)
         {
-            throw new NotImplementedException();
-            //var criteria = new Dictionary<string, object> { { masterJoin.MasterColumn.ActualName, row[masterJoin.DetailColumn.HomogenizedName] } };
-            //return _adapter.RunQuery(new QueryOperation(new QueryOperation(_adapter, masterJoin.Master.ActualName, ExpressionHelper.CriteriaDictionaryToExpression(masterJoin.Master.ActualName,
-            //                                                                           criteria))).FirstOrDefault();
+            //throw new NotImplementedException();
+            var criteria = new Dictionary<string, object> { { masterJoin.MasterColumn.ActualName, row[masterJoin.DetailColumn.HomogenizedName] } };
+            var expression = ExpressionHelper.CriteriaDictionaryToExpression(masterJoin.Master.ActualName, criteria);
+            IEnumerable<SimpleQueryClauseBase> _;
+            return _adapter.RunQuery(new SimpleQuery(database, masterJoin.Master.ActualName).Where(expression), null, out _).FirstOrDefault();
         }
 
         private SimpleQuery GetDetail(IDictionary<string, object> row, TableJoin join)

@@ -51,7 +51,7 @@ namespace Simple.Data.Commands
                                                                                      CreateCriteriaDictionary(binder,
                                                                                                               args));
             var result = (QueryResult)dataStrategy.Run.Execute(new QueryOperation(dataStrategy, table.GetQualifiedName(), criteriaExpression));
-            return result.Data.FirstOrDefault();
+            return result.Data.FirstOrDefault().ToDynamicRecord(table.GetQualifiedName(), dataStrategy);
         }
 
         public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)

@@ -101,6 +101,7 @@
     <Compile Include="FindHelper.cs" />
     <Compile Include="FunctionNameConverter.cs" />
     <Compile Include="GenericDbParameterFactory.cs" />
+    <Compile Include="GetExecutor.cs" />
     <Compile Include="HomogenizedDictionaryIndex.cs" />
     <Compile Include="IBulkInserter.cs" />
     <Compile Include="IBulkUpdater.cs" />
@@ -156,6 +157,7 @@
     <Compile Include="TraceHelper.cs" />
     <Compile Include="TupleExtensions.cs" />
     <Compile Include="TypeHelper.cs" />
+    <Compile Include="UpdateByCriteriaExecutor.cs" />
     <Compile Include="UpdateEntityExecutor.cs" />
     <Compile Include="UpdateHelper.cs" />
   </ItemGroup>

@@ -84,7 +84,7 @@ namespace Simple.Data
         private object GetRelatedData(GetMemberBinder binder, IAdapterWithRelation relatedAdapter)
         {
             object result;
-            var related = relatedAdapter.FindRelated(_tableName, _data, binder.Name);
+            var related = relatedAdapter.FindRelated(_tableName, _data, binder.Name, _database);
             var query = related as SimpleQuery;
             if (query != null)
             {

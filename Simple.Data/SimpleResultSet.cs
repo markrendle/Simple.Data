@@ -8,6 +8,8 @@ using System.Text;
 
 namespace Simple.Data
 {
+    using System.Collections.ObjectModel;
+
     public sealed class SimpleResultSet : DynamicObject, IEnumerable
     {
         public static readonly SimpleResultSet Empty = new SimpleResultSet();
@@ -313,6 +315,11 @@ namespace Simple.Data
         internal void SetOutputValues(IReadOnlyDictionary<string,object> outputValues)
         {
             _outputValues = outputValues;
+        }
+        
+        internal void SetOutputValues(IDictionary<string,object> outputValues)
+        {
+            _outputValues = new ReadOnlyDictionary<string, object>(outputValues);
         }
     }
 }

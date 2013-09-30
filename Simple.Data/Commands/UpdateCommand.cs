@@ -43,6 +43,7 @@ namespace Simple.Data.Commands
             }
 
             var newValuesDict = newValues as IReadOnlyDictionary<string, object>;
+
             var originalValuesDict = ObjectToDictionary(args[1]) as IReadOnlyDictionary<string, object>;
             if (originalValuesDict == null) throw new InvalidOperationException("Parameter type mismatch; both parameters to Update should be same type.");
             return dataStrategy.Run.Execute(new UpdateEntityOperation(table.GetQualifiedName(), newValuesDict, originalValuesDict));
@@ -56,8 +57,6 @@ namespace Simple.Data.Commands
 
             var dict = record as IReadOnlyDictionary<string, object>;
             if (dict == null) throw new InvalidOperationException("Could not resolve data from passed object.");
-            var key = dataStrategy.GetAdapter().GetKey(table.GetQualifiedName(), dict);
-            dict = dict.Where(kvp => key.All(keyKvp => keyKvp.Key.Homogenize() != kvp.Key.Homogenize())).ToReadOnlyDictionary();
             return dataStrategy.Run.Execute(new UpdateEntityOperation(table.GetQualifiedName(), dict));
         }
 

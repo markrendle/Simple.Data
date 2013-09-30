@@ -23,8 +23,9 @@ namespace Simple.Data
         /// <param name="tableName">Name of the table.</param>
         /// <param name="row"></param>
         /// <param name="relatedTableName"></param>
+        /// <param name="database"></param>
         /// <returns>The list of records matching the criteria. If no records are found, return an empty list.</returns>
         /// <remarks>When implementing the <see cref="Adapter"/> interface, if relationships are not possible, throw a <see cref="NotSupportedException"/>.</remarks>
-        object FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName);
+        object FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName, DataStrategy database);
     }
 }

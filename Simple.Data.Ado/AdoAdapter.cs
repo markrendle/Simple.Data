@@ -90,9 +90,9 @@ namespace Simple.Data.Ado
 
         public override IReadOnlyDictionary<string, object> GetKey(string tableName, IReadOnlyDictionary<string, object> record)
         {
-            var homogenizedRecord = new Dictionary<string, object>(HomogenizedEqualityComparer.DefaultInstance);
-            return GetKeyNames(tableName)
-                .Select(k => k.Homogenize())
+            var homogenizedRecord = record.ToDictionary(HomogenizedEqualityComparer.DefaultInstance);
+            var keyNames = GetKeyNames(tableName).Select(k => k.Homogenize()).ToList();
+            return keyNames
                 .Where(homogenizedRecord.ContainsKey)
                 .ToDictionary(key => key, key => homogenizedRecord[key]);
         }
@@ -152,7 +152,7 @@ namespace Simple.Data.Ado
             Func<IOperation, AdoAdapter, AdoAdapterTransaction, OperationResult> func;
             if (_executorFactory.TryGet(operation, out func))
             {
-                return func(operation, this, null);
+                return func(operation, this, transaction as AdoAdapterTransaction);
             }
 
             throw new NotSupportedException(string.Format("Operation '{0}' is not supported by the current database.", operation.GetType().Name));

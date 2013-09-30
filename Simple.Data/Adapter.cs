@@ -112,7 +112,7 @@ namespace Simple.Data
                 }
 
                 criteria.Add(criteriaFieldName, keyValuePair.Value);
-                data.Remove(keyValuePair);
+                data.Remove(keyValuePair.Key);
             }
             record = new ReadOnlyDictionary<string, object>(data);
             return ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteria);

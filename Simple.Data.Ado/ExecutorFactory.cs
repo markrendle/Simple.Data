@@ -19,7 +19,16 @@
             dict.Add(CreateFunction<InsertOperation>(InsertExecutor.ExecuteInsert));
             dict.Add(CreateFunction<UpdateEntityOperation>(UpdateEntityExecutor.ExecuteUpdateEntity));
             dict.Add(CreateFunction<DeleteOperation>(DeleteExecutor.Execute));
+            dict.Add(CreateFunction<GetOperation>(GetExecutor.ExecuteGet));
+            dict.Add(CreateFunction<UpdateByCriteriaOperation>(UpdateByCriteriaExecutor.ExecuteUpdate));
+            dict.Add(CreateFunction<FunctionOperation>(ExecuteFunction));
             return (FuncDict)dict;
+        }
+
+        private static OperationResult ExecuteFunction(FunctionOperation operation, AdoAdapter adapter, AdoAdapterTransaction transaction)
+        {
+            var result = adapter.Execute(operation.FunctionName, operation.Parameters, transaction);
+            return new MultiDataResult(result);
         }
 
         private static KeyValuePair<Type, ExecuteFunc> CreateFunction<T>(Func<T, AdoAdapter, AdoAdapterTransaction, OperationResult> target)
