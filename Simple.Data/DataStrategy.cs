@@ -53,10 +53,10 @@ namespace Simple.Data
         internal bool TryInvokeFunction(String functionName, Func<IDictionary<String, Object>> getFunctionArguments,
                                         out object result)
         {
-            var adapterWithFunctions = GetAdapter() as IAdapterWithFunctions;
-            if (adapterWithFunctions != null && adapterWithFunctions.IsValidFunction(functionName))
+            var adapter = GetAdapter();
+            if (adapter != null && adapter.IsValidFunction(functionName))
             {
-                var command = new ExecuteFunctionCommand(GetDatabase(), adapterWithFunctions, functionName,
+                var command = new ExecuteFunctionCommand(GetDatabase(), adapter, functionName,
                                                          getFunctionArguments());
                 return ExecuteFunction(out result, command);
             }

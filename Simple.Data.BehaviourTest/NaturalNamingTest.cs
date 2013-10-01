@@ -25,7 +25,7 @@ namespace Simple.Data.IntegrationTest
         public void DotNetNamingIsCorrectlyResolvedInFind()
         {
             _db.Customers.Find(_db.Customers.CustomerName == "Arthur");
-            GeneratedSqlIs("select [dbo].[Customers].[CustomerId], [dbo].[Customers].[Customer_Name] from [dbo].[customers] where [dbo].[customers].[customer_name] = @p1");
+            GeneratedSqlIs("select [dbo].[Customers].[CustomerId],[dbo].[Customers].[Customer_Name] from [dbo].[customers] where [dbo].[customers].[customer_name] = @p1");
             Parameter(0).Is("Arthur");
         }
 

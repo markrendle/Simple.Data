@@ -76,25 +76,6 @@ namespace Simple.Data
             return ifThen;
         }
 
-        private Expression BuildArrayCreator()
-        {
-            if (!_property.CanWrite) return null;
-
-            var genericType = _property.PropertyType.GetGenericArguments().Single();
-            var creatorInstance = ConcreteTypeCreator.Get(genericType);
-            var collection = Expression.Variable(_property.PropertyType);
-
-            var createCollection = MakeCreateNewCollection(collection, genericType);
-
-            if (createCollection == null) return null;
-
-            var addMethod = _property.PropertyType.GetMethod("Add");
-
-            if (addMethod == null) return null;
-
-            return BuildCollectionCreatorExpression(genericType, creatorInstance, collection, createCollection, addMethod);
-        }
-
         private Expression BuildCollectionCreator()
         {
             var genericType = _property.PropertyType.GetGenericArguments().Single();

@@ -53,4 +53,12 @@ namespace Simple.Data.Ado
             get { return _name; }
         }
     }
+
+    static class AdoAdapterTransactionEx
+    {
+        public static IDbTransaction TransactionOrDefault(this AdoAdapterTransaction transaction)
+        {
+            return ReferenceEquals(transaction, null) ? null : transaction.DbTransaction;
+        }
+    }
 }

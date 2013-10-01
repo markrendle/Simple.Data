@@ -6,34 +6,41 @@ using System.Text;
 namespace Simple.Data.Extensions
 {
     using System.Collections.Concurrent;
+    using System.Collections.ObjectModel;
     using System.Linq.Expressions;
     using System.Reflection;
 
     public static class ObjectEx
     {
-        private static readonly ConcurrentDictionary<Type, Func<object, IDictionary<string, object>>> Converters =
-            new ConcurrentDictionary<Type, Func<object, IDictionary<string, object>>>();
+        private static readonly ConcurrentDictionary<Type, Func<object, IReadOnlyDictionary<string, object>>> Converters =
+            new ConcurrentDictionary<Type, Func<object, IReadOnlyDictionary<string, object>>>();
 
-        public static IDictionary<string, object> AnonymousObjectToDictionary(this object obj)
+        public static IReadOnlyDictionary<string, object> AnonymousObjectToDictionary(this object obj)
         {
             return obj.GetType().GetProperties().ToDictionary(p => p.Name, p => p.GetValue(obj, null));
         }
 
-        public static IDictionary<string, object> ObjectToDictionary(this object obj)
+        public static IReadOnlyDictionary<string, object> ObjectToDictionary(this object obj)
         {
             if (obj == null) return new Dictionary<string, object>();
 
-            var alreadyADictionary = obj as IDictionary<string,object>;
+            var alreadyAReadOnlyDictionary = obj as IReadOnlyDictionary<string,object>;
 
+            if (alreadyAReadOnlyDictionary != null)
+            {
+                return alreadyAReadOnlyDictionary;
+            }
+
+            var alreadyADictionary = obj as IDictionary<string, object>;
             if (alreadyADictionary != null)
             {
-                return new Dictionary<string, object>(alreadyADictionary);
+                return new ReadOnlyDictionary<string, object>(alreadyADictionary);
             }
 
             return Converters.GetOrAdd(obj.GetType(), MakeToDictionaryFunc)(obj);
         }
 
-        private static Func<object, IDictionary<string, object>> MakeToDictionaryFunc(Type type)
+        private static Func<object, IReadOnlyDictionary<string, object>> MakeToDictionaryFunc(Type type)
         {
             var param = Expression.Parameter(typeof(object));
             var typed = Expression.Variable(type);
@@ -45,7 +52,7 @@ namespace Simple.Data.Extensions
                                          Expression.Assign(typed, Expression.Convert(param, type)),
                                          listInit);
 
-            return Expression.Lambda<Func<object, IDictionary<String, object>>>(block, param).Compile();
+            return Expression.Lambda<Func<object, IReadOnlyDictionary<String, object>>>(block, param).Compile();
         }
 
         static readonly MethodInfo DictionaryAddMethod = typeof(Dictionary<string, object>).GetMethod("Add");

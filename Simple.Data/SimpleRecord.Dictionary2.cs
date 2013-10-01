@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Simple.Data
 {
-    sealed partial class SimpleRecord : IDictionary<string, object>
+    sealed partial class SimpleRecord : IDictionary<string, object>, IReadOnlyDictionary<string, object>
     {
         IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
         {
@@ -52,6 +52,26 @@ namespace Simple.Data
             return _data.ContainsKey(key);
         }
 
+        bool IReadOnlyDictionary<string, object>.TryGetValue(string key, out object value)
+        {
+            return _data.TryGetValue(key, out value);
+        }
+
+        object IReadOnlyDictionary<string, object>.this[string key]
+        {
+            get { return _data[key]; }
+        }
+
+        IEnumerable<string> IReadOnlyDictionary<string, object>.Keys
+        {
+            get { return _data.Keys.AsEnumerable(); }
+        }
+
+        IEnumerable<object> IReadOnlyDictionary<string, object>.Values
+        {
+            get { return _data.Values.AsEnumerable(); }
+        }
+
         void IDictionary<string, object>.Add(string key, object value)
         {
             _data.Add(key, value);
@@ -60,6 +80,11 @@ namespace Simple.Data
         bool IDictionary<string, object>.Remove(string key)
         {
             return _data.Remove(key);
+        }
+
+        bool IReadOnlyDictionary<string, object>.ContainsKey(string key)
+        {
+            return _data.ContainsKey(key);
         }
 
         bool IDictionary<string, object>.TryGetValue(string key, out object value)
@@ -86,6 +111,11 @@ namespace Simple.Data
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return _data.GetEnumerator();
+        }
+
+        int IReadOnlyCollection<KeyValuePair<string, object>>.Count
+        {
+            get { return _data.Count; }
         }
     }
 }

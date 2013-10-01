@@ -23,7 +23,7 @@ namespace Simple.Data.UnitTest
         public void ArgumentsToDictionaryShouldApplyOrdinalNamesToFirstArguments()
         {
             var binder = new TestInvokeMemberBinder("Test", false, new CallInfo(2, "Foo"));
-            var actual = binder.ArgumentsToDictionary(new object[] { 1, 2 });
+            var actual = binder.ArgumentsToReadOnlyDictionary(new object[] { 1, 2 });
             Assert.AreEqual("_0", actual.First().Key);
         }
 
@@ -32,7 +32,7 @@ namespace Simple.Data.UnitTest
         {
             var binder = new TestInvokeMemberBinder("Test", false, new CallInfo(1, "Foo"));
             var input = new Dictionary<string, object> { { "Test1", 1 }, { "Test2", 2 } };
-            var actual = binder.ArgumentsToDictionary(new object[] { input });
+            var actual = binder.ArgumentsToReadOnlyDictionary(new object[] { input });
             Assert.AreEqual(input["Test2"], actual["Test2"]);
         }
     }

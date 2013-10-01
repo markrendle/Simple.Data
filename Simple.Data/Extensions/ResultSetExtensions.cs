@@ -8,7 +8,8 @@ namespace Simple.Data.Extensions
         public static SimpleResultSet ResultSetFromModifiedRowCount(this int count)
         {
             var simpleResultSet = new SimpleResultSet(Enumerable.Empty<SimpleRecord>());
-            simpleResultSet.SetOutputValues(new Dictionary<string, object> { { "__ReturnValue", count } });
+            IDictionary<string, object> outputValues = new Dictionary<string, object> { { "__ReturnValue", count } };
+            simpleResultSet.SetOutputValues(outputValues);
             return simpleResultSet;
         }
     }

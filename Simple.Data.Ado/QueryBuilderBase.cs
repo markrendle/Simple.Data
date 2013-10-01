@@ -263,7 +263,8 @@ namespace Simple.Data.Ado
 
         protected string RemoveSchemaFromQueryTableName()
         {
-            return _query.TableName.StartsWith(_table.Schema + '.', StringComparison.InvariantCultureIgnoreCase)
+            if (string.IsNullOrWhiteSpace(_table.Schema)) return _query.TableName;
+            return _query.TableName.StartsWith(_table.Schema.Replace(".", string.Empty) + '.', StringComparison.InvariantCultureIgnoreCase)
                        ? _query.TableName.Substring(_query.TableName.IndexOf('.') + 1)
                        : _query.TableName;
         }

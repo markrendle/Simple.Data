@@ -5,6 +5,7 @@ namespace Simple.Data.Commands
     using System.Dynamic;
     using System.Linq;
     using Extensions;
+    using Operations;
 
     class UpsertByCommand : ICommand
     {
@@ -30,7 +31,8 @@ namespace Simple.Data.Commands
                 var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(),
                                                                                          criteria);
                 var data = binder.NamedArgumentsToDictionary(args);
-                result = dataStrategy.Run.Upsert(table.GetQualifiedName(), data, criteriaExpression, !binder.IsResultDiscarded());
+                var operation = new UpsertOperation(table.GetQualifiedName(), data, !binder.IsResultDiscarded());
+                result = dataStrategy.Run.Execute(operation);
             }
 
             return ResultHelper.TypeResult(result, table, dataStrategy);
@@ -39,13 +41,21 @@ namespace Simple.Data.Commands
         internal static object UpsertByKeyFields(string tableName, DataStrategy dataStrategy, object entity, IEnumerable<string> keyFieldNames, bool isResultRequired, ErrorCallback errorCallback)
         {
             var record = UpdateCommand.ObjectToDictionary(entity);
-            var list = record as IList<IDictionary<string, object>>;
-            if (list != null) return dataStrategy.Run.UpsertMany(tableName, list, keyFieldNames, isResultRequired, errorCallback);
+            var list = record as IList<IReadOnlyDictionary<string, object>>;
+            if (list != null)
+            {
+                var operation = new UpsertOperation(tableName, list, isResultRequired, keyFieldNames.ToArray(),
+                    errorCallback);
+                return dataStrategy.Run.Execute(operation);
+            }
+            else
+            {
 
-            var dict = record as IDictionary<string, object>;
-            var criteria = GetCriteria(keyFieldNames, dict);
-            var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteria);
-            return dataStrategy.Run.Upsert(tableName, dict, criteriaExpression, isResultRequired);
+                var dict = record as IDictionary<string, object>;
+                var operation = new UpsertOperation(tableName, dict, isResultRequired, keyFieldNames.ToArray(),
+                    errorCallback);
+                return dataStrategy.Run.Execute(operation);
+            }
         }
 
         private static IEnumerable<KeyValuePair<string, object>> GetCriteria(IEnumerable<string> keyFieldNames, IDictionary<string, object> record)

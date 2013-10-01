@@ -1,16 +1,25 @@
+using Simple.Data.Operations;
+
 namespace Simple.Data
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Data;
     using System.Linq;
+    using System.Runtime.Remoting.Messaging;
+    using Extensions;
     using QueryPolyfills;
 
-    public partial class InMemoryAdapter : Adapter, IAdapterWithFunctions
+    public partial class InMemoryAdapter : Adapter
     {
+        private static readonly Dictionary<Type, Func<InMemoryAdapter, IOperation, OperationResult>> OperationFunctions
+            = new Dictionary<Type, Func<InMemoryAdapter, IOperation, OperationResult>>
+                {
+                    {typeof(GetOperation), (a,o) => a.Get((GetOperation)o)}
+                };
         private readonly Dictionary<string, string> _autoIncrementColumns;
         private readonly Dictionary<string, string[]> _keyColumns;
-
         private readonly Dictionary<string, List<IDictionary<string, object>>> _tables;
 
         [Flags]
@@ -40,12 +49,17 @@ namespace Simple.Data
         {
         }
 
-        public InMemoryAdapter(IEqualityComparer<string> nameComparer)
+        public InMemoryAdapter(IEqualityComparer<string> keyComparer)
         {
-            _nameComparer = nameComparer;
-            _keyColumns = new Dictionary<string, string[]>(_nameComparer);
-            _autoIncrementColumns = new Dictionary<string, string>(_nameComparer);
-            _tables = new Dictionary<string, List<IDictionary<string, object>>>(nameComparer);
+            _keyComparer = keyComparer;
+            _keyColumns = new Dictionary<string, string[]>(_keyComparer);
+            _autoIncrementColumns = new Dictionary<string, string>(_keyComparer);
+            _tables = new Dictionary<string, List<IDictionary<string, object>>>(keyComparer);
+        }
+
+        public override IEqualityComparer<string> KeyComparer
+        {
+            get { return _keyComparer; }
         }
 
         private List<IDictionary<string, object>> GetTable(string tableName)
@@ -55,7 +69,7 @@ namespace Simple.Data
             return _tables[tableName];
         }
 
-        public override IDictionary<string, object> GetKey(string tableName, IDictionary<string, object> record)
+        public override IReadOnlyDictionary<string, object> GetKey(string tableName, IReadOnlyDictionary<string, object> record)
         {
             if (!_keyColumns.ContainsKey(tableName)) return null;
             return _keyColumns[tableName].ToDictionary(key => key, key => record.ContainsKey(key) ? record[key] : null);
@@ -67,63 +81,90 @@ namespace Simple.Data
             return _keyColumns[tableName];
         }
 
-        public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
+        IAdapterTransaction IAdapterWithTransactions.BeginTransaction(IsolationLevel isolationLevel)
         {
-            if (!_keyColumns.ContainsKey(tableName)) throw new InvalidOperationException("No key specified for In-Memory table.");
-            var keys = _keyColumns[tableName];
-            if (keys.Length != keyValues.Length) throw new ArgumentException("Incorrect number of values for key.");
-            var expression = new ObjectReference(keys[0]) == keyValues[0];
-            for (int i = 1; i < keyValues.Length; i++)
-            {
-                expression = expression && new ObjectReference(keys[i]) == keyValues[i];
-            }
-
-            return Find(tableName, expression).FirstOrDefault();
+            return BeginTransaction(isolationLevel);
         }
 
-        public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
+        private IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
             var whereClauseHandler = new WhereClauseHandler(tableName, new WhereClause(criteria));
             return whereClauseHandler.Run(GetTable(tableName));
         }
 
-        public override IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query,
-                                                                          out IEnumerable<SimpleQueryClauseBase>
-                                                                              unhandledClauses)
+        public override OperationResult Execute(IOperation operation)
         {
-            unhandledClauses = query.Clauses.AsEnumerable();
-            return GetTable(query.TableName);
+            if (operation == null) throw new ArgumentNullException("operation");
+
+            Func<InMemoryAdapter, IOperation, OperationResult> func;
+            if (OperationFunctions.TryGetValue(operation.GetType(), out func))
+            {
+                return func(this, operation);
+            }
+            throw new NotSupportedException();
         }
 
-        public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, bool resultRequired)
+        public OperationResult Execute(IOperation operation, IAdapterTransaction transaction)
         {
-            data = new Dictionary<string, object>(data, _nameComparer);
-            if (_autoIncrementColumns.ContainsKey(tableName))
+            return Execute(operation);
+        }
+
+        private DataResult Get(GetOperation operation)
+        {
+            if (!_keyColumns.ContainsKey(operation.TableName)) throw new InvalidOperationException("No key specified for In-Memory table.");
+            var keys = _keyColumns[operation.TableName];
+            if (keys.Length != operation.KeyValues.Length) throw new ArgumentException("Incorrect number of values for key.");
+            var expression = new ObjectReference(keys[0]) == operation.KeyValues[0];
+            for (int i = 1; i < operation.KeyValues.Length; i++)
             {
-                var table = GetTable(tableName);
-                var autoIncrementColumn = _autoIncrementColumns[tableName];
-
-                if(!data.ContainsKey(autoIncrementColumn))
-                {
-                    data.Add(autoIncrementColumn, 0);
-                }
-
-                object nextVal = 0;
-                if(table.Count > 0)
-                {
-                    nextVal = table.Select(d => d[autoIncrementColumn]).Max();
-                }
-                
-                nextVal = ObjectMaths.Increment(nextVal);
-                data[autoIncrementColumn] = nextVal;
+                expression = expression && new ObjectReference(keys[i]) == operation.KeyValues[i];
             }
 
-            GetTable(tableName).Add(data);
+            return new DataResult(Find(operation.TableName, expression));
+        }
 
-            AddAsDetail(tableName, data);
-            AddAsMaster(tableName, data);
+        private DataResult RunQuery(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
+        {
+            unhandledClauses = query.Clauses.AsEnumerable();
+            return new DataResult(GetTable(query.TableName));
+        }
 
-            return data;
+        private DataResult Insert(InsertOperation operation)
+        {
+            return new DataResult(InsertImpl(operation));
+        }
+
+        private IEnumerable<IDictionary<string, object>> InsertImpl(InsertOperation operation)
+        {
+            foreach (var data in operation.Data.Select(d => d.ToDictionary(kvp => kvp.Key, kvp => kvp.Value)))
+            {
+                if (_autoIncrementColumns.ContainsKey(operation.TableName))
+                {
+                    var table = GetTable(operation.TableName);
+                    var autoIncrementColumn = _autoIncrementColumns[operation.TableName];
+
+                    if (!data.ContainsKey(autoIncrementColumn))
+                    {
+                        data.Add(autoIncrementColumn, 0);
+                    }
+
+                    object nextVal = 0;
+                    if (table.Count > 0)
+                    {
+                        nextVal = table.Select(d => d[autoIncrementColumn]).Max();
+                    }
+
+                    nextVal = ObjectMaths.Increment(nextVal);
+                    data[autoIncrementColumn] = nextVal;
+                }
+
+                GetTable(operation.TableName).Add(data);
+
+                AddAsDetail(operation.TableName, data);
+                AddAsMaster(operation.TableName, data);
+
+                yield return data;
+            }
         }
 
         private void AddAsDetail(string tableName, IDictionary<string, object> data)
@@ -172,7 +213,7 @@ namespace Simple.Data
             }
         }
 
-        public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
+        private CommandResult Update(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria)
         {
             int count = 0;
             foreach (var record in Find(tableName, criteria))
@@ -180,7 +221,7 @@ namespace Simple.Data
                 UpdateRecord(data, record);
                 ++count;
             }
-            return count;
+            return new CommandResult(count);
         }
 
         private static void UpdateRecord(IEnumerable<KeyValuePair<string, object>> data, IDictionary<string, object> record)
@@ -191,14 +232,14 @@ namespace Simple.Data
             }
         }
 
-        public override int Delete(string tableName, SimpleExpression criteria)
+        private CommandResult Delete(string tableName, SimpleExpression criteria)
         {
             List<IDictionary<string, object>> deletions = Find(tableName, criteria).ToList();
             foreach (var record in deletions)
             {
                 GetTable(tableName).Remove(record);
             }
-            return deletions.Count;
+            return new CommandResult(deletions.Count);
         }
 
         public override bool IsExpressionFunction(string functionName, params object[] args)
@@ -251,7 +292,7 @@ namespace Simple.Data
             get { return new JoinConfig(_joins);}
         }
 
-        private IEqualityComparer<string> _nameComparer = EqualityComparer<string>.Default;
+        private readonly IEqualityComparer<string> _keyComparer = EqualityComparer<string>.Default;
 
         internal class JoinInfo
         {
@@ -303,24 +344,9 @@ namespace Simple.Data
             }
         }
 
-        public override IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> dict, SimpleExpression criteriaExpression, bool isResultRequired, IAdapterTransaction adapterTransaction)
+        public DataResult Get(GetOperation operation, IAdapterTransaction transaction)
         {
-            return Upsert(tableName, dict, criteriaExpression, isResultRequired);
-        }
-
-        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IDictionary<string,object>,Exception,bool> errorCallback)
-        {
-            return UpsertMany(tableName, list, keyFieldNames, isResultRequired, errorCallback);
-        }
-
-        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
-        {
-            return UpsertMany(tableName, list, isResultRequired, errorCallback);
-        }
-
-        public IDictionary<string, object> Get(string tableName, IAdapterTransaction transaction, params object[] parameterValues)
-        {
-            return Get(tableName, parameterValues);
+            return Get(operation);
         }
 
         public class JoinConfig
@@ -395,25 +421,32 @@ namespace Simple.Data
             return _functions.ContainsKey(functionName);
         }
 
-        public IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> Execute(string functionName, IDictionary<string, object> parameters)
+        public OperationResult Execute(FunctionOperation operation)
         {
-            if (!_functions.ContainsKey(functionName)) throw new InvalidOperationException(string.Format("Function '{0}' not found.", functionName));
-            var obj = ((_functions[functionName].Flags & FunctionFlags.PassThru) == FunctionFlags.PassThru) ?
-                            _functions[functionName].Delegate.DynamicInvoke(parameters) :
-                            _functions[functionName].Delegate.DynamicInvoke(parameters.Values.ToArray());
+            if (!_functions.ContainsKey(operation.FunctionName)) throw new InvalidOperationException(string.Format("Function '{0}' not found.", operation.FunctionName));
+            var obj = ((_functions[operation.FunctionName].Flags & FunctionFlags.PassThru) == FunctionFlags.PassThru) ?
+                            _functions[operation.FunctionName].Delegate.DynamicInvoke(operation.Parameters) :
+                            _functions[operation.FunctionName].Delegate.DynamicInvoke(operation.Parameters.Values.ToArray());
 
             var dict = obj as IDictionary<string, object>;
-            if (dict != null) return new List<IEnumerable<IDictionary<string, object>>> { new List<IDictionary<string, object>> { dict } };
+            if (dict != null)
+            {
+                return new DataResult(EnumerableEx.Once(dict));
+            }
 
             var list = obj as IEnumerable<IDictionary<string, object>>;
-            if (list != null) return new List<IEnumerable<IDictionary<string, object>>> { list };
+            if (list != null) return new DataResult(list);
 
-            return obj as IEnumerable<IEnumerable<IDictionary<string, object>>>;
-        }
+            var lists = obj as IEnumerable<IEnumerable<IDictionary<string, object>>>;
 
-        public IEnumerable<IEnumerable<IEnumerable<KeyValuePair<string, object>>>> Execute(string functionName, IDictionary<string, object> parameters, IAdapterTransaction transaction)
-        {
-            return Execute(functionName, parameters);
+            if (lists != null) return new MultiDataResult(lists);
+
+            if (obj is int)
+            {
+                return new CommandResult((int)obj);
+            }
+
+            return null;
         }
     }
 }

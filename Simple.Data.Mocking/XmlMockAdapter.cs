@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using Simple.Data.Operations;
 
 namespace Simple.Data.Mocking
 {
@@ -35,7 +36,7 @@ namespace Simple.Data.Mocking
             return GetKeyFieldNames(tableName).ToList();
         }
 
-        public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
+        public override IDictionary<string, object> Get(GetOperation operation)
         {
             throw new NotImplementedException();
         }

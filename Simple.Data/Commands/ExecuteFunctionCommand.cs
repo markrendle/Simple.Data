@@ -7,14 +7,16 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data.Commands
 {
+    using Operations;
+
     public class ExecuteFunctionCommand
     {
         private readonly DataStrategy _database;
-        private readonly IAdapterWithFunctions _adapter;
+        private readonly Adapter _adapter;
         private readonly string _functionName;
         private readonly IDictionary<string, object> _arguments;
 
-        public ExecuteFunctionCommand(DataStrategy database, IAdapterWithFunctions adapter, string functionName, IDictionary<string, object> arguments)
+        public ExecuteFunctionCommand(DataStrategy database, Adapter adapter, string functionName, IDictionary<string, object> arguments)
         {
             _database = database;
             _adapter = adapter;
@@ -24,17 +26,17 @@ namespace Simple.Data.Commands
 
         public bool Execute(out object result)
         {
-            result = ToMultipleResultSets(_adapter.Execute(_functionName, _arguments));
+            result = ToMultipleResultSets(_adapter.Execute(new FunctionOperation(_functionName, _arguments)));
             return true;
         }
 
         private SimpleResultSet ToMultipleResultSets(object source)
         {
             if (source == null) return SimpleResultSet.Empty;
-            var resultSets = source as IEnumerable<IEnumerable<IDictionary<string, object>>>;
+            var resultSets = source as MultiDataResult;
             if (resultSets == null) throw new InvalidOperationException("Adapter returned incorrect Type.");
 
-            return ToMultipleDynamicEnumerables(resultSets);
+            return ToMultipleDynamicEnumerables(resultSets.Results);
         }
 
         private SimpleResultSet ToMultipleDynamicEnumerables(IEnumerable<IEnumerable<IDictionary<string, object>>> resultSets)
@@ -46,8 +48,17 @@ namespace Simple.Data.Commands
 
         public bool Execute(out object result, IAdapterTransaction adapterTransaction)
         {
-            result = ToMultipleResultSets(_adapter.Execute(_functionName, _arguments, adapterTransaction));
-            return true;
+            var adapterWithTransactions = _adapter as IAdapterWithTransactions;
+            if (adapterWithTransactions != null)
+            {
+                result =
+                    ToMultipleResultSets(adapterWithTransactions.Execute(new FunctionOperation(_functionName, _arguments),
+                        adapterTransaction));
+                return true;
+            }
+
+            result = null;
+            return false;
         }
     }
 }

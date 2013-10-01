@@ -16,6 +16,7 @@ namespace Simple.Data.SqlTest
         [SetUp]
         public void CreateStoredProcedures()
         {
+            AppDomain.CurrentDomain.SetData("DataDirectory", TestContext.CurrentContext.TestDirectory);
             var provider = new SqlServer.SqlConnectionProvider();
             Trace.Write("Loaded provider " + provider.GetType().Name);
 
@@ -33,4 +34,5 @@ namespace Simple.Data.SqlTest
             }
         }
     }
+
 }

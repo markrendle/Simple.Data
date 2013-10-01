@@ -27,7 +27,7 @@ namespace Simple.Data.IntegrationTest
             return new Database(new AdoAdapter(new MockConnectionProvider(new MockDbConnection(mockDatabase), mockSchemaProvider)));
         }
 
-        private const string usersColumns = "[foo].[users].[id], [foo].[users].[name], [foo].[users].[password], [foo].[users].[age]";
+        private const string usersColumns = "[foo].[users].[id],[foo].[users].[name],[foo].[users].[password],[foo].[users].[age]";
 
         [Test]
         public void TestFindEqualWithInt32()
@@ -253,7 +253,7 @@ namespace Simple.Data.IntegrationTest
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
             database.foobar.Test.Find(database.foobar.Test.Id == 1);
-            Assert.AreEqual("select [foo.bar].[Test].[Id], [foo.bar].[Test].[Value] from [foo.bar].[Test] where [foo.bar].[Test].[id] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual("select [foo.bar].[Test].[Id],[foo.bar].[Test].[Value] from [foo.bar].[Test] where [foo.bar].[Test].[id] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual(1, mockDatabase.Parameters[0]);
         }
     }

@@ -8,6 +8,8 @@ using System.Text;
 
 namespace Simple.Data
 {
+    using System.Collections.ObjectModel;
+
     public sealed class SimpleResultSet : DynamicObject, IEnumerable
     {
         public static readonly SimpleResultSet Empty = new SimpleResultSet();
@@ -15,7 +17,7 @@ namespace Simple.Data
         private readonly IEnumerable<IEnumerable<dynamic>> _sources;
         private readonly IEnumerator<IEnumerable<dynamic>> _sourceEnumerator;
         private bool _hasCurrent;
-        private IDictionary<string, object> _outputValues;
+        private IReadOnlyDictionary<string, object> _outputValues;
 
         private SimpleResultSet() : this(Enumerable.Empty<IEnumerable<dynamic>>())
         {
@@ -33,7 +35,7 @@ namespace Simple.Data
             _hasCurrent = _sourceEnumerator.MoveNext();
         }
 
-        public IDictionary<string, object> OutputValues
+        public IReadOnlyDictionary<string, object> OutputValues
         {
             get { return _outputValues; }
         }
@@ -310,9 +312,14 @@ namespace Simple.Data
             return new SimpleResultSet(q);
         }
 
-        internal void SetOutputValues(IDictionary<string,object> outputValues)
+        internal void SetOutputValues(IReadOnlyDictionary<string,object> outputValues)
         {
             _outputValues = outputValues;
+        }
+        
+        internal void SetOutputValues(IDictionary<string,object> outputValues)
+        {
+            _outputValues = new ReadOnlyDictionary<string, object>(outputValues);
         }
     }
 }

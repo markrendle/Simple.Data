@@ -6,6 +6,7 @@ using Simple.Data.Extensions;
 namespace Simple.Data.Commands
 {
     using System.Collections.Generic;
+    using Operations;
 
     class UpdateAllCommand : ICommand
     {
@@ -28,9 +29,9 @@ namespace Simple.Data.Commands
                 throw new SimpleDataException("Could not resolve data.");
             }
 
-            var updatedCount = dataStrategy.Run.Update(table.GetQualifiedName(), data, criteria);
-            
-            return updatedCount.ResultSetFromModifiedRowCount();
+            return 
+                dataStrategy.Run.Execute(new UpdateByCriteriaOperation(table.GetQualifiedName(), criteria,
+                    data.ToReadOnly()));
         }
     }
 }

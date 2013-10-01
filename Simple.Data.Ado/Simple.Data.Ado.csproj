@@ -11,6 +11,8 @@
     <RootNamespace>Simple.Data.Ado</RootNamespace>
     <AssemblyName>Simple.Data.Ado</AssemblyName>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>SecurityRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release-Mono|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,6 +41,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -84,16 +89,19 @@
     <Compile Include="DbConnectionEx.cs" />
     <Compile Include="DbConnectionExtensions.cs" />
     <Compile Include="DelegatingConnectionBase1.cs" />
+    <Compile Include="DeleteExecutor.cs" />
     <Compile Include="DeleteHelper.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="EagerLoadingEnumerable.cs" />
     <Compile Include="EventHandlerEx.cs" />
+    <Compile Include="ExecutorFactory.cs" />
     <Compile Include="ExpressionFormatter.cs" />
     <Compile Include="ExpressionFormatterBase.cs" />
     <Compile Include="ExpressionHasher.cs" />
     <Compile Include="FindHelper.cs" />
     <Compile Include="FunctionNameConverter.cs" />
     <Compile Include="GenericDbParameterFactory.cs" />
+    <Compile Include="GetExecutor.cs" />
     <Compile Include="HomogenizedDictionaryIndex.cs" />
     <Compile Include="IBulkInserter.cs" />
     <Compile Include="IBulkUpdater.cs" />
@@ -104,6 +112,7 @@
     <Compile Include="IDbParameterFactory.cs" />
     <Compile Include="IExpressionFormatter.cs" />
     <Compile Include="IFunctionNameConverter.cs" />
+    <Compile Include="InsertExecutor.cs" />
     <Compile Include="IObservableQueryRunner.cs" />
     <Compile Include="IQueryPager.cs" />
     <Compile Include="ISchemaGetter.cs" />
@@ -113,7 +122,6 @@
     <Compile Include="OptimizedDictionary.cs" />
     <Compile Include="OptimizedDictionaryIndex.cs" />
     <Compile Include="OptimizedDictionary2.cs" />
-    <Compile Include="AdoOptimizingDelegateFactory.cs" />
     <Compile Include="ParameterTemplate.cs" />
     <Compile Include="ProcedureExecutor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -126,6 +134,7 @@
     <Compile Include="ProviderHelper.cs" />
     <Compile Include="QueryBuilder.cs" />
     <Compile Include="QueryBuilderBase.cs" />
+    <Compile Include="QueryExecutor.cs" />
     <Compile Include="SimpleReferenceFormatter.cs" />
     <Compile Include="SchemaResolutionException.cs" />
     <Compile Include="Schema\AmbiguousObjectNameException.cs" />
@@ -148,6 +157,8 @@
     <Compile Include="TraceHelper.cs" />
     <Compile Include="TupleExtensions.cs" />
     <Compile Include="TypeHelper.cs" />
+    <Compile Include="UpdateByCriteriaExecutor.cs" />
+    <Compile Include="UpdateEntityExecutor.cs" />
     <Compile Include="UpdateHelper.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -10,12 +10,12 @@ namespace Simple.Data.Ado
     class BulkInserterHelper
     {
         protected readonly AdoAdapter Adapter;
-        protected readonly IEnumerable<IDictionary<string, object>> Data;
+        protected readonly IEnumerable<IReadOnlyDictionary<string, object>> Data;
         private readonly Table _table;
         private readonly List<Column> _columns;
-        private Action<IDictionary<string, object>, IDbCommand> _parameterSetter;
+        private Action<IReadOnlyDictionary<string, object>, IDbCommand> _parameterSetter;
 
-        public BulkInserterHelper(AdoAdapter adapter, IEnumerable<IDictionary<string, object>> data, Table table, List<Column> columns)
+        public BulkInserterHelper(AdoAdapter adapter, IEnumerable<IReadOnlyDictionary<string, object>> data, Table table, List<Column> columns)
         {
             Adapter = adapter;
             Data = data;
@@ -23,7 +23,7 @@ namespace Simple.Data.Ado
             _columns = columns;
         }
 
-        public virtual void InsertRowsWithoutFetchBack(string insertSql, Func<IDictionary<string, object>, Exception, bool> onError)
+        public virtual void InsertRowsWithoutFetchBack(string insertSql, ErrorCallback onError)
         {
             var connection = Adapter.CreateConnection();
             using (connection.MaybeDisposable())
@@ -40,7 +40,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        public virtual IEnumerable<IDictionary<string, object>> InsertRowsWithSeparateStatements(string insertSql, string selectSql, Func<IDictionary<string, object>, Exception, bool> onError)
+        public virtual IEnumerable<IDictionary<string, object>> InsertRowsWithSeparateStatements(string insertSql, string selectSql, ErrorCallback onError)
         {
             var connection = Adapter.CreateConnection();
             using (connection.MaybeDisposable())
@@ -56,7 +56,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        public virtual IEnumerable<IDictionary<string, object>> InsertRowsWithCompoundStatement(string insertSql, string selectSql, Func<IDictionary<string, object>, Exception, bool> onError)
+        public virtual IEnumerable<IDictionary<string, object>> InsertRowsWithCompoundStatement(string insertSql, string selectSql, ErrorCallback onError)
         {
             insertSql += "; " + selectSql;
 
@@ -72,7 +72,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        protected IDictionary<string, object> InsertRowAndSelect(IDictionary<string, object> row, IDbCommand command, Func<IDictionary<string,object>, Exception, bool> onError)
+        protected IDictionary<string, object> InsertRowAndSelect(IReadOnlyDictionary<string, object> row, IDbCommand command, ErrorCallback onError)
         {
             if (_parameterSetter == null) _parameterSetter = BuildParameterSettingAction(row);
             _parameterSetter(row, command);
@@ -89,7 +89,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        protected int InsertRow(IDictionary<string, object> row, IDbCommand command, Func<IDictionary<string, object>, Exception, bool> onError)
+        protected int InsertRow(IReadOnlyDictionary<string, object> row, IDbCommand command, ErrorCallback onError)
         {
             if (_parameterSetter == null) _parameterSetter = BuildParameterSettingAction(row);
             _parameterSetter(row, command);
@@ -105,7 +105,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        protected IDictionary<string, object> InsertRow(IDictionary<string, object> row, IDbCommand insertCommand, IDbCommand selectCommand, Func<IDictionary<string, object>, Exception, bool> onError)
+        protected IDictionary<string, object> InsertRow(IReadOnlyDictionary<string, object> row, IDbCommand insertCommand, IDbCommand selectCommand, ErrorCallback onError)
         {
             if (_parameterSetter == null) _parameterSetter = BuildParameterSettingAction(row);
             _parameterSetter(row, insertCommand);
@@ -152,10 +152,10 @@ namespace Simple.Data.Ado
             }
         }
 
-        private Action<IDictionary<string,object>, IDbCommand> BuildParameterSettingAction(IDictionary<string,object> sample)
+        private Action<IReadOnlyDictionary<string, object>, IDbCommand> BuildParameterSettingAction(IReadOnlyDictionary<string, object>sample)
         {
             var actions =
-                _columns.Select<Column, Action<IDictionary<string,object>, IDbCommand>>((c, i) => (row, cmd) => cmd.SetParameterValue(i, null)).ToArray();
+                _columns.Select<Column, Action<IReadOnlyDictionary<string, object>, IDbCommand>>((c, i) => (row, cmd) => cmd.SetParameterValue(i, null)).ToArray();
 
             var usedColumnNames = sample.Keys.Where(k => _columns.Any(c => String.Equals(c.ActualName, k, StringComparison.InvariantCultureIgnoreCase))).ToArray();
 
@@ -171,7 +171,7 @@ namespace Simple.Data.Ado
             return actions.Aggregate((working, next) => working + next) ?? ((row,cmd) => { });
         }
 
-        private Action<IDictionary<string, object>, IDbCommand> BuildIndividualFunction(string key, int index)
+        private Action<IReadOnlyDictionary<string, object>, IDbCommand> BuildIndividualFunction(string key, int index)
         {
             return (dict, command) => command.SetParameterValue(index, dict[key]);
         }

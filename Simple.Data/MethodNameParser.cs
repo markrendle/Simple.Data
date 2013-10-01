@@ -9,7 +9,7 @@ namespace Simple.Data
 {
     internal static class MethodNameParser
     {
-        internal static IDictionary<string, object> ParseFromBinder(InvokeMemberBinder binder, IList<object> args)
+        internal static IReadOnlyDictionary<string, object> ParseFromBinder(InvokeMemberBinder binder, IList<object> args)
         {
             if (binder == null) throw new ArgumentNullException("binder");
             if (binder.CallInfo.ArgumentNames != null && binder.CallInfo.ArgumentNames.Count > 0)
@@ -27,7 +27,7 @@ namespace Simple.Data
             return ParseFromMethodName(binder.Name, args);
         }
 
-        internal static IDictionary<string, object> ParseFromMethodName(string methodName, IList<object> args)
+        internal static IReadOnlyDictionary<string, object> ParseFromMethodName(string methodName, IList<object> args)
         {
             if (args == null) throw new ArgumentNullException("args");
             if (args.Count == 0) throw new ArgumentException("No parameters specified.");
@@ -36,7 +36,7 @@ namespace Simple.Data
 
             if (columns.Count == 0) throw new ArgumentException("No columns specified.");
 
-            return columns.Select((s,i) => new KeyValuePair<string, object>(s, args[i])).ToDictionary();
+            return columns.Select((s,i) => new KeyValuePair<string, object>(s, args[i])).ToReadOnlyDictionary(StringComparer.InvariantCultureIgnoreCase);
         }
 
         internal static IEnumerable<string> ParseCriteriaNamesFromMethodName(string methodName)
@@ -48,7 +48,7 @@ namespace Simple.Data
             return columns.AsEnumerable();
         }
 
-        internal static IDictionary<string, object> ParseFromMethodName(string methodName, IDictionary<string, object> args)
+        internal static IReadOnlyDictionary<string, object> ParseFromMethodName(string methodName, IReadOnlyDictionary<string, object> args)
         {
             if (args == null) throw new ArgumentNullException("args");
             if (args.Count == 0) throw new ArgumentException("No parameters specified.");
@@ -57,7 +57,7 @@ namespace Simple.Data
 
             if (columns.Count == 0) throw new ArgumentException("No columns specified.");
 
-            return columns.Select(s => new KeyValuePair<string, object>(s, args[s])).ToDictionary();
+            return columns.Select(s => new KeyValuePair<string, object>(s, args[s])).ToReadOnlyDictionary(StringComparer.InvariantCultureIgnoreCase);
 
         }
 

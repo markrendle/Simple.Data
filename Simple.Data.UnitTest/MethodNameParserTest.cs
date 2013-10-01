@@ -5,8 +5,9 @@ using System.Collections.Generic;
 
 namespace Simple.Data.UnitTest
 {
-    
-    
+    using System.Collections.ObjectModel;
+
+
     /// <summary>
     ///This is a test class for MethodNameParserTest and is intended
     ///to contain all MethodNameParserTest Unit Tests
@@ -34,8 +35,8 @@ namespace Simple.Data.UnitTest
         {
             const string methodName = "FindByThisAndThat";
             IList<object> args = new object[] {1, "Foo"};
-            IDictionary<string, object> expected = new Dictionary<string, object> { {"This", 1}, {"That", "Foo"}};
-            IDictionary<string, object> actual = MethodNameParser.ParseFromMethodName(methodName, expected);
+            var expected = new ReadOnlyDictionary<string, object>(new Dictionary<string, object> { {"This", 1}, {"That", "Foo"}});
+            var actual = MethodNameParser.ParseFromMethodName(methodName, expected);
             ListHelper.AssertAreEqual(expected, actual);
         }
 

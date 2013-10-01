@@ -62,10 +62,6 @@
     <Compile Include="XmlMockAdapterTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Simple.Data.Mocking\Simple.Data.Mocking.csproj">
-      <Project>{292611F6-BBBD-492D-891C-0D9FB4BF5433}</Project>
-      <Name>Simple.Data.Mocking</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Simple.Data\Simple.Data.csproj">
       <Project>{148CEE80-2E84-4ABD-B5AB-20415B2BBD21}</Project>
       <Name>Simple.Data</Name>

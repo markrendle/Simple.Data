@@ -7,6 +7,7 @@ using System.Text;
 using System.Dynamic;
 using Simple.Data.Commands;
 using Simple.Data.Extensions;
+using Simple.Data.Operations;
 
 namespace Simple.Data
 {
@@ -171,7 +172,8 @@ namespace Simple.Data
 
         private IEnumerable<dynamic> GetAll()
         {
-            return _dataStrategy.Run.Find(_tableName, null).Select(dict => new SimpleRecord(dict, _tableName, _dataStrategy));
+            var result = (DataResult) _dataStrategy.Run.Execute(new QueryOperation(null));
+            return result.Data.Select(dict => new SimpleRecord(dict, _tableName, _dataStrategy));
         }
 
         public AllColumnsSpecialReference AllColumns()

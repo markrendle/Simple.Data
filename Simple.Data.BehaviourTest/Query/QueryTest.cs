@@ -240,11 +240,5 @@ namespace Simple.Data.IntegrationTest
         {
             Assert.Throws<ArgumentException>(() => _db.Users.All().OrderByDescending(1));
         }
-
-        [Test]
-        public void CallingFirstOnTableShouldThrowInvalidOperationException()
-        {
-            Assert.Throws<InvalidOperationException>(() => _db.Users.First());
-        }
     }
 }

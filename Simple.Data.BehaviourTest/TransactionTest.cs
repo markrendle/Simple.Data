@@ -26,7 +26,7 @@ namespace Simple.Data.IntegrationTest
             return new Database(new AdoAdapter(new MockConnectionProvider(new MockDbConnection(mockDatabase), mockSchemaProvider)));
         }
 
-        private const string usersColumns = "[dbo].[Users].[Id], [dbo].[Users].[Name], [dbo].[Users].[Password], [dbo].[Users].[Age]";
+        private const string usersColumns = "[dbo].[Users].[Id],[dbo].[Users].[Name],[dbo].[Users].[Password],[dbo].[Users].[Age]";
 
         [Test]
         public void TestFindEqualWithInt32()

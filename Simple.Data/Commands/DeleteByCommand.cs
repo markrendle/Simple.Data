@@ -5,6 +5,7 @@ using System.Dynamic;
 namespace Simple.Data.Commands
 {
     using Extensions;
+    using Operations;
 
     class DeleteByCommand : ICommand
     {
@@ -16,18 +17,19 @@ namespace Simple.Data.Commands
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
             SimpleExpression criteriaExpression = GetCriteriaExpression(binder, args, table);
-            return dataStrategy.Run.Delete(table.GetQualifiedName(), criteriaExpression);
+            var commandResult = (CommandResult)dataStrategy.Run.Execute(new DeleteOperation(table.GetQualifiedName(), criteriaExpression));
+            return commandResult.RowsAffected;
         }
 
         private static SimpleExpression GetCriteriaExpression(InvokeMemberBinder binder, object[] args, DynamicTable table)
         {
-            IDictionary<string, object> criteria;
+            IReadOnlyDictionary<string, object> criteria;
             if (binder.Name.Equals("delete", StringComparison.InvariantCultureIgnoreCase))
             {
                 criteria = binder.NamedArgumentsToDictionary(args);
                 if (criteria.Count == 0 && args.Length == 1)
                 {
-                    criteria = args[0] as IDictionary<string, object> ?? args[0].ObjectToDictionary();
+                    criteria = args[0] as IReadOnlyDictionary<string, object> ?? args[0].ObjectToDictionary();
                 }
             }
             else

@@ -4,14 +4,17 @@ using System.ComponentModel.Composition;
 using System.Data;
 using System.Linq;
 using Simple.Data.Ado.Schema;
+using Simple.Data.Operations;
 
 namespace Simple.Data.Ado
 {
+    using System.Collections.ObjectModel;
     using Extensions;
 
     [Export("Ado", typeof (Adapter))]
     public partial class AdoAdapter : Adapter, ICloneable
     {
+        private readonly ExecutorFactory _executorFactory = new ExecutorFactory();
         private readonly AdoAdapterFinder _finder;
         private readonly ProviderHelper _providerHelper = new ProviderHelper();
         private CommandOptimizer _commandOptimizer = new CommandOptimizer();
@@ -80,11 +83,16 @@ namespace Simple.Data.Ado
             get { return _connectionProvider.GetSchemaProvider(); }
         }
 
-        public override IDictionary<string, object> GetKey(string tableName, IDictionary<string, object> record)
+        public override IEqualityComparer<string> KeyComparer
         {
-            var homogenizedRecord = new Dictionary<string, object>(record, HomogenizedEqualityComparer.DefaultInstance);
-            return GetKeyNames(tableName)
-                .Select(k => k.Homogenize())
+            get { return HomogenizedEqualityComparer.DefaultInstance; }
+        }
+
+        public override IReadOnlyDictionary<string, object> GetKey(string tableName, IReadOnlyDictionary<string, object> record)
+        {
+            var homogenizedRecord = record.ToDictionary(HomogenizedEqualityComparer.DefaultInstance);
+            var keyNames = GetKeyNames(tableName).Select(k => k.Homogenize()).ToList();
+            return keyNames
                 .Where(homogenizedRecord.ContainsKey)
                 .ToDictionary(key => key, key => homogenizedRecord[key]);
         }
@@ -132,29 +140,53 @@ namespace Simple.Data.Ado
             return new AdoAdapterRelatedFinder(this);
         }
 
-        public override IDictionary<string, object> Get(string tableName, params object[] keyValues)
+        public override OperationResult Execute(IOperation operation)
+        {
+            return Execute(operation, null);
+        }
+
+        public OperationResult Execute(IOperation operation, IAdapterTransaction transaction)
+        {
+            if (operation == null) throw new ArgumentNullException("operation");
+
+            Func<IOperation, AdoAdapter, AdoAdapterTransaction, OperationResult> func;
+            if (_executorFactory.TryGet(operation, out func))
+            {
+                return func(operation, this, transaction as AdoAdapterTransaction);
+            }
+
+            throw new NotSupportedException(string.Format("Operation '{0}' is not supported by the current database.", operation.GetType().Name));
+        }
+
+        public OperationResult Execute(FunctionOperation operation)
+        {
+            throw new NotImplementedException();
+        }
+
+        private IDictionary<string, object> Get(GetOperation operation)
         {
             // We don't need to implement Get because we provide a delegate for this operation...
             throw new NotImplementedException();
         }
 
-        public override IDictionary<string, object> FindOne(string tableName, SimpleExpression criteria)
+        private IDictionary<string, object> FindOne(QueryOperation operation)
         {
-            return _finder.FindOne(tableName, criteria);
+            return operation.Query.FirstOrDefault();
         }
 
-        public override Func<object[], IDictionary<string, object>> CreateFindOneDelegate(string tableName,
+        private Func<object[], IDictionary<string, object>> CreateFindOneDelegate(string tableName,
                                                                                           SimpleExpression criteria)
         {
             return _finder.CreateFindOneDelegate(tableName, criteria);
         }
 
-        public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
+        private IEnumerable<IDictionary<string, object>> Find(QueryOperation operation)
         {
-            return _finder.Find(tableName, criteria);
+            IEnumerable<SimpleQueryClauseBase> _;
+            return RunQuery(operation.Query, out _);
         }
 
-        public override IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query,
+        private IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query,
                                                                           out IEnumerable<SimpleQueryClauseBase>
                                                                               unhandledClauses)
         {
@@ -162,7 +194,7 @@ namespace Simple.Data.Ado
         }
 
 
-        public override IEnumerable<IEnumerable<IDictionary<string, object>>> RunQueries(SimpleQuery[] queries,
+        private IEnumerable<IEnumerable<IDictionary<string, object>>> RunQueries(SimpleQuery[] queries,
                                                                                          List
                                                                                              <
                                                                                              IEnumerable
@@ -185,7 +217,7 @@ namespace Simple.Data.Ado
                     && args[0] is string);
         }
 
-        public override IObservable<IDictionary<string, object>> RunQueryAsObservable(SimpleQuery query,
+        private IObservable<IDictionary<string, object>> RunQueryAsObservable(SimpleQuery query,
                                                                                       out
                                                                                           IEnumerable
                                                                                           <SimpleQueryClauseBase>
@@ -194,19 +226,12 @@ namespace Simple.Data.Ado
             return new AdoAdapterQueryRunner(this).RunQueryAsObservable(query, out unhandledClauses);
         }
 
-        public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, bool resultRequired)
+        private IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, bool resultRequired)
         {
             return new AdoAdapterInserter(this).Insert(tableName, data, resultRequired);
         }
 
-        public override IEnumerable<IDictionary<string, object>> InsertMany(string tableName,
-                                                                            IEnumerable<IDictionary<string, object>>
-                                                                                data, Func<IDictionary<string,object>, Exception, bool> onError, bool resultRequired)
-        {
-            return new AdoAdapterInserter(this).InsertMany(tableName, data, onError, resultRequired);
-        }
-
-        public override int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data,
+        private int UpdateMany(string tableName, IEnumerable<IReadOnlyDictionary<string, object>> data,
                                        IEnumerable<string> criteriaFieldNames)
         {
             IBulkUpdater bulkUpdater = ProviderHelper.GetCustomProvider<IBulkUpdater>(ConnectionProvider) ??
@@ -214,14 +239,14 @@ namespace Simple.Data.Ado
             return bulkUpdater.Update(this, tableName, data.ToList(), criteriaFieldNames, null);
         }
 
-        public override int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> data)
+        private int UpdateMany(string tableName, IEnumerable<IReadOnlyDictionary<string, object>> data)
         {
             IBulkUpdater bulkUpdater = ProviderHelper.GetCustomProvider<IBulkUpdater>(ConnectionProvider) ??
                                        new BulkUpdater();
             return bulkUpdater.Update(this, tableName, data.ToList(), null);
         }
 
-        public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
+        private int Update(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria)
         {
             ICommandBuilder commandBuilder = new UpdateHelper(_schema).GetUpdateCommand(tableName, data, criteria);
             return Execute(commandBuilder);
@@ -233,7 +258,7 @@ namespace Simple.Data.Ado
         /// <param name="tableName">Name of the table.</param>
         /// <param name="criteria">The expression to use as criteria for the delete operation.</param>
         /// <returns>The number of records which were deleted.</returns>
-        public override int Delete(string tableName, SimpleExpression criteria)
+        private int Delete(string tableName, SimpleExpression criteria)
         {
             ICommandBuilder commandBuilder = new DeleteHelper(_schema).GetDeleteCommand(tableName, criteria);
             return Execute(commandBuilder);
@@ -259,7 +284,7 @@ namespace Simple.Data.Ado
             _connectionModifier = connection => connection;
         }
 
-        private int Execute(ICommandBuilder commandBuilder)
+        public int Execute(ICommandBuilder commandBuilder)
         {
             IDbConnection connection = CreateConnection();
             using (connection.MaybeDisposable())
@@ -286,6 +311,7 @@ namespace Simple.Data.Ado
 
         internal int Execute(ICommandBuilder commandBuilder, IAdapterTransaction transaction)
         {
+            if (transaction == null) return Execute(commandBuilder);
             IDbTransaction dbTransaction = ((AdoAdapterTransaction) transaction).DbTransaction;
             return Execute(commandBuilder, dbTransaction);
         }
@@ -326,18 +352,18 @@ namespace Simple.Data.Ado
             return _schema ?? (_schema = DatabaseSchema.Get(_connectionProvider, _providerHelper));
         }
 
-        public override IDictionary<string, object> Upsert(string tableName, IDictionary<string, object> data, SimpleExpression criteria, bool resultRequired)
+        private IDictionary<string, object> Upsert(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria, bool resultRequired)
         {
             return new AdoAdapterUpserter(this).Upsert(tableName, data, criteria, resultRequired);
         }
 
-        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
+        private IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list, bool isResultRequired, Func<IReadOnlyDictionary<string, object>, Exception, bool> errorCallback)
         {
             var upserter = new AdoAdapterUpserter(this);
             return upserter.UpsertMany(tableName, list, isResultRequired, errorCallback);
         }
 
-        public override IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IDictionary<string, object>> list, IEnumerable<string> keyFieldNames, bool isResultRequired, Func<IDictionary<string, object>, Exception, bool> errorCallback)
+        private IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list, IEnumerable<string> keyFieldNames, bool isResultRequired, Func<IReadOnlyDictionary<string, object>, Exception, bool> errorCallback)
         {
             return new AdoAdapterUpserter(this).UpsertMany(tableName, list, keyFieldNames.ToArray(), isResultRequired, errorCallback);
         }

@@ -6,6 +6,7 @@ using Simple.Data.Extensions;
 namespace Simple.Data.Commands
 {
     using System.Collections.Generic;
+    using Operations;
 
     class UpdateByCommand : ICommand
     {
@@ -26,20 +27,18 @@ namespace Simple.Data.Commands
             var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), criteria);
             var data = binder.NamedArgumentsToDictionary(args)
                 .Where(kvp => !criteria.ContainsKey(kvp.Key))
-                .ToDictionary();
-            return dataStrategy.Run.Update(table.GetQualifiedName(), data, criteriaExpression);
+                .ToReadOnlyDictionary();
+            return dataStrategy.Run.Execute(new UpdateByCriteriaOperation(table.GetQualifiedName(), criteriaExpression, data));
         }
 
         internal static object UpdateByKeyFields(string tableName, DataStrategy dataStrategy, object entity, IEnumerable<string> keyFieldNames)
         {
             var record = UpdateCommand.ObjectToDictionary(entity);
-            var list = record as IList<IDictionary<string, object>>;
-            if (list != null) return dataStrategy.Run.UpdateMany(tableName, list, keyFieldNames);
+            var list = record as ICollection<IReadOnlyDictionary<string, object>>;
+            if (list != null) return dataStrategy.Run.Execute(new UpdateEntityOperation(tableName, list));
 
-            var dict = record as IDictionary<string, object>;
-            var criteria = GetCriteria(keyFieldNames, dict);
-            var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteria);
-            return dataStrategy.Run.Update(tableName, dict, criteriaExpression);
+            var dict = record as IReadOnlyDictionary<string, object>;
+            return dataStrategy.Run.Execute(new UpdateEntityOperation(tableName, dict));
         }
 
         private static IEnumerable<KeyValuePair<string, object>> GetCriteria(IEnumerable<string> keyFieldNames, IDictionary<string, object> record)

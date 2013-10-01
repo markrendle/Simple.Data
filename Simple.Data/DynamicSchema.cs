@@ -37,10 +37,10 @@ namespace Simple.Data
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
-            var adapterWithFunctions = _dataStrategy.GetAdapter() as IAdapterWithFunctions;
-            if (adapterWithFunctions != null && adapterWithFunctions.IsValidFunction(string.Format("{0}.{1}", _name, binder.Name)))
+            var adapter = _dataStrategy.GetAdapter();
+            if (adapter != null && adapter.IsValidFunction(string.Format("{0}.{1}", _name, binder.Name)))
             {
-                var command = new ExecuteFunctionCommand(_dataStrategy.GetDatabase(), adapterWithFunctions, string.Format("{0}.{1}", _name, binder.Name),
+                var command = new ExecuteFunctionCommand(_dataStrategy.GetDatabase(), adapter, string.Format("{0}.{1}", _name, binder.Name),
                                                          binder.ArgumentsToDictionary(args));
                 return command.Execute(out result);
             }

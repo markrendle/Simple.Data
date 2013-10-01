@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
+using Simple.Data.Operations;
 
 namespace Simple.Data.Commands
 {
@@ -17,11 +18,13 @@ namespace Simple.Data.Commands
 
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            var result = dataStrategy.Run.Get(table.GetName(), args);
-            if (result == null || result.Count == 0) return null;
+            var result = (DataResult)dataStrategy.Run.Execute(new GetOperation(table.GetName(), args));
+            if (result == null) return null;
+            var record = result.Data.FirstOrDefault();
+            if (record == null) return null;
             return binder.Name.Equals("get", StringComparison.OrdinalIgnoreCase)
-                       ? new SimpleRecord(result, table.GetQualifiedName(), dataStrategy)
-                       : result.First().Value;
+                       ? new SimpleRecord(record, table.GetQualifiedName(), dataStrategy)
+                       : record.First().Value;
         }
 
         public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)
@@ -36,17 +39,7 @@ namespace Simple.Data.Commands
 
         public Func<object[], object> CreateDelegate(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            if (dataStrategy is SimpleTransaction) return null;
-
-            var func = dataStrategy.GetAdapter().OptimizingDelegateFactory.CreateGetDelegate(dataStrategy.GetAdapter(),
-                                                                                         table.GetQualifiedName(), args);
-                return a =>
-                           {
-                               var data = func(a);
-                               return (data != null && data.Count > 0)
-                                          ? new SimpleRecord(data, table.GetQualifiedName(), dataStrategy)
-                                          : null;
-                           };
+            return null;
         }
     }
 }

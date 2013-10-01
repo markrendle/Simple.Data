@@ -22,7 +22,7 @@ namespace Simple.Data.Ado
             _expressionFormatter = new ExpressionFormatter(_commandBuilder, _schema);
         }
 
-        public ICommandBuilder GetUpdateCommand(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
+        public ICommandBuilder GetUpdateCommand(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria)
         {
             var table = _schema.FindTable(tableName);
             var updateClause = GetUpdateClause(table, data);

@@ -16,7 +16,7 @@ namespace Simple.Data.Extensions
         public static IDictionary<TKey,TValue> ToDictionary<TKey,TValue>(this IEnumerable<KeyValuePair<TKey,TValue>> source, IEqualityComparer<TKey> equalityComparer)
         {
             var dict = source as IDictionary<TKey, TValue>;
-            if (dict != null) return new Dictionary<TKey, TValue>(dict);
+            if (dict != null) return new Dictionary<TKey, TValue>(dict, equalityComparer);
             return source.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, equalityComparer);
         }
 
