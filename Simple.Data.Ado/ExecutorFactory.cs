@@ -21,14 +21,30 @@
             dict.Add(CreateFunction<DeleteOperation>(DeleteExecutor.Execute));
             dict.Add(CreateFunction<GetOperation>(GetExecutor.ExecuteGet));
             dict.Add(CreateFunction<UpdateByCriteriaOperation>(UpdateByCriteriaExecutor.ExecuteUpdate));
-            dict.Add(CreateFunction<FunctionOperation>(ExecuteFunction));
+            dict.Add(CreateFunction<FunctionOperation>(FunctionExecutor.ExecuteFunction));
+            dict.Add(CreateFunction<UpsertOperation>(ExecuteUpsert));
             return (FuncDict)dict;
         }
 
-        private static OperationResult ExecuteFunction(FunctionOperation operation, AdoAdapter adapter, AdoAdapterTransaction transaction)
+        private static OperationResult ExecuteUpsert(UpsertOperation operation, AdoAdapter adapter, AdoAdapterTransaction transaction)
         {
-            var result = adapter.Execute(operation.FunctionName, operation.Parameters, transaction);
-            return new MultiDataResult(result);
+            var checkedEnumerable = CheckedEnumerable.Create(operation.Data);
+            if (checkedEnumerable.IsEmpty) return CommandResult.Empty;
+            var upserter = new AdoAdapterUpserter(adapter, transaction.TransactionOrDefault());
+            DataResult dataResult;
+            if (checkedEnumerable.HasMoreThanOneValue)
+            {
+                dataResult =
+                    new DataResult(upserter.UpsertMany(operation.TableName, checkedEnumerable.ToList(),
+                        operation.ResultRequired,
+                        (d, e) => operation.ErrorCallback(d, e)));
+            }
+            else
+            {
+                var row = checkedEnumerable.Single;
+                dataResult = new DataResult(upserter.Upsert(operation.TableName, checkedEnumerable.Single, operation.Criteria, operation.ResultRequired));
+            }
+            return dataResult;
         }
 
         private static KeyValuePair<Type, ExecuteFunc> CreateFunction<T>(Func<T, AdoAdapter, AdoAdapterTransaction, OperationResult> target)

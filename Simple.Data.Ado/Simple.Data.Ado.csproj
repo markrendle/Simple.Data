@@ -99,6 +99,7 @@
     <Compile Include="ExpressionFormatterBase.cs" />
     <Compile Include="ExpressionHasher.cs" />
     <Compile Include="FindHelper.cs" />
+    <Compile Include="FunctionExecutor.cs" />
     <Compile Include="FunctionNameConverter.cs" />
     <Compile Include="GenericDbParameterFactory.cs" />
     <Compile Include="GetExecutor.cs" />

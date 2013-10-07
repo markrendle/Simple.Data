@@ -16,7 +16,7 @@ namespace Simple.Data.SqlCe40Test
     {
         private static readonly string DatabasePath = Path.Combine(
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8)),
-            "TestDatabase.sdf");
+            "TestDatabaseCopy.sdf");
 
         [TestFixtureSetUp]
         public void DeleteAlice()

@@ -3,6 +3,7 @@ namespace Simple.Data.Commands
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Dynamic;
     using System.Linq;
     using Extensions;
@@ -53,7 +54,7 @@ namespace Simple.Data.Commands
             if (key == null) throw new InvalidOperationException(string.Format("No key columns defined for table \"{0}\"",table.GetQualifiedName()));
             if (key.Count == 0) return dataStrategy.Run.Execute(new InsertOperation(table.GetQualifiedName(), dict, isResultRequired));
             var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), key);
-            return dataStrategy.Run.Execute(new UpsertOperation(table.GetQualifiedName(), dict, isResultRequired));
+            return dataStrategy.Run.Execute(new UpsertOperation(table.GetQualifiedName(), dict, isResultRequired, criteria));
         }
 
         internal static object ObjectToDictionary(object obj, IEqualityComparer<string> keyComparer)
@@ -61,20 +62,26 @@ namespace Simple.Data.Commands
             var dynamicRecord = obj as SimpleRecord;
             if (dynamicRecord != null)
             {
-                return new Dictionary<string, object>(dynamicRecord, keyComparer);
+                return obj;
+            }
+
+            var readOnlyDictionary = obj as IReadOnlyDictionary<string, object>;
+            if (readOnlyDictionary != null)
+            {
+                return readOnlyDictionary;
             }
 
             var dictionary = obj as IDictionary<string, object>;
             if (dictionary != null)
             {
-                return dictionary;
+                return new ReadOnlyDictionary<string, object>(dictionary);
             }
 
             var list = obj as IEnumerable;
             if (list != null)
             {
                 var originals = list.Cast<object>().ToList();
-                var dictionaries = originals.Select(o => ObjectToDictionary(o, keyComparer) as IDictionary<string,object>).Where(o => o != null && o.Count > 0).ToList();
+                var dictionaries = originals.Select(o => ObjectToDictionary(o, keyComparer) as IReadOnlyDictionary<string,object>).Where(o => o != null && o.Count > 0).ToList();
                 if (originals.Count == dictionaries.Count)
                     return dictionaries;
             }

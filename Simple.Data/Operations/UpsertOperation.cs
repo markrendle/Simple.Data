@@ -9,37 +9,37 @@
         private readonly IEnumerable<IReadOnlyDictionary<string, object>> _data;
         private readonly bool _resultRequired;
         private readonly string _tableName;
-        private readonly string[] _byFieldNames;
+        private readonly SimpleExpression _criteria;
         private readonly ErrorCallback _errorCallback;
 
-        public UpsertOperation(string tableName, IDictionary<string, object> data, bool resultRequired, string[] byFieldNames = null, ErrorCallback errorCallback = null)
-            : this(tableName, resultRequired, byFieldNames, errorCallback)
+        public UpsertOperation(string tableName, IDictionary<string, object> data, bool resultRequired, SimpleExpression criteria = null, ErrorCallback errorCallback = null)
+            : this(tableName, resultRequired, criteria, errorCallback)
         {
             _data = EnumerableEx.Once(new ReadOnlyDictionary<string, object>(data)); 
         }
 
-        public UpsertOperation(string tableName, IReadOnlyDictionary<string, object> data, bool resultRequired, string[] byFieldNames = null, ErrorCallback errorCallback = null)
-            : this(tableName, resultRequired, byFieldNames, errorCallback)
+        public UpsertOperation(string tableName, IReadOnlyDictionary<string, object> data, bool resultRequired, SimpleExpression criteria = null, ErrorCallback errorCallback = null)
+            : this(tableName, resultRequired, criteria, errorCallback)
         {
             _data = EnumerableEx.Once(data);
         }
 
-        public UpsertOperation(string tableName, IEnumerable<IDictionary<string, object>> data, bool resultRequired, string[] byFieldNames = null, ErrorCallback errorCallback = null)
-            : this(tableName, resultRequired, byFieldNames, errorCallback)
+        public UpsertOperation(string tableName, IEnumerable<IDictionary<string, object>> data, bool resultRequired, SimpleExpression criteria = null, ErrorCallback errorCallback = null)
+            : this(tableName, resultRequired, criteria, errorCallback)
         {
             _data = data.Select(d => new ReadOnlyDictionary<string, object>(d));
         }
 
-        public UpsertOperation(string tableName, bool resultRequired, string[] byFieldNames = null, ErrorCallback errorCallback = null)
+        public UpsertOperation(string tableName, bool resultRequired, SimpleExpression criteria = null, ErrorCallback errorCallback = null)
         {
             _tableName = tableName;
             _resultRequired = resultRequired;
-            _byFieldNames = byFieldNames;
+            _criteria = criteria;
             _errorCallback = errorCallback ?? ((item, exception) => true) ;
         }
 
-        public UpsertOperation(string tableName, IEnumerable<IReadOnlyDictionary<string, object>> data, bool resultRequired, string[] byFieldNames = null, ErrorCallback errorCallback = null)
-            : this(tableName, resultRequired, byFieldNames, errorCallback)
+        public UpsertOperation(string tableName, IEnumerable<IReadOnlyDictionary<string, object>> data, bool resultRequired, SimpleExpression criteria = null, ErrorCallback errorCallback = null)
+            : this(tableName, resultRequired, criteria, errorCallback)
         {
             _data = data;
         }
@@ -64,9 +64,9 @@
             get { return _errorCallback; }
         }
 
-        public string[] ByFieldNames
+        public SimpleExpression Criteria
         {
-            get { return _byFieldNames; }
+            get { return _criteria; }
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Simple.Data.SqlCe40Test.SchemaTests
     {
         private static readonly string DatabasePath = Path.Combine(
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8)),
-            "TestDatabase.sdf");
+            "TestDatabaseCopy.sdf");
 
         protected override Database GetDatabase()
         {

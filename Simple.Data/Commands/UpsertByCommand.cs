@@ -2,6 +2,7 @@ namespace Simple.Data.Commands
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Dynamic;
     using System.Linq;
     using Extensions;
@@ -31,7 +32,7 @@ namespace Simple.Data.Commands
                 var criteriaExpression = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(),
                                                                                          criteria);
                 var data = binder.NamedArgumentsToDictionary(args);
-                var operation = new UpsertOperation(table.GetQualifiedName(), data, !binder.IsResultDiscarded());
+                var operation = new UpsertOperation(table.GetQualifiedName(), data, !binder.IsResultDiscarded(), criteriaExpression);
                 result = dataStrategy.Run.Execute(operation);
             }
 
@@ -44,21 +45,26 @@ namespace Simple.Data.Commands
             var list = record as IList<IReadOnlyDictionary<string, object>>;
             if (list != null)
             {
-                var operation = new UpsertOperation(tableName, list, isResultRequired, keyFieldNames.ToArray(),
-                    errorCallback);
+                var operation = new UpsertOperation(tableName, list, isResultRequired, null, errorCallback);
                 return dataStrategy.Run.Execute(operation);
             }
             else
             {
 
-                var dict = record as IDictionary<string, object>;
-                var operation = new UpsertOperation(tableName, dict, isResultRequired, keyFieldNames.ToArray(),
+                var dict = record as IReadOnlyDictionary<string, object>;
+                if (dict == null)
+                {
+                    dict = new ReadOnlyDictionary<string, object>(record as IDictionary<string, object>);
+                }
+                var criteria = GetCriteria(keyFieldNames, dict);
+                var operation = new UpsertOperation(tableName, dict, isResultRequired,
+                    ExpressionHelper.CriteriaDictionaryToExpression(tableName, criteria),
                     errorCallback);
                 return dataStrategy.Run.Execute(operation);
             }
         }
 
-        private static IEnumerable<KeyValuePair<string, object>> GetCriteria(IEnumerable<string> keyFieldNames, IDictionary<string, object> record)
+        private static IDictionary<string, object> GetCriteria(IEnumerable<string> keyFieldNames, IReadOnlyDictionary<string, object> record)
         {
             var criteria = new Dictionary<string, object>();
 
