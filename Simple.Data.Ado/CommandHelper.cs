@@ -115,8 +115,17 @@ namespace Simple.Data.Ado
             if (value == null) return DBNull.Value;
             if (TypeHelper.IsKnownType(value.GetType())) return value;
             if (value is Enum) return value;
-            var asString = value.ToString();
-            if (asString != value.GetType().FullName) return asString;
+
+            if (value is DynamicObject)
+            {
+                var asString = value.ToString();
+                if (asString != value.GetType().FullName) return asString;
+            }
+
+            var converter = value.GetType().GetOperatorConversionMethod(value.GetType());
+            if (converter != null)
+                return converter.Invoke(null, new[] { value });
+
             return value;
         }
 

@@ -101,6 +101,11 @@ namespace Simple.Data.Ado
             {
                 return dynamicObject.ToString();
             }
+
+            var converter = value.GetType().GetOperatorConversionMethod(value.GetType());
+            if (converter != null)
+                return converter.Invoke(null, new[] { value });
+
             return value;
         }
 

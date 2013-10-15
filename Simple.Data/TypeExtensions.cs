@@ -25,5 +25,18 @@ namespace Simple.Data
                        .Select(t => t.GetInterfaceMethod(name))
                        .FirstOrDefault(m => m != null);
         }
+
+        public static MethodInfo GetOperatorConversionMethod(this Type conversionOwnerType, Type convertFromType)
+        {
+            var converter = conversionOwnerType.GetMethod("op_Implicit", new[] { convertFromType });
+            if (converter != null)
+                return converter;
+
+            converter = conversionOwnerType.GetMethod("op_Explicit", new[] { convertFromType });
+            if (converter != null)
+                return converter;
+
+            return null;
+        }
     }
 }

@@ -338,6 +338,11 @@ namespace Simple.Data
         {
             if (ReferenceEquals(source, null)) return null;
             if (targetType.IsInstanceOfType(source)) return source;
+
+            var converter = targetType.GetOperatorConversionMethod(source.GetType());
+            if (converter != null)
+                return converter.Invoke(null, new[] { source });
+
             return Convert.ChangeType(source, targetType);
         }
 

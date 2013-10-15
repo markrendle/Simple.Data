@@ -88,11 +88,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BulkInsertTest.cs" />
-    <Compile Include="ConversionTests.cs" />
+    <Compile Include="OperatorConversionTests.cs" />
     <Compile Include="DatabaseHelper.cs" />
     <Compile Include="DatabaseOpenerTests.cs" />
     <Compile Include="FunctionTest.cs" />
     <Compile Include="SchemaQualifiedTests.cs" />
+    <Compile Include="WeirdConversionTests.cs" />
     <Compile Include="WeirdTypeTest.cs" />
     <Compile Include="SchemaTests\DataTypeTests.cs" />
     <Compile Include="DbImage.cs" />
