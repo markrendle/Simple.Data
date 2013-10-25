@@ -103,6 +103,10 @@
     <Compile Include="FunctionNameConverter.cs" />
     <Compile Include="GenericDbParameterFactory.cs" />
     <Compile Include="GetExecutor.cs" />
+    <Compile Include="GraphMap.cs" />
+    <Compile Include="GraphNode.cs" />
+    <Compile Include="CollectionGraphNode.cs" />
+    <Compile Include="SingleRecordGraphNode.cs" />
     <Compile Include="HomogenizedDictionaryIndex.cs" />
     <Compile Include="IBulkInserter.cs" />
     <Compile Include="IBulkUpdater.cs" />

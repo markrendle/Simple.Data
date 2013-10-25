@@ -6,6 +6,7 @@ namespace Simple.Data.QueryPolyfills
 
     public class DictionaryEqualityComparer : IEqualityComparer<IDictionary<string, object>>
     {
+        public static readonly DictionaryEqualityComparer Instance = new DictionaryEqualityComparer();
         public bool Equals(IDictionary<string, object> x, IDictionary<string, object> y)
         {
             if (ReferenceEquals(x, y)) return true;
