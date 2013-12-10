@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Trespasser</id>
+    <version>1.1</version>
+    <title>Trespasser</title>
+    <authors>Mark Rendle</authors>
+    <owners>Mark Rendle</owners>
+    <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
+    <projectUrl>http://github.com/markrendle/trespasser</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Private Proxy for testing</description>
+    <summary>Private Proxy for testing</summary>
+    <tags>Test NUnit xUnit</tags>
+  </metadata>
+</package>
