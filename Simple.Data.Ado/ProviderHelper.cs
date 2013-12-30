@@ -82,7 +82,7 @@ namespace Simple.Data.Ado
             return Composer.Default.Compose<IConnectionProvider>(extension);
         }
 
-        public IConnectionProvider GetProviderByConnectionName(string connectionName)
+        public IConnectionProvider GetProviderByConnectionName(string connectionName, string schemaName = null)
         {
             var connectionSettings = ConfigurationManager.ConnectionStrings[connectionName];
             if (connectionSettings == null)
@@ -90,12 +90,12 @@ namespace Simple.Data.Ado
                 throw new ArgumentOutOfRangeException("connectionName");
             }
 
-            return GetProviderByConnectionString(connectionSettings.ConnectionString, connectionSettings.ProviderName);
+            return GetProviderByConnectionString(connectionSettings.ConnectionString, connectionSettings.ProviderName, schemaName);
         }
 
-        public IConnectionProvider GetProviderByConnectionString(string connectionString, string providerName)
+        public IConnectionProvider GetProviderByConnectionString(string connectionString, string providerName, string schemaName = null)
         {
-            return _connectionProviderCache.GetOrAdd(new ConnectionToken(connectionString, providerName),
+            return _connectionProviderCache.GetOrAdd(new ConnectionToken(connectionString, providerName, schemaName),
                                                      LoadProviderByConnectionToken);
         }
 
@@ -115,6 +115,11 @@ namespace Simple.Data.Ado
             }
 
             provider.SetConnectionString(token.ConnectionString);
+
+            var schemaConnectionProvider = provider as ISchemaConnectionProvider;
+            if(schemaConnectionProvider != null)
+                schemaConnectionProvider.SetSchema(token.SchemaName);
+
             return provider;
             
         }
@@ -272,7 +277,7 @@ namespace Simple.Data.Ado
             {
                 unchecked
                 {
-                    return (ConnectionString.GetHashCode()*397) ^ ProviderName.GetHashCode();
+                    return (ConnectionString.GetHashCode()*397) ^ (ProviderName.GetHashCode() * 397) ^ SchemaName.GetHashCode();
                 }
             }
 
@@ -288,12 +293,14 @@ namespace Simple.Data.Ado
 
             private readonly string _connectionString;
             private readonly string _providerName;
+            private readonly string _schemaName;
 
-            public ConnectionToken(string connectionString, string providerName)
+            public ConnectionToken(string connectionString, string providerName, string schemaName = null)
             {
                 if (connectionString == null) throw new ArgumentNullException("connectionString");
                 _connectionString = connectionString;
                 _providerName = providerName ?? string.Empty;
+                _schemaName = schemaName ?? string.Empty;
             }
 
             public string ConnectionString
@@ -304,6 +311,11 @@ namespace Simple.Data.Ado
             public string ProviderName
             {
                 get { return _providerName; }
+            }
+
+            public string SchemaName
+            {
+                get { return _schemaName; }
             }
         }
     }

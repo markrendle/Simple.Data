@@ -359,7 +359,7 @@ namespace Simple.Data
         {
             if (ReferenceEquals(source, null)) return null;
             if (targetType.IsInstanceOfType(source)) return source;
-
+            
             if (source is string && targetType == typeof(Guid)) return TypeDescriptor.GetConverter(typeof(Guid)).ConvertFromInvariantString(source.ToString());
             return Convert.ChangeType(source, targetType);
         }

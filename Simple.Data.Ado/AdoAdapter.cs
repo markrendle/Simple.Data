@@ -105,8 +105,17 @@ namespace Simple.Data.Ado
             {
                 if (settingsKeys.Contains("ProviderName"))
                 {
-                    _connectionProvider = ProviderHelper.GetProviderByConnectionString(Settings.ConnectionString,
-                                                                                       Settings.ProviderName);
+                    if(settingsKeys.Contains("SchemaName"))
+                    {
+                        _connectionProvider = ProviderHelper.GetProviderByConnectionString(Settings.ConnectionString
+                            , Settings.ProviderName
+                            , Settings.SchemaName);
+                    }
+                    else
+                    {
+                        _connectionProvider = ProviderHelper.GetProviderByConnectionString(Settings.ConnectionString,
+                            Settings.ProviderName);
+                    }
                 }
                 else
                 {
@@ -119,7 +128,14 @@ namespace Simple.Data.Ado
             }
             else if (settingsKeys.Contains("ConnectionName"))
             {
-                _connectionProvider = ProviderHelper.GetProviderByConnectionName(Settings.ConnectionName);
+                if (settingsKeys.Contains("SchemaName"))
+                {
+                    _connectionProvider = ProviderHelper.GetProviderByConnectionName(Settings.ConnectionName, Settings.SchemaName);
+                }
+                else
+                {
+                    _connectionProvider = ProviderHelper.GetProviderByConnectionName(Settings.ConnectionName);
+                }
             }
             _schema = DatabaseSchema.Get(_connectionProvider, _providerHelper);
             _relatedFinder = new Lazy<AdoAdapterRelatedFinder>(CreateRelatedFinder);

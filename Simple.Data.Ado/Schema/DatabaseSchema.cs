@@ -125,8 +125,11 @@ namespace Simple.Data.Ado.Schema
 
         public static DatabaseSchema Get(IConnectionProvider connectionProvider, ProviderHelper providerHelper)
         {
-            return Instances.GetOrAdd(connectionProvider.ConnectionString,
-                                      sp => new DatabaseSchema(connectionProvider.GetSchemaProvider(), providerHelper));
+            var instance = connectionProvider is ISchemaConnectionProvider 
+                ? Instances.GetOrAdd(((ISchemaConnectionProvider)connectionProvider).ConnectionProviderKey, sp => new DatabaseSchema(connectionProvider.GetSchemaProvider(), providerHelper))
+                : Instances.GetOrAdd(connectionProvider.ConnectionString, sp => new DatabaseSchema(connectionProvider.GetSchemaProvider(), providerHelper));
+
+            return instance;
         }
 
         public static void ClearCache()

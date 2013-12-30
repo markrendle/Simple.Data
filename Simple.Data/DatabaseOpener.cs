@@ -13,9 +13,9 @@
             get { return LocalOpenMethods.Value; }
         }
 
-        public dynamic OpenDefault()
+        public dynamic OpenDefault(string schemaName = null)
         {
-            return OpenMethods.OpenDefaultImpl();
+            return OpenMethods.OpenDefaultImpl(schemaName);
         }
 
         public dynamic OpenFile(string filename)
@@ -33,6 +33,11 @@
             return OpenMethods.OpenConnectionWithProviderImpl(connectionString, providerName);
         }
 
+        public dynamic OpenConnection(string connectionString, string providerName, string schemaName)
+        {
+            return OpenMethods.OpenConnectionWithProviderAndSchemaImpl(connectionString, providerName, schemaName);
+        }
+
         public dynamic Open(string adapterName, object settings)
         {
             return OpenMethods.OpenImpl(adapterName, settings);
@@ -41,6 +46,11 @@
         public dynamic OpenNamedConnection(string connectionName)
         {
             return OpenMethods.OpenNamedConnectionImpl(connectionName);
+        }
+
+        public dynamic OpenNamedConnection(string connectionName, string schemaName)
+        {
+            return OpenMethods.OpenNamedConnectionAndSchemaImpl(connectionName, schemaName);
         }
 
         public void ClearAdapterCache()
@@ -68,9 +78,9 @@
             OpenMethods.UseMockAdapter(adapterCreator);
         }
 
-        internal static Database OpenDefaultMethod()
+        internal static Database OpenDefaultMethod(string schemaName = null)
         {
-            return new Database(AdapterFactory.Create("Ado", new { ConnectionName = "Simple.Data.Properties.Settings.DefaultConnectionString" }));
+            return new Database(AdapterFactory.Create("Ado", new { ConnectionName = "Simple.Data.Properties.Settings.DefaultConnectionString", SchemaName = schemaName }));
         }
 
         internal static Database OpenFileMethod(string filename)
@@ -88,9 +98,19 @@
             return new Database(AdapterFactory.Create("Ado", new { ConnectionString = connectionString, ProviderName = providerName }));
         }
 
+        internal static Database OpenConnectionAndSchemaMethod(string connectionString, string providerName, string schemaName)
+        {
+            return new Database(AdapterFactory.Create("Ado", new { ConnectionString = connectionString, ProviderName = providerName, SchemaName = schemaName }));
+        }
+
         internal static Database OpenNamedConnectionMethod(string connectionName)
         {
             return new Database(AdapterFactory.Create("Ado", new { ConnectionName = connectionName }));
+        }
+
+        internal static Database OpenNamedConnectionAndSchemaMethod(string connectionName, string schemaName)
+        {
+            return new Database(AdapterFactory.Create("Ado", new { ConnectionName = connectionName, SchemaName = schemaName }));
         }
 
         internal static Database OpenMethod(string adapterName, object settings)
