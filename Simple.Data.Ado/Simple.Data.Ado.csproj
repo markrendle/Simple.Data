@@ -106,6 +106,7 @@
     <Compile Include="IFunctionNameConverter.cs" />
     <Compile Include="IObservableQueryRunner.cs" />
     <Compile Include="IQueryPager.cs" />
+    <Compile Include="ISchemaConnectionProvider.cs" />
     <Compile Include="ISchemaGetter.cs" />
     <Compile Include="ISqlOptimizer.cs" />
     <Compile Include="Joiner.cs" />

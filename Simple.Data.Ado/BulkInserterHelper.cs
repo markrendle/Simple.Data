@@ -1,3 +1,5 @@
+using Simple.Data.Extensions;
+
 namespace Simple.Data.Ado
 {
     using System;
@@ -157,7 +159,7 @@ namespace Simple.Data.Ado
             var actions =
                 _columns.Select<Column, Action<IDictionary<string,object>, IDbCommand>>((c, i) => (row, cmd) => cmd.SetParameterValue(i, null)).ToArray();
 
-            var usedColumnNames = sample.Keys.Where(k => _columns.Any(c => String.Equals(c.ActualName, k, StringComparison.InvariantCultureIgnoreCase))).ToArray();
+            var usedColumnNames = sample.Keys.Where(k => _columns.Any(c => String.Equals(c.HomogenizedName, k.Homogenize(), StringComparison.InvariantCultureIgnoreCase))).ToArray();
 
             foreach (var columnName in usedColumnNames)
             {

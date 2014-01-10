@@ -9,9 +9,9 @@ namespace Simple.Data
         /// specified in the 'Simple.Data.Properties.Settings.ConnectionString' config ConnectionStrings setting.
         /// </summary>
         /// <returns>A <see cref="Database"/> object as a dynamic type.</returns>
-        public static dynamic Open()
+        public static dynamic Open(string schemaName = null)
         {
-            return DatabaseOpener.OpenDefault();
+            return DatabaseOpener.OpenDefault(schemaName);
         }
 
         /// <summary>
@@ -36,9 +36,19 @@ namespace Simple.Data
             return DatabaseOpener.OpenFile(filename);
         }
         
-        public static dynamic OpenNamedConnection(string connectionName)
+        public static dynamic OpenNamedConnection(string connectionName, string schemaName = null)
         {
-            return DatabaseOpener.OpenNamedConnection(connectionName);
+            return DatabaseOpener.OpenNamedConnection(connectionName, schemaName);
+        }
+
+        public static dynamic OpenConnection(string connectionString,string providerName)
+        {
+            return DatabaseOpener.OpenConnection(connectionString, providerName);
+        }
+
+        public static dynamic OpenConnection(string connectionString, string providerName, string schemaName)
+        {
+            return DatabaseOpener.OpenConnection(connectionString, providerName, schemaName);
         }
     }
 }
