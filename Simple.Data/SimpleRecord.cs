@@ -46,12 +46,22 @@ namespace Simple.Data
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            if (_data.ContainsKey(binder.Name))
+            if (TryGetMember(binder.Name, out result) == false)
             {
-                result = _data[binder.Name];
+                return base.TryGetMember(binder, out result);
+            }
+
+            return true;
+        }
+
+        private bool TryGetMember(string name, out object result)
+        {
+            if (_data.ContainsKey(name))
+            {
+                result = _data[name];
                 var converted = ConvertResult(result);
                 if (!ReferenceEquals(result, converted))
-                    _data[binder.Name] = result = converted;
+                    _data[name] = result = converted;
 
                 return true;
             }
@@ -67,9 +77,9 @@ namespace Simple.Data
                 try
                 {
                     var relatedAdapter = _database.GetAdapter() as IAdapterWithRelation;
-                    if (relatedAdapter != null && relatedAdapter.IsValidRelation(_tableName, binder.Name))
+                    if (relatedAdapter != null && relatedAdapter.IsValidRelation(_tableName, name))
                     {
-                        result = GetRelatedData(binder, relatedAdapter);
+                        result = GetRelatedData(name, relatedAdapter);
                         return true;
                     }
                 }
@@ -78,13 +88,15 @@ namespace Simple.Data
                     throw new UnresolvableObjectException(e.ObjectName, string.Format("Column '{0}' not found.", e.ObjectName), e);
                 }
             }
-            return base.TryGetMember(binder, out result);
+
+            result = null;
+            return false;
         }
 
-        private object GetRelatedData(GetMemberBinder binder, IAdapterWithRelation relatedAdapter)
+        private object GetRelatedData(string name, IAdapterWithRelation relatedAdapter)
         {
             object result;
-            var related = relatedAdapter.FindRelated(_tableName, _data, binder.Name);
+            var related = relatedAdapter.FindRelated(_tableName, _data, name);
             var query = related as SimpleQuery;
             if (query != null)
             {
@@ -94,10 +106,10 @@ namespace Simple.Data
             else
             {
                 result = related is IDictionary<string, object>
-                             ? (object) new SimpleRecord(related as IDictionary<string, object>, binder.Name, _database)
+                             ? (object) new SimpleRecord(related as IDictionary<string, object>, name, _database)
                              : ((IEnumerable<IDictionary<string, object>>) related).Select(
-                                       dict => new SimpleRecord(dict, binder.Name, _database)).ToList<dynamic>();
-                _data[binder.Name] = result;
+                                       dict => new SimpleRecord(dict, name, _database)).ToList<dynamic>();
+                _data[name] = result;
 
             }
             return result;
@@ -113,6 +125,19 @@ namespace Simple.Data
         {
             result = _concreteObject.Get(binder.Type, _data);
             return result != null;
+        }
+
+        public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
+        {
+            if (indexes.Length == 1 && indexes[0] is string)
+            {
+                if (TryGetMember((string) indexes[0], out result))
+                {
+                    return true;
+                }
+            }
+
+            return base.TryGetIndex(binder, indexes, out result);
         }
 
         public override IEnumerable<string> GetDynamicMemberNames()
