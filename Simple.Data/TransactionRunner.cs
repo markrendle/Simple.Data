@@ -96,6 +96,7 @@ namespace Simple.Data
         {
             SimpleExpression criteria = CreateCriteriaFromOriginalValues(tableName, newValuesDict, originalValuesDict);
             var changedValuesDict = CreateChangedValuesDict(newValuesDict, originalValuesDict);
+            if (changedValuesDict.Count == 0) return 0;
             return _adapter.Update(tableName, changedValuesDict, criteria, _adapterTransaction);
         }
 
