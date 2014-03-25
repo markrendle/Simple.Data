@@ -44,13 +44,15 @@ namespace Simple.Data.SqlServer
             using (bulkCopy)
             {
                 connection.OpenIfClosed();
-                foreach (var record in data)
+
+                var dataList = data.ToList();
+                foreach (var record in dataList)
                 {
                     if (count == 0)
                     {
-                        dataTable = CreateDataTable(adapter, tableName, record.Keys, bulkCopy);
+                        dataTable = CreateDataTable(adapter, tableName, dataList.SelectMany(r => r.Keys).Distinct(), bulkCopy);
                     }
-                    dataTable.Rows.Add(record.Values.ToArray());
+                    AddRow(dataTable, record);
 
                     if (++count%5000 == 0)
                     {
@@ -82,7 +84,7 @@ namespace Simple.Data.SqlServer
             return options;
         }
 
-        private DataTable CreateDataTable(AdoAdapter adapter, string tableName, ICollection<string> keys, SqlBulkCopy bulkCopy)
+        private DataTable CreateDataTable(AdoAdapter adapter, string tableName, IEnumerable<string> keys, SqlBulkCopy bulkCopy)
         {
             var table = adapter.GetSchema().FindTable(tableName);
             var dataTable = new DataTable(table.ActualName);
@@ -104,5 +106,17 @@ namespace Simple.Data.SqlServer
 
             return dataTable;
         }
+
+        private void AddRow(DataTable dataTable, IDictionary<string, object> record)
+        {
+            var dataRow = dataTable.NewRow();
+            foreach (DataColumn column in dataTable.Columns)
+            {
+                if (record.ContainsKey(column.ColumnName))
+                    dataRow[column] = record[column.ColumnName];
+            }
+            dataTable.Rows.Add(dataRow);
+        }
+
     }
 }

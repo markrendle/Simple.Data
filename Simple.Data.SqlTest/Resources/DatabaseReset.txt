@@ -86,6 +86,8 @@ BEGIN
 	DROP TABLE [dbo].[HierarchyIdTest]
 	IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[TimestampTest]') AND type in (N'U'))
 	DROP TABLE [dbo].[TimestampTest]
+	IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[OptionalColumnTest]') AND type in (N'U'))
+	DROP TABLE [dbo].[OptionalColumnTest]
 
 	CREATE TABLE [dbo].[Users] (
 		[Id]       INT            IDENTITY (1, 1) NOT NULL,
@@ -244,6 +246,16 @@ BEGIN
 	(
 		[Id] ASC
 	))
+
+	CREATE TABLE [dbo].[OptionalColumnTest](
+		[Id] [int] IDENTITY(1,1) NOT NULL,
+		[FirstName] [nvarchar](50),
+		[LastName] [nvarchar](50),
+		[MiddleInitial] [nvarchar](50),
+	)
+
+	ALTER TABLE [dbo].[OptionalColumnTest]
+		ADD CONSTRAINT [PK_OptionalColumnTest] PRIMARY KEY CLUSTERED ([Id] ASC)
 
 	BEGIN TRANSACTION
 	SET IDENTITY_INSERT [dbo].[Customers] ON
