@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
+using Simple.Data.Ado;
 using Simple.Data.SqlServer;
 
 namespace Simple.Data.SqlTest
@@ -111,6 +112,16 @@ namespace Simple.Data.SqlTest
             var pagedSql = new SqlQueryPager().ApplyPaging(sql, new[] {"[dbo].[PromoPosts].[Id]"}, 0, 25).Single();
             var modified = Normalize.Replace(pagedSql, " ").ToLowerInvariant();
             Assert.AreEqual(expected, modified);
+        }
+
+        [Test]
+        public void ShouldThrowIfTableHasNoPrimaryKey([Values(null, new string[0])]string[] keys)
+        {
+            var sql = "select [dbo].[d].[a] from [dbo].[b]";
+
+            Assert.Throws<AdoAdapterException>(
+                () => new SqlQueryPager().ApplyPaging(sql, keys, 5, 10).ToList()
+            );
         }
     }
 }

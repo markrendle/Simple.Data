@@ -183,13 +183,14 @@
             else
             {
                 var table = _adapter.GetSchema().FindTable(query.TableName);
-                if (table.PrimaryKey == null || table.PrimaryKey.Length == 0)
+                var keys = new string[0];
+                if (table.PrimaryKey != null && table.PrimaryKey.Length > 0)
                 {
-                    throw new AdoAdapterException(string.Format("Cannot apply paging to table '{0}' with no primary key.", table.ActualName));
+                    keys = table.PrimaryKey.AsEnumerable()
+                        .Select(k => string.Format("{0}.{1}", table.QualifiedName, _adapter.GetSchema().QuoteObjectName(k)))
+                        .ToArray();
                 }
-                var keys = table.PrimaryKey.AsEnumerable()
-                     .Select(k => string.Format("{0}.{1}", table.QualifiedName, _adapter.GetSchema().QuoteObjectName(k)))
-                     .ToArray();
+
                 int skip = skipClause == null ? 0 : skipClause.Count;
                 int take = takeClause == null ? maxInt : takeClause.Count;
                 commandTexts = queryPager.ApplyPaging(mainCommandBuilder.Text, keys,  skip, take);

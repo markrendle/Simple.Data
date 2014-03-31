@@ -96,7 +96,14 @@ namespace Simple.Data
 
         private static bool IsSimpleDataAssembly(Assembly assembly)
         {
-            return assembly.GetFullName().StartsWith("Simple.Data.", StringComparison.OrdinalIgnoreCase);
+            try
+            {
+                return assembly.GetFullName().StartsWith("Simple.Data.", StringComparison.OrdinalIgnoreCase);
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

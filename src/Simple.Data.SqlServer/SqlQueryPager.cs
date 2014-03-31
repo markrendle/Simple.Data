@@ -22,6 +22,11 @@ namespace Simple.Data.SqlServer
 
         public IEnumerable<string> ApplyPaging(string sql, string[] keys, int skip, int take)
         {
+            if (keys == null || keys.Length == 0)
+            {
+                throw new AdoAdapterException("Cannot apply paging to table with no primary key.");
+            }
+
             sql = sql.Replace(Environment.NewLine, " ");
             var builder = new StringBuilder("WITH __Data AS (SELECT ");
 
