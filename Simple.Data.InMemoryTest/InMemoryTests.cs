@@ -806,5 +806,21 @@
 
             Assert.AreEqual(3, actual.Count);
         }
+
+        [Test]
+        public void UpdateWithOriginalValuesRowsUpdatedShouldBeZeroIfNewValueAreSameAsOriginalValue()
+        {
+            var adapter = new InMemoryAdapter();
+            adapter.SetKeyColumn("Test", "Id");
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+            db.Test.Upsert(Id: 1, SomeValue: "Testing");
+            var record = db.Test.Get(1);
+            var record1 = record.Clone();
+
+            var rowsUpdated = db.Test.Update(record, record1);
+
+            Assert.AreEqual(0, rowsUpdated);
+        }
     }
 }
