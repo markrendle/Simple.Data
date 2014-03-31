@@ -50,6 +50,18 @@
         }
 
         [Test]
+        public void InsertAndFindAllByStringTypeShouldWork()
+        {
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            db.Test.Insert(Id: 1, Name: "Alice");
+            db.Test.Insert(Id: 2, Name: "Bob");
+            List<dynamic> records = db.Test.FindAllByName(new[] { "Alice", "Bob" }).ToList();
+            Assert.IsNotNull(records);
+            Assert.AreEqual(2, records.Count);
+        }
+
+        [Test]
         public void InsertAndFindWithTwoColumnsShouldWork()
         {
             Database.UseMockAdapter(new InMemoryAdapter());

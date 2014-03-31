@@ -100,7 +100,7 @@ namespace Simple.Data.QueryPolyfills
                     d =>
                         {
                             var resolvedLeftOperand = Resolve(d, arg.LeftOperand);
-                            if (resolvedLeftOperand.OfType<IEnumerable>().Any())
+                            if (resolvedLeftOperand.Any(o => !(o is string) && o is IEnumerable))
                             {
                                 return resolvedLeftOperand.OfType<IEnumerable>().Any(
                                     o => o.Cast<object>().SequenceEqual(((IEnumerable)arg.RightOperand).Cast<object>()));
