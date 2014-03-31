@@ -41,6 +41,17 @@ namespace Simple.Data.UnitTest
             Assert.AreEqual("Bob", target.Name);
         }
 
+        /// <summary>
+        ///A test for DynamicRecord Constructor
+        ///</summary>
+        [Test()]
+        public void DynamicRecordIndexerTest()
+        {
+            dynamic target = new SimpleRecord();
+            target.Name = "Bob";
+            Assert.AreEqual("Bob", target["Name"]);
+        }
+
         [Test]
         public void DynamicCastTest()
         {
