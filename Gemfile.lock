@@ -1,0 +1,15 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    albacore (0.3.5)
+      rubyzip
+    rake (10.1.0)
+    rubyzip (0.9.9)
+
+PLATFORMS
+  x86-mingw32
+
+DEPENDENCIES
+  albacore (>= 0.3.4.0)
+  rake (>= 10.0.3.0)
+  rubyzip (= 0.9.9)
