@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Simple.Data.Ado.Schema
@@ -140,7 +141,24 @@ namespace Simple.Data.Ado.Schema
         public ObjectName BuildObjectName(String text)
         {
             if (text == null) throw new ArgumentNullException("text");
-            if (!text.Contains('.')) return new ObjectName(this.DefaultSchema, text);
+            if (!text.Contains('.'))
+            {
+                try
+                {
+                    var table = _lazyTables.Value.Find(text);
+                    return new ObjectName(table.Schema, table.ActualName);
+                } 
+                catch (UnresolvableObjectException)
+                { }
+                try
+                {
+                    var procedure = _lazyProcedures.Value.Find(text);
+                    return new ObjectName(procedure.Schema, procedure.Name);
+                } 
+                catch (UnresolvableObjectException)
+                { }
+                return new ObjectName(this.DefaultSchema, text);
+            }
             var schemaDotTable = text.Split('.');
             if (schemaDotTable.Length != 2) throw new InvalidOperationException(string.Format("Could not parse table name '{0}'.", text));
             return new ObjectName(schemaDotTable[0], schemaDotTable[1]);
