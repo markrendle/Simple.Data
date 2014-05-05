@@ -61,7 +61,21 @@ namespace Simple.Data.Ado.Schema
             }
             if (!string.IsNullOrWhiteSpace(_defaultSchema))
             {
-                return Find(procedureName, _defaultSchema);
+                try
+                {
+                    return Find(procedureName, _defaultSchema);
+                } 
+                catch (UnresolvableObjectException)
+                {
+                    var procedure = FindprocedureWithName(procedureName.Homogenize())
+                                    ?? FindprocedureWithPluralName(procedureName.Homogenize())
+                                    ?? FindprocedureWithSingularName(procedureName.Homogenize());
+
+                    if (procedure == null)
+                    {
+                        throw;
+                    }
+                }
             }
             return FindprocedureWithName(procedureName.Homogenize())
                    ?? FindprocedureWithPluralName(procedureName.Homogenize())
