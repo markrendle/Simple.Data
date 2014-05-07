@@ -250,6 +250,37 @@
         }
 
         [Test]
+        public void TestFindAcrossJoinAfterDelete()
+        {
+            var adapter = new InMemoryAdapter();
+            adapter.SetKeyColumn("Thing1Table", "Id");
+            adapter.SetKeyColumn("Thing2Table", "Id");
+            adapter.Join.Master("Thing1Table", "Id").Detail("ThingJoin", "Thing1Id");
+            adapter.Join.Master("Thing2Table", "Id").Detail("ThingJoin", "Thing2Id");
+
+            Database.UseMockAdapter(adapter);
+            var db = Database.Open();
+
+            var thing1 = new {Id = 1, Name = "Thing1"};
+            var thing2 = new {Id = 2, Name = "Thing2"};
+            var thingJoin = new {Thing1Id = 1, Thing2Id = 2};
+ 
+            db.Thing1Table.Insert(thing1);
+            db.Thing2Table.Insert(thing2);
+            db.ThingJoin.Insert(thingJoin);
+ 
+            //Delete the join object.
+            db.ThingJoin.DeleteAll(db.ThingJoin.Thing1Id == 1 && db.ThingJoin.Thing2Id == 2);
+            
+            //Ensure after we drop one of the relationships, there is only no records left in the join table.
+            Assert.AreEqual(0, db.ThingJoin.All().ToList().Count);
+
+            //Ensure we don't find the Thing across the join after the delete
+            var foundByJoin = db.Thing1Table.FindAll(db.Thing1Table.ThingJoin.Thing1Id == 1).FirstOrDefault();
+            Assert.IsNull(foundByJoin);
+        }
+
+        [Test]
         public void TestOrderBy()
         {
             Database.UseMockAdapter(new InMemoryAdapter());
