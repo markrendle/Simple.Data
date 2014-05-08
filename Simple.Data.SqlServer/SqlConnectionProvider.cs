@@ -14,6 +14,7 @@ namespace Simple.Data.SqlServer
     public class SqlConnectionProvider : IConnectionProvider
     {
         private string _connectionString;
+        private SqlConnection _sharedConnection;
 
         public SqlConnectionProvider()
         {
@@ -27,7 +28,7 @@ namespace Simple.Data.SqlServer
 
         public IDbConnection CreateConnection()
         {
-            return new SqlConnection(_connectionString);
+            return _sharedConnection ?? new SqlConnection(_connectionString);
         }
 
         public ISchemaProvider GetSchemaProvider()
@@ -78,6 +79,16 @@ namespace Simple.Data.SqlServer
         public IProcedureExecutor GetProcedureExecutor(AdoAdapter adapter, ObjectName procedureName)
         {
             return new ProcedureExecutor(adapter, procedureName);
+        }
+
+        public void SetSharedConnection(object sharedConnection)
+        {
+            _sharedConnection = (SqlConnection) sharedConnection;
+        }
+
+        public bool IsSharedConnection()
+        {
+            return _sharedConnection != null;
         }
     }
 }

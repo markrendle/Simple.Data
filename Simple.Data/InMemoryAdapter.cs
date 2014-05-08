@@ -172,6 +172,44 @@ namespace Simple.Data
             }
         }
 
+        private void DeleteAsDetail(string tableName, IDictionary<string, object> data)
+        {
+            foreach (var @join in _joins.Where(j => j.DetailTableName.Equals(tableName, StringComparison.OrdinalIgnoreCase)))
+            {
+                if (!data.ContainsKey(@join.DetailKey)) continue;
+                foreach (
+                    var master in
+                        GetTable(@join.MasterTableName).Where(
+                            d => d.ContainsKey(@join.MasterKey) && d[@join.MasterKey].Equals(data[@join.DetailKey])))
+                {
+                    data[@join.MasterPropertyName] = master;
+                    if (master.ContainsKey(@join.DetailPropertyName))
+                    {
+                        ((List<IDictionary<string, object>>)master[@join.DetailPropertyName]).Remove(data);
+                    }
+                }
+            }
+        }
+
+        private void DeleteAsMaster(string tableName, IDictionary<string, object> data)
+        {
+            foreach (var @join in _joins.Where(j => j.MasterTableName.Equals(tableName, StringComparison.OrdinalIgnoreCase)))
+            {
+                if (!data.ContainsKey(@join.MasterKey)) continue;
+                foreach (
+                    var detail in
+                        GetTable(@join.DetailTableName).Where(
+                            d => d.ContainsKey(@join.DetailKey) && d[@join.DetailKey].Equals(data[@join.MasterKey])))
+                {
+                    detail[@join.MasterPropertyName] = data;
+                    if (data.ContainsKey(@join.DetailPropertyName))
+                    {
+                        ((List<IDictionary<string, object>>)data[@join.DetailPropertyName]).Add(data);
+                    }
+                }
+            }
+        }
+
         public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
         {
             int count = 0;
@@ -196,6 +234,8 @@ namespace Simple.Data
             List<IDictionary<string, object>> deletions = Find(tableName, criteria).ToList();
             foreach (var record in deletions)
             {
+                DeleteAsDetail(tableName, record);
+                DeleteAsMaster(tableName, record);
                 GetTable(tableName).Remove(record);
             }
             return deletions.Count;

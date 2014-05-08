@@ -74,6 +74,16 @@ namespace Simple.Data.Mocking.Ado
             return new ProcedureExecutor(adapter, procedureName);
         }
 
+        public void SetSharedConnection(object sharedConnection)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsSharedConnection()
+        {
+            return false;
+        }
+
         private bool _supportsCompoundStatements = true;
         public bool SupportsCompoundStatements
         {

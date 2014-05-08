@@ -318,6 +318,7 @@ namespace Simple.Data.Ado
         public void UseSharedConnection(IDbConnection connection)
         {
             _sharedConnection = connection;
+            _connectionProvider.SetSharedConnection(connection);
         }
 
         public void StopUsingSharedConnection()

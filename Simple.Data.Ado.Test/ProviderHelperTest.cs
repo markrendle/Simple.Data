@@ -90,6 +90,16 @@ namespace Simple.Data.Ado.Test
                 throw new NotImplementedException();
             }
 
+            public void SetSharedConnection(object sharedConnection)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool IsSharedConnection()
+            {
+                return false;
+            }
+
             public Type RequestedServiceType { get; private set; }
             public Object GetService(Type serviceType)
             {

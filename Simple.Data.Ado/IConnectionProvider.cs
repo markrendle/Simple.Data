@@ -14,5 +14,7 @@ namespace Simple.Data.Ado
         string GetIdentityFunction();
         bool SupportsStoredProcedures { get; }
         IProcedureExecutor GetProcedureExecutor(AdoAdapter adapter, ObjectName procedureName);
+        void SetSharedConnection(object sharedConnection);
+        bool IsSharedConnection();
     }
 }
