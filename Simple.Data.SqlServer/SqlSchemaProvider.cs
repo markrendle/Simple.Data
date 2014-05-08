@@ -72,11 +72,22 @@ namespace Simple.Data.SqlServer
 
         private IEnumerable<DataRow> GetSchema(string collectionName, params string[] constraints)
         {
-            using (var cn = ConnectionProvider.CreateConnection())
+            var cn = ConnectionProvider.CreateConnection() as SqlConnection;
+            try
             {
-                cn.Open();
+                if (!ConnectionProvider.IsSharedConnection())
+                    cn.Open();
 
-                return cn.GetSchema(collectionName, constraints).AsEnumerable();
+                var schema = cn.GetSchema(collectionName, constraints).AsEnumerable();
+                return schema;
+            }
+            finally
+            {
+                if (!ConnectionProvider.IsSharedConnection())
+                {
+                    cn.Close();
+                    cn.Dispose();
+                }
             }
         }
 
@@ -89,8 +100,13 @@ namespace Simple.Data.SqlServer
         {
             // GetSchema does not return the return value of e.g. a stored proc correctly,
             // i.e. there isn't sufficient information to correctly set up a stored proc.
-            using (var connection = (SqlConnection)ConnectionProvider.CreateConnection())
+            var connection = (SqlConnection) ConnectionProvider.CreateConnection();
+
+            try
             {
+                if (!ConnectionProvider.IsSharedConnection())
+                    connection.Open();
+
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandType = CommandType.StoredProcedure;
@@ -102,6 +118,14 @@ namespace Simple.Data.SqlServer
                     //Tim Cartwright: I added size and dbtype so inout/out params would function properly.
                     foreach (SqlParameter p in command.Parameters)
                         yield return new Parameter(p.ParameterName, SqlTypeResolver.GetClrType(p.DbType.ToString()), p.Direction, p.DbType, p.Size);
+                }
+            }
+            finally
+            {
+                if (!ConnectionProvider.IsSharedConnection())
+                {
+                    connection.Close();
+                    connection.Dispose();
                 }
             }
         }
@@ -208,14 +232,26 @@ where object_id = object_id(@tableName, 'TABLE') or object_id = object_id(@table
         private DataTable SelectToDataTable(string sql, params SqlParameter[] parameters)
         {
             var dataTable = new DataTable();
-            using (var cn = ConnectionProvider.CreateConnection() as SqlConnection)
+            var cn = ConnectionProvider.CreateConnection() as SqlConnection;
+            try
             {
+                if (!ConnectionProvider.IsSharedConnection())
+                    cn.Open();
+
                 using (var adapter = new SqlDataAdapter(sql, cn))
                 {
                     adapter.SelectCommand.Parameters.AddRange(parameters);
                     adapter.Fill(dataTable);
                 }
 
+            }
+            finally
+            {
+                if (!ConnectionProvider.IsSharedConnection())
+                {
+                    cn.Close();
+                    cn.Dispose();
+                }
             }
 
             return dataTable;

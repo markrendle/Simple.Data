@@ -74,5 +74,15 @@ namespace Simple.Data.SqlCe40
         {
             throw new NotSupportedException("SQL Server Compact Edition does not support stored procedures.");
         }
+
+        public void SetSharedConnection(object sharedConnection)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsSharedConnection()
+        {
+            return false;
+        }
     }
 }

@@ -64,6 +64,16 @@ namespace Simple.Data.Ado.Test
         {
             throw new NotImplementedException();
         }
+
+        public void SetSharedConnection(object sharedConnection)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsSharedConnection()
+        {
+            return false;
+        }
     }
 
     public class StubSchemaProvider : ISchemaProvider
