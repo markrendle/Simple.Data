@@ -98,7 +98,7 @@ namespace Simple.Data.Ado.Schema
         private TableCollection CreateTableCollection()
         {
             return new TableCollection(_schemaProvider.GetTables()
-                .Select(table => new Table(table.ActualName, table.Schema, table.Type, this)));
+                .Select(table => new Table(table.ActualName, table.Schema, table.Type, this, table.AliasedTable)));
         }
 
         private ProcedureCollection CreateProcedureCollection()
@@ -107,7 +107,7 @@ namespace Simple.Data.Ado.Schema
                                                      .Select(
                                                          proc =>
                                                          new Procedure(proc.Name, proc.SpecificName, proc.Schema,
-                                                                             this)), _schemaProvider.GetDefaultSchema());
+                                                                             this, proc.AliasedProcedure)), _schemaProvider.GetDefaultSchema());
         }
 
         public string QuoteObjectName(string unquotedName)

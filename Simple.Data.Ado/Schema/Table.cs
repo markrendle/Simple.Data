@@ -11,19 +11,21 @@ namespace Simple.Data.Ado.Schema
         private readonly string _actualName;
         private readonly string _schema;
         private readonly TableType _type;
+        private readonly string _aliasedTable;
         private readonly DatabaseSchema _databaseSchema;
         private readonly Lazy<ColumnCollection> _lazyColumns;
         private readonly Lazy<Key> _lazyPrimaryKey;
         private readonly Lazy<ForeignKeyCollection> _lazyForeignKeys;
 
-        public Table(string name, string schema, TableType type)
+        public Table(string name, string schema, TableType type, string aliasedTable = "")
         {
             _actualName = name;
             _schema = string.IsNullOrWhiteSpace(schema) ? null : schema;
             _type = type;
+            _aliasedTable = aliasedTable;
         }
 
-        internal Table(string name, string schema, TableType type, DatabaseSchema databaseSchema)
+        internal Table(string name, string schema, TableType type, DatabaseSchema databaseSchema, string aliasedTable = "")
         {
             _actualName = name;
             _databaseSchema = databaseSchema;
@@ -32,6 +34,7 @@ namespace Simple.Data.Ado.Schema
             _lazyColumns = new Lazy<ColumnCollection>(GetColumns);
             _lazyPrimaryKey = new Lazy<Key>(GetPrimaryKey);
             _lazyForeignKeys = new Lazy<ForeignKeyCollection>(GetForeignKeys);
+            _aliasedTable = aliasedTable;
         }
 
         public TableType Type
@@ -72,6 +75,11 @@ namespace Simple.Data.Ado.Schema
                            ? _databaseSchema.QuoteObjectName(_actualName)
                            : _databaseSchema.QuoteObjectName(_schema) + '.' + _databaseSchema.QuoteObjectName(_actualName);
             }
+        }
+
+        public string AliasedTable
+        {
+            get { return _aliasedTable; }
         }
 
         public IEnumerable<Column> Columns
@@ -195,7 +203,7 @@ namespace Simple.Data.Ado.Schema
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(other._actualName, _actualName) && Equals(other._schema, _schema) && Equals(other._type, _type);
+            return Equals(other._actualName, _actualName) && Equals(other._schema, _schema) && Equals(other._type, _type) && Equals(other._aliasedTable, _aliasedTable);
         }
 
         /// <summary>
