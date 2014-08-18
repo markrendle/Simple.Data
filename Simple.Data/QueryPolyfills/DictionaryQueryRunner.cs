@@ -47,6 +47,9 @@ namespace Simple.Data.QueryPolyfills
             }
 
             source = RunOrderByClauses(source);
+            
+            source = RunHavingClauses(source);
+            source = RunSelectClauses(source);
 
             foreach (var clause in _clauses)
             {
@@ -56,9 +59,7 @@ namespace Simple.Data.QueryPolyfills
                     source = handler(clause, source);
                 }
             }
-            
-            source = RunHavingClauses(source);
-            source = RunSelectClauses(source);
+
             return source;
         }
 
