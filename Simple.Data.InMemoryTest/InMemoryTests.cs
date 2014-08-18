@@ -188,6 +188,16 @@
             Assert.AreEqual("Bob", records[0].Name);
         }
 
+        [Test]
+        public void SelectWithDistinctShouldReturnOnlyDistinctRows()
+        {
+            var db = CreateAggregateTestDb();
+            var records = db.Test.All().Select(db.Test.Name).Distinct().ToList();
+            Assert.AreEqual(2, records.Count);
+            Assert.AreEqual("Alice", records[0].Name);
+            Assert.AreEqual("Bob", records[1].Name);
+        }
+
         private static dynamic CreateAggregateTestDb()
         {
             Database.UseMockAdapter(new InMemoryAdapter());
