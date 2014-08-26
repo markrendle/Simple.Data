@@ -13,23 +13,26 @@ namespace Simple.Data.Ado.Schema
         private readonly string _name;
         private readonly string _specificName;
         private readonly string _schema;
+        private readonly string _aliasedProc;
         private readonly Lazy<ParameterCollection> _lazyParameters;
 
-        public Procedure(string name, string specificName, string schema)
+        public Procedure(string name, string specificName, string schema, string aliasedProc = "")
         {
             _name = name;
             _specificName = specificName;
             _schema = schema.NullIfWhitespace();
+            _aliasedProc = aliasedProc;
             _lazyParameters = new Lazy<ParameterCollection>(() => new ParameterCollection(GetParameters()));
          }
 
-        internal Procedure(string name, string specificName, string schema, DatabaseSchema databaseSchema)
+        internal Procedure(string name, string specificName, string schema, DatabaseSchema databaseSchema, string aliasedProc = "")
         {
             _name = name;
             _specificName = specificName;
             _schema = schema.NullIfWhitespace();
             _lazyParameters = new Lazy<ParameterCollection>(() => new ParameterCollection(GetParameters()));
             _databaseSchema = databaseSchema;
+            _aliasedProc = aliasedProc;
         }
 
         private IEnumerable<Parameter> GetParameters()
@@ -50,6 +53,11 @@ namespace Simple.Data.Ado.Schema
         public string Name
         {
             get { return _name; }
+        }
+
+        public string AliasedProcedure
+        {
+            get { return _aliasedProc; }
         }
 
         public ParameterCollection Parameters

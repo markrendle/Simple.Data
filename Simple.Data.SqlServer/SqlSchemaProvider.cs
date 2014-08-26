@@ -10,12 +10,22 @@ namespace Simple.Data.SqlServer
 {
     class SqlSchemaProvider : ISchemaProvider
     {
+        enum ObjectNamePart
+        {
+            Name = 1,
+            Schema = 2,
+            Database = 3,
+            Server = 4
+        }
+
         private readonly IConnectionProvider _connectionProvider;
+        private IEnumerable<Tuple<string, string, string>> _synonyms;
 
         public SqlSchemaProvider(IConnectionProvider connectionProvider)
         {
             if (connectionProvider == null) throw new ArgumentNullException("connectionProvider");
             _connectionProvider = connectionProvider;
+            _synonyms = getSynonyms();
         }
 
         public IConnectionProvider ConnectionProvider
@@ -25,7 +35,15 @@ namespace Simple.Data.SqlServer
 
         public IEnumerable<Table> GetTables()
         {
-            return GetSchema("TABLES").Select(SchemaRowToTable);
+            var tables = GetSchema("TABLES").Select(SchemaRowToTable);
+            //Add Synonyms a table to the tables list
+            List<Table> synTables = new List<Table>();
+            foreach (var syn in _synonyms.Where(s => s.Item3 == "U" || s.Item3 == "V"))
+                synTables.Add(new Table(syn.Item1, getObjectPart(syn.Item2, ObjectNamePart.Schema)
+                    , syn.Item3 == "U" ? TableType.Table : TableType.View
+                    , getObjectPart(syn.Item2, ObjectNamePart.Name)));
+
+            return tables.Union(synTables);
         }
 
         private static Table SchemaRowToTable(DataRow row)
@@ -37,9 +55,33 @@ namespace Simple.Data.SqlServer
         public IEnumerable<Column> GetColumns(Table table)
         {
             if (table == null) throw new ArgumentNullException("table");
-            var cols = GetColumnsDataTable(table);
-            return cols.AsEnumerable().Select(row => SchemaRowToColumn(table, row));
+            //if this table is a synonym, get columns from real table
+            if (!string.IsNullOrEmpty(table.AliasedTable))
+                return GetColumnsFromSchemaQuery(table).AsEnumerable().Select(row => SynonymSchemaRowToColumn(table, row));
+            else
+                return GetColumnsDataTable(table).AsEnumerable().Select(row => SchemaRowToColumn(table, row));
         }
+
+        private static Column SynonymSchemaRowToColumn(Table table, DataRow row)
+        {
+            SqlDbType sqlDbType = SqlDbType.Udt;
+
+            if (!row.IsNull("DataTypeName"))
+                sqlDbType = DbTypeFromInformationSchemaTypeName((string)row["DataTypeName"]);
+
+            var size = (int)row["ColumnSize"];
+            switch (sqlDbType)
+            {
+                case SqlDbType.Image:
+                case SqlDbType.NText:
+                case SqlDbType.Text:
+                    size = -1;
+                    break;
+            }
+
+            return new SqlColumn(row["ColumnName"].ToString(), table, (bool)row["IsIdentity"], sqlDbType, size);
+        }
+
 
         private static Column SchemaRowToColumn(Table table, DataRow row)
         {
@@ -67,7 +109,13 @@ namespace Simple.Data.SqlServer
 
         public IEnumerable<Procedure> GetStoredProcedures()
         {
-            return GetSchema("Procedures").Select(SchemaRowToStoredProcedure);
+            var sprocs = GetSchema("Procedures").Select(SchemaRowToStoredProcedure);
+            //Add Synonyms a sproc to the sproc list
+            List<Procedure> synProcs = new List<Procedure>();
+            foreach (var syn in _synonyms.Where(s => s.Item3 == "P"))
+                synProcs.Add(new Procedure(syn.Item1, syn.Item1, string.Empty, syn.Item2));
+
+            return sprocs.Union(synProcs);
         }
 
         private IEnumerable<DataRow> GetSchema(string collectionName, params string[] constraints)
@@ -87,6 +135,9 @@ namespace Simple.Data.SqlServer
 
         public IEnumerable<Parameter> GetParameters(Procedure storedProcedure)
         {
+            //support for aliased storec procedure names (synonyms)
+            var sprocName = string.IsNullOrEmpty(storedProcedure.AliasedProcedure) ? storedProcedure.QualifiedName
+                : storedProcedure.AliasedProcedure;
             // GetSchema does not return the return value of e.g. a stored proc correctly,
             // i.e. there isn't sufficient information to correctly set up a stored proc.
             using (var connection = (SqlConnection)ConnectionProvider.CreateConnection())
@@ -94,7 +145,7 @@ namespace Simple.Data.SqlServer
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = storedProcedure.QualifiedName;
+                    command.CommandText = sprocName;
 
                     connection.Open();
                     SqlCommandBuilder.DeriveParameters(command);
@@ -109,7 +160,8 @@ namespace Simple.Data.SqlServer
         public Key GetPrimaryKey(Table table)
         {
             if (table == null) throw new ArgumentNullException("table");
-            var primaryKeys = GetPrimaryKeys(table.ActualName);
+            var tableName = table.ActualName;
+            var primaryKeys = GetPrimaryKeys(tableName);
             if (primaryKeys == null)
             {
                 return new Key(Enumerable.Empty<string>());
@@ -117,7 +169,7 @@ namespace Simple.Data.SqlServer
             return new Key(primaryKeys.AsEnumerable()
                 .Where(
                     row =>
-                    row["TABLE_SCHEMA"].ToString() == table.Schema && row["TABLE_NAME"].ToString() == table.ActualName)
+                    row["TABLE_SCHEMA"].ToString() == table.Schema && row["TABLE_NAME"].ToString() == tableName)
                     .OrderBy(row => (int)row["ORDINAL_POSITION"])
                     .Select(row => row["COLUMN_NAME"].ToString()));
         }
@@ -125,9 +177,10 @@ namespace Simple.Data.SqlServer
         public IEnumerable<ForeignKey> GetForeignKeys(Table table)
         {
             if (table == null) throw new ArgumentNullException("table");
-            var groups = GetForeignKeys(table.ActualName)
+            var tableName = table.ActualName;
+            var groups = GetForeignKeys(tableName)
                 .Where(row =>
-                    row["TABLE_SCHEMA"].ToString() == table.Schema && row["TABLE_NAME"].ToString() == table.ActualName)
+                    row["TABLE_SCHEMA"].ToString() == table.Schema && row["TABLE_NAME"].ToString() == tableName)
                 .GroupBy(row => row["CONSTRAINT_NAME"].ToString())
                 .ToList();
 
@@ -162,20 +215,71 @@ namespace Simple.Data.SqlServer
         private DataTable GetColumnsDataTable(Table table)
         {
             const string columnSelect = @"SELECT name, is_identity, type_name(system_type_id) as type_name, max_length from sys.columns 
-where object_id = object_id(@tableName, 'TABLE') or object_id = object_id(@tableName, 'VIEW') order by column_id";
+                where object_id = object_id(@tableName, 'TABLE') or object_id = object_id(@tableName, 'VIEW') order by column_id";
             var @tableName = new SqlParameter("@tableName", SqlDbType.NVarChar, 128);
             @tableName.Value = string.Format("[{0}].[{1}]", table.Schema, table.ActualName);
             return SelectToDataTable(columnSelect, @tableName);
         }
 
+        private DataTable GetColumnsFromSchemaQuery(Table table)
+        {
+            DataTable dt = new DataTable();
+            using (var cn = ConnectionProvider.CreateConnection() as SqlConnection)
+            {
+                string commandText = string.Format("select top 1 * from {0}", table.QualifiedName);
+                using (SqlCommand cmd = new SqlCommand(commandText, cn))
+                {
+                    cmd.CommandType = CommandType.Text;
+                    cn.Open();
+                    SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+                    return dr.GetSchemaTable();
+                }
+            }
+        }
+
         private DataTable GetPrimaryKeys()
         {
-            return SelectToDataTable(Properties.Resources.PrimaryKeySql);
+            var dt = SelectToDataTable(Properties.Resources.PrimaryKeySql);
+            //get pks for synonym tables
+            foreach (var syn in _synonyms.Where(s => s.Item3 == "U" || s.Item3 == "V"))
+            {
+                DataTable remoteTable = GetRemotePrimaryKey(syn.Item1, syn.Item2);
+                if (remoteTable.Rows.Count > 0)
+                    dt.Merge(remoteTable);
+            }
+            return dt;
+        }
+
+        private DataTable GetRemotePrimaryKey(string tableName, string remoteTableName)
+        {
+            return SelectToDataTable(string.Format(Properties.Resources.RemotePrimaryKeySql
+                , tableName
+                , getObjectPart(remoteTableName, ObjectNamePart.Server) + "." + getObjectPart(remoteTableName, ObjectNamePart.Database) + "."
+                , getObjectPart(remoteTableName, ObjectNamePart.Name)));
         }
 
         private DataTable GetForeignKeys()
         {
-            return SelectToDataTable(Properties.Resources.ForeignKeysSql);
+            var dt = SelectToDataTable(Properties.Resources.ForeignKeysSql);
+            //get fks for synonym tables
+            foreach (var syn in _synonyms.Where(s => s.Item3 == "U" || s.Item3 == "V"))
+            {
+                DataTable remoteTable = GetRemoteForeignKeys(syn.Item1, syn.Item2);
+                if (remoteTable.Rows.Count > 0)
+                    dt.Merge(remoteTable);
+            }
+            return dt;
+        }
+
+        private DataTable GetRemoteForeignKeys(string tableName, string remoteTableName)
+        {
+            var serverName = getObjectPart(remoteTableName, ObjectNamePart.Server);
+            var databaseName = getObjectPart(remoteTableName, ObjectNamePart.Database);
+            return SelectToDataTable(string.Format(Properties.Resources.RemoteForeignKeysSql
+               , tableName
+               , serverName + "." + databaseName + "."
+               , "[" + serverName + "].[" + databaseName + "]."
+               , getObjectPart(remoteTableName, ObjectNamePart.Name)));
         }
 
         private DataTable GetPrimaryKeys(string tableName)
@@ -229,6 +333,38 @@ where object_id = object_id(@tableName, 'TABLE') or object_id = object_id(@table
         public String GetDefaultSchema()
         {
             return "dbo";
+        }
+
+        private IEnumerable<Tuple<string, string, string>> getSynonyms()
+        {
+            const string synSelect = @"SELECT name, base_object_name, OBJECTPROPERTYEX(OBJECT_ID(name), 'BaseType') AS BaseType FROM SYS.SYNONYMS;";
+            var dataTable = new DataTable();
+            using (var cn = ConnectionProvider.CreateConnection() as SqlConnection)
+            {
+                using (var adapter = new SqlDataAdapter(synSelect, cn))
+                {
+                    adapter.Fill(dataTable);
+                }
+            }
+            foreach (DataRow row in dataTable.Rows)
+                yield return new Tuple<string, string, string>(row["name"].ToString(), row["base_object_name"].ToString(), row["BaseType"].ToString().Trim());
+        }
+
+        private string getObjectPart(string fullObjectName, ObjectNamePart objectNamePart)
+        {
+            if (!fullObjectName.Contains('.'))
+                return fullObjectName;
+
+            var objParts = fullObjectName.Split('.');
+            if (objParts.Length < (int)objectNamePart)
+            {
+                if (objectNamePart == ObjectNamePart.Schema)
+                    return GetDefaultSchema();
+                else
+                    return string.Empty;
+            }
+            string result = objParts[objParts.Length - (int)objectNamePart];
+            return result.Replace("[", string.Empty).Replace("]", string.Empty);
         }
     }
 }

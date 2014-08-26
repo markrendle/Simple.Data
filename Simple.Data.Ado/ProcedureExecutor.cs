@@ -48,7 +48,7 @@ namespace Simple.Data.Ado
             using (var command = cn.CreateCommand(_adapter.AdoOptions))
             {
                 command.Transaction = transaction;
-                command.CommandText = procedure.QualifiedName;
+                command.CommandText = string.IsNullOrEmpty(procedure.AliasedProcedure) ? procedure.QualifiedName : procedure.AliasedProcedure;
                 command.CommandType = CommandType.StoredProcedure;
                 SetParameters(procedure, command, suppliedParameters);
                 try
