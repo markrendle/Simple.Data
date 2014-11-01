@@ -1,0 +1,22 @@
+<?xml version='1.0'?>
+<package xmlns='http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd'>
+  <metadata>
+    <id>Simple.Data.SqlServer</id>
+    <version>2.0.0-alpha1</version>
+    <authors>Mark Rendle and contributors</authors>
+    <owners>Mark Rendle</owners>
+    <copyright>Mark Rendle</copyright>
+    <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
+    <projectUrl>http://github.com/markrendle/Simple.Data</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Simple data access for .NET 4.5 and above</description>
+    <tags>simple.data</tags>
+    <dependencies>
+      <dependency id='Simple.Data.Ado' version='[2.0.0-alpha1]' />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src='src\Simple.Data.SqlServer\bin\Debug\Simple.Data.SqlServer.dll' target='lib\net45' />
+    <file src='src\Simple.Data.SqlServer\bin\Debug\Simple.Data.SqlServer.pdb' target='lib\net45' />
+  </files>
+</package> 

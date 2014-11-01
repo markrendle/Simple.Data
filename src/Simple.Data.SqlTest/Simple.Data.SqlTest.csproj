@@ -100,6 +100,7 @@
     <Compile Include="DatabaseHelper.cs" />
     <Compile Include="DatabaseOpenerTests.cs" />
     <Compile Include="FunctionTest.cs" />
+    <Compile Include="MetadataTests.cs" />
     <Compile Include="SchemaQualifiedTests.cs" />
     <Compile Include="WeirdTypeTest.cs" />
     <Compile Include="SchemaTests\DataTypeTests.cs" />

@@ -7,6 +7,7 @@
     using System.Linq;
     using System.Threading.Tasks;
     using Extensions;
+    using Metadata;
     using Operations;
     using Schema;
 
@@ -327,6 +328,11 @@
         }
 
         #endregion
+
+        public override IMetadata GetMetadata()
+        {
+            return new AdoMetadata(this);
+        }
     }
 
     public class ConnectionCreatedEventArgs : EventArgs

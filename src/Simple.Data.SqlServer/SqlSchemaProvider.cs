@@ -44,9 +44,13 @@ namespace Simple.Data.SqlServer
         private static Column SchemaRowToColumn(Table table, DataRow row)
         {
             SqlDbType sqlDbType = SqlDbType.Udt;
+            string typeName = string.Empty;
 
             if (!row.IsNull("type_name"))
-                sqlDbType = DbTypeFromInformationSchemaTypeName((string)row["type_name"]);
+            {
+                typeName = (string)row["type_name"];
+                sqlDbType = DbTypeFromInformationSchemaTypeName(typeName);
+            }
 
             var size = (short)row["max_length"];
             switch (sqlDbType)
@@ -62,7 +66,7 @@ namespace Simple.Data.SqlServer
                     break;
             }
 
-            return new SqlColumn(row["name"].ToString(), table, (bool)row["is_identity"], sqlDbType, size);
+            return new SqlColumn(row["name"].ToString(), table, (bool)row["is_identity"], sqlDbType, size){TypeName = typeName};
         }
 
         public IEnumerable<Procedure> GetStoredProcedures()

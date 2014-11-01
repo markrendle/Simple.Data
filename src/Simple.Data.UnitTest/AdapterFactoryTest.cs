@@ -74,5 +74,10 @@ namespace Simple.Data.UnitTest
         {
             throw new NotImplementedException();
         }
+
+        public override IMetadata GetMetadata()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

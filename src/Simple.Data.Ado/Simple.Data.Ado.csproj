@@ -69,6 +69,7 @@
     <Compile Include="AdoAdapterRelatedFinder.cs" />
     <Compile Include="AdoAdapterTransaction.cs" />
     <Compile Include="AdoAdapterUpserter.cs" />
+    <Compile Include="Metadata\AdoMetadata.cs" />
     <Compile Include="AdoOptions.cs" />
     <Compile Include="BulkInserter.cs" />
     <Compile Include="BulkInserterHelper.cs" />

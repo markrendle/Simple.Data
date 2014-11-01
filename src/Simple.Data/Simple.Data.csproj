@@ -101,6 +101,7 @@
     <Compile Include="ForUpdateClause.cs" />
     <Compile Include="FunctionSignature.cs" />
     <Compile Include="BadExpressionException.cs" />
+    <Compile Include="IMetadata.cs" />
     <Compile Include="JoinType.cs" />
     <Compile Include="MultiDataResult.cs" />
     <Compile Include="OfTypeEnumerable.cs" />

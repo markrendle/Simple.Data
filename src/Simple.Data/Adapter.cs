@@ -132,5 +132,7 @@ namespace Simple.Data
         {
             return false;
         }
+
+        public abstract IMetadata GetMetadata();
     }
 }

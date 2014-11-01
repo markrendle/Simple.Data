@@ -192,5 +192,10 @@ namespace Simple.Data
         {
             return new Database(this);
         }
+
+        public static IMetadata GetMetadata(Database database)
+        {
+            return database._adapter.GetMetadata();
+        }
     }
 }

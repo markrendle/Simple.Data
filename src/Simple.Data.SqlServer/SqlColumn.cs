@@ -1,5 +1,6 @@
 ﻿namespace Simple.Data.SqlServer
 {
+    using System;
     using System.Data;
     using Ado.Schema;
 
@@ -11,7 +12,7 @@
         {
         }
 
-        public SqlColumn(string actualName, Table table, SqlDbType sqlDbType) : base(actualName, table)
+        public SqlColumn(string actualName, Table table, SqlDbType sqlDbType) : base(actualName, table, sqlDbType.ToDbType())
         {
             _sqlDbType = sqlDbType;
         }
@@ -21,7 +22,7 @@
         }
 
         public SqlColumn(string actualName, Table table, bool isIdentity, SqlDbType sqlDbType, int maxLength)
-            : base(actualName, table, isIdentity, default(DbType), maxLength)
+            : base(actualName, table, isIdentity, sqlDbType.ToDbType(), maxLength)
         {
             _sqlDbType = sqlDbType;
         }
