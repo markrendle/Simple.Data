@@ -3,8 +3,8 @@
     using System;
     using Mocking.Ado;
     using NUnit.Framework;
+    using Xunit;
 
-    [TestFixture]
     public class ShoutyNameResolutionTests : DatabaseIntegrationContext
     {
         protected override void SetSchema(MockSchemaProvider schemaProvider)
@@ -19,26 +19,26 @@
             schemaProvider.SetForeignKeys(new object[] { "FK_ORDER_CUSTOMER", "dbo", "ORDER", "CUSTOMER_ID", "dbo", "CUSTOMER", "CUSTOMER_ID", 0 });
         }
 
-        [Test]
-        public void IndexerMethodWorksWithShoutyFromSingular()
+        [Fact]
+        public async void IndexerMethodWorksWithShoutyFromSingular()
         {
-            TargetDb["Customer"].All().ToList();
+            await TargetDb["Customer"].All().ToList();
             GeneratedSqlIs("select [dbo].[CUSTOMER].[CUSTOMER_ID] from [dbo].[CUSTOMER]");
         }
 
-        [Test]
-        public void IndexerMethodWorksWithSchemaAndShoutyFromSingular()
+        [Fact]
+        public async void IndexerMethodWorksWithSchemaAndShoutyFromSingular()
         {
-            TargetDb["dbo"]["Customer"].All().ToList();
+            await TargetDb["dbo"]["Customer"].All().ToList();
             GeneratedSqlIs("select [dbo].[CUSTOMER].[CUSTOMER_ID] from [dbo].[CUSTOMER]");
         }
 
 
-        [Test]
-        public void NaturalJoinWithShoutyCaseCreatesCorrectCommand()
+        [Fact]
+        public async void NaturalJoinWithShoutyCaseCreatesCorrectCommand()
         {
             var orderDate = new DateTime(2010, 1, 1);
-            TargetDb.Customer.Find(TargetDb.Customers.Orders.OrderDate == orderDate);
+            await TargetDb.Customer.Find(TargetDb.Customers.Orders.OrderDate == orderDate);
             const string expectedSql = "select [dbo].[CUSTOMER].[CUSTOMER_ID] from [dbo].[CUSTOMER] join [dbo].[ORDER] on " + 
                                        "([dbo].[CUSTOMER].[CUSTOMER_ID] = [dbo].[ORDER].[CUSTOMER_ID])"
                                        + " where [dbo].[ORDER].[ORDER_DATE] = @p1";

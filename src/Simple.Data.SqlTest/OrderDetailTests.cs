@@ -3,24 +3,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using NUnit.Framework;
 
 namespace Simple.Data.SqlTest
 {
-    [TestFixture]
+    using Xunit;
+    using Assert = NUnit.Framework.Assert;
+
     public class OrderDetailTests
     {
-        [TestFixtureSetUp]
-        public void Setup()
+        public OrderDetailTests()
         {
             DatabaseHelper.Reset();
         }
 
-        [Test]
-        public void TestOrderDetail()
+        [Fact]
+        public async void TestOrderDetail()
         {
             var db = DatabaseHelper.Open();
-            var order = db.Orders.FindByOrderDate(new DateTime(2010,10,10));
+            var order = await db.Orders.FindByOrderDate(new DateTime(2010,10,10));
             Assert.IsNotNull(order);
 
             var orderItem = order.OrderItems.FirstOrDefault();
@@ -29,11 +29,11 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual("Widget", item.Name);
         }
         
-        [Test]
-        public void TestOrderDetailFromList()
+        [Fact]
+        public async void TestOrderDetailFromList()
         {
             var db = DatabaseHelper.Open();
-            var orders = db.Orders.FindAllByOrderDate(new DateTime(2010,10,10));
+            var orders = await db.Orders.FindAllByOrderDate(new DateTime(2010,10,10));
             Assert.IsNotNull(orders);
 
             foreach (var order in orders)
@@ -45,11 +45,11 @@ namespace Simple.Data.SqlTest
             }
         }
 
-        [Test]
-        public void TestComplexObjectCreation()
+        [Fact]
+        public async void TestComplexObjectCreation()
         {
             var db = DatabaseHelper.Open();
-            var row = db.Customers.FindByCustomerId(1);
+            var row = await db.Customers.FindByCustomerId(1);
             Customer customer = row;
             customer.Orders.AddRange(row.Orders.Cast<Order>());
 

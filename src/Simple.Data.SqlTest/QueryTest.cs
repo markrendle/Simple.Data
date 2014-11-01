@@ -7,95 +7,95 @@ using NUnit.Framework;
 namespace Simple.Data.SqlTest
 {
     using System.Collections;
+    using Xunit;
+    using Assert = NUnit.Framework.Assert;
 
-    [TestFixture]
     public class QueryTest
     {
-        [TestFixtureSetUp]
-        public void Setup()
+        public QueryTest()
         {
             DatabaseHelper.Reset();
         }
 
-        [Test]
-        public void CountWithNoCriteriaShouldSelectThree()
+        [Fact]
+        public async void CountWithNoCriteriaShouldSelectThree()
         {
             var db = DatabaseHelper.Open();
-            var count = db.Users.GetCount();
+            var count = await db.Users.GetCount();
             Assert.AreEqual(3, count);
         }
 
-        [Test]
-        public void CountWithCriteriaShouldSelectTwo()
+        [Fact]
+        public async void CountWithCriteriaShouldSelectTwo()
         {
             var db = DatabaseHelper.Open();
-            int count = db.Users.GetCount(db.Users.Age > 30);
+            int count = await db.Users.GetCount(db.Users.Age > 30);
             Assert.AreEqual(2, count);
         }
 
-        [Test]
-        public void CountByShouldSelectOne()
+        [Fact]
+        public async void CountByShouldSelectOne()
         {
             var db = DatabaseHelper.Open();
-            Assert.AreEqual(1, db.Users.GetCountByName("Bob"));
+            Assert.AreEqual(1, await db.Users.GetCountByName("Bob"));
         }
 
-       [Test]
-        public void ExistsWithNoCriteriaShouldReturnTrue()
+       [Fact]
+        public async void ExistsWithNoCriteriaShouldReturnTrue()
         {
             var db = DatabaseHelper.Open();
-            Assert.AreEqual(true, db.Users.Exists());
+            Assert.AreEqual(true, await db.Users.Exists());
         }
 
-        [Test]
-        public void ExistsWithValidCriteriaShouldReturnTrue()
+        [Fact]
+        public async void ExistsWithValidCriteriaShouldReturnTrue()
         {
             var db = DatabaseHelper.Open();
-            Assert.AreEqual(true, db.Users.Exists(db.Users.Age > 30));
+            Assert.AreEqual(true, await db.Users.Exists(db.Users.Age > 30));
         }
 
-        [Test]
-        public void ExistsWithInvalidCriteriaShouldReturnFalse()
+        [Fact]
+        public async void ExistsWithInvalidCriteriaShouldReturnFalse()
         {
             var db = DatabaseHelper.Open();
-            Assert.AreEqual(false, db.Users.Exists(db.Users.Age == -1));
+            Assert.AreEqual(false, await db.Users.Exists(db.Users.Age == -1));
         }
 
-        [Test]
-        public void ExistsByValidValueShouldReturnTrue()
+        [Fact]
+        public async void ExistsByValidValueShouldReturnTrue()
         {
             var db = DatabaseHelper.Open();
-            Assert.AreEqual(true, db.Users.ExistsByName("Bob"));
+            Assert.AreEqual(true, await db.Users.ExistsByName("Bob"));
         }
 
-        [Test]
-        public void ExistsByInvalidValueShouldReturnFalse()
+        [Fact]
+        public async void ExistsByInvalidValueShouldReturnFalse()
         {
             var db = DatabaseHelper.Open();
-            Assert.AreEqual(false, db.Users.ExistsByName("Peter Kay"));
+            Assert.AreEqual(false, await db.Users.ExistsByName("Peter Kay"));
         }
 
-        [Test]
-        public void ColumnAliasShouldChangeDynamicPropertyName()
+        [Fact]
+        public async void ColumnAliasShouldChangeDynamicPropertyName()
         {
             var db = DatabaseHelper.Open();
-            var actual = db.Users.QueryById(1).Select(db.Users.Name.As("Alias")).First();
+            var actual = await db.Users.QueryById(1).Select(db.Users.Name.As("Alias")).First();
             Assert.AreEqual("Bob", actual.Alias);
         }
 
-        [Test]
-        public void MissingColumnShouldHaveColumnNotFoundMessage()
+        [Fact]
+        public async void MissingColumnShouldHaveColumnNotFoundMessage()
         {
             var db = DatabaseHelper.Open();
-            var actual = db.Users.QueryById(1).Select(db.Users.Name).First();
+            var actual = await db.Users.QueryById(1).Select(db.Users.Name).First();
             Assert.Throws<UnresolvableObjectException>(() => Console.WriteLine(actual.Bobbins), "Column not found.");
         }
 
-        [Test]
-        public void ShouldSelectFromOneToTen()
+        [Fact]
+        public async void ShouldSelectFromOneToTen()
         {
             var db = DatabaseHelper.Open();
-            var query = db.PagingTest.QueryById(1.to(100)).Take(10);
+            var query = await db.PagingTest.QueryById(1.to(100)).Take(10).ToList();
             int index = 1;
             foreach (var row in query)
             {
@@ -104,11 +104,11 @@ namespace Simple.Data.SqlTest
             }
         }
 
-        [Test]
-        public void ShouldSelectFromElevenToTwenty()
+        [Fact]
+        public async void ShouldSelectFromElevenToTwenty()
         {
             var db = DatabaseHelper.Open();
-            var query = db.PagingTest.QueryById(1.to(100)).Skip(10).Take(10);
+            var query = await db.PagingTest.QueryById(1.to(100)).Skip(10).Take(10).ToList();
             int index = 11;
             foreach (var row in query)
             {
@@ -117,11 +117,11 @@ namespace Simple.Data.SqlTest
             }
         }
 
-        [Test]
-        public void ShouldSelectFromOneHundredToNinetyOne()
+        [Fact]
+        public async void ShouldSelectFromOneHundredToNinetyOne()
         {
             var db = DatabaseHelper.Open();
-            var query = db.PagingTest.QueryById(1.to(100)).OrderByDescending(db.PagingTest.Id).Skip(0).Take(10);
+            var query = await db.PagingTest.QueryById(1.to(100)).OrderByDescending(db.PagingTest.Id).Skip(0).Take(10).ToList();
             int index = 100;
             foreach (var row in query)
             {
@@ -130,12 +130,12 @@ namespace Simple.Data.SqlTest
             }
         }
 
-        [Test]
-        public void WithTotalCountShouldGiveCount()
+        //TODO: [Fact]
+        public async void WithTotalCountShouldGiveCount()
         {
             Promise<int> count;
             var db = DatabaseHelper.Open();
-            var list = db.PagingTest.QueryById(1.to(50))
+            var list = await db.PagingTest.QueryById(1.to(50))
                 .Take(10)
                 .WithTotalCount(out count)
                 .ToList();
@@ -145,12 +145,12 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(50, count);
         }
 
-        [Test]
-        public void WithTotalCountWithExplicitSelectShouldGiveCount()
+        //TODO: [Fact]
+        public async void WithTotalCountWithExplicitSelectShouldGiveCount()
         {
             Promise<int> count;
             var db = DatabaseHelper.Open();
-            List<dynamic> list = db.PagingTest.QueryById(1.to(50))
+            List<dynamic> list = await db.PagingTest.QueryById(1.to(50))
                 .Select(db.PagingTest.Id)
                 .WithTotalCount(out count)
                 .Take(10)
@@ -165,12 +165,12 @@ namespace Simple.Data.SqlTest
             }
         }
 
-        [Test]
-        public void WithTotalCountWithExplicitSelectAndOrderByShouldGiveCount()
+        //TODO: [Fact]
+        public async void WithTotalCountWithExplicitSelectAndOrderByShouldGiveCount()
         {
             Promise<int> count;
             var db = DatabaseHelper.Open();
-            List<dynamic> list = db.PagingTest.QueryById(1.to(50))
+            List<dynamic> list = await db.PagingTest.QueryById(1.to(50))
                 .Select(db.PagingTest.Id)
                 .OrderByDescending(db.PagingTest.Id)
                 .WithTotalCount(out count)
@@ -186,14 +186,14 @@ namespace Simple.Data.SqlTest
             }
         }
 
-        [Test]
+        //TODO: [Fact]
 // ReSharper disable InconsistentNaming
-        public void WithTotalCountShouldGiveCount_ObsoleteFutureVersion()
+        public async void WithTotalCountShouldGiveCount_ObsoleteFutureVersion()
 // ReSharper restore InconsistentNaming
         {
             Future<int> count;
             var db = DatabaseHelper.Open();
-            var list = db.PagingTest.QueryById(1.to(50))
+            var list = await db.PagingTest.QueryById(1.to(50))
                 .WithTotalCount(out count)
                 .Take(10)
                 .ToList();
@@ -203,20 +203,20 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(50, count);
         }
 
-        [Test]
-        public void ShouldDirectlyQueryDetailTable()
+        [Fact]
+        public async void ShouldDirectlyQueryDetailTable()
         {
             var db = DatabaseHelper.Open();
-            var order = db.Customers.QueryByNameAndAddress("Test", "100 Road").Orders.FirstOrDefault();
+            var order = await db.Customers.QueryByNameAndAddress("Test", "100 Road").Orders.FirstOrDefault();
             Assert.IsNotNull(order);
             Assert.AreEqual(1, order.OrderId);
         }
 
-        [Test]
-        public void ShouldReturnNullWhenNoRowFound()
+        [Fact]
+        public async void ShouldReturnNullWhenNoRowFound()
         {
             var db = DatabaseHelper.Open();
-            string name = db.Customers
+            string name = await db.Customers
                         .Query()
                         .Select(db.Customers.Name)
                         .Where(db.Customers.CustomerId == 0) // There is no CustomerId 0
@@ -226,11 +226,11 @@ namespace Simple.Data.SqlTest
             Assert.IsNull(name);
         }
 
-        [Test]
-        public void ToScalarListShouldReturnStringList()
+        [Fact]
+        public async void ToScalarListShouldReturnStringList()
         {
             var db = DatabaseHelper.Open();
-            List<string> name = db.Customers
+            List<string> name = await db.Customers
                         .Query()
                         .Select(db.Customers.Name)
                         .OrderByName()
@@ -239,11 +239,11 @@ namespace Simple.Data.SqlTest
             Assert.AreNotEqual(0, name.Count);
         }
 
-        [Test]
-        public void ToScalarArrayShouldReturnStringArray()
+        [Fact]
+        public async void ToScalarArrayShouldReturnStringArray()
         {
             var db = DatabaseHelper.Open();
-            string[] name = db.Customers
+            string[] name = await db.Customers
                         .Query()
                         .Select(db.Customers.Name)
                         .OrderByName()
@@ -252,22 +252,22 @@ namespace Simple.Data.SqlTest
             Assert.AreNotEqual(0, name.Length);
         }
 
-        [Test]
-        public void HavingWithMinDateShouldReturnCorrectRow()
+        [Fact]
+        public async void HavingWithMinDateShouldReturnCorrectRow()
         {
             var db = DatabaseHelper.Open();
-            var row =
+            var row = await
                 db.GroupTestMaster.Query().Having(db.GroupTestMaster.GroupTestDetail.Date.Min() >=
                                                   new DateTime(2000, 1, 1))
                                                   .FirstOrDefault();
             Assert.IsNotNull(row);
             Assert.AreEqual("Two", row.Name);
         }
-        [Test]
-        public void HavingWithMaxDateShouldReturnCorrectRow()
+        [Fact]
+        public async void HavingWithMaxDateShouldReturnCorrectRow()
         {
             var db = DatabaseHelper.Open();
-            var row =
+            var row = await
                 db.GroupTestMaster.Query().Having(db.GroupTestMaster.GroupTestDetail.Date.Max() <
                                                   new DateTime(2009, 1, 1))
                                                   .FirstOrDefault();
@@ -275,42 +275,42 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual("One", row.Name);
         }
 
-        [Test]
-        public void HavingWithCountShouldReturnCorrectRow()
+        [Fact]
+        public async void HavingWithCountShouldReturnCorrectRow()
         {
             var db = DatabaseHelper.Open();
-            var row = db.GroupTestMaster.Query()
+            var row = await db.GroupTestMaster.Query()
                 .Having(db.GroupTestMaster.GroupTestDetail.Id.Count() == 2)
                 .FirstOrDefault();
             Assert.IsNotNull(row);
             Assert.AreEqual("Two", row.Name);
         }
 
-        [Test]
-        public void HavingWithAverageShouldReturnCorrectRow()
+        [Fact]
+        public async void HavingWithAverageShouldReturnCorrectRow()
         {
             var db = DatabaseHelper.Open();
-            var row = db.GroupTestMaster.Query()
+            var row = await db.GroupTestMaster.Query()
                 .Having(db.GroupTestMaster.GroupTestDetail.Number.Average() == 2)
                 .FirstOrDefault();
             Assert.IsNotNull(row);
             Assert.AreEqual("One", row.Name);
         }
 
-        [Test]
-        public void ToScalarOrDefault()
+        [Fact]
+        public async void ToScalarOrDefault()
         {
             var db = DatabaseHelper.Open();
-            int max = db.Users.FindAllByName("ZXCVBNM").Select(db.Users.Age.Max()).ToScalarOrDefault<int>();
+            int max = await db.Users.FindAllByName("ZXCVBNM").Select(db.Users.Age.Max()).ToScalarOrDefault<int>();
             Assert.AreEqual(0, max);
         }
 
 
-        [Test]
-        public void WithClauseShouldPreselectDetailTableAsCollection()
+        [Fact]
+        public async void WithClauseShouldPreselectDetailTableAsCollection()
         {
             var db = DatabaseHelper.Open();
-            var result = db.Customers.FindAllByCustomerId(1).WithOrders().FirstOrDefault() as IDictionary<string, object>;
+            var result = await db.Customers.FindAllByCustomerId(1).WithOrders().FirstOrDefault() as IDictionary<string, object>;
             Assert.IsNotNull(result);
             Assert.Contains("Orders", (ICollection)result.Keys);
             var orders = result["Orders"] as IList<IDictionary<string, object>>;
@@ -318,11 +318,11 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, orders.Count);
         }
 
-        [Test]
-        public void WithClauseShouldPreselectDetailTablesAsCollections()
+        [Fact]
+        public async void WithClauseShouldPreselectDetailTablesAsCollections()
         {
             var db = DatabaseHelper.Open();
-            var result = db.Customers.FindAllByCustomerId(1).WithOrders().WithNotes().FirstOrDefault() as IDictionary<string, object>;
+            var result = await db.Customers.FindAllByCustomerId(1).WithOrders().WithNotes().FirstOrDefault() as IDictionary<string, object>;
             Assert.IsNotNull(result);
             Assert.Contains("Orders", (ICollection)result.Keys);
             var orders = result["Orders"] as IList<IDictionary<string, object>>;
@@ -334,11 +334,11 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(2, notes.Count);
         }
 
-        [Test]
-        public void FindAllWithClauseWithJoinCriteriaShouldPreselectDetailTableAsCollection()
+        [Fact]
+        public async void FindAllWithClauseWithJoinCriteriaShouldPreselectDetailTableAsCollection()
         {
             var db = DatabaseHelper.Open();
-            var result = db.Customers.FindAllByCustomerId(1).With(db.Customers.Orders.OrderItems).FirstOrDefault() as IDictionary<string, object>;
+            var result = await db.Customers.FindAllByCustomerId(1).With(db.Customers.Orders.OrderItems).FirstOrDefault() as IDictionary<string, object>;
             Assert.IsNotNull(result);
             Assert.Contains("OrderItems", (ICollection)result.Keys);
             var orderItems = result["OrderItems"] as IList<IDictionary<string, object>>;
@@ -347,10 +347,10 @@ namespace Simple.Data.SqlTest
         }
 
         [Test, Ignore]
-        public void FindAllWithClauseWithNestedDetailTable()
+        public async void FindAllWithClauseWithNestedDetailTable()
         {
             var db = DatabaseHelper.Open();
-            var result = db.Customers.FindAllByCustomerId(1).With(db.Customers.Orders).With(db.Customers.Orders.OrderItems).FirstOrDefault() as IDictionary<string, object>;
+            var result = await db.Customers.FindAllByCustomerId(1).With(db.Customers.Orders).With(db.Customers.Orders.OrderItems).FirstOrDefault() as IDictionary<string, object>;
             Assert.IsNotNull(result);
             Assert.Contains("Orders", result.Keys.ToArray());
             var orders = result["Orders"] as IList<IDictionary<string, object>>;
@@ -360,11 +360,11 @@ namespace Simple.Data.SqlTest
             Assert.Contains("OrderItems", order.Keys.ToArray());
         }
 
-        [Test]
-        public void GetWithClauseWithJoinCriteriaShouldPreselectDetailTableAsCollection()
+        [Fact]
+        public async void GetWithClauseWithJoinCriteriaShouldPreselectDetailTableAsCollection()
         {
             var db = DatabaseHelper.Open();
-            var result = db.Customers.With(db.Customers.Orders.OrderItems).Get(1) as IDictionary<string, object>;
+            var result = await db.Customers.With(db.Customers.Orders.OrderItems).Get(1) as IDictionary<string, object>;
             Assert.IsNotNull(result);
             Assert.Contains("OrderItems", (ICollection)result.Keys);
             var orderItems = result["OrderItems"] as IList<IDictionary<string, object>>;
@@ -372,11 +372,11 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, orderItems.Count);
         }
 
-        [Test]
-        public void WithClauseWithTwoStepShouldPreselectManyToManyTableAsCollection()
+        [Fact]
+        public async void WithClauseWithTwoStepShouldPreselectManyToManyTableAsCollection()
         {
             var db = DatabaseHelper.Open();
-            var result = db.Customers.FindAll(db.Customers.Order.OrderId == 1).WithOrders().FirstOrDefault() as IDictionary<string, object>;
+            var result = await db.Customers.FindAll(db.Customers.Order.OrderId == 1).WithOrders().FirstOrDefault() as IDictionary<string, object>;
             Assert.IsNotNull(result);
             Assert.Contains("Orders", (ICollection)result.Keys);
             var orders = result["Orders"] as IList<IDictionary<string, object>>;
@@ -384,54 +384,54 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, orders.Count);
         }
 
-        [Test]
-        public void WithClauseShouldPreselectMasterTableAsDictionary()
+        [Fact]
+        public async void WithClauseShouldPreselectMasterTableAsDictionary()
         {
             var db = DatabaseHelper.Open();
-            var result = db.Orders.FindAllByOrderId(1).WithCustomer().FirstOrDefault() as IDictionary<string,object>;
+            var result = await db.Orders.FindAllByOrderId(1).WithCustomer().FirstOrDefault() as IDictionary<string,object>;
             Assert.IsNotNull(result);
             Assert.Contains("Customer", (ICollection)result.Keys);
             var customer = result["Customer"] as IDictionary<string, object>;
             Assert.IsNotNull(customer);
         }
 
-        [Test]
-        public void WithClauseShouldCastToStaticTypeWithComplexProperty()
+        [Fact]
+        public async void WithClauseShouldCastToStaticTypeWithComplexProperty()
         {
             var db = DatabaseHelper.Open();
-            Order actual = db.Orders.FindAllByOrderId(1).WithCustomer().FirstOrDefault();
+            Order actual = await db.Orders.FindAllByOrderId(1).WithCustomer().FirstOrDefault();
             Assert.IsNotNull(actual);
             Assert.IsNotNull(actual.Customer);
             Assert.AreEqual("Test", actual.Customer.Name);
             Assert.AreEqual("100 Road", actual.Customer.Address);
         }
 
-        [Test]
-        public void WithClauseShouldCastToStaticTypeWithCollection()
+        [Fact]
+        public async void WithClauseShouldCastToStaticTypeWithCollection()
         {
             var db = DatabaseHelper.Open();
-            Customer actual = db.Customers.FindAllByCustomerId(1).WithOrders().FirstOrDefault();
+            Customer actual = await db.Customers.FindAllByCustomerId(1).WithOrders().FirstOrDefault();
             Assert.IsNotNull(actual);
             Assert.AreEqual(1, actual.Orders.Single().OrderId);
             Assert.AreEqual(new DateTime(2010,10,10), actual.Orders.Single().OrderDate);
         }
         
-        [Test]
-        public void WithClauseShouldCastToStaticTypeWithEmptyCollection()
+        [Fact]
+        public async void WithClauseShouldCastToStaticTypeWithEmptyCollection()
         {
             var db = DatabaseHelper.Open();
-            var newCustomer = db.Customers.Insert(Name: "No Orders");
-            Customer actual = db.Customers.FindAllByCustomerId(newCustomer.CustomerId).WithOrders().FirstOrDefault();
+            var newCustomer = await db.Customers.Insert(Name: "No Orders");
+            Customer actual = await db.Customers.FindAllByCustomerId(newCustomer.CustomerId).WithOrders().FirstOrDefault();
             Assert.IsNotNull(actual);
             Assert.IsNotNull(actual.Orders);
             Assert.AreEqual(0, actual.Orders.Count);
         }
 
-        [Test]
-        public void WithClauseContainingAliasShouldReturnResults()
+        [Fact]
+        public async void WithClauseContainingAliasShouldReturnResults()
         {
             var db = DatabaseHelper.Open();
-            var actual = db.Customers
+            var actual = await db.Customers
                            .With(db.Customers.Orders.As("Orders_1"))
                            .With(db.Customers.Orders.As("Orders_2"))
                            .FirstOrDefault();
@@ -442,14 +442,14 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(new DateTime(2010, 10, 10), actual.Orders_2.Single().OrderDate);
         }
 
-        [Test]
-        public void SelfJoinShouldNotThrowException()
+        [Fact]
+        public async void SelfJoinShouldNotThrowException()
         {
             var db = DatabaseHelper.Open();
 
             var q = db.Employees.Query().LeftJoin(db.Employees.As("Manager"), Id: db.Employees.ManagerId);
             q = q.Select(db.Employees.Name, q.Manager.Name.As("Manager"));
-            List<dynamic> employees = q.ToList();
+            List<dynamic> employees = await q.ToList();
 
             Assert.AreEqual(3, employees.Count); // The top man is missing
 
@@ -458,8 +458,8 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, kingsSubordinates.Count);
         }
         
-        [Test]
-        public void OrderByOnJoinedColumnShouldUseJoinedColumn()
+        [Fact]
+        public async void OrderByOnJoinedColumnShouldUseJoinedColumn()
         {
             SimpleDataTraceSources.TraceSource.Switch.Level = SourceLevels.All;
             var traceListener = new TestTraceListener();
@@ -469,36 +469,36 @@ namespace Simple.Data.SqlTest
 
             var q = db.Employees.Query().LeftJoin(db.Employees.As("Manager"), Id: db.Employees.ManagerId);
             q = q.Select(db.Employees.Name, q.Manager.Name.As("Manager"));
-            List<dynamic> employees = q.OrderBy(q.Manager.Name).ToList();
+            List<dynamic> employees = await q.OrderBy(q.Manager.Name).ToList();
             SimpleDataTraceSources.TraceSource.Listeners.Remove(traceListener);
             Assert.Greater(traceListener.Output.IndexOf("order by [manager].[name]", StringComparison.OrdinalIgnoreCase), 0);
         }
 
-        [Test]
-        public void CanFetchMoreThanOneHundredRows()
+        [Fact]
+        public async void CanFetchMoreThanOneHundredRows()
         {
             var db = DatabaseHelper.Open();
 
-            db.Customers.Insert(Enumerable.Range(0, 200).Select(n => new Customer {Name = "Customer " + n}));
+            await db.Customers.Insert(Enumerable.Range(0, 200).Select(n => new Customer {Name = "Customer " + n}));
 
-            List<dynamic> customers = db.Customers.All().ToList();
+            List<dynamic> customers = await db.Customers.All().ToList();
 
             Assert.GreaterOrEqual(customers.Count, 200);
         }
 
-        [Test]
-        public void QueryWithForUpdateFalseShouldReturnCorrectResult()
+        [Fact]
+        public async void QueryWithForUpdateFalseShouldReturnCorrectResult()
         {
             var db = DatabaseHelper.Open();
-            var actual = db.Users.QueryById(1).Select(db.Users.Name).ForUpdate(false).First();
+            var actual = await db.Users.QueryById(1).Select(db.Users.Name).ForUpdate(false).First();
             Assert.AreEqual("Bob", actual.Name);
         }
 
-        [Test]
-        public void QueryWithForUpdateTrueShouldReturnCorrectResult()
+        [Fact]
+        public async void QueryWithForUpdateTrueShouldReturnCorrectResult()
         {
             var db = DatabaseHelper.Open();
-            var actual = db.Users.QueryById(1).Select(db.Users.Name).ForUpdate(true).First();
+            var actual = await db.Users.QueryById(1).Select(db.Users.Name).ForUpdate(true).First();
             Assert.AreEqual("Bob", actual.Name);
         }
     }

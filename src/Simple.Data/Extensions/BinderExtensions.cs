@@ -1,7 +1,9 @@
 ﻿namespace Simple.Data.Extensions
 {
     using System;
+    using System.Collections.Generic;
     using System.Dynamic;
+    using System.Linq;
     using System.Reflection;
     using Microsoft.CSharp.RuntimeBinder;
 
@@ -9,7 +11,9 @@
     {
         private static readonly Type TypeOfICSharpInvokeMemberBinder;
         private static readonly PropertyInfo ResultDiscardedProperty;
+        private static readonly PropertyInfo TypeArgumentsProperty;
         private static readonly Func<InvokeMemberBinder, bool> ResultDiscardedGetter;
+        private static readonly Func<InvokeMemberBinder, Type> TypeArgumentsGetter;
 
         static BinderExtensions()
         {
@@ -25,14 +29,21 @@
                     {
                         ResultDiscardedGetter = GetResultDiscardedImpl;
                     }
+                    TypeArgumentsProperty = TypeOfICSharpInvokeMemberBinder.GetProperty("TypeArguments");
+                    if (TypeArgumentsProperty != null)
+                    {
+                        TypeArgumentsGetter = GetGenericParameterImpl;
+                    }
                 }
             }
             catch
             {
                 ResultDiscardedGetter = null;
+                TypeArgumentsGetter = null;
             }
 
             ResultDiscardedGetter = ResultDiscardedGetter ?? (_ => false);
+            TypeArgumentsGetter = TypeArgumentsGetter ?? (_ => null);
         }
 
         public static bool HasSingleUnnamedArgument(this InvokeMemberBinder binder)
@@ -45,6 +56,11 @@
         public static bool IsResultDiscarded(this InvokeMemberBinder binder)
         {
             return ResultDiscardedGetter(binder);
+        }
+
+        public static Type GetGenericParameter(this InvokeMemberBinder binder)
+        {
+            return TypeArgumentsGetter(binder);
         }
 
         private static bool GetResultDiscardedImpl(InvokeMemberBinder binder)
@@ -74,6 +90,35 @@
             catch (TargetInvocationException)
             {
                 return true;
+            }
+        }
+        private static Type GetGenericParameterImpl(InvokeMemberBinder binder)
+        {
+            if (!TypeOfICSharpInvokeMemberBinder.IsInstanceOfType(binder)) return null;
+
+            try
+            {
+                return ((IEnumerable<Type>)TypeArgumentsProperty.GetValue(binder, null)).FirstOrDefault();
+            }
+            catch (ArgumentException)
+            {
+                return null;
+            }
+            catch (TargetException)
+            {
+                return null;
+            }
+            catch (TargetParameterCountException)
+            {
+                return null;
+            }
+            catch (MethodAccessException)
+            {
+                return null;
+            }
+            catch (TargetInvocationException)
+            {
+                return null;
             }
         }
     }

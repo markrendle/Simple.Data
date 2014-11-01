@@ -3,33 +3,33 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
 
 namespace Simple.Data.SqlTest
 {
-    [TestFixture]
+    using Xunit;
+    using Assert = NUnit.Framework.Assert;
+
     public class NaturalJoinTest
     {
-        [TestFixtureSetUp]
-        public void Setup()
+        public NaturalJoinTest()
         {
             DatabaseHelper.Reset();
         }
 
-        [Test]
-        public void CustomerDotOrdersDotOrderDateShouldReturnOneRow()
+        [Fact]
+        public async void CustomerDotOrdersDotOrderDateShouldReturnOneRow()
         {
             var db = DatabaseHelper.Open();
-            var row = db.Customers.Find(db.Customers.Orders.OrderDate == new DateTime(2010, 10, 10));
+            var row = await db.Customers.Find(db.Customers.Orders.OrderDate == new DateTime(2010, 10, 10));
             Assert.IsNotNull(row);
             Assert.AreEqual("Test", row.Name);
         }
 
-        [Test]
-        public void CustomerDotOrdersDotOrderItemsDotItemDotNameShouldReturnOneRow()
+        [Fact]
+        public async void CustomerDotOrdersDotOrderItemsDotItemDotNameShouldReturnOneRow()
         {
             var db = DatabaseHelper.Open();
-            var customer = db.Customers.Find(db.Customers.Orders.OrderItems.Item.Name == "Widget");
+            var customer = await db.Customers.Find(db.Customers.Orders.OrderItems.Item.Name == "Widget");
             Assert.IsNotNull(customer);
             Assert.AreEqual("Test", customer.Name);
             foreach (var order in customer.Orders)
@@ -38,11 +38,11 @@ namespace Simple.Data.SqlTest
             }
         }
 
-        [Test]
-        public void CustomerDotNameAndCustomerDotOrdersDotOrderItemsDotItemDotNameShouldReturnOneRow()
+        [Fact]
+        public async void CustomerDotNameAndCustomerDotOrdersDotOrderItemsDotItemDotNameShouldReturnOneRow()
         {
             var db = DatabaseHelper.Open();
-            var customer = db.Customers.Find(db.Customers.Name == "Test" &&
+            var customer = await db.Customers.Find(db.Customers.Name == "Test" &&
                                              db.Customers.Orders.OrderItems.Item.Name == "Widget");
             Assert.IsNotNull(customer);
             Assert.AreEqual("Test", customer.Name);
@@ -52,11 +52,11 @@ namespace Simple.Data.SqlTest
             }
         }
 
-        [Test]
-        public void CustomerDotNameAndCustomerDotOrdersDotOrderDateAndCustomerDotOrdersDotOrderItemsDotItemDotNameShouldReturnOneRow()
+        [Fact]
+        public async void CustomerDotNameAndCustomerDotOrdersDotOrderDateAndCustomerDotOrdersDotOrderItemsDotItemDotNameShouldReturnOneRow()
         {
             var db = DatabaseHelper.Open();
-            var customer = db.Customers.Find(db.Customers.Name == "Test" &&
+            var customer = await db.Customers.Find(db.Customers.Name == "Test" &&
                                              db.Customers.Orders.OrderDate == new DateTime(2010, 10, 10) &&
                                              db.Customers.Orders.OrderItems.Item.Name == "Widget");
             Assert.IsNotNull(customer);

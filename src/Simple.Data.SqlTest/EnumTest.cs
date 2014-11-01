@@ -5,29 +5,28 @@ using System.Text;
 
 namespace Simple.Data.SqlTest
 {
-    using NUnit.Framework;
+    using Xunit;
+    using Assert = NUnit.Framework.Assert;
 
-    [TestFixture]
     public class EnumTest
     {
-        [TestFixtureSetUp]
-        public void Setup()
+        public EnumTest()
         {
             DatabaseHelper.Reset();
         }
 
-        [Test]
-        public void ConvertsBetweenEnumAndInt()
+        [Fact]
+        public async void ConvertsBetweenEnumAndInt()
         {
             var db = DatabaseHelper.Open();
-            EnumTestClass actual = db.EnumTest.Insert(Flag: TestFlag.One);
+            EnumTestClass actual = await db.EnumTest.Insert(Flag: TestFlag.One);
             Assert.AreEqual(TestFlag.One, actual.Flag);
 
             actual.Flag = TestFlag.Three;
 
-            db.EnumTest.Update(actual);
+            await db.EnumTest.Update(actual);
 
-            actual = db.EnumTest.FindById(actual.Id);
+            actual = await db.EnumTest.FindById(actual.Id);
             Assert.AreEqual(TestFlag.Three, actual.Flag);
         }
     }

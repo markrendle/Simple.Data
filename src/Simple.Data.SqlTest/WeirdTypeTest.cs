@@ -5,36 +5,35 @@ using System.Text;
 
 namespace Simple.Data.SqlTest
 {
-    using NUnit.Framework;
+    using Xunit;
+    using Assert = NUnit.Framework.Assert;
 
-    [TestFixture]
     public class WeirdTypeTest
     {
-        [TestFixtureSetUp]
-        public void Setup()
+        public WeirdTypeTest()
         {
             DatabaseHelper.Reset();
         }
 
-        [Test]
-        public void TestInsertOnGeography()
+        [Fact]
+        public async void TestInsertOnGeography()
         {
             var db = DatabaseHelper.Open();
-            var actual = db.GeographyTest.Insert(Description: "Test");
+            var actual = await db.GeographyTest.Insert(Description: "Test");
             Assert.IsNotNull(actual);
         }
-        [Test]
-        public void TestInsertOnGeometry()
+        [Fact]
+        public async void TestInsertOnGeometry()
         {
             var db = DatabaseHelper.Open();
-            var actual = db.GeometryTest.Insert(Description: "Test");
+            var actual = await db.GeometryTest.Insert(Description: "Test");
             Assert.IsNotNull(actual);
         }
-        [Test]
-        public void TestInsertOnHierarchyId()
+        [Fact]
+        public async void TestInsertOnHierarchyId()
         {
             var db = DatabaseHelper.Open();
-            var actual = db.HierarchyIdTest.Insert(Description: "Test");
+            var actual = await db.HierarchyIdTest.Insert(Description: "Test");
             Assert.IsNotNull(actual);
         }
     }

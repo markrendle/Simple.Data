@@ -944,8 +944,142 @@
             }
         }
 
+        public dynamic RunSync()
+        {
+            if (_singleton)
+            {
+                return RunSingleton().Result;
+            }
+            else
+            {
+                var enumerable = Run().Result;
+                return new SimpleList<dynamic>(enumerable.ToList());
+            }
+        }
+
         private struct SingletonIndicator
         {
+        }
+    }
+
+    public class SimpleList<T> : DynamicObject, IList<T>
+    {
+        private readonly IList<T> _wrapped;
+
+        public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
+        {
+            if (!base.TryInvokeMember(binder, args, out result))
+            {
+                var extArgs = new object[args.Length + 1];
+                var types = new Type[args.Length + 1];
+                extArgs[0] = _wrapped;
+                types[0] = typeof (IEnumerable<T>);
+                for (int i = 0; i < args.Length; i++)
+                {
+                    extArgs[i] = args[i];
+                    if (args[i] != null)
+                    {
+                        types[i + 1] = args[i].GetType();
+                    }
+                }
+                var method = typeof (Enumerable).GetMethod(binder.Name, BindingFlags.Static | BindingFlags.Public, null, types, null);
+                if (method != null)
+                {
+                    var typeArg = binder.GetGenericParameter();
+                    if (typeArg != null)
+                    {
+                        method = method.MakeGenericMethod(typeArg);
+                    }
+                    result = method.Invoke(null, extArgs);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public dynamic FirstOrDefault()
+        {
+            return _wrapped.FirstOrDefault();
+        }
+
+        public IEnumerable<TCast> Cast<TCast>()
+        {
+            foreach (dynamic d in _wrapped)
+            {
+                TCast c = d;
+                yield return c;
+            }
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return _wrapped.GetEnumerator();
+        }
+
+        public void Add(T item)
+        {
+            _wrapped.Add(item);
+        }
+
+        public void Clear()
+        {
+            _wrapped.Clear();
+        }
+
+        public bool Contains(T item)
+        {
+            return _wrapped.Contains(item);
+        }
+
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            _wrapped.CopyTo(array, arrayIndex);
+        }
+
+        public bool Remove(T item)
+        {
+            return _wrapped.Remove(item);
+        }
+
+        public int Count
+        {
+            get { return _wrapped.Count; }
+        }
+
+        public bool IsReadOnly
+        {
+            get { return _wrapped.IsReadOnly; }
+        }
+
+        public int IndexOf(T item)
+        {
+            return _wrapped.IndexOf(item);
+        }
+
+        public void Insert(int index, T item)
+        {
+            _wrapped.Insert(index, item);
+        }
+
+        public void RemoveAt(int index)
+        {
+            _wrapped.RemoveAt(index);
+        }
+
+        public T this[int index]
+        {
+            get { return _wrapped[index]; }
+            set { _wrapped[index] = value; }
+        }
+
+        public SimpleList(IList<T> wrapped)
+        {
+            _wrapped = wrapped;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

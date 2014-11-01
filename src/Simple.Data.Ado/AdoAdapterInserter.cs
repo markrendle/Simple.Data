@@ -48,7 +48,7 @@ namespace Simple.Data.Ado
             return bulkInserter.Insert(_adapter, tableName, list, _transaction, onError, resultRequired);
         }
 
-        public Task<IDictionary<string, object>> Insert(string tableName, IEnumerable<KeyValuePair<string, object>> data, bool resultRequired)
+        public async Task<IDictionary<string, object>> Insert(string tableName, IEnumerable<KeyValuePair<string, object>> data, bool resultRequired)
         {
             var table = _adapter.GetSchema().FindTable(tableName);
             var dataArray = data.ToArray();
@@ -57,7 +57,7 @@ namespace Simple.Data.Ado
             var customInserter = _adapter.ProviderHelper.GetCustomProvider<ICustomInserter>(_adapter.ConnectionProvider);
             if (customInserter != null)
             {
-                return customInserter.Insert(_adapter, tableName, dataArray.ToDictionary(), _transaction, resultRequired);
+                return await customInserter.Insert(_adapter, tableName, dataArray.ToDictionary(), _transaction, resultRequired);
             }
 
             var dataDictionary = dataArray.Where(kvp => table.HasColumn(kvp.Key) && table.FindColumn(kvp.Key).IsWriteable)
@@ -82,16 +82,16 @@ namespace Simple.Data.Ado
                         if (_adapter.ProviderSupportsCompoundStatements)
                         {
                             insertSql += "; " + selectSql;
-                            return ExecuteSingletonQuery(insertSql, dataDictionary.Keys, dataDictionary.Values);
+                            return await ExecuteSingletonQuery(insertSql, dataDictionary.Keys, dataDictionary.Values);
                         }
-                        return ExecuteSingletonQuery(insertSql, selectSql, dataDictionary.Keys,
+                        return await ExecuteSingletonQuery(insertSql, selectSql, dataDictionary.Keys,
                                                      dataDictionary.Values);
                     }
                 }
             }
 
             Execute(insertSql, dataDictionary.Keys, dataDictionary.Values);
-            return Task.FromResult(NullDictionary);
+            return null;
         }
 
         private void CheckInsertablePropertiesAreAvailable(Table table, IEnumerable<KeyValuePair<string, object>> data)

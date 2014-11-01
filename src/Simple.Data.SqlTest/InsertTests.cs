@@ -1,29 +1,28 @@
 ﻿using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using NUnit.Framework;
 using Simple.Data.Ado;
 using Simple.Data.SqlTest.Resources;
 
 namespace Simple.Data.SqlTest
 {
     using System;
+    using Xunit;
+    using Assert = NUnit.Framework.Assert;
 
-    [TestFixture]
     public class InsertTests
     {
-        [TestFixtureSetUp]
-        public void Setup()
+        public InsertTests()
         {
             DatabaseHelper.Reset();
         }
 
-        [Test]
-        public void TestInsertWithNamedArguments()
+        [Fact]
+        public async void TestInsertWithNamedArguments()
         {
             var db = DatabaseHelper.Open();
 
-            var user = db.Users.Insert(Name: "Ford", Password: "hoopy", Age: 29);
+            var user = await db.Users.Insert(Name: "Ford", Password: "hoopy", Age: 29);
 
             Assert.IsNotNull(user);
             Assert.AreEqual("Ford", user.Name);
@@ -31,35 +30,35 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(29, user.Age);
         }
 
-        [Test]
-        public void TestInsertWithIdentityInsertOn()
+        [Fact]
+        public async void TestInsertWithIdentityInsertOn()
         {
             var db = DatabaseHelper.Open().WithOptions(new AdoOptions(identityInsert: true));
-            var user = db.Users.Insert(Id: 42, Name: "Arthur", Password: "Tea", Age: 30);
+            var user = await db.Users.Insert(Id: 42, Name: "Arthur", Password: "Tea", Age: 30);
             Assert.IsNotNull(user);
             Assert.AreEqual(42, user.Id);
         }
 
-        [Test]
-        public void TestInsertWithIdentityInsertOnThenOffAgain()
+        [Fact]
+        public async void TestInsertWithIdentityInsertOnThenOffAgain()
         {
             var db = DatabaseHelper.Open().WithOptions(new AdoOptions(identityInsert: true));
-            var user = db.Users.Insert(Id: 2267709, Name: "Douglas", Password: "dirk", Age: 49);
+            var user = await db.Users.Insert(Id: 2267709, Name: "Douglas", Password: "dirk", Age: 49);
             Assert.IsNotNull(user);
             Assert.AreEqual(2267709, user.Id);
             db.ClearOptions();
-            user = db.Users.Insert(Name: "Frak", Password: "true", Age: 200);
+            user = await db.Users.Insert(Name: "Frak", Password: "true", Age: 200);
             Assert.Less(2267709, user.Id);
         }
 
-        [Test]
-        public void TestInsertWithStaticTypeObject()
+        [Fact]
+        public async void TestInsertWithStaticTypeObject()
         {
             var db = DatabaseHelper.Open();
 
             var user = new User {Name = "Zaphod", Password = "zarquon", Age = 42};
 
-            var actual = db.Users.Insert(user);
+            var actual = await db.Users.Insert(user);
 
             Assert.IsNotNull(user);
             Assert.AreEqual("Zaphod", actual.Name);
@@ -67,8 +66,8 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(42, actual.Age);
         }
 
-        [Test]
-        public void TestMultiInsertWithStaticTypeObjects()
+        [Fact]
+        public async void TestMultiInsertWithStaticTypeObjects()
         {
             var db = DatabaseHelper.Open();
 
@@ -78,7 +77,7 @@ namespace Simple.Data.SqlTest
                                 new User { Name = "Wowbagger", Password = "teatime", Age = int.MaxValue }
                             };
 
-            IList<User> actuals = db.Users.Insert(users).ToList<User>();
+            IList<User> actuals = (await db.Users.Insert(users)).ToList<User>();
 
             Assert.AreEqual(2, actuals.Count);
             Assert.AreNotEqual(0, actuals[0].Id);
@@ -92,8 +91,8 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(int.MaxValue, actuals[1].Age);
         }
 
-        [Test]
-        public void TestMultiInsertWithStaticTypeObjectsAndNoReturn()
+        [Fact]
+        public async void TestMultiInsertWithStaticTypeObjectsAndNoReturn()
         {
             var db = DatabaseHelper.Open();
 
@@ -103,16 +102,16 @@ namespace Simple.Data.SqlTest
                                 new User { Name = "Wowbagger", Password = "teatime", Age = int.MaxValue }
                             };
 
-            db.Users.Insert(users);
+            await db.Users.Insert(users);
 
-            var slartibartfast = db.Users.FindByName("Slartibartfast");
+            var slartibartfast = await db.Users.FindByName("Slartibartfast");
             Assert.IsNotNull(slartibartfast);
             Assert.AreNotEqual(0, slartibartfast.Id);
             Assert.AreEqual("Slartibartfast", slartibartfast.Name);
             Assert.AreEqual("bistromathics", slartibartfast.Password);
             Assert.AreEqual(777, slartibartfast.Age);
 
-            var wowbagger = db.Users.FindByName("Wowbagger");
+            var wowbagger = await db.Users.FindByName("Wowbagger");
             Assert.IsNotNull(wowbagger);
 
             Assert.AreNotEqual(0, wowbagger.Id);
@@ -121,8 +120,8 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(int.MaxValue, wowbagger.Age);
         }
 
-        [Test]
-        public void TestInsertWithDynamicTypeObject()
+        [Fact]
+        public async void TestInsertWithDynamicTypeObject()
         {
             var db = DatabaseHelper.Open();
 
@@ -131,7 +130,7 @@ namespace Simple.Data.SqlTest
             user.Password = "diodes";
             user.Age = 42000000;
 
-            var actual = db.Users.Insert(user);
+            var actual = await db.Users.Insert(user);
 
             Assert.IsNotNull(user);
             Assert.AreEqual("Marvin", actual.Name);
@@ -139,8 +138,8 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(42000000, actual.Age);
         }
 
-        [Test]
-        public void TestMultiInsertWithDynamicTypeObjects()
+        [Fact]
+        public async void TestMultiInsertWithDynamicTypeObjects()
         {
             var db = DatabaseHelper.Open();
 
@@ -156,7 +155,7 @@ namespace Simple.Data.SqlTest
 
             var users = new[] { user1, user2 };
 
-            IList<dynamic> actuals = db.Users.Insert(users).ToList();
+            IList<dynamic> actuals = (await db.Users.Insert(users)).ToList();
 
             Assert.AreEqual(2, actuals.Count);
             Assert.AreNotEqual(0, actuals[0].Id);
@@ -170,8 +169,8 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(int.MaxValue, actuals[1].Age);
         }
 
-        [Test]
-        public void TestMultiInsertWithErrorCallback()
+        [Fact]
+        public async void TestMultiInsertWithErrorCallback()
         {
             var db = DatabaseHelper.Open();
 
@@ -195,7 +194,7 @@ namespace Simple.Data.SqlTest
 
             ErrorCallback onError = (o, exception) => passed = true;
 
-            IList<dynamic> actuals = db.Users.Insert(users,onError).ToList();
+            IList<dynamic> actuals = (await db.Users.Insert(users,onError)).ToList();
 
             Assert.IsTrue(passed, "Callback was not called.");
             Assert.AreEqual(2, actuals.Count);
@@ -210,8 +209,8 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(int.MaxValue, actuals[1].Age);
         }
 
-        [Test]
-        public void TestTransactionMultiInsertWithErrorCallback()
+        [Fact]
+        public async void TestTransactionMultiInsertWithErrorCallback()
         {
             var db = DatabaseHelper.Open();
             IList<dynamic> actuals;
@@ -237,7 +236,7 @@ namespace Simple.Data.SqlTest
 
                 ErrorCallback onError = (o, exception) => passed = true;
 
-                actuals = db.Users.Insert(users, onError).ToList();
+                actuals = (await db.Users.Insert(users, onError)).ToList();
 
                 tx.Commit();
             }
@@ -255,15 +254,15 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(int.MaxValue, actuals[1].Age);
         }
 
-        [Test]
-        public void TestWithImageColumn()
+        [Fact]
+        public async void TestWithImageColumn()
         {
             var db = DatabaseHelper.Open();
             try
             {
                 var image = GetImage.Image;
-                db.Images.Insert(Id: 1, TheImage: image);
-                var img = (DbImage)db.Images.FindById(1);
+                await db.Images.Insert(Id: 1, TheImage: image);
+                var img = (DbImage)(await db.Images.FindById(1));
                 Assert.IsTrue(image.SequenceEqual(img.TheImage));
             }
             finally
@@ -272,8 +271,8 @@ namespace Simple.Data.SqlTest
             }
         }
 
-        [Test]
-        public void TestInsertWithVarBinaryMaxColumn()
+        [Fact]
+        public async void TestInsertWithVarBinaryMaxColumn()
         {
             var db = DatabaseHelper.Open();
             var image = GetImage.Image;
@@ -282,28 +281,28 @@ namespace Simple.Data.SqlTest
                                 Id = 1,
                                 Data = image
                             };
-            db.Blobs.Insert(blob);
-            blob = db.Blobs.FindById(1);
+            await db.Blobs.Insert(blob);
+            blob = await db.Blobs.FindById(1);
             Assert.IsTrue(image.SequenceEqual(blob.Data));
         }
 
-        [Test]
-        public void TestInsertWithTimestampColumn()
+        [Fact]
+        public async void TestInsertWithTimestampColumn()
         {
             var db = DatabaseHelper.Open();
-            var row = db.TimestampTest.Insert(Description: "Foo");
+            var row = await db.TimestampTest.Insert(Description: "Foo");
             Assert.IsNotNull(row);
             Assert.IsInstanceOf<byte[]>(row.Version);
         }
 
-        [Test]
-        public void TestInsertWithDateTimeOffsetColumn()
+        [Fact]
+        public async void TestInsertWithDateTimeOffsetColumn()
         {
             var db = DatabaseHelper.Open();
             dynamic entry = new ExpandoObject();
             var time = DateTimeOffset.Now;
             entry.time = time;
-            var inserted = db.DateTimeOffsetTest.Insert(entry);
+            var inserted = await db.DateTimeOffsetTest.Insert(entry);
             Assert.AreEqual(time, inserted.time);
         }
     }

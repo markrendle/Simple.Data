@@ -119,6 +119,18 @@ namespace Simple.Data.Commands
             return Execute().GetAwaiter();
         }
 
+        public async Task<IEnumerable<dynamic>> ToList()
+        {
+            IEnumerable<dynamic> enumerable = await Execute();
+            return enumerable.ToList();
+        }
+
+        public async Task<IEnumerable<T>> ToList<T>()
+        {
+            IEnumerable<dynamic> enumerable = await Execute();
+            return new List<T>(enumerable.Select(item => (T)item));
+        }
+
         private async Task<dynamic> Execute()
         {
             var result = await _dataStrategy.Run.Execute(_operation);

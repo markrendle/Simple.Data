@@ -11,199 +11,203 @@ using Simple.Data.TestHelper;
 namespace Simple.Data.SqlTest
 {
     using System;
+    using Xunit;
+    using Assert = NUnit.Framework.Assert;
 
     /// <summary>
     /// Summary description for FindTests
     /// </summary>
-    [TestFixture]
     public class FindTests
     {
-        [TestFixtureSetUp]
-        public void Setup()
+        public FindTests()
+        {
+            DatabaseHelper.Reset();
+        }
+        public async void Setup()
         {
             DatabaseHelper.Reset();
         }
 
-        [Test]
-        public void TestFindById()
+        [Fact]
+        public async void TestFindById()
         {
             var db = DatabaseHelper.Open();
-            var user = db.Users.FindById(1);
+            var user = await db.Users.FindById(1);
             Assert.AreEqual(1, user.Id);
         }
 
-        [Test]
-        public void TestFindByIdWithCast()
+        [Fact]
+        public async void TestFindByIdWithCast()
         {
             var db = DatabaseHelper.Open();
-            var user = (User)db.Users.FindById(1);
+            var user = (User)(await db.Users.FindById(1));
             Assert.AreEqual(1, user.Id);
         }
 
-        [Test]
-        public void TestFindByReturnsOne()
+        [Fact]
+        public async void TestFindByReturnsOne()
         {
             var db = DatabaseHelper.Open();
-            var user = (User)db.Users.FindByName("Bob");
+            var user = (User)(await db.Users.FindByName("Bob"));
             Assert.AreEqual(1, user.Id);
         }
 
-        [Test]
-        public void TestFindAllByName()
+        [Fact]
+        public async void TestFindAllByName()
         {
             var db = DatabaseHelper.Open();
-            IEnumerable<User> users = db.Users.FindAllByName("Bob").Cast<User>();
+            IEnumerable<User> users = await db.Users.FindAllByName("Bob").Cast<User>();
             Assert.AreEqual(1, users.Count());
         }
 
-        [Test]
-        public void TestFindAllByNameArray()
+        [Fact]
+        public async void TestFindAllByNameArray()
         {
             var db = DatabaseHelper.Open();
-            IEnumerable<User> users = db.Users.FindAllByName(new[] { "Bob", "UnknownUser" }).Cast<User>();
+            IEnumerable<User> users = await db.Users.FindAllByName(new[] { "Bob", "UnknownUser" }).Cast<User>();
             Assert.AreEqual(1, users.Count());
         }
 
-        [Test]
-        public void TestFindAllByNameAsIEnumerableOfDynamic()
+        [Fact]
+        public async void TestFindAllByNameAsIEnumerableOfDynamic()
         {
             var db = DatabaseHelper.Open();
-            IEnumerable<dynamic> users = db.Users.FindAllByName("Bob");
+            IEnumerable<dynamic> users = await db.Users.FindAllByName("Bob");
             Assert.AreEqual(1, users.Count());
         }
 
-        [Test]
-        public void TestFindAllByPartialName()
+        [Fact]
+        public async void TestFindAllByPartialName()
         {
             var db = DatabaseHelper.Open();
-            IEnumerable<User> users = db.Users.FindAll(db.Users.Name.Like("Bob")).ToList<User>();
+            IEnumerable<User> users = await db.Users.FindAll(db.Users.Name.Like("Bob")).ToList<User>();
             Assert.AreEqual(1, users.Count());
         }
 
-        [Test]
-        public void TestFindAllByPartialNameOnChar()
+        [Fact]
+        public async void TestFindAllByPartialNameOnChar()
         {
             var db = DatabaseHelper.Open();
-            IEnumerable<User> users = db.UsersWithChar.FindAll(db.UsersWithChar.Name.Like("Bob%")).ToList<User>();
+            IEnumerable<User> users = await db.UsersWithChar.FindAll(db.UsersWithChar.Name.Like("Bob%")).ToList<User>();
             Assert.AreEqual(1, users.Count());
         }
 
-        [Test]
-        public void TestFindAllByExcludedPartialName()
+        [Fact]
+        public async void TestFindAllByExcludedPartialName()
         {
             var db = DatabaseHelper.Open();
-            IEnumerable<User> users = db.Users.FindAll(db.Users.Name.NotLike("Bob")).ToList<User>();
+            IEnumerable<User> users = await db.Users.FindAll(db.Users.Name.NotLike("Bob")).ToList<User>();
             Assert.AreEqual(2, users.Count());
         }
 
-        [Test]
-        public void TestAllCount()
+        [Fact]
+        public async void TestAllCount()
         {
             var db = DatabaseHelper.Open();
-            var count = db.Users.All().ToList().Count;
+            var count = (await db.Users.All().ToList()).Count;
             Assert.AreEqual(3, count);
         }
 
-        [Test]
-        public void TestAllWithSkipCount()
+        [Fact]
+        public async void TestAllWithSkipCount()
         {
             var db = DatabaseHelper.Open();
-            var count = db.Users.All().Skip(1).ToList().Count;
+            var count = await db.Users.All().Skip(1).ToList().Count;
             Assert.AreEqual(2, count);
         }
 
-        [Test]
-        public void TestImplicitCast()
+        [Fact]
+        public async void TestImplicitCast()
         {
             var db = DatabaseHelper.Open();
-            User user = db.Users.FindById(1);
+            User user = await db.Users.FindById(1);
             Assert.AreEqual(1, user.Id);
         }
 
-        [Test]
-        public void TestImplicitEnumerableCast()
+        [Fact]
+        public async void TestImplicitEnumerableCast()
         {
             var db = DatabaseHelper.Open();
-            foreach (User user in db.Users.All())
+            foreach (User user in await db.Users.All())
             {
                 Assert.IsNotNull(user);
             }
         }
 
         
-        [Test]
-        public void TestFindWithCriteriaAndSchemaQualification()
+        [Fact]
+        public async void TestFindWithCriteriaAndSchemaQualification()
         {
             var db = DatabaseHelper.Open();
 
-            var dboActual = db.dbo.SchemaTable.Find(db.dbo.SchemaTable.Id == 1);
+            var dboActual = await db.dbo.SchemaTable.Find(db.dbo.SchemaTable.Id == 1);
 
             Assert.IsNotNull(dboActual);
             Assert.AreEqual("Pass", dboActual.Description);
         }
 
-        [Test]
-        public void TestFindOnAView()
+        [Fact]
+        public async void TestFindOnAView()
         {
             var db = DatabaseHelper.Open();
-            var u = db.VwCustomers.FindByCustomerId(1);
+            var u = await db.VwCustomers.FindByCustomerId(1);
             Assert.IsNotNull(u);
         }
 
-        [Test]
-        public void TestCast()
+        [Fact]
+        public async void TestCast()
         {
             var db = DatabaseHelper.Open();
-            var userQuery = db.Users.All().Cast<User>() as IEnumerable<User>;
+            var userQuery = (await db.Users.All().Cast<User>()) as IEnumerable<User>;
             Assert.IsNotNull(userQuery);
             var users = userQuery.ToList();
             Assert.AreNotEqual(0, users.Count);
         }
 
-        [Test]
-        public void FindByWithNamedParameter()
+        //TODO: [Fact]
+        public async void FindByWithNamedParameter()
         {
             var db = DatabaseHelper.Open();
-            var user = db.Users.FindBy(Name: "Bob");
+            var user = await db.Users.FindBy(Name: "Bob");
             Assert.IsNotNull(user);
 
         }
 
-        [Test]
-        public void WithClauseShouldCastToStaticTypeWithCollection()
+        //TODO: [Fact]
+        public async void WithClauseShouldCastToStaticTypeWithCollection()
         {
             var db = DatabaseHelper.Open();
-            Customer actual = db.Customers.WithOrders().FindByCustomerId(1);
+            Customer actual = await db.Customers.WithOrders().FindByCustomerId(1);
             Assert.IsNotNull(actual);
             Assert.AreEqual(1, actual.Orders.Single().OrderId);
             Assert.AreEqual(new DateTime(2010, 10, 10), actual.Orders.Single().OrderDate);
         }
 
-        [Test]
-        public void NamedParameterAndWithClauseShouldCastToStaticTypeWithCollection()
+        //TODO: [Fact]
+        public async void NamedParameterAndWithClauseShouldCastToStaticTypeWithCollection()
         {
             var db = DatabaseHelper.Open();
-            Customer actual = db.Customers.WithOrders().FindBy(CustomerId: 1);
+            Customer actual = await db.Customers.WithOrders().FindBy(CustomerId: 1);
             Assert.IsNotNull(actual);
             Assert.AreEqual(1, actual.Orders.Single().OrderId);
             Assert.AreEqual(new DateTime(2010, 10, 10), actual.Orders.Single().OrderDate);
         }
 
-        [Test]
-        public void ExpressionAndWithClauseShouldCastToStaticTypeWithCollection()
+        //TODO: [Fact]
+        public async void ExpressionAndWithClauseShouldCastToStaticTypeWithCollection()
         {
             var db = DatabaseHelper.Open();
-            Customer actual = db.Customers.WithOrders().Find(db.Customers.CustomerId == 1);
+            Customer actual = await db.Customers.WithOrders().Find(db.Customers.CustomerId == 1);
             Assert.IsNotNull(actual);
             Assert.AreEqual(1, actual.Orders.Single().OrderId);
             Assert.AreEqual(new DateTime(2010, 10, 10), actual.Orders.Single().OrderDate);
         }
 
-        [Test]
-        public void SelectClauseShouldRestrictColumn()
+        //TODO: [Fact]
+        public async void SelectClauseShouldRestrictColumn()
         {
             var db = DatabaseHelper.Open();
-            var actual = db.Customers.Select(db.Customers.Name).FindByCustomerId(1).ToScalar();
+            var actual = await db.Customers.Select(db.Customers.Name).FindByCustomerId(1).ToScalar();
             Assert.AreEqual("Test", actual);
 
         }

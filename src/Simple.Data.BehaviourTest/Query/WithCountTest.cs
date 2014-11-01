@@ -9,8 +9,8 @@ namespace Simple.Data.IntegrationTest.Query
 {
     using Mocking.Ado;
     using NUnit.Framework;
+    using Xunit;
 
-    [TestFixture]
     public class WithCountTest : DatabaseIntegrationContext
     {
         protected override void SetSchema(MockSchemaProvider schemaProvider)
@@ -21,9 +21,9 @@ namespace Simple.Data.IntegrationTest.Query
                                       new[] { "dbo", "Users", "Password" });
         }
 
-        [Test]
+        //[Fact]
 // ReSharper disable InconsistentNaming
-        public void WithTotalCountShouldCreateCompoundQuery_ObsoleteFutureVersion()
+        public async void WithTotalCountShouldCreateCompoundQuery_ObsoleteFutureVersion()
 // ReSharper restore InconsistentNaming
         {
             const string expected = @"select count(*) from [dbo].[users] where [dbo].[users].[name] = @p1_c0; " +
@@ -38,8 +38,8 @@ namespace Simple.Data.IntegrationTest.Query
             GeneratedSqlIs(expected);
         }
 
-        [Test]
-        public void WithTotalCountShouldCreateCompoundQuery()
+        //[Fact]
+        public async void WithTotalCountShouldCreateCompoundQuery()
         {
             const string expected = @"select count(*) from [dbo].[users] where [dbo].[users].[name] = @p1_c0; " +
                 @"select [dbo].[users].[name],[dbo].[users].[password] from [dbo].[users] where [dbo].[users].[name] = @p1_c1";
@@ -48,13 +48,13 @@ namespace Simple.Data.IntegrationTest.Query
             var q = TargetDb.Users.QueryByName("Foo")
                 .WithTotalCount(out count);
 
-            EatException<InvalidOperationException>(() => q.ToList());
+            await EatExceptionAsync<InvalidOperationException>(() => q.ToList());
 
             GeneratedSqlIs(expected);
         }
 
-        [Test]
-        public void WithTotalCountWithExplicitSelectShouldCreateCompoundQuery()
+        //[Fact]
+        public async void WithTotalCountWithExplicitSelectShouldCreateCompoundQuery()
         {
             const string expected = @"select count(*) from [dbo].[users] where [dbo].[users].[name] = @p1_c0; " +
                 @"select [dbo].[users].[name] from [dbo].[users] where [dbo].[users].[name] = @p1_c1";

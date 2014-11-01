@@ -21,8 +21,13 @@
                         operation.ResultRequired));
             }
             var single = checkedEnumerable.Single;
-            var data = await inserter.Insert(operation.TableName, single, operation.ResultRequired);
-            return new DataResult(data);
+            var insert = inserter.Insert(operation.TableName, single, operation.ResultRequired);
+            if (insert != null)
+            {
+                var data = await insert;
+                return new DataResult(data);
+            }
+            return null;
         }
     }
 }

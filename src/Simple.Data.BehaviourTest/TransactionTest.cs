@@ -11,7 +11,9 @@ using Simple.Data.Mocking.Ado;
 
 namespace Simple.Data.IntegrationTest
 {
-    [TestFixture]
+    using Xunit;
+    using Assert = NUnit.Framework.Assert;
+
     public class TransactionTest
     {
         static Database CreateDatabase(MockDatabase mockDatabase)
@@ -28,40 +30,40 @@ namespace Simple.Data.IntegrationTest
 
         private const string usersColumns = "[dbo].[Users].[Id],[dbo].[Users].[Name],[dbo].[Users].[Password],[dbo].[Users].[Age]";
 
-        [Test]
-        public void TestFindEqualWithInt32()
+        [Fact]
+        public async void TestFindEqualWithInt32()
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
             using (var transaction = database.BeginTransaction())
             {
-                transaction.Users.Find(database.Users.Id == 1);
+                await transaction.Users.Find(database.Users.Id == 1);
             }
             Assert.AreEqual(("select " + usersColumns + " from [dbo].[users] where [dbo].[users].[id] = @p1").ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual(1, mockDatabase.Parameters[0]);
         }
 
-        [Test]
-        public void TestFindByDynamicSingleColumn()
+        [Fact]
+        public async void TestFindByDynamicSingleColumn()
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
             using (var transaction = database.BeginTransaction())
             {
-                transaction.Users.FindByName("Foo");
+                await transaction.Users.FindByName("Foo");
             }
             Assert.AreEqual(("select " + usersColumns + " from [dbo].[Users] where [dbo].[Users].[name] = @p1").ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
             Assert.AreEqual("Foo", mockDatabase.Parameters[0]);
         }
 
-        [Test]
-        public void TestInsertWithNamedArguments()
+        [Fact]
+        public async void TestInsertWithNamedArguments()
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
             using (var transaction = database.BeginTransaction())
             {
-                transaction.Users.Insert(Name: "Steve", Age: 50);
+                await transaction.Users.Insert(Name: "Steve", Age: 50);
                 transaction.Commit();
             }
             Assert.AreEqual("insert into [dbo].[Users] ([Name],[Age]) values (@p0,@p1)".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
@@ -70,14 +72,14 @@ namespace Simple.Data.IntegrationTest
             Assert.IsTrue(MockDbTransaction.CommitCalled);
         }
 
-        [Test]
-        public void TestUpdateWithNamedArguments()
+        [Fact]
+        public async void TestUpdateWithNamedArguments()
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
             using (var transaction = database.BeginTransaction())
             {
-                transaction.Users.UpdateById(Id: 1, Name: "Steve", Age: 50);
+                await transaction.Users.UpdateById(Id: 1, Name: "Steve", Age: 50);
                 transaction.Commit();
             }
             Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
@@ -87,29 +89,8 @@ namespace Simple.Data.IntegrationTest
             Assert.IsTrue(MockDbTransaction.CommitCalled);
         }
 
-        [Test]
-        public void TestUpdateWithDynamicObject()
-        {
-            var mockDatabase = new MockDatabase();
-            dynamic database = CreateDatabase(mockDatabase);
-            dynamic record = new SimpleRecord();
-            record.Id = 1;
-            record.Name = "Steve";
-            record.Age = 50;
-            using (var transaction = database.BeginTransaction())
-            {
-                transaction.Users.Update(record);
-                transaction.Commit();
-            }
-            Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
-            Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
-            Assert.AreEqual(50, mockDatabase.Parameters[1]);
-            Assert.AreEqual(1, mockDatabase.Parameters[2]);
-            Assert.IsTrue(MockDbTransaction.CommitCalled);
-        }
-
-        [Test]
-        public void TestUpdateByWithDynamicObject()
+        [Fact]
+        public async void TestUpdateWithDynamicObject()
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
@@ -119,7 +100,7 @@ namespace Simple.Data.IntegrationTest
             record.Age = 50;
             using (var transaction = database.BeginTransaction())
             {
-                transaction.Users.UpdateById(record);
+                await transaction.Users.Update(record);
                 transaction.Commit();
             }
             Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
@@ -129,8 +110,29 @@ namespace Simple.Data.IntegrationTest
             Assert.IsTrue(MockDbTransaction.CommitCalled);
         }
 
-        [Test]
-        public void TestUpdateWithStaticObject()
+        [Fact]
+        public async void TestUpdateByWithDynamicObject()
+        {
+            var mockDatabase = new MockDatabase();
+            dynamic database = CreateDatabase(mockDatabase);
+            dynamic record = new SimpleRecord();
+            record.Id = 1;
+            record.Name = "Steve";
+            record.Age = 50;
+            using (var transaction = database.BeginTransaction())
+            {
+                await transaction.Users.UpdateById(record);
+                transaction.Commit();
+            }
+            Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
+            Assert.AreEqual("Steve", mockDatabase.Parameters[0]);
+            Assert.AreEqual(50, mockDatabase.Parameters[1]);
+            Assert.AreEqual(1, mockDatabase.Parameters[2]);
+            Assert.IsTrue(MockDbTransaction.CommitCalled);
+        }
+
+        [Fact]
+        public async void TestUpdateWithStaticObject()
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
@@ -142,7 +144,7 @@ namespace Simple.Data.IntegrationTest
                            };
             using (var transaction = database.BeginTransaction())
             {
-                transaction.Users.Update(user);
+                await transaction.Users.Update(user);
                 transaction.Commit();
             }
             Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
@@ -153,8 +155,8 @@ namespace Simple.Data.IntegrationTest
             Assert.IsTrue(MockDbTransaction.CommitCalled);
         }
         
-        [Test]
-        public void TestBulkUpdateWithStaticObject()
+        [Fact]
+        public async void TestBulkUpdateWithStaticObject()
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
@@ -167,7 +169,7 @@ namespace Simple.Data.IntegrationTest
             var users = new[] {user};
             using (var transaction = database.BeginTransaction())
             {
-                transaction.Users.Update(users);
+                await transaction.Users.Update(users);
                 transaction.Commit();
             }
             Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
@@ -178,8 +180,8 @@ namespace Simple.Data.IntegrationTest
             Assert.IsTrue(MockDbTransaction.CommitCalled);
         }
 
-        [Test]
-        public void TestUpdateByWithStaticObject()
+        [Fact]
+        public async void TestUpdateByWithStaticObject()
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
@@ -191,7 +193,7 @@ namespace Simple.Data.IntegrationTest
                            };
             using (var transaction = database.BeginTransaction())
             {
-                transaction.Users.UpdateById(user);
+                await transaction.Users.UpdateById(user);
                 transaction.Commit();
             }
             Assert.AreEqual("update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
@@ -202,14 +204,14 @@ namespace Simple.Data.IntegrationTest
             Assert.IsTrue(MockDbTransaction.CommitCalled);
         }
 
-        [Test]
-        public void TestDeleteWithNamedArguments()
+        [Fact]
+        public async void TestDeleteWithNamedArguments()
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
             using (var transaction = database.BeginTransaction())
             {
-                transaction.Users.Delete(Id: 1);
+                await transaction.Users.Delete(Id: 1);
                 transaction.Commit();
             }
             Assert.AreEqual("delete from [dbo].[Users] where [dbo].[Users].[Id] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());
@@ -217,14 +219,14 @@ namespace Simple.Data.IntegrationTest
             Assert.IsTrue(MockDbTransaction.CommitCalled);
         }
 
-        [Test]
-        public void TestDeleteBy()
+        [Fact]
+        public async void TestDeleteBy()
         {
             var mockDatabase = new MockDatabase();
             dynamic database = CreateDatabase(mockDatabase);
             using (var transaction = database.BeginTransaction())
             {
-                transaction.Users.DeleteById(1);
+                await transaction.Users.DeleteById(1);
                 transaction.Commit();
             }
             Assert.AreEqual("delete from [dbo].[Users] where [dbo].[Users].[Id] = @p1".ToLowerInvariant(), mockDatabase.Sql.ToLowerInvariant());

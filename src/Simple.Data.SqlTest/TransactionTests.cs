@@ -3,22 +3,22 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
 using Simple.Data.Ado;
 
 namespace Simple.Data.SqlTest
 {
-    [TestFixture]
+    using Xunit;
+    using Assert = NUnit.Framework.Assert;
+
     public class TransactionTests
     {
-        [SetUp]
-        public void Setup()
+        public TransactionTests()
         {
             DatabaseHelper.Reset();
         }
 
-        [Test]
-        public void TestCommit()
+        //TODO: [Fact]
+        public async void TestCommit()
         {
             var db = DatabaseHelper.Open();
 
@@ -26,8 +26,8 @@ namespace Simple.Data.SqlTest
             {
                 try
                 {
-                    var order = tx.Orders.Insert(CustomerId: 1, OrderDate: DateTime.Today);
-                    tx.OrderItems.Insert(OrderId: order.OrderId, ItemId: 1, Quantity: 3);
+                    var order = await tx.Orders.Insert(CustomerId: 1, OrderDate: DateTime.Today);
+                    await tx.OrderItems.Insert(OrderId: order.OrderId, ItemId: 1, Quantity: 3);
                     tx.Commit();
                 }
                 catch
@@ -40,7 +40,7 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(2, db.OrderItems.All().ToList().Count);
         }
 
-        [Test]
+        //TODO: [Fact]
         public void TestRollback()
         {
             var db = DatabaseHelper.Open();
@@ -55,7 +55,7 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, db.OrderItems.All().ToList().Count);
         }
 
-        [Test]
+        //TODO: [Fact]
         public void TestWithOptionsTransaction()
         {
             var dbWithOptions = DatabaseHelper.Open().WithOptions(new AdoOptions(commandTimeout: 60000));
@@ -68,7 +68,7 @@ namespace Simple.Data.SqlTest
             Assert.Pass();
         }
 
-        [Test]
+        //TODO: [Fact]
         public void TestRollbackOnProcedure()
         {
             var db = DatabaseHelper.Open();
@@ -83,7 +83,7 @@ namespace Simple.Data.SqlTest
             Assert.IsNull(customer);
         }
 
-        [Test]
+        //TODO: [Fact]
         public void QueryInsideTransaction()
         {
             var db = DatabaseHelper.Open();

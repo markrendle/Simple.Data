@@ -8,6 +8,8 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data
 {
+    using System.Threading.Tasks;
+
     public partial class SimpleRecord : DynamicObject, ICloneable
     {
         private static readonly DictionaryCloner Cloner = new DictionaryCloner();
@@ -89,10 +91,23 @@ namespace Simple.Data
             if (query != null)
             {
                 query.SetDataStrategy(_database);
-                result = query;
+                result = query.RunSync();
             }
             else
             {
+                var dictTask = related as Task<IDictionary<string,object>> ;
+                if (dictTask != null)
+                {
+                    related = dictTask.Result;
+                }
+                else
+                {
+                    var enumTask = related as Task<IEnumerable<IDictionary<string, object>>>;
+                    if (enumTask != null)
+                    {
+                        related = enumTask.Result;
+                    }
+                }
                 result = related is IDictionary<string, object>
                              ? (object) new SimpleRecord(related as IDictionary<string, object>, binder.Name, _database)
                              : ((IEnumerable<IDictionary<string, object>>) related).Select(

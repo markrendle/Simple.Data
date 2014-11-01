@@ -3,39 +3,38 @@ namespace Simple.Data.SqlTest
     using System.Collections.Generic;
     using System.Dynamic;
     using System.Linq;
-    using NUnit.Framework;
     using Resources;
+    using Xunit;
+    using Assert = NUnit.Framework.Assert;
 
-    [TestFixture]
     public class UpsertTests
     {
-        [TestFixtureSetUp]
-        public void Setup()
+        public UpsertTests()
         {
             DatabaseHelper.Reset();
         }
 
-        [Test]
-        public void TestUpsertWithNamedArgumentsAndExistingObject()
+        //TODO: [Fact]
+        public async void TestUpsertWithNamedArgumentsAndExistingObject()
         {
             var db = DatabaseHelper.Open();
 
-            db.Users.UpsertById(Id: 1, Name: "Ford Prefect");
-            var user = db.Users.Get(1);
+            await db.Users.UpsertById(Id: 1, Name: "Ford Prefect");
+            var user = await db.Users.FindById(1);
 
             Assert.IsNotNull(user);
             Assert.AreEqual(1, user.Id);
             Assert.AreEqual("Ford Prefect", user.Name);
         }
 
-        [Test]
-        public void TestUpsertWithNamedArgumentsAndExistingObjectUsingTransaction()
+        //TODO: [Fact]
+        public async void TestUpsertWithNamedArgumentsAndExistingObjectUsingTransaction()
         {
             using (var tx = DatabaseHelper.Open().BeginTransaction())
             {
 
-                tx.Users.UpsertById(Id: 1, Name: "Ford Prefect");
-                var user = tx.Users.Get(1);
+                await tx.Users.UpsertById(Id: 1, Name: "Ford Prefect");
+                var user = await tx.Users.FindById(1);
                 tx.Commit();
 
                 Assert.IsNotNull(user);
@@ -44,12 +43,12 @@ namespace Simple.Data.SqlTest
             }
         }
 
-        [Test]
-        public void TestUpsertWithNamedArgumentsAndNewObject()
+        //TODO: [Fact]
+        public async void TestUpsertWithNamedArgumentsAndNewObject()
         {
             var db = DatabaseHelper.Open();
 
-            var user = db.Users.UpsertById(Id: 0, Name: "Ford Prefect", Password: "Foo", Age: 42);
+            var user = await db.Users.UpsertById(Id: 0, Name: "Ford Prefect", Password: "Foo", Age: 42);
 
             Assert.IsNotNull(user);
             Assert.AreNotEqual(0, user.Id);
@@ -58,14 +57,14 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(42, user.Age);
         }
 
-        [Test]
-        public void TestUpsertWithStaticTypeObject()
+        [Fact]
+        public async void TestUpsertWithStaticTypeObject()
         {
             var db = DatabaseHelper.Open();
 
             var user = new User {Id = 2, Name = "Charlie", Password = "foobar", Age = 42};
 
-            var actual = db.Users.Upsert(user);
+            var actual = await db.Users.Upsert(user);
 
             Assert.IsNotNull(user);
             Assert.AreEqual(2, actual.Id);
@@ -74,14 +73,14 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(42, actual.Age);
         }
 
-        [Test]
-        public void TestUpsertByWithStaticTypeObject()
+        //TODO: [Fact]
+        public async void TestUpsertByWithStaticTypeObject()
         {
             var db = DatabaseHelper.Open();
 
             var user = new User {Id = 2, Name = "Charlie", Password = "foobar", Age = 42};
 
-            var actual = db.Users.UpsertById(user);
+            var actual = await db.Users.UpsertById(user);
 
             Assert.IsNotNull(user);
             Assert.AreEqual(2, actual.Id);
@@ -90,8 +89,8 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(42, actual.Age);
         }
 
-        [Test]
-        public void TestMultiUpsertWithStaticTypeObjectsForExistingRecords()
+        [Fact]
+        public async void TestMultiUpsertWithStaticTypeObjectsForExistingRecords()
         {
             var db = DatabaseHelper.Open();
 
@@ -101,7 +100,7 @@ namespace Simple.Data.SqlTest
                                 new User { Id = 2, Name = "Wowbagger", Password = "teatime", Age = int.MaxValue }
                             };
 
-            IList<User> actuals = db.Users.Upsert(users).ToList<User>();
+            IList<User> actuals = await db.Users.Upsert(users).ToList<User>();
 
             Assert.AreEqual(2, actuals.Count);
             Assert.AreEqual(1, actuals[0].Id);
@@ -115,8 +114,8 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(int.MaxValue, actuals[1].Age);
         }
 
-        [Test]
-        public void TestMultiUpsertWithStaticTypeObjectsForNewRecords()
+        [Fact]
+        public async void TestMultiUpsertWithStaticTypeObjectsForNewRecords()
         {
             var db = DatabaseHelper.Open();
 
@@ -126,7 +125,7 @@ namespace Simple.Data.SqlTest
                                 new User { Name = "Wowbagger", Password = "teatime", Age = int.MaxValue }
                             };
 
-            IList<User> actuals = db.Users.Upsert(users).ToList<User>();
+            IList<User> actuals = await db.Users.Upsert(users).ToList<User>();
 
             Assert.AreEqual(2, actuals.Count);
             Assert.AreNotEqual(0, actuals[0].Id);
@@ -140,8 +139,8 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(int.MaxValue, actuals[1].Age);
         }
 
-        [Test]
-        public void TestMultiUpsertWithStaticTypeObjectsForMixedRecords()
+        [Fact]
+        public async void TestMultiUpsertWithStaticTypeObjectsForMixedRecords()
         {
             var db = DatabaseHelper.Open();
 
@@ -151,7 +150,7 @@ namespace Simple.Data.SqlTest
                                 new User { Name = "Wowbagger", Password = "teatime", Age = int.MaxValue }
                             };
 
-            IList<User> actuals = db.Users.Upsert(users).ToList<User>();
+            IList<User> actuals = await db.Users.Upsert(users).ToList<User>();
 
             Assert.AreEqual(2, actuals.Count);
             Assert.AreEqual(1, actuals[0].Id);
@@ -165,8 +164,8 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(int.MaxValue, actuals[1].Age);
         }
 
-        [Test]
-        public void TestMultiUpsertWithStaticTypeObjectsAndNoReturn()
+        [Fact]
+        public async void TestMultiUpsertWithStaticTypeObjectsAndNoReturn()
         {
             var db = DatabaseHelper.Open();
 
@@ -177,16 +176,16 @@ namespace Simple.Data.SqlTest
                             };
 
             //IList<User> actuals = db.Users.Upsert(users).ToList<User>();
-            db.Users.Upsert(users);
+            await db.Users.Upsert(users);
 
-            var slartibartfast = db.Users.FindByName("Slartibartfast");
+            var slartibartfast = await db.Users.FindByName("Slartibartfast");
             Assert.IsNotNull(slartibartfast);
             Assert.AreNotEqual(0, slartibartfast.Id);
             Assert.AreEqual("Slartibartfast", slartibartfast.Name);
             Assert.AreEqual("bistromathics", slartibartfast.Password);
             Assert.AreEqual(777, slartibartfast.Age);
 
-            var wowbagger = db.Users.FindByName("Wowbagger");
+            var wowbagger = await db.Users.FindByName("Wowbagger");
             Assert.IsNotNull(wowbagger);
 
             Assert.AreNotEqual(0, wowbagger.Id);
@@ -195,8 +194,8 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(int.MaxValue, wowbagger.Age);
         }
 
-        [Test]
-        public void TestUpsertWithDynamicTypeObject()
+        [Fact]
+        public async void TestUpsertWithDynamicTypeObject()
         {
             var db = DatabaseHelper.Open();
 
@@ -205,7 +204,7 @@ namespace Simple.Data.SqlTest
             user.Password = "diodes";
             user.Age = 42000000;
 
-            var actual = db.Users.Upsert(user);
+            var actual = await db.Users.Upsert(user);
 
             Assert.IsNotNull(user);
             Assert.AreEqual("Marvin", actual.Name);
@@ -213,8 +212,8 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(42000000, actual.Age);
         }
 
-        [Test]
-        public void TestMultiUpsertWithDynamicTypeObjects()
+        [Fact]
+        public async void TestMultiUpsertWithDynamicTypeObjects()
         {
             var db = DatabaseHelper.Open();
 
@@ -230,7 +229,7 @@ namespace Simple.Data.SqlTest
 
             var users = new[] { user1, user2 };
 
-            IList<dynamic> actuals = db.Users.Upsert(users).ToList();
+            IList<dynamic> actuals = await db.Users.Upsert(users).ToList();
 
             Assert.AreEqual(2, actuals.Count);
             Assert.AreNotEqual(0, actuals[0].Id);
@@ -244,8 +243,8 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(int.MaxValue, actuals[1].Age);
         }
 
-        [Test]
-        public void TestMultiUpsertWithErrorCallback()
+        [Fact]
+        public async void TestMultiUpsertWithErrorCallback()
         {
             var db = DatabaseHelper.Open();
 
@@ -269,7 +268,7 @@ namespace Simple.Data.SqlTest
 
             ErrorCallback onError = (o, exception) => passed = true;
 
-            IList<dynamic> actuals = db.Users.Upsert(users,onError).ToList();
+            IList<dynamic> actuals = await db.Users.Upsert(users,onError).ToList();
 
             Assert.IsTrue(passed, "Callback was not called.");
             Assert.AreEqual(2, actuals.Count);
@@ -284,8 +283,8 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(int.MaxValue, actuals[1].Age);
         }
 
-        [Test]
-        public void TestMultiUpsertWithErrorCallbackUsingTransaction()
+        [Fact]
+        public async void TestMultiUpsertWithErrorCallbackUsingTransaction()
         {
             IList<dynamic> actuals;
             bool passed = false;
@@ -310,7 +309,7 @@ namespace Simple.Data.SqlTest
 
                 ErrorCallback onError = (o, exception) => passed = true;
 
-                actuals = tx.Users.Upsert(users, onError).ToList();
+                actuals = await tx.Users.Upsert(users, onError).ToList();
             }
 
             Assert.IsTrue(passed, "Callback was not called.");
@@ -326,8 +325,8 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(int.MaxValue, actuals[1].Age);
         }
 
-        [Test]
-        public void TestTransactionMultiUpsertWithErrorCallback()
+        [Fact]
+        public async void TestTransactionMultiUpsertWithErrorCallback()
         {
             var db = DatabaseHelper.Open();
             IList<dynamic> actuals;
@@ -353,7 +352,7 @@ namespace Simple.Data.SqlTest
 
                 ErrorCallback onError = (o, exception) => passed = true;
 
-                actuals = db.Users.Upsert(users, onError).ToList();
+                actuals = await db.Users.Upsert(users, onError).ToList();
 
                 tx.Commit();
             }
@@ -371,15 +370,15 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(int.MaxValue, actuals[1].Age);
         }
 
-        [Test]
-        public void TestWithImageColumn()
+        [Fact]
+        public async void TestWithImageColumn()
         {
             var db = DatabaseHelper.Open();
             try
             {
                 var image = GetImage.Image;
-                db.Images.Upsert(Id: 1, TheImage: image);
-                var img = (DbImage)db.Images.FindById(1);
+                await db.Images.Upsert(Id: 1, TheImage: image);
+                var img = (DbImage)(await db.Images.FindById(1));
                 Assert.IsTrue(image.SequenceEqual(img.TheImage));
             }
             finally
@@ -388,8 +387,8 @@ namespace Simple.Data.SqlTest
             }
         }
 
-        [Test]
-        public void TestUpsertWithVarBinaryMaxColumn()
+        [Fact]
+        public async void TestUpsertWithVarBinaryMaxColumn()
         {
             var db = DatabaseHelper.Open();
             var image = GetImage.Image;
@@ -398,30 +397,30 @@ namespace Simple.Data.SqlTest
                                Id = 1,
                                Data = image
                            };
-            db.Blobs.Upsert(blob);
-            blob = db.Blobs.FindById(1);
+            await db.Blobs.Upsert(blob);
+            blob = await db.Blobs.FindById(1);
             Assert.IsTrue(image.SequenceEqual(blob.Data));
         }
 
-        [Test]
-        public void TestUpsertWithSingleArgumentAndExistingObject()
+        //TODO: [Fact]
+        public async void TestUpsertWithSingleArgumentAndExistingObject()
         {
             var db = DatabaseHelper.Open();
 
-            var actual = db.Users.UpsertById(Id: 1);
+            var actual = await db.Users.UpsertById(Id: 1);
 
             Assert.IsNotNull(actual);
             Assert.AreEqual(1, actual.Id);
             Assert.IsNotNull(actual.Name);
         }
 
-        [Test]
-        public void TestUpsertUserBySecondaryField()
+        //TODO: [Fact]
+        public async void TestUpsertUserBySecondaryField()
         {
           var db = DatabaseHelper.Open();
 
-          var id = db.Users.UpsertByName(new User() { Age = 20, Name = "Black sheep", Password = "Bah" }).Id;
-          User actual = db.Users.FindById(id);
+          var id = await db.Users.UpsertByName(new User() { Age = 20, Name = "Black sheep", Password = "Bah" }).Id;
+          User actual = await db.Users.FindById(id);
 
           Assert.AreEqual(id, actual.Id);
           Assert.AreEqual("Black sheep", actual.Name);
@@ -429,13 +428,13 @@ namespace Simple.Data.SqlTest
           Assert.AreEqual(20, actual.Age);
         }
 
-        [Test]
-        public void TestUpsertUserByTwoSecondaryFields()
+        //TODO: [Fact]
+        public async void TestUpsertUserByTwoSecondaryFields()
         {
           var db = DatabaseHelper.Open();
 
-          var id = db.Users.UpsertByNameAndPassword(new User() { Age = 20, Name = "Black sheep", Password = "Bah" }).Id;
-          User actual = db.Users.FindById(id);
+          var id = await db.Users.UpsertByNameAndPassword(new User() { Age = 20, Name = "Black sheep", Password = "Bah" }).Id;
+          User actual = await db.Users.FindById(id);
 
           Assert.AreEqual(id, actual.Id);
           Assert.AreEqual("Black sheep", actual.Name);
@@ -443,15 +442,15 @@ namespace Simple.Data.SqlTest
           Assert.AreEqual(20, actual.Age);
         }
 
-        [Test]
-        public void TestUpsertExisting()
+        //TODO: [Fact]
+        public async void TestUpsertExisting()
         {
           var db = DatabaseHelper.Open();
 
-          var id = db.Users.UpsertByNameAndPassword(new User() { Age = 20, Name = "Black sheep", Password = "Bah" }).Id;
-          db.Users.UpsertById(new User() { Id = id, Age = 12, Name = "Dog", Password = "Bark" });
+          var id = await db.Users.UpsertByNameAndPassword(new User() { Age = 20, Name = "Black sheep", Password = "Bah" }).Id;
+          await db.Users.UpsertById(new User() { Id = id, Age = 12, Name = "Dog", Password = "Bark" });
 
-          User actual = db.Users.FindById(id);
+          User actual = await db.Users.FindById(id);
 
           Assert.AreEqual(id, actual.Id);
           Assert.AreEqual("Dog", actual.Name);

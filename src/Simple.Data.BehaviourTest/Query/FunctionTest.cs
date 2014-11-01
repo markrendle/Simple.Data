@@ -7,8 +7,8 @@ namespace Simple.Data.IntegrationTest.Query
 {
     using Mocking.Ado;
     using NUnit.Framework;
+    using Xunit;
 
-    [TestFixture]
     public class FunctionTest : DatabaseIntegrationContext
     {
         protected override void SetSchema(MockSchemaProvider schemaProvider)
@@ -21,7 +21,7 @@ namespace Simple.Data.IntegrationTest.Query
 
         private const string usersColumns = "[dbo].[Users].[Name],[dbo].[Users].[Password]";
 
-        [Test]
+        [Fact]
         public void SubstringIsEnteredCorrectlyInFindAll()
         {
             const string expected = @"select [dbo].[users].[name],[dbo].[users].[password] from [dbo].[users] where substring([dbo].[users].[name],@p1,@p2) = @p3";
@@ -35,12 +35,12 @@ namespace Simple.Data.IntegrationTest.Query
             Parameter(2).Is("A");
         }
 
-        [Test]
-        public void SubstringIsEnteredCorrectlyInFindOne()
+        [Fact]
+        public async void SubstringIsEnteredCorrectlyInFindOne()
         {
             const string expected = @"select " + usersColumns + " from [dbo].[users] where substring([dbo].[users].[name],@p1,@p2) = @p3";
 
-            TargetDb.Users.Find(TargetDb.Users.Name.Substring(0, 1) == "A");
+            await TargetDb.Users.Find(TargetDb.Users.Name.Substring(0, 1) == "A");
 
             GeneratedSqlIs(expected);
             Parameter(0).Is(0);
@@ -48,7 +48,7 @@ namespace Simple.Data.IntegrationTest.Query
             Parameter(2).Is("A");
         }
 
-        [Test]
+        [Fact]
         public void GroupingAndOrderingOnFunction()
         {
             const string expected =
@@ -64,7 +64,7 @@ namespace Simple.Data.IntegrationTest.Query
             GeneratedSqlIs(expected);
         }
 
-        [Test]
+        [Fact]
         public void CountingOnColumn()
         {
             const string expected =

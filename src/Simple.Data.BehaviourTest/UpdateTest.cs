@@ -1,12 +1,11 @@
-﻿using NUnit.Framework;
-using Simple.Data.Mocking.Ado;
+﻿using Simple.Data.Mocking.Ado;
 
 namespace Simple.Data.IntegrationTest
 {
     using System;
     using System.Collections.Generic;
+    using Xunit;
 
-    [TestFixture]
     public class UpdateTest : DatabaseIntegrationContext
     {
         protected override void SetSchema(MockSchemaProvider schemaProvider)
@@ -52,50 +51,50 @@ namespace Simple.Data.IntegrationTest
 // ReSharper restore CoVariantArrayConversion
         }
 
-        [Test]
-        public void TestUpdateWithNamedArguments()
+        [Fact]
+        public async void TestUpdateWithNamedArguments()
         {
-            TargetDb.Users.UpdateById(Id: 1, Name: "Steve", Age: 50);
+            await TargetDb.Users.UpdateById(Id: 1, Name: "Steve", Age: 50);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
             Parameter(0).Is("Steve");
             Parameter(1).Is(50);
             Parameter(2).Is(1);
         }
 
-        [Test]
-        public void TestUpdateWithNamedArgumentsUsingDifferentCase()
+        [Fact]
+        public async void TestUpdateWithNamedArgumentsUsingDifferentCase()
         {
-            TargetDb.Users.UpdateById(id: 1, Name: "Steve", Age: 50);
+            await TargetDb.Users.UpdateById(id: 1, Name: "Steve", Age: 50);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
             Parameter(0).Is("Steve");
             Parameter(1).Is(50);
             Parameter(2).Is(1);
         }
 
-        [Test]
-        public void TestUpdateWithNamedArgumentsUsingExpression()
+        [Fact]
+        public async void TestUpdateWithNamedArgumentsUsingExpression()
         {
-            TargetDb.Users.UpdateAll(Age: TargetDb.Users.Age + 1);
+            await TargetDb.Users.UpdateAll(Age: TargetDb.Users.Age + 1);
             GeneratedSqlIs("update [dbo].[Users] set [Age] = ([dbo].[Users].[Age] + @p1)");
             Parameter(0).Is(1);
         }
 
-        [Test]
-        public void TestUpdateWithDynamicObject()
+        [Fact]
+        public async void TestUpdateWithDynamicObject()
         {
             dynamic record = new SimpleRecord();
             record.Id = 1;
             record.Name = "Steve";
             record.Age = 50;
-            TargetDb.Users.Update(record);
+            await TargetDb.Users.Update(record);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
             Parameter(0).Is("Steve");
             Parameter(1).Is(50);
             Parameter(2).Is(1);
         }
 
-        [Test]
-        public void TestUpdateWithDynamicObjectAndOriginalValues()
+        [Fact]
+        public async void TestUpdateWithDynamicObjectAndOriginalValues()
         {
             dynamic newRecord = new SimpleRecord();
             newRecord.Id = 1;
@@ -106,15 +105,15 @@ namespace Simple.Data.IntegrationTest
             originalRecord.Name = "Steve";
             originalRecord.Age = 50;
 
-            TargetDb.Users.Update(newRecord, originalRecord);
+            await TargetDb.Users.Update(newRecord, originalRecord);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where ([dbo].[Users].[Id] = @p2 and [dbo].[Users].[Name] = @p3)");
             Parameter(0).Is("Steve-o");
             Parameter(1).Is(1);
             Parameter(2).Is("Steve");
         }
 
-        [Test]
-        public void TestUpdateWithDynamicObjectsAndOriginalValues()
+        [Fact]
+        public async void TestUpdateWithDynamicObjectsAndOriginalValues()
         {
             dynamic newRecord = new SimpleRecord();
             newRecord.Id = 1;
@@ -125,15 +124,15 @@ namespace Simple.Data.IntegrationTest
             originalRecord.Name = "Steve";
             originalRecord.Age = 50;
 
-            TargetDb.Users.Update(new[] {newRecord}, new[] {originalRecord});
+            await TargetDb.Users.Update(new[] {newRecord}, new[] {originalRecord});
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where ([dbo].[Users].[Id] = @p2 and [dbo].[Users].[Name] = @p3)");
             Parameter(0).Is("Steve-o");
             Parameter(1).Is(1);
             Parameter(2).Is("Steve");
         }
 
-        [Test]
-        public void TestUpdateWithDynamicObjectList()
+        [Fact]
+        public async void TestUpdateWithDynamicObjectList()
         {
             dynamic record1 = new SimpleRecord();
             record1.Id = 1;
@@ -143,15 +142,15 @@ namespace Simple.Data.IntegrationTest
             record2.Id = 2;
             record2.Name = "Bob";
             record2.Age = 42;
-            TargetDb.Users.Update(new[] { record1, record2 });
+            await TargetDb.Users.Update(new[] { record1, record2 });
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
             Parameter(0).Is("Bob");
             Parameter(1).Is(42);
             Parameter(2).Is(2);
         }
 
-        [Test]
-        public void TestUpdateByWithDynamicObjectList()
+        [Fact]
+        public async void TestUpdateByWithDynamicObjectList()
         {
             dynamic record1 = new SimpleRecord();
             record1.Id = 1;
@@ -161,29 +160,29 @@ namespace Simple.Data.IntegrationTest
             record2.Id = 2;
             record2.Name = "Bob";
             record2.Age = 42;
-            TargetDb.Users.UpdateById(new[] { record1, record2 });
+            await TargetDb.Users.UpdateById(new[] { record1, record2 });
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
             Parameter(0).Is("Bob");
             Parameter(1).Is(42);
             Parameter(2).Is(2);
         }
 
-        [Test]
-        public void TestUpdateByWithDynamicObject()
+        [Fact]
+        public async void TestUpdateByWithDynamicObject()
         {
             dynamic record = new SimpleRecord();
             record.Id = 1;
             record.Name = "Steve";
             record.Age = 50;
-            TargetDb.Users.UpdateById(record);
+            await TargetDb.Users.UpdateById(record);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
             Parameter(0).Is("Steve");
             Parameter(1).Is(50);
             Parameter(2).Is(1);
         }
 
-        [Test]
-        public void TestUpdateWithStaticObject()
+        [Fact]
+        public async void TestUpdateWithStaticObject()
         {
             var user = new User
                            {
@@ -191,7 +190,7 @@ namespace Simple.Data.IntegrationTest
                                Name = "Steve",
                                Age = 50
                            };
-            TargetDb.Users.Update(user);
+            await TargetDb.Users.Update(user);
             GeneratedSqlIs(
                 "update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4");
             Parameter(0).Is("Steve");
@@ -200,8 +199,8 @@ namespace Simple.Data.IntegrationTest
             Parameter(3).Is(1);
         }
 
-        [Test]
-        public void TestUpdateWithStaticObjectAndOriginalObject()
+        [Fact]
+        public async void TestUpdateWithStaticObjectAndOriginalObject()
         {
             var newUser = new User
                            {
@@ -210,15 +209,15 @@ namespace Simple.Data.IntegrationTest
                                Age = 50
                            };
             var originalUser = new User {Id = 1, Name = "Steve", Age = 50};
-            TargetDb.Users.Update(newUser, originalUser);
+            await TargetDb.Users.Update(newUser, originalUser);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where ([dbo].[Users].[Id] = @p2 and [dbo].[Users].[Name] = @p3)");
             Parameter(0).Is("Steve-o");
             Parameter(1).Is(1);
             Parameter(2).Is("Steve");
         }
 
-        [Test]
-        public void TestUpdateWithStaticObjectsAndOriginalObject()
+        [Fact]
+        public async void TestUpdateWithStaticObjectsAndOriginalObject()
         {
             var newUser = new User
             {
@@ -227,15 +226,15 @@ namespace Simple.Data.IntegrationTest
                 Age = 50
             };
             var originalUser = new User { Id = 1, Name = "Steve", Age = 50 };
-            TargetDb.Users.Update(new[] {newUser}, new[] {originalUser});
+            await TargetDb.Users.Update(new[] {newUser}, new[] {originalUser});
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where ([dbo].[Users].[Id] = @p2 and [dbo].[Users].[Name] = @p3)");
             Parameter(0).Is("Steve-o");
             Parameter(1).Is(1);
             Parameter(2).Is("Steve");
         }
         
-        [Test]
-        public void TestUpdateWithStaticObjectWithShoutyCase()
+        [Fact]
+        public async void TestUpdateWithStaticObjectWithShoutyCase()
         {
             var user = new User
             {
@@ -243,7 +242,7 @@ namespace Simple.Data.IntegrationTest
                 Name = "Steve",
                 Age = 50
             };
-            TargetDb.UserTable.Update(user);
+            await TargetDb.UserTable.Update(user);
             GeneratedSqlIs(
                 "update [dbo].[USER_TABLE] set [NAME] = @p1, [PASSWORD] = @p2, [AGE] = @p3 where [dbo].[USER_TABLE].[ID] = @p4");
             Parameter(0).Is("Steve");
@@ -252,8 +251,8 @@ namespace Simple.Data.IntegrationTest
             Parameter(3).Is(1);
         }
 
-        [Test]
-        public void TestUpdateWithStaticObjectWithAdditionalProperty()
+        [Fact]
+        public async void TestUpdateWithStaticObjectWithAdditionalProperty()
         {
             var user = new RogueUser
             {
@@ -262,7 +261,7 @@ namespace Simple.Data.IntegrationTest
                 Age = 50,
                 RogueProperty = 42
             };
-            TargetDb.Users.Update(user);
+            await TargetDb.Users.Update(user);
             GeneratedSqlIs(
                 "update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4");
             Parameter(0).Is("Steve");
@@ -271,15 +270,15 @@ namespace Simple.Data.IntegrationTest
             Parameter(3).Is(1);
         }
 
-        [Test]
-        public void TestUpdateWithStaticObjectList()
+        [Fact]
+        public async void TestUpdateWithStaticObjectList()
         {
             var users = new[]
                             {
                                 new User { Id = 2, Name = "Bob", Age = 42 },
                                 new User { Id = 1, Name = "Steve", Age = 50 }
                             };
-            TargetDb.Users.Update(users);
+            await TargetDb.Users.Update(users);
             GeneratedSqlIs(
                 "update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4");
             Parameter(0).Is("Steve");
@@ -288,15 +287,15 @@ namespace Simple.Data.IntegrationTest
             Parameter(3).Is(1);
         }
 
-        [Test]
-        public void TestUpdateByWithStaticObjectList()
+        [Fact]
+        public async void TestUpdateByWithStaticObjectList()
         {
             var users = new[]
                             {
                                 new User { Id = 2, Name = "Bob", Age = 42 },
                                 new User { Id = 1, Name = "Steve", Age = 50 }
                             };
-            TargetDb.Users.UpdateById(users);
+            await TargetDb.Users.UpdateById(users);
             GeneratedSqlIs(
                 "update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4");
             Parameter(0).Is("Steve");
@@ -305,8 +304,8 @@ namespace Simple.Data.IntegrationTest
             Parameter(3).Is(1);
         }
 
-        [Test]
-        public void TestUpdateByWithStaticObject()
+        [Fact]
+        public async void TestUpdateByWithStaticObject()
         {
             var user = new User
                            {
@@ -314,7 +313,7 @@ namespace Simple.Data.IntegrationTest
                                Name = "Steve",
                                Age = 50
                            };
-            TargetDb.Users.UpdateById(user);
+            await TargetDb.Users.UpdateById(user);
             GeneratedSqlIs(
                 "update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4");
             Parameter(0).Is("Steve");
@@ -323,46 +322,46 @@ namespace Simple.Data.IntegrationTest
             Parameter(3).Is(1);
         }
 
-        [Test]
-        public void TestThatUpdateUsesDbNullForNullValues()
+        [Fact]
+        public async void TestThatUpdateUsesDbNullForNullValues()
         {
-            TargetDb.Users.UpdateById(Id: 1, Name: null);
+            await TargetDb.Users.UpdateById(Id: 1, Name: null);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Id] = @p2");
             Parameter(0).IsDBNull();
         }
 
-        [Test]
-        public void TestUpdateAll()
+        [Fact]
+        public async void TestUpdateAll()
         {
-            TargetDb.Users.UpdateAll(Name: "Steve");
+            await TargetDb.Users.UpdateAll(Name: "Steve");
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1");
             Parameter(0).Is("Steve");
         }
 
-        [Test]
-        public void TestUpdateWithCriteria()
+        [Fact]
+        public async void TestUpdateWithCriteria()
         {
-            TargetDb.Users.UpdateAll(TargetDb.Users.Age > 30, Name: "Steve");
+            await TargetDb.Users.UpdateAll(TargetDb.Users.Age > 30, Name: "Steve");
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Age] > @p2");
             Parameter(0).Is("Steve");
             Parameter(1).Is(30);
         }
 
-        [Test]
-        public void TestUpdateWithCriteriaWithNaturalJoin()
+        [Fact]
+        public async void TestUpdateWithCriteriaWithNaturalJoin()
         {
             var yearAgo = DateTime.Today.Subtract(TimeSpan.FromDays(365));
-            TargetDb.Users.UpdateAll(TargetDb.Users.UserHistory.LastSeen < yearAgo, Name: "Dead User");
+            await TargetDb.Users.UpdateAll(TargetDb.Users.UserHistory.LastSeen < yearAgo, Name: "Dead User");
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Id] in " +
                 "(select [dbo].[Users].[Id] from [dbo].[Users] join [dbo].[UserHistory] on ([dbo].[Users].[Id] = [dbo].[UserHistory].[UserId]) where [dbo].[UserHistory].[LastSeen] < @p2)");
             Parameter(0).Is("Dead User");
             Parameter(1).Is(yearAgo);
         }
 
-        [Test]
-        public void TestUpdateWithCriteriaWithNaturalJoinOnCompoundKeyTable()
+        [Fact]
+        public async void TestUpdateWithCriteriaWithNaturalJoinOnCompoundKeyTable()
         {
-            TargetDb.AnnoyingMaster.UpdateAll(TargetDb.AnnoyingMaster.AnnoyingDetail.Value < 42, Text: "Really annoying");
+            await TargetDb.AnnoyingMaster.UpdateAll(TargetDb.AnnoyingMaster.AnnoyingDetail.Value < 42, Text: "Really annoying");
             GeneratedSqlIs("update [dbo].[AnnoyingMaster] set [Text] = @p1 where exists " +
                 "(select 1 from [dbo].[AnnoyingMaster] [_updatejoin] join [dbo].[AnnoyingDetail] on ([_updatejoin].[Id1] = [dbo].[AnnoyingDetail].[MasterId1] and [_updatejoin].[Id2] = [dbo].[AnnoyingDetail].[MasterId2]) "+
                 "where [dbo].[AnnoyingDetail].[Value] < @p2 and ([_updatejoin].[Id1] = [dbo].[AnnoyingMaster].[Id1] and [_updatejoin].[Id2] = [dbo].[AnnoyingMaster].[Id2]))");
@@ -370,20 +369,20 @@ namespace Simple.Data.IntegrationTest
             Parameter(1).Is(42);
         }
 
-        [Test]
-        public void TestUpdateWithCriteriaAndDictionary()
+        [Fact]
+        public async void TestUpdateWithCriteriaAndDictionary()
         {
             var data = new Dictionary<string, object> { { "Name", "Steve" } };
-            TargetDb.Users.UpdateAll(TargetDb.Users.Age > 30, data);
+            await TargetDb.Users.UpdateAll(TargetDb.Users.Age > 30, data);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Age] > @p2");
             Parameter(0).Is("Steve");
             Parameter(1).Is(30);
         }
 
-        [Test]
-        public void TestUpdateWithCriteriaAsNamedArg()
+        [Fact]
+        public async void TestUpdateWithCriteriaAsNamedArg()
         {
-            TargetDb.Users.UpdateAll(Name: "Steve", Condition: TargetDb.Users.Age > 30);
+            await TargetDb.Users.UpdateAll(Name: "Steve", Condition: TargetDb.Users.Age > 30);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Age] > @p2");
             Parameter(0).Is("Steve");
             Parameter(1).Is(30);

@@ -1,101 +1,100 @@
 ﻿using System.Diagnostics;
-using NUnit.Framework;
 
 namespace Simple.Data.SqlTest
 {
     using System.Data;
+    using Xunit;
+    using Assert = NUnit.Framework.Assert;
 
-    [TestFixture]
     public class ProcedureTest
     {
-        [TestFixtureSetUp]
-        public void Setup()
+        public ProcedureTest()
         {
             DatabaseHelper.Reset();
         }
 
-        [Test]
-        public void GetCustomersTest()
+        //TODO: [Fact]
+        public async void GetCustomersTest()
         {
             var db = DatabaseHelper.Open();
-            var results = db.GetCustomers();
+            var results = await db.GetCustomers();
             var actual = results.First();
             Assert.AreEqual(1, actual.CustomerId);
         }
 
-        [Test]
-        public void GetCustomerCountTest()
+        //TODO: [Fact]
+        public async void GetCustomerCountTest()
         {
             var db = DatabaseHelper.Open();
-            var results = db.GetCustomerCount();
+            var results = await db.GetCustomerCount();
             Assert.AreEqual(1, results.ReturnValue);
         }
 
-        [Test]
-        public void FindGetCustomerCountAndInvokeTest()
+        //TODO: [Fact]
+        public async void FindGetCustomerCountAndInvokeTest()
         {
             var db = DatabaseHelper.Open();
             var getCustomerCount = db.GetCustomerCount;
-            var results = getCustomerCount();
+            var results = await getCustomerCount();
             Assert.AreEqual(1, results.ReturnValue);
         }
 
-        [Test]
-        public void FindGetCustomerCountUsingIndexerAndInvokeTest()
+        //TODO: [Fact]
+        public async void FindGetCustomerCountUsingIndexerAndInvokeTest()
         {
             var db = DatabaseHelper.Open();
             var getCustomerCount = db["GetCustomerCount"];
-            var results = getCustomerCount();
+            var results = await getCustomerCount();
             Assert.AreEqual(1, results.ReturnValue);
         }
 
-        [Test]
-        public void SchemaUnqualifiedProcedureResolutionTest()
+        //TODO: [Fact]
+        public async void SchemaUnqualifiedProcedureResolutionTest()
         {
             var db = DatabaseHelper.Open();
-            var actual = db.SchemaProc().FirstOrDefault();
+            var actual = await db.SchemaProc().FirstOrDefault();
             Assert.IsNotNull(actual);
             Assert.AreEqual("dbo.SchemaProc", actual.Actual);
         }
 
-        [Test]
-        public void SchemaQualifiedProcedureResolutionTest()
+        //TODO: [Fact]
+        public async void SchemaQualifiedProcedureResolutionTest()
         {
             var db = DatabaseHelper.Open();
-            var actual = db.test.SchemaProc().FirstOrDefault();
+            var actual = await db.test.SchemaProc().FirstOrDefault();
             Assert.IsNotNull(actual);
             Assert.AreEqual("test.SchemaProc", actual.Actual);
         }
 
-        [Test]
-        public void GetCustomerCountAsOutputTest()
+        //TODO: [Fact]
+        public async void GetCustomerCountAsOutputTest()
         {
             var db = DatabaseHelper.Open();
-            var actual = db.GetCustomerCountAsOutput();
+            var actual = await db.GetCustomerCountAsOutput();
             Assert.AreEqual(42, actual.OutputValues["Count"]);
         }
 
 #if DEBUG // Trace is only written for DEBUG build
-        [Test]
-        public void GetCustomerCountSecondCallExecutesNonQueryTest()
+        //TODO: [Fact]
+        public async void GetCustomerCountSecondCallExecutesNonQueryTest()
         {
             SimpleDataTraceSources.TraceSource.Switch.Level = SourceLevels.All;
             var listener = new TestTraceListener();
             SimpleDataTraceSources.TraceSource.Listeners.Add(listener);
             var db = DatabaseHelper.Open();
-            db.GetCustomerCount();
+            await db.GetCustomerCount();
             Assert.IsFalse(listener.Output.Contains("ExecuteNonQuery"));
-            db.GetCustomerCount();
+            await db.GetCustomerCount();
             Assert.IsTrue(listener.Output.Contains("ExecuteNonQuery"));
             SimpleDataTraceSources.TraceSource.Listeners.Remove(listener);
         }
 #endif
 
-        [Test]
-        public void GetCustomerAndOrdersTest()
+        //TODO: [Fact]
+        public async void GetCustomerAndOrdersTest()
         {
             var db = DatabaseHelper.Open();
-            var results = db.GetCustomerAndOrders(1);
+            var results = await db.GetCustomerAndOrders(1);
             var customer = results.FirstOrDefault();
             Assert.IsNotNull(customer);
             Assert.AreEqual(1, customer.CustomerId);
@@ -105,34 +104,34 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, order.OrderId);
         }
 
-		[Test]
-		public void AddCustomerTest()
+		//TODO: [Fact]
+		public async void AddCustomerTest()
 		{
 			var db = DatabaseHelper.Open();
 			Customer customer;
-			customer = db.AddCustomer("Peter", "Address").FirstOrDefault();
+			customer = await db.AddCustomer("Peter", "Address").FirstOrDefault();
 			Assert.IsNotNull(customer);
-			customer = db.Customers.FindByCustomerId(customer.CustomerId);
+			customer = await db.Customers.FindByCustomerId(customer.CustomerId);
 			Assert.IsNotNull(customer);
 		}
 
-		[Test]
-		public void AddCustomerNullAddressTest()
+		//TODO: [Fact]
+		public async void AddCustomerNullAddressTest()
 		{
 			var db = DatabaseHelper.Open();
 			Customer customer;
-			customer = db.AddCustomer("Peter", null).FirstOrDefault();
+			customer = await db.AddCustomer("Peter", null).FirstOrDefault();
 			Assert.IsNotNull(customer);
-			customer = db.Customers.FindByCustomerId(customer.CustomerId);
+			customer = await db.Customers.FindByCustomerId(customer.CustomerId);
 			Assert.IsNotNull(customer);
 		}
 
-		[Test]
-        public void GetCustomerAndOrdersStillWorksAfterZeroRecordCallTest()
+		//TODO: [Fact]
+        public async void GetCustomerAndOrdersStillWorksAfterZeroRecordCallTest()
         {
             var db = DatabaseHelper.Open();
             db.GetCustomerAndOrders(1000);
-            var results = db.GetCustomerAndOrders(1);
+            var results = await db.GetCustomerAndOrders(1);
             var customer = results.FirstOrDefault();
             Assert.IsNotNull(customer);
             Assert.AreEqual(1, customer.CustomerId);
@@ -142,16 +141,16 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, order.OrderId);
         }
 
-        [Test]
-        public void ScalarFunctionIsCalledCorrectly()
+        //TODO: [Fact]
+        public async void ScalarFunctionIsCalledCorrectly()
         {
             var db = DatabaseHelper.Open();
-            var results = db.VarcharAndReturnInt("The answer to everything");
+            var results = await db.VarcharAndReturnInt("The answer to everything");
             Assert.AreEqual(42, results.ReturnValue);
         }
 
-        [Test]
-        public void CallProcedureWithDataTable()
+        //TODO: [Fact]
+        public async void CallProcedureWithDataTable()
         {
             var db = DatabaseHelper.Open();
             var dataTable = new DataTable();
@@ -160,7 +159,7 @@ namespace Simple.Data.SqlTest
             dataTable.Rows.Add("Two");
             dataTable.Rows.Add("Three");
 
-            var actual = db.ReturnStrings(dataTable).ToScalarList<string>();
+            var actual = await db.ReturnStrings(dataTable).ToScalarList<string>();
 
             Assert.AreEqual(3, actual.Count);
             Assert.Contains("One", actual);

@@ -9,12 +9,19 @@ using Simple.Data.SqlServer;
 
 namespace Simple.Data.SqlTest
 {
-    [TestFixture]
+    using Xunit;
+    using Assert = NUnit.Framework.Assert;
+
     public class SqlQueryPagerTest
     {
         static readonly Regex Normalize = new Regex(@"\s+", RegexOptions.Multiline);
 
-        [Test]
+        public SqlQueryPagerTest()
+        {
+            DatabaseHelper.Reset();
+        }
+
+        [Fact]
         public void ShouldApplyLimitUsingTop()
         {
             var sql = "select a,b,c from d where a = 1 order by c";
@@ -26,7 +33,7 @@ namespace Simple.Data.SqlTest
             Assert.IsTrue(expected.SequenceEqual(modified));
         }
 
-        [Test]
+        [Fact]
         public void ShouldApplyLimitUsingTopWithDistinct()
         {
             var sql = "select distinct a,b,c from d where a = 1 order by c";
@@ -38,7 +45,7 @@ namespace Simple.Data.SqlTest
             Assert.IsTrue(expected.SequenceEqual(modified));
         }
 
-        [Test]
+        [Fact]
         public void ShouldApplyPagingUsingOrderBy()
         {
             var sql = "select [dbo].[d].[a],[dbo].[d].[b],[dbo].[d].[c] from [dbo].[d] where [dbo].[d].[a] = 1 order by [dbo].[d].[c]";
@@ -52,7 +59,7 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(expected[0], modified[0]);
         }
 
-        [Test]
+        [Fact]
         public void ShouldApplyPagingUsingOrderByKeysIfNotAlreadyOrdered()
         {
             var sql = "select [dbo].[d].[a],[dbo].[d].[b],[dbo].[d].[c] from [dbo].[d] where [dbo].[d].[a] = 1";
@@ -66,7 +73,7 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(expected[0], modified[0]);
         }
 
-        [Test]
+        [Fact]
         public void ShouldCopeWithAliasedColumns()
         {
             var sql = "select [dbo].[d].[a],[dbo].[d].[b] as [foo],[dbo].[d].[c] from [dbo].[d] where [dbo].[d].[a] = 1";
@@ -80,7 +87,7 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(expected[0], modified[0]);
         }
 
-        [Test]
+        [Fact]
         public void ShouldCopeWithColumnsThatEndInFrom()
         {
             const string sql = @"SELECT [dbo].[PromoPosts].[Id],[dbo].[PromoPosts].[ActiveFrom],[dbo].[PromoPosts].[ActiveTo],[dbo].[PromoPosts].[Created],[dbo].[PromoPosts].[Updated] 
@@ -95,7 +102,7 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(expected, modified);
         }
 
-        [Test]
+        [Fact]
         public void ShouldExcludeLeftJoinedTablesFromSubSelect()
         {
             const string sql = @"SELECT [dbo].[MainClass].[ID],
@@ -114,7 +121,7 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(expected, modified);
         }
 
-        [Test]
+        //TODO: [Fact]
         public void ShouldThrowIfTableHasNoPrimaryKey([Values(null, new string[0])]string[] keys)
         {
             var sql = "select [dbo].[d].[a] from [dbo].[b]";

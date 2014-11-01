@@ -10,12 +10,13 @@ using Simple.Data.Ado.Schema;
 namespace Simple.Data.SqlServer
 {
     using System.Data.SqlClient;
+    using System.Diagnostics;
     using System.Threading.Tasks;
 
     [Export(typeof(ICustomInserter))]
     public class SqlCustomInserter : ICustomInserter
     {
-        public Task<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IDictionary<string, object> data, IDbTransaction transaction = null, bool resultRequired = false)
+        public async Task<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IDictionary<string, object> data, IDbTransaction transaction = null, bool resultRequired = false)
         {
             var table = adapter.GetSchema().FindTable(tableName);
             var dataDictionary = BuildDataDictionary(adapter, data, table);
@@ -44,7 +45,7 @@ namespace Simple.Data.SqlServer
                 {
                     insertSql.AppendFormat(" SELECT * FROM {0} WHERE {1} = SCOPE_IDENTITY()", table.QualifiedName,
                                            identityColumn.QuotedName);
-                    return ExecuteSingletonQuery(adapter, insertSql.ToString(), dataDictionary.Keys,
+                    return await ExecuteSingletonQuery(adapter, insertSql.ToString(), dataDictionary.Keys,
                                                  dataDictionary.Values, transaction);
                 }
             }
@@ -77,13 +78,13 @@ namespace Simple.Data.SqlServer
             return dataDictionary;
         }
 
-        internal Task<IDictionary<string, object>> ExecuteSingletonQuery(AdoAdapter adapter, string sql, IEnumerable<Column> columns, IEnumerable<Object> values, IDbTransaction transaction)
+        internal async Task<IDictionary<string, object>> ExecuteSingletonQuery(AdoAdapter adapter, string sql, IEnumerable<Column> columns, IEnumerable<Object> values, IDbTransaction transaction)
         {
             if (transaction != null)
             {
                 var command = new CommandHelper(adapter).CreateInsert(transaction.Connection, sql, columns, values.ToArray());
                 command.Transaction = transaction;
-                return TryExecuteSingletonQuery(command);
+                return await TryExecuteSingletonQuery(command);
             }
 
             var connection = adapter.CreateConnection();
@@ -92,22 +93,45 @@ namespace Simple.Data.SqlServer
                 using (var command = new CommandHelper(adapter).CreateInsert(connection, sql, columns, values.ToArray()))
                 {
                     connection.OpenIfClosed();
-                    return TryExecuteSingletonQuery(command);
+                    return await TryExecuteSingletonQuery(command);
                 }
             }
         }
 
         private static async Task<IDictionary<string, object>> TryExecuteSingletonQuery(IDbCommand command)
         {
-            using (var reader = await ((SqlCommand)command).ExecuteReaderAsync())
+            IDictionary<string, object> result = null;
+            bool close = false;
+            var sqlCommand = ((SqlCommand)command);
+            if (sqlCommand.Connection.State == ConnectionState.Closed)
             {
-                if (await reader.ReadAsync())
+                await sqlCommand.Connection.OpenAsync();
+                close = true;
+            }
+            try
+            {
+                if (sqlCommand.Connection.State == ConnectionState.Closed)
                 {
-                    return reader.ToDictionary();
+                    Debugger.Break();
+                }
+                var reader = await sqlCommand.ExecuteReaderAsync();
+                if (reader.Read())
+                {
+                    result = reader.ToDictionary();
                 }
             }
-
-            return null;
+            catch (InvalidOperationException)
+            {
+                Debugger.Break();
+            }
+            finally 
+            {
+                if (close)
+                {
+                    sqlCommand.Connection.Close();
+                }
+            }
+            return result;
         }
 
         internal int Execute(AdoAdapter adapter, string sql, IEnumerable<Column> columns, IEnumerable<Object> values, IDbTransaction transaction)

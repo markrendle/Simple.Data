@@ -5,58 +5,57 @@ using System.Text;
 
 namespace Simple.Data.SqlTest
 {
-    using NUnit.Framework;
     using Resources;
+    using Xunit;
+    using Assert = NUnit.Framework.Assert;
 
-    [TestFixture]
     public class DeleteTest
     {
-        [TestFixtureSetUp]
-        public void Setup()
+        public DeleteTest()
         {
             DatabaseHelper.Reset();
         }
 
-        [Test]
-        public void TestDeleteByColumn()
+        [Fact]
+        public async void TestDeleteByColumn()
         {
             var db = DatabaseHelper.Open();
-            db.DeleteTest.Insert(Id: 1);
-            var count = db.DeleteTest.DeleteById(1);
+            await db.DeleteTest.Insert(Id: 1);
+            var count = await db.DeleteTest.DeleteById(1);
             Assert.AreEqual(1, count);
         }
 
-        [Test]
-        public void TestDeleteAll()
+        [Fact]
+        public async void TestDeleteAll()
         {
             var db = DatabaseHelper.Open();
-            db.DeleteTest.Insert(Id: 1);
-            db.DeleteTest.Insert(Id: 2);
-            var count = db.DeleteTest.DeleteAll();
-            Assert.AreEqual(2, count.ReturnValue);
+            await db.DeleteTest.Insert(Id: 1);
+            await db.DeleteTest.Insert(Id: 2);
+            var count = await db.DeleteTest.DeleteAll();
+            Assert.AreEqual(2, count);
         }
 
-        [Test]
-        public void TestDeleteByColumnInTransaction()
+        [Fact]
+        public async void TestDeleteByColumnInTransaction()
         {
             var db = DatabaseHelper.Open();
             var tx = db.BeginTransaction();
-            tx.DeleteTest.Insert(Id: 1);
-            var count = tx.DeleteTest.DeleteById(1);
+            await tx.DeleteTest.Insert(Id: 1);
+            var count = await tx.DeleteTest.DeleteById(1);
             tx.Commit();
             Assert.AreEqual(1, count);
         }
 
-        [Test]
-        public void TestDeleteAllInTransaction()
+        [Fact]
+        public async void TestDeleteAllInTransaction()
         {
             var db = DatabaseHelper.Open();
             var tx = db.BeginTransaction();
-            tx.DeleteTest.Insert(Id: 1);
-            tx.DeleteTest.Insert(Id: 2);
-            var count = tx.DeleteTest.DeleteAll();
+            await tx.DeleteTest.Insert(Id: 1);
+            await tx.DeleteTest.Insert(Id: 2);
+            var count = await tx.DeleteTest.DeleteAll();
             tx.Commit();
-            Assert.AreEqual(2, count.ReturnValue);
+            Assert.AreEqual(2, count);
         }
     }
 }

@@ -3,40 +3,40 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
 
 namespace Simple.Data.SqlTest
 {
-    [TestFixture]
+    using Xunit;
+    using Assert = NUnit.Framework.Assert;
+
     public class ConversionTests
     {
-        [TestFixtureSetUp]
-        public void Setup()
+        public ConversionTests()
         {
             DatabaseHelper.Reset();
         }
 
-        [Test]
-        public void WeirdTypeGetsConvertedToInt()
+        [Fact]
+        public async void WeirdTypeGetsConvertedToInt()
         {
             var weirdValue = new WeirdType(1);
             var db = DatabaseHelper.Open();
-            var user = db.Users.FindById(weirdValue);
+            var user = await db.Users.FindById(weirdValue);
             Assert.AreEqual(1, user.Id);
         }
 
-        [Test]
-        public void WeirdTypeUsedInQueryGetsConvertedToInt()
+        [Fact]
+        public async void WeirdTypeUsedInQueryGetsConvertedToInt()
         {
             var weirdValue = new WeirdType(1);
             var db = DatabaseHelper.Open();
-            var user = db.Users.QueryById(weirdValue).FirstOrDefault();
+            var user = await db.Users.QueryById(weirdValue).FirstOrDefault();
             Assert.IsNotNull(user);
             Assert.AreEqual(1, user.Id);
         }
 
-        [Test]
-        public void InsertingWeirdTypesFromExpando()
+        [Fact]
+        public async void InsertingWeirdTypesFromExpando()
         {
             dynamic expando = new ExpandoObject();
             expando.Name = new WeirdType("Oddball");
@@ -45,7 +45,7 @@ namespace Simple.Data.SqlTest
             expando.ThisIsNotAColumn = new WeirdType("Submit");
 
             var db = DatabaseHelper.Open();
-            var user = db.Users.Insert(expando);
+            var user = await db.Users.Insert(expando);
             Assert.IsInstanceOf<int>(user.Id);
             Assert.AreEqual("Oddball", user.Name);
             Assert.AreEqual("Fish", user.Password);

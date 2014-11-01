@@ -1,52 +1,50 @@
 ﻿using System.Dynamic;
 using System.Linq;
-using NUnit.Framework;
 
 namespace Simple.Data.SqlTest
 {
     using System.Collections.Generic;
+    using Xunit;
 
-    [TestFixture]
     public class UpdateTests
     {
-        [TestFixtureSetUp]
-        public void Setup()
+        public UpdateTests()
         {
             DatabaseHelper.Reset();
         }
 
-        [Test]
-        public void TestUpdateWithNamedArguments()
+        [Fact]
+        public async void TestUpdateWithNamedArguments()
         {
             var db = DatabaseHelper.Open();
 
-            db.Users.UpdateById(Id: 1, Name: "Ford", Password: "hoopy", Age: 29);
-            var user = db.Users.FindById(1);
-            Assert.IsNotNull(user);
-            Assert.AreEqual("Ford", user.Name);
-            Assert.AreEqual("hoopy", user.Password);
-            Assert.AreEqual(29, user.Age);
+            await db.Users.UpdateById(Id: 1, Name: "Ford", Password: "hoopy", Age: 29);
+            var user = await db.Users.FindById(1);
+            Assert.NotNull(user);
+            Assert.Equal("Ford", user.Name);
+            Assert.Equal("hoopy", user.Password);
+            Assert.Equal(29, user.Age);
         }
 
-        [Test]
-        public void TestUpdateWithStaticTypeObject()
+        [Fact]
+        public async void TestUpdateWithStaticTypeObject()
         {
             var db = DatabaseHelper.Open();
 
             var user = new User { Id = 2, Name = "Zaphod", Password = "zarquon", Age = 42 };
 
-            db.Users.Update(user);
+            await db.Users.Update(user);
 
-            User actual = db.Users.FindById(2);
+            User actual = await db.Users.FindById(2);
 
-            Assert.IsNotNull(user);
-            Assert.AreEqual("Zaphod", actual.Name);
-            Assert.AreEqual("zarquon", actual.Password);
-            Assert.AreEqual(42, actual.Age);
+            Assert.NotNull(user);
+            Assert.Equal("Zaphod", actual.Name);
+            Assert.Equal("zarquon", actual.Password);
+            Assert.Equal(42, actual.Age);
         }
 
-        [Test]
-        public void TestUpdateWithDynamicTypeObject()
+        [Fact]
+        public async void TestUpdateWithDynamicTypeObject()
         {
             var db = DatabaseHelper.Open();
 
@@ -56,18 +54,18 @@ namespace Simple.Data.SqlTest
             user.Password = "diodes";
             user.Age = 42000000;
 
-            db.Users.Update(user);
+            await db.Users.Update(user);
 
-            var actual = db.Users.FindById(3);
+            var actual = await db.Users.FindById(3);
 
-            Assert.IsNotNull(user);
-            Assert.AreEqual("Marvin", actual.Name);
-            Assert.AreEqual("diodes", actual.Password);
-            Assert.AreEqual(42000000, actual.Age);
+            Assert.NotNull(user);
+            Assert.Equal("Marvin", actual.Name);
+            Assert.Equal("diodes", actual.Password);
+            Assert.Equal(42000000, actual.Age);
         }
 
-        [Test]
-        public void TestUpdateWithVarBinaryMaxColumn()
+        [Fact]
+        public async void TestUpdateWithVarBinaryMaxColumn()
         {
             var db = DatabaseHelper.Open();
             var blob = new Blob
@@ -75,71 +73,70 @@ namespace Simple.Data.SqlTest
                                Id = 1,
                                Data = new byte[] {9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
                            };
-            db.Blobs.Insert(blob);
+            await db.Blobs.Insert(blob);
 
             var newData = blob.Data = new byte[] {0,1,2,3,4,5,6,7,8,9};
 
-            db.Blobs.Update(blob);
+            await db.Blobs.Update(blob);
 
-            blob = db.Blobs.FindById(1);
+            blob = await db.Blobs.FindById(1);
             
-            Assert.IsTrue(newData.SequenceEqual(blob.Data));
+            Assert.True(newData.SequenceEqual(blob.Data));
         }
 
-        [Test]
-        public void TestUpdateWithJoinCriteria()
+        //TODO: [Fact]
+        public async void TestUpdateWithJoinCriteria()
         {
             var db = DatabaseHelper.Open();
-            db.Customers.UpdateAll(db.Customers.Orders.OrderId == 1, Name: "Updated");
-            var customer = db.Customers.Get(1);
-            Assert.AreEqual("Updated", customer.Name);
+            await db.Customers.UpdateAll(db.Customers.Orders.OrderId == 1, Name: "Updated");
+            var customer = await db.Customers.Get(1);
+            Assert.Equal("Updated", customer.Name);
         }
 
-        [Test]
-        public void TestUpdateAllWithNoMatchingRows()
+        [Fact]
+        public async void TestUpdateAllWithNoMatchingRows()
         {
             var db = DatabaseHelper.Open();
-            db.test.SchemaTable.UpdateAll(db.test.SchemaTable.Id == 1138, Description: "Updated");
-            var test = db.test.SchemaTable.FindById(1138);
-            Assert.IsNull(test);
+            await db.test.SchemaTable.UpdateAll(db.test.SchemaTable.Id == 1138, Description: "Updated");
+            var test = await db.test.SchemaTable.FindById(1138);
+            Assert.Null(test);
         }
 
-        [Test]
-        public void TestUpdateWithJoinCriteriaOnCompoundKeyTable()
+        //TODO: [Fact]
+        public async void TestUpdateWithJoinCriteriaOnCompoundKeyTable()
         {
             var db = DatabaseHelper.Open();
-            db.CompoundKeyMaster.UpdateAll(db.CompoundKeyMaster.CompoundKeyDetail.Value == 1, Description: "Updated");
-            var record = db.CompoundKeyMaster.Get(1, 1);
-            Assert.AreEqual("Updated", record.Description);
+            await db.CompoundKeyMaster.UpdateAll(db.CompoundKeyMaster.CompoundKeyDetail.Value == 1, Description: "Updated");
+            var record = await db.CompoundKeyMaster.Get(1, 1);
+            Assert.Equal("Updated", record.Description);
         }
         
-        [Test]
-        public void ToListShouldExecuteQuery()
+        [Fact]
+        public async void ToListShouldExecuteQuery()
         {
             var db = DatabaseHelper.Open();
-            List<Customer> customers = db.Customers.All().ToList<Customer>();
+            List<Customer> customers = await db.Customers.All().ToList<Customer>();
             foreach (var customer in customers)
             {
                 customer.Address = "Updated";
             }
 
-            Assert.DoesNotThrow(() =>
-                db.Customers.Update(customers));
+            await Assert.DoesNotThrowAsync(async () => await db.Customers.Update(customers));
         }
 
-        [Test]
-        public void TestUpdateWithTimestamp()
+        //TODO: [Fact]
+        public async void TestUpdateWithTimestamp()
         {
             var db = DatabaseHelper.Open();
-            var row = db.TimestampTest.Insert(Description: "Inserted");
+            var row = await db.TimestampTest.Insert(Description: "Inserted");
             row.Description = "Updated";
             db.TimestampTest.Update(row);
             row = db.TimestampTest.Get(row.Id);
-            Assert.AreEqual("Updated", row.Description);
+            Assert.Equal("Updated", row.Description);
         }
 
-        [Test]
-        public void TestUpdateByInputIsNotMutated()
+        [Fact]
+        public async void TestUpdateByInputIsNotMutated()
         {
             var db = DatabaseHelper.Open();
             var user = new Dictionary<string, object>
@@ -150,29 +147,29 @@ namespace Simple.Data.SqlTest
               {"Password", "P"}
             };
 
-            user["Id"] = db.Users.Insert(user).Id;
+            user["Id"] = (await db.Users.Insert(user)).Id;
 
-            db.Users.UpdateById(user);
+            await db.Users.UpdateById(user);
 
-            Assert.AreEqual(4, user.Keys.Count);
+            Assert.Equal(4, user.Keys.Count);
         }
 
-        [Test]
-        public void TestUpdatingACriteriaColumn()
+        [Fact]
+        public async void TestUpdatingACriteriaColumn()
         {
             var db = DatabaseHelper.Open();
-            var user = db.Users.Insert(Age: 42, Name: "Z1", Password: "argh");
-            db.Users.UpdateAll(db.Users.Name == "Z1", Name: "1Z");
+            var user = await db.Users.Insert(Age: 42, Name: "Z1", Password: "argh");
+            await db.Users.UpdateAll(db.Users.Name == "Z1", Name: "1Z");
         }
 
-        [Test]
-        public void TestUpdateWithOriginalUsingAnonymousObjects()
+        [Fact]
+        public async void TestUpdateWithOriginalUsingAnonymousObjects()
         {
             var db = DatabaseHelper.Open();
-            var user = db.Users.Insert(Age: 54, Name: "YZ1", Password: "argh");
-            db.Users.Update(new {Name = "2YZ"}, new {Name = "YZ1"});
-            var actual = db.Users.FindById(user.Id);
-            Assert.AreEqual("2YZ", actual.Name);
+            var user = await db.Users.Insert(Age: 54, Name: "YZ1", Password: "argh");
+            await db.Users.Update(new {Name = "2YZ"}, new {Name = "YZ1"});
+            var actual = await db.Users.FindById(user.Id);
+            Assert.Equal("2YZ", actual.Name);
         }
     }
 }
