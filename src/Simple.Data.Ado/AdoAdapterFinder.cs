@@ -39,18 +39,18 @@
             }
         }
 
-        public IDictionary<string, object> FindOne(string tableName, SimpleExpression criteria)
+        public async Task<IDictionary<string, object>> FindOne(string tableName, SimpleExpression criteria)
         {
-            if (criteria == null) return FindAll(_adapter.GetSchema().BuildObjectName(tableName)).FirstOrDefault();
+            if (criteria == null) return (await FindAll(_adapter.GetSchema().BuildObjectName(tableName))).FirstOrDefault();
             var commandTemplate = GetCommandTemplate(tableName, criteria);
-            return ExecuteSingletonQuery(commandTemplate, criteria.GetValues());
+            return await ExecuteSingletonQuery(commandTemplate, criteria.GetValues());
         }
 
         public Func<object[],Task<IDictionary<string,object>>> CreateFindOneDelegate(string tableName, SimpleExpression criteria)
         {
             if (criteria == null)
             {
-                return _ => FindAll(_adapter.GetSchema().BuildObjectName(tableName)).FirstOrDefault();
+                return async _ => (await FindAll(_adapter.GetSchema().BuildObjectName(tableName))).FirstOrDefault();
             }
             var commandBuilder = new FindHelper(_adapter.GetSchema())
                 .GetFindByCommand(_adapter.GetSchema().BuildObjectName(tableName), criteria);
@@ -73,7 +73,7 @@
             }
         }
 
-        private IDictionary<string, object> ExecuteSingletonQuery(IDbCommand command, object[] parameterValues, IDictionary<string,int> index)
+        private Task<IDictionary<string, object>> ExecuteSingletonQuery(IDbCommand command, object[] parameterValues, IDictionary<string,int> index)
         {
             for (int i = 0; i < command.Parameters.Count; i++)
             {
@@ -83,7 +83,7 @@
             return TryExecuteSingletonQuery(command.Connection, command, index);
         }
 
-        public IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
+        public Task<IEnumerable<IDictionary<string, object>>> Find(string tableName, SimpleExpression criteria)
         {
             if (criteria == null) return FindAll(_adapter.GetSchema().BuildObjectName(tableName));
             var commandTemplate = GetCommandTemplate(tableName, criteria);
@@ -144,7 +144,7 @@
             }
         }
 
-        private IEnumerable<IDictionary<string, object>> TryExecuteQuery(IDbConnection connection, IDbCommand command, IDictionary<string, int> index)
+        private Task<IEnumerable<IDictionary<string, object>>> TryExecuteQuery(IDbConnection connection, IDbCommand command, IDictionary<string, int> index)
         {
             try
             {
@@ -168,13 +168,13 @@
             }
         }
 
-        private static IDictionary<string, object> TryExecuteSingletonQuery(IDbConnection connection, IDbCommand command, IDictionary<string, int> index)
+        private async Task<IDictionary<string, object>> TryExecuteSingletonQuery(IDbConnection connection, IDbCommand command, IDictionary<string, int> index)
         {
             using (connection.MaybeDisposable())
             using (command)
             {
-                connection.OpenIfClosed();
-                using (var reader = command.TryExecuteReader())
+                await _adapter.CommandExecutor.OpenIfClosed(connection);
+                using (var reader = await _adapter.CommandExecutor.ExecuteReader(command))
                 {
                     if (reader.Read())
                     {

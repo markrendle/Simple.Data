@@ -19,15 +19,6 @@ namespace Simple.Data.Ado
             }
         }
 
-        public static async Task OpenIfClosedAsync(this IDbConnection connection)
-        {
-            if (connection.State == ConnectionState.Closed)
-            {
-                await connection.OpenAsync();
-                await ((SqlConnection) connection).OpenAsync();
-            }
-        }
-
         public static IDbCommand CreateCommand(this IDbConnection connection, AdoOptions options)
         {
             if (options == null || options.CommandTimeout < 0) return connection.CreateCommand();

@@ -55,7 +55,7 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void TestUpdateWithNamedArguments()
         {
-            _db.Users.UpdateById(Id: 1, Name: "Steve", Age: 50);
+            TargetDb.Users.UpdateById(Id: 1, Name: "Steve", Age: 50);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
             Parameter(0).Is("Steve");
             Parameter(1).Is(50);
@@ -65,7 +65,7 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void TestUpdateWithNamedArgumentsUsingDifferentCase()
         {
-            _db.Users.UpdateById(id: 1, Name: "Steve", Age: 50);
+            TargetDb.Users.UpdateById(id: 1, Name: "Steve", Age: 50);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
             Parameter(0).Is("Steve");
             Parameter(1).Is(50);
@@ -75,7 +75,7 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void TestUpdateWithNamedArgumentsUsingExpression()
         {
-            _db.Users.UpdateAll(Age: _db.Users.Age + 1);
+            TargetDb.Users.UpdateAll(Age: TargetDb.Users.Age + 1);
             GeneratedSqlIs("update [dbo].[Users] set [Age] = ([dbo].[Users].[Age] + @p1)");
             Parameter(0).Is(1);
         }
@@ -87,7 +87,7 @@ namespace Simple.Data.IntegrationTest
             record.Id = 1;
             record.Name = "Steve";
             record.Age = 50;
-            _db.Users.Update(record);
+            TargetDb.Users.Update(record);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
             Parameter(0).Is("Steve");
             Parameter(1).Is(50);
@@ -106,7 +106,7 @@ namespace Simple.Data.IntegrationTest
             originalRecord.Name = "Steve";
             originalRecord.Age = 50;
 
-            _db.Users.Update(newRecord, originalRecord);
+            TargetDb.Users.Update(newRecord, originalRecord);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where ([dbo].[Users].[Id] = @p2 and [dbo].[Users].[Name] = @p3)");
             Parameter(0).Is("Steve-o");
             Parameter(1).Is(1);
@@ -125,7 +125,7 @@ namespace Simple.Data.IntegrationTest
             originalRecord.Name = "Steve";
             originalRecord.Age = 50;
 
-            _db.Users.Update(new[] {newRecord}, new[] {originalRecord});
+            TargetDb.Users.Update(new[] {newRecord}, new[] {originalRecord});
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where ([dbo].[Users].[Id] = @p2 and [dbo].[Users].[Name] = @p3)");
             Parameter(0).Is("Steve-o");
             Parameter(1).Is(1);
@@ -143,7 +143,7 @@ namespace Simple.Data.IntegrationTest
             record2.Id = 2;
             record2.Name = "Bob";
             record2.Age = 42;
-            _db.Users.Update(new[] { record1, record2 });
+            TargetDb.Users.Update(new[] { record1, record2 });
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
             Parameter(0).Is("Bob");
             Parameter(1).Is(42);
@@ -161,7 +161,7 @@ namespace Simple.Data.IntegrationTest
             record2.Id = 2;
             record2.Name = "Bob";
             record2.Age = 42;
-            _db.Users.UpdateById(new[] { record1, record2 });
+            TargetDb.Users.UpdateById(new[] { record1, record2 });
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
             Parameter(0).Is("Bob");
             Parameter(1).Is(42);
@@ -175,7 +175,7 @@ namespace Simple.Data.IntegrationTest
             record.Id = 1;
             record.Name = "Steve";
             record.Age = 50;
-            _db.Users.UpdateById(record);
+            TargetDb.Users.UpdateById(record);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1, [Age] = @p2 where [dbo].[Users].[Id] = @p3");
             Parameter(0).Is("Steve");
             Parameter(1).Is(50);
@@ -191,7 +191,7 @@ namespace Simple.Data.IntegrationTest
                                Name = "Steve",
                                Age = 50
                            };
-            _db.Users.Update(user);
+            TargetDb.Users.Update(user);
             GeneratedSqlIs(
                 "update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4");
             Parameter(0).Is("Steve");
@@ -210,7 +210,7 @@ namespace Simple.Data.IntegrationTest
                                Age = 50
                            };
             var originalUser = new User {Id = 1, Name = "Steve", Age = 50};
-            _db.Users.Update(newUser, originalUser);
+            TargetDb.Users.Update(newUser, originalUser);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where ([dbo].[Users].[Id] = @p2 and [dbo].[Users].[Name] = @p3)");
             Parameter(0).Is("Steve-o");
             Parameter(1).Is(1);
@@ -227,7 +227,7 @@ namespace Simple.Data.IntegrationTest
                 Age = 50
             };
             var originalUser = new User { Id = 1, Name = "Steve", Age = 50 };
-            _db.Users.Update(new[] {newUser}, new[] {originalUser});
+            TargetDb.Users.Update(new[] {newUser}, new[] {originalUser});
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where ([dbo].[Users].[Id] = @p2 and [dbo].[Users].[Name] = @p3)");
             Parameter(0).Is("Steve-o");
             Parameter(1).Is(1);
@@ -243,7 +243,7 @@ namespace Simple.Data.IntegrationTest
                 Name = "Steve",
                 Age = 50
             };
-            _db.UserTable.Update(user);
+            TargetDb.UserTable.Update(user);
             GeneratedSqlIs(
                 "update [dbo].[USER_TABLE] set [NAME] = @p1, [PASSWORD] = @p2, [AGE] = @p3 where [dbo].[USER_TABLE].[ID] = @p4");
             Parameter(0).Is("Steve");
@@ -262,7 +262,7 @@ namespace Simple.Data.IntegrationTest
                 Age = 50,
                 RogueProperty = 42
             };
-            _db.Users.Update(user);
+            TargetDb.Users.Update(user);
             GeneratedSqlIs(
                 "update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4");
             Parameter(0).Is("Steve");
@@ -279,7 +279,7 @@ namespace Simple.Data.IntegrationTest
                                 new User { Id = 2, Name = "Bob", Age = 42 },
                                 new User { Id = 1, Name = "Steve", Age = 50 }
                             };
-            _db.Users.Update(users);
+            TargetDb.Users.Update(users);
             GeneratedSqlIs(
                 "update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4");
             Parameter(0).Is("Steve");
@@ -296,7 +296,7 @@ namespace Simple.Data.IntegrationTest
                                 new User { Id = 2, Name = "Bob", Age = 42 },
                                 new User { Id = 1, Name = "Steve", Age = 50 }
                             };
-            _db.Users.UpdateById(users);
+            TargetDb.Users.UpdateById(users);
             GeneratedSqlIs(
                 "update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4");
             Parameter(0).Is("Steve");
@@ -314,7 +314,7 @@ namespace Simple.Data.IntegrationTest
                                Name = "Steve",
                                Age = 50
                            };
-            _db.Users.UpdateById(user);
+            TargetDb.Users.UpdateById(user);
             GeneratedSqlIs(
                 "update [dbo].[Users] set [Name] = @p1, [Password] = @p2, [Age] = @p3 where [dbo].[Users].[Id] = @p4");
             Parameter(0).Is("Steve");
@@ -326,7 +326,7 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void TestThatUpdateUsesDbNullForNullValues()
         {
-            _db.Users.UpdateById(Id: 1, Name: null);
+            TargetDb.Users.UpdateById(Id: 1, Name: null);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Id] = @p2");
             Parameter(0).IsDBNull();
         }
@@ -334,7 +334,7 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void TestUpdateAll()
         {
-            _db.Users.UpdateAll(Name: "Steve");
+            TargetDb.Users.UpdateAll(Name: "Steve");
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1");
             Parameter(0).Is("Steve");
         }
@@ -342,7 +342,7 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void TestUpdateWithCriteria()
         {
-            _db.Users.UpdateAll(_db.Users.Age > 30, Name: "Steve");
+            TargetDb.Users.UpdateAll(TargetDb.Users.Age > 30, Name: "Steve");
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Age] > @p2");
             Parameter(0).Is("Steve");
             Parameter(1).Is(30);
@@ -352,7 +352,7 @@ namespace Simple.Data.IntegrationTest
         public void TestUpdateWithCriteriaWithNaturalJoin()
         {
             var yearAgo = DateTime.Today.Subtract(TimeSpan.FromDays(365));
-            _db.Users.UpdateAll(_db.Users.UserHistory.LastSeen < yearAgo, Name: "Dead User");
+            TargetDb.Users.UpdateAll(TargetDb.Users.UserHistory.LastSeen < yearAgo, Name: "Dead User");
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Id] in " +
                 "(select [dbo].[Users].[Id] from [dbo].[Users] join [dbo].[UserHistory] on ([dbo].[Users].[Id] = [dbo].[UserHistory].[UserId]) where [dbo].[UserHistory].[LastSeen] < @p2)");
             Parameter(0).Is("Dead User");
@@ -362,7 +362,7 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void TestUpdateWithCriteriaWithNaturalJoinOnCompoundKeyTable()
         {
-            _db.AnnoyingMaster.UpdateAll(_db.AnnoyingMaster.AnnoyingDetail.Value < 42, Text: "Really annoying");
+            TargetDb.AnnoyingMaster.UpdateAll(TargetDb.AnnoyingMaster.AnnoyingDetail.Value < 42, Text: "Really annoying");
             GeneratedSqlIs("update [dbo].[AnnoyingMaster] set [Text] = @p1 where exists " +
                 "(select 1 from [dbo].[AnnoyingMaster] [_updatejoin] join [dbo].[AnnoyingDetail] on ([_updatejoin].[Id1] = [dbo].[AnnoyingDetail].[MasterId1] and [_updatejoin].[Id2] = [dbo].[AnnoyingDetail].[MasterId2]) "+
                 "where [dbo].[AnnoyingDetail].[Value] < @p2 and ([_updatejoin].[Id1] = [dbo].[AnnoyingMaster].[Id1] and [_updatejoin].[Id2] = [dbo].[AnnoyingMaster].[Id2]))");
@@ -374,7 +374,7 @@ namespace Simple.Data.IntegrationTest
         public void TestUpdateWithCriteriaAndDictionary()
         {
             var data = new Dictionary<string, object> { { "Name", "Steve" } };
-            _db.Users.UpdateAll(_db.Users.Age > 30, data);
+            TargetDb.Users.UpdateAll(TargetDb.Users.Age > 30, data);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Age] > @p2");
             Parameter(0).Is("Steve");
             Parameter(1).Is(30);
@@ -383,7 +383,7 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void TestUpdateWithCriteriaAsNamedArg()
         {
-            _db.Users.UpdateAll(Name: "Steve", Condition: _db.Users.Age > 30);
+            TargetDb.Users.UpdateAll(Name: "Steve", Condition: TargetDb.Users.Age > 30);
             GeneratedSqlIs("update [dbo].[Users] set [Name] = @p1 where [dbo].[Users].[Age] > @p2");
             Parameter(0).Is("Steve");
             Parameter(1).Is(30);

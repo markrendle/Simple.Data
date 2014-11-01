@@ -10,8 +10,8 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void HavingClauseWithNaturalJoin()
         {
-            var q = _db.Customers.Query()
-                .Having(_db.Customers.Orders.OrderDate.Max() < new DateTime(2011, 1, 1));
+            var q = TargetDb.Customers.Query()
+                .Having(TargetDb.Customers.Orders.OrderDate.Max() < new DateTime(2011, 1, 1));
 
             EatException<InvalidOperationException>(() => q.ToList());
 
@@ -24,8 +24,8 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void HavingClauseWithDetailTableCount()
         {
-            var q = _db.Customers.Query()
-                .Having(_db.Customers.Orders.OrderId.Count() >= 100);
+            var q = TargetDb.Customers.Query()
+                .Having(TargetDb.Customers.Orders.OrderId.Count() >= 100);
 
             EatException<InvalidOperationException>(() => q.ToList());
 
@@ -38,9 +38,9 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void BasicHavingClause()
         {
-            var q = _db.Orders.Query()
-                .Select(_db.Orders.CustomerId)
-                .Having(_db.Orders.OrderDate.Max() <= new DateTime(2011, 1, 1));
+            var q = TargetDb.Orders.Query()
+                .Select(TargetDb.Orders.CustomerId)
+                .Having(TargetDb.Orders.OrderDate.Max() <= new DateTime(2011, 1, 1));
 
             EatException<InvalidOperationException>(() => q.ToList());
 

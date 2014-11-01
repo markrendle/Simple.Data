@@ -39,9 +39,9 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void JoinWithExplicitClauseUsingNamedParameters()
         {
-            var q = _db.Employees.Query()
-                .Join(_db.Department, Id: _db.Employees.DepartmentId)
-                .Select(_db.Employees.Name, _db.Department.Name.As("Department"));
+            var q = TargetDb.Employees.Query()
+                .Join(TargetDb.Department, Id: TargetDb.Employees.DepartmentId)
+                .Select(TargetDb.Employees.Name, TargetDb.Department.Name.As("Department"));
 
             try
             {
@@ -59,9 +59,9 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void OuterJoinWithExplicitClauseUsingNamedParameters()
         {
-            var q = _db.Employees.Query()
-                .OuterJoin(_db.Department, Id: _db.Employees.DepartmentId)
-                .Select(_db.Employees.Name, _db.Department.Name.As("Department"));
+            var q = TargetDb.Employees.Query()
+                .OuterJoin(TargetDb.Department, Id: TargetDb.Employees.DepartmentId)
+                .Select(TargetDb.Employees.Name, TargetDb.Department.Name.As("Department"));
 
             try
             {
@@ -79,9 +79,9 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void LeftJoinWithExplicitClauseUsingNamedParameters()
         {
-            var q = _db.Employees.Query()
-                .LeftJoin(_db.Department, Id: _db.Employees.DepartmentId)
-                .Select(_db.Employees.Name, _db.Department.Name.As("Department"));
+            var q = TargetDb.Employees.Query()
+                .LeftJoin(TargetDb.Department, Id: TargetDb.Employees.DepartmentId)
+                .Select(TargetDb.Employees.Name, TargetDb.Department.Name.As("Department"));
 
             try
             {
@@ -99,9 +99,9 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void JoinWithExplicitClauseUsingExpression()
         {
-            var q = _db.Employees.Query()
-                .Join(_db.Department).On(_db.Department.Id == _db.Employees.DepartmentId)
-                .Select(_db.Employees.Name, _db.Department.Name.As("Department"));
+            var q = TargetDb.Employees.Query()
+                .Join(TargetDb.Department).On(TargetDb.Department.Id == TargetDb.Employees.DepartmentId)
+                .Select(TargetDb.Employees.Name, TargetDb.Department.Name.As("Department"));
 
             try
             {
@@ -119,9 +119,9 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void LeftJoinWithExplicitClauseUsingExpression()
         {
-            var q = _db.Employees.Query()
-                .LeftJoin(_db.Department).On(_db.Department.Id == _db.Employees.DepartmentId)
-                .Select(_db.Employees.Name, _db.Department.Name.As("Department"));
+            var q = TargetDb.Employees.Query()
+                .LeftJoin(TargetDb.Department).On(TargetDb.Department.Id == TargetDb.Employees.DepartmentId)
+                .Select(TargetDb.Employees.Name, TargetDb.Department.Name.As("Department"));
 
             try
             {
@@ -139,10 +139,10 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void SelfJoinWithExplicitClauseUsingNamedParameters()
         {
-            var q = _db.Employees.Query()
-                .Join(_db.Employees.As("Manager"), Id: _db.Employees.ManagerId);
+            var q = TargetDb.Employees.Query()
+                .Join(TargetDb.Employees.As("Manager"), Id: TargetDb.Employees.ManagerId);
 
-            q = q.Select(_db.Employees.Name, q.Manager.Name.As("Manager"));
+            q = q.Select(TargetDb.Employees.Name, q.Manager.Name.As("Manager"));
 
             try
             {
@@ -160,10 +160,10 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void LeftSelfJoinWithExplicitClauseUsingNamedParameters()
         {
-            var q = _db.Employees.Query()
-                .LeftJoin(_db.Employees.As("Manager"), Id: _db.Employees.ManagerId);
+            var q = TargetDb.Employees.Query()
+                .LeftJoin(TargetDb.Employees.As("Manager"), Id: TargetDb.Employees.ManagerId);
 
-            q = q.Select(_db.Employees.Name, q.Manager.Name.As("Manager"));
+            q = q.Select(TargetDb.Employees.Name, q.Manager.Name.As("Manager"));
 
             try
             {
@@ -182,9 +182,9 @@ namespace Simple.Data.IntegrationTest.Query
         public void SelfJoinWithExplicitClauseUsingOutParameterAndNamedParameters()
         {
             dynamic manager;
-            var q = _db.Employees.Query()
-                .Join(_db.Employees.As("Manager"), out manager).On(Id: _db.Employees.ManagerId)
-                .Select(_db.Employees.Name, manager.Name.As("Manager"));
+            var q = TargetDb.Employees.Query()
+                .Join(TargetDb.Employees.As("Manager"), out manager).On(Id: TargetDb.Employees.ManagerId)
+                .Select(TargetDb.Employees.Name, manager.Name.As("Manager"));
 
             try
             {
@@ -203,9 +203,9 @@ namespace Simple.Data.IntegrationTest.Query
         public void LeftSelfJoinWithExplicitClauseUsingOutParameterAndNamedParameters()
         {
             dynamic manager;
-            var q = _db.Employees.Query()
-                .LeftJoin(_db.Employees.As("Manager"), out manager).On(Id: _db.Employees.ManagerId)
-                .Select(_db.Employees.Name, manager.Name.As("Manager"));
+            var q = TargetDb.Employees.Query()
+                .LeftJoin(TargetDb.Employees.As("Manager"), out manager).On(Id: TargetDb.Employees.ManagerId)
+                .Select(TargetDb.Employees.Name, manager.Name.As("Manager"));
 
             try
             {
@@ -223,9 +223,9 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void SelfJoinWithExplicitClauseUsingExpression()
         {
-            var q = _db.Employees.Query();
-            q = q.Join(_db.Employees.As("Manager")).On(q.Manager.Id == _db.Employees.ManagerId);
-            q = q.Select(_db.Employees.Name, q.Manager.Name.As("Manager"));
+            var q = TargetDb.Employees.Query();
+            q = q.Join(TargetDb.Employees.As("Manager")).On(q.Manager.Id == TargetDb.Employees.ManagerId);
+            q = q.Select(TargetDb.Employees.Name, q.Manager.Name.As("Manager"));
 
             try
             {
@@ -244,9 +244,9 @@ namespace Simple.Data.IntegrationTest.Query
         public void SelfJoinWithExplicitClauseUsingExpressionAndOutParameter()
         {
             dynamic manager;
-            var q = _db.Employees.Query()
-                .Join(_db.Employees.As("Manager"), out manager).On(manager.Id == _db.Employees.ManagerId)
-                .Select(_db.Employees.Name, manager.Name.As("Manager"));
+            var q = TargetDb.Employees.Query()
+                .Join(TargetDb.Employees.As("Manager"), out manager).On(manager.Id == TargetDb.Employees.ManagerId)
+                .Select(TargetDb.Employees.Name, manager.Name.As("Manager"));
 
             EatException(() => q.ToList());
 
@@ -257,17 +257,17 @@ namespace Simple.Data.IntegrationTest.Query
         [Test]
         public void TwoJoins()
         {
-            _db.Activity.Query()
-                .Join(_db.Activity_Join).On(_db.Activity.ID_Activity == _db.Activity_Join.ID_Activity)
-                .Join(_db.Location).On(_db.Activity_Join.ID_Location == _db.Location.ID_Location)
-                .Where(_db.Activity.ID_trip == 1 &&
-                       _db.Activity.Activity_Time == 'D' &&
-                       _db.Activity.Is_Public == true)
+            TargetDb.Activity.Query()
+                .Join(TargetDb.Activity_Join).On(TargetDb.Activity.ID_Activity == TargetDb.Activity_Join.ID_Activity)
+                .Join(TargetDb.Location).On(TargetDb.Activity_Join.ID_Location == TargetDb.Location.ID_Location)
+                .Where(TargetDb.Activity.ID_trip == 1 &&
+                       TargetDb.Activity.Activity_Time == 'D' &&
+                       TargetDb.Activity.Is_Public == true)
                 .Select(
-                    _db.Activity.ID_Activity
-                    , _db.Activity.ID_Trip
-                    , _db.Activity.Activity_Time
-                    , _db.Activity.Is_Public)
+                    TargetDb.Activity.ID_Activity
+                    , TargetDb.Activity.ID_Trip
+                    , TargetDb.Activity.Activity_Time
+                    , TargetDb.Activity.Is_Public)
                 .ToList<Activity>();
 
             GeneratedSqlIs("select [dbo].[Activity].[ID_Activity],[dbo].[Activity].[ID_Trip],[dbo].[Activity].[Activity_Time],[dbo].[Activity].[Is_Public] " +
@@ -280,21 +280,21 @@ namespace Simple.Data.IntegrationTest.Query
         public void PassingTrueToOnThrowsBadExpressionException()
         {
             Assert.Throws<BadExpressionException>(
-                () => _db.Activity.All().Join(_db.Location).On(true));
+                () => TargetDb.Activity.All().Join(TargetDb.Location).On(true));
         }
 
         [Test]
         public void PassingObjectReferenceToOnThrowsBadExpressionException()
         {
             Assert.Throws<BadExpressionException>(
-                () => _db.Activity.All().Join(_db.Location).On(_db.Location.ID_Location));
+                () => TargetDb.Activity.All().Join(TargetDb.Location).On(TargetDb.Location.ID_Location));
         }
 
         [Test]
         public void PassingTablesWrongWayRoundThrowsBadExpressionException()
         {
             Assert.Throws<BadJoinExpressionException>(
-                () => _db.Activity.All().Join(_db.Activity, LocationId: _db.Location.ID_Location));
+                () => TargetDb.Activity.All().Join(TargetDb.Activity, LocationId: TargetDb.Location.ID_Location));
         }
 
         class Activity

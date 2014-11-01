@@ -8,6 +8,7 @@ namespace Simple.Data.Ado
     using System.Data;
     using System.Data.SqlClient;
     using System.Linq;
+    using System.Threading.Tasks;
     using Extensions;
 
     public partial class AdoAdapter : IAdapterWithTransactions
@@ -48,7 +49,7 @@ namespace Simple.Data.Ado
             return bulkUpdater.Update(this, tableName, data.ToList(), ((AdoAdapterTransaction)transaction).DbTransaction);
         }
 
-        private int Update(string tableName, IReadOnlyDictionary<string, object> data, IAdapterTransaction adapterTransaction)
+        private Task<int> Update(string tableName, IReadOnlyDictionary<string, object> data, IAdapterTransaction adapterTransaction)
         {
             string[] keyFieldNames = GetKeyNames(tableName).ToArray();
             if (keyFieldNames.Length == 0) throw new AdoAdapterException(string.Format("No primary key found for implicit update of table '{0}'.", tableName));
@@ -91,9 +92,9 @@ namespace Simple.Data.Ado
                                                                                                      operation.KeyValues);
         }
 
-        public IEnumerable<IDictionary<string, object>> RunQuery(SimpleQuery query, IAdapterTransaction transaction, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
+        public Task<IEnumerable<IDictionary<string, object>>> RunQuery(SimpleQuery query, IAdapterTransaction transaction, List<SimpleQueryClauseBase> unhandledClauses)
         {
-            return new AdoAdapterQueryRunner(this, (AdoAdapterTransaction)transaction).RunQuery(query, out unhandledClauses);
+            return new AdoAdapterQueryRunner(this, (AdoAdapterTransaction)transaction).RunQuery(query, unhandledClauses);
         }
 
         public IEnumerable<IDictionary<string, object>> Find(QueryOperation operation,
@@ -102,39 +103,39 @@ namespace Simple.Data.Ado
             throw new NotImplementedException();
         }
 
-        public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data,
+        public Task<IDictionary<string, object>> Insert(string tableName, IDictionary<string, object> data,
                                                   IAdapterTransaction transaction, bool resultRequired)
         {
             return new AdoAdapterInserter(this, ((AdoAdapterTransaction)transaction).DbTransaction).Insert(tableName,
                                                                                                           data, resultRequired);
         }
 
-        public int Update(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria,
+        public Task<int> Update(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria,
                           IAdapterTransaction transaction)
         {
             ICommandBuilder commandBuilder = new UpdateHelper(_schema).GetUpdateCommand(tableName, data, criteria);
             return Execute(commandBuilder, transaction);
         }
 
-        public int Delete(string tableName, SimpleExpression criteria, IAdapterTransaction transaction)
+        public Task<int> Delete(string tableName, SimpleExpression criteria, IAdapterTransaction transaction)
         {
             ICommandBuilder commandBuilder = new DeleteHelper(_schema).GetDeleteCommand(tableName, criteria);
             return Execute(commandBuilder, transaction);
         }
 
-        private IDictionary<string, object> Upsert(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria, bool resultRequired, IAdapterTransaction adapterTransaction)
+        private Task<IDictionary<string, object>> Upsert(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria, bool resultRequired, IAdapterTransaction adapterTransaction)
         {
             var transaction = ((AdoAdapterTransaction) adapterTransaction).DbTransaction;
             return new AdoAdapterUpserter(this, transaction).Upsert(tableName, data, criteria, resultRequired);
         }
 
-        private IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IReadOnlyDictionary<string, object>, Exception, bool> errorCallback)
+        private Task<IEnumerable<IDictionary<string, object>>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IReadOnlyDictionary<string, object>, Exception, bool> errorCallback)
         {
             var transaction = ((AdoAdapterTransaction) adapterTransaction).DbTransaction;
             return new AdoAdapterUpserter(this, transaction).UpsertMany(tableName, list, isResultRequired, errorCallback);
         }
 
-        private IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list, IEnumerable<string> keyFieldNames, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IReadOnlyDictionary<string, object>, Exception, bool> errorCallback)
+        private Task<IEnumerable<IDictionary<string, object>>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list, IEnumerable<string> keyFieldNames, IAdapterTransaction adapterTransaction, bool isResultRequired, Func<IReadOnlyDictionary<string, object>, Exception, bool> errorCallback)
         {
             var transaction = ((AdoAdapterTransaction) adapterTransaction).DbTransaction;
             return new AdoAdapterUpserter(this, transaction).UpsertMany(tableName, list, keyFieldNames.ToArray(), isResultRequired, errorCallback);

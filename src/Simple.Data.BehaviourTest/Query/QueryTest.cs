@@ -37,8 +37,8 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void SpecifyingColumnsShouldRestrictSelect()
         {
-            _db.Users.All()
-                .Select(_db.Users.Name, _db.Users.Password)
+            TargetDb.Users.All()
+                .Select(TargetDb.Users.Name, TargetDb.Users.Password)
                 .ToList();
             GeneratedSqlIs("select [dbo].[users].[name],[dbo].[users].[password] from [dbo].[users]");
         }
@@ -46,8 +46,8 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void SpecifyingColumnStarShouldSelectAllColumns()
         {
-            _db.Users.All()
-                .Select(_db.Users.Name, _db.Users.UserBio.Star())
+            TargetDb.Users.All()
+                .Select(TargetDb.Users.Name, TargetDb.Users.UserBio.Star())
                 .ToList();
             GeneratedSqlIs("select [dbo].[users].[name],[dbo].[userbio].[userid],[dbo].[userbio].[text] from [dbo].[users]" +
                 " left join [dbo].[userbio] on ([dbo].[users].[id] = [dbo].[userbio].[userid])");
@@ -56,8 +56,8 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void SpecifyingColumnAllColumnsShouldSelectAllColumns()
         {
-            _db.Users.All()
-                .Select(_db.Users.Name, _db.Users.UserBio.AllColumns())
+            TargetDb.Users.All()
+                .Select(TargetDb.Users.Name, TargetDb.Users.UserBio.AllColumns())
                 .ToList();
             GeneratedSqlIs("select [dbo].[users].[name],[dbo].[userbio].[userid],[dbo].[userbio].[text] from [dbo].[users]" +
                 " left join [dbo].[userbio] on ([dbo].[users].[id] = [dbo].[userbio].[userid])");
@@ -66,8 +66,8 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void SpecifyingColumnWithAliasShouldAddAsClause()
         {
-            _db.Users.All()
-                .Select(_db.Users.Name, _db.Users.Password.As("SuperSecretPassword"))
+            TargetDb.Users.All()
+                .Select(TargetDb.Users.Name, TargetDb.Users.Password.As("SuperSecretPassword"))
                 .ToList();
             GeneratedSqlIs("select [dbo].[users].[name],[dbo].[users].[password] as [supersecretpassword] from [dbo].[users]");
         }
@@ -75,8 +75,8 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void SpecifyingColumnMathsWithAliasShouldAddAsClause()
         {
-            _db.Users.All()
-                .Select(_db.Users.Name, (_db.Users.Id + _db.Users.Age).As("Nonsense"))
+            TargetDb.Users.All()
+                .Select(TargetDb.Users.Name, (TargetDb.Users.Id + TargetDb.Users.Age).As("Nonsense"))
                 .ToList();
             GeneratedSqlIs("select [dbo].[users].[name],([dbo].[users].[id] + [dbo].[users].[age]) as [nonsense] from [dbo].[users]");
         }
@@ -84,8 +84,8 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void SpecifyingColumnsFromOtherTablesShouldAddJoin()
         {
-            _db.Users.All()
-                .Select(_db.Users.Name, _db.Users.Password, _db.Users.UserBio.Text)
+            TargetDb.Users.All()
+                .Select(TargetDb.Users.Name, TargetDb.Users.Password, TargetDb.Users.UserBio.Text)
                 .ToList();
             GeneratedSqlIs(
                 "select [dbo].[users].[name],[dbo].[users].[password],[dbo].[userbio].[text] from [dbo].[users]" +
@@ -95,8 +95,8 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void SpecifyingColumnsAndAggregatesFromOtherTablesShouldAddJoins()
         {
-            _db.Users.All()
-                .Select(_db.Users.Name, _db.Users.Password, _db.Users.UserBio.Text, _db.Users.UserPayments.Amount.Sum())
+            TargetDb.Users.All()
+                .Select(TargetDb.Users.Name, TargetDb.Users.Password, TargetDb.Users.UserBio.Text, TargetDb.Users.UserPayments.Amount.Sum())
                 .ToList();
             GeneratedSqlIs(
                 "select [dbo].[users].[name],[dbo].[users].[password],[dbo].[userbio].[text],sum([dbo].[userpayment].[amount]) from [dbo].[users]" +
@@ -111,7 +111,7 @@ namespace Simple.Data.IntegrationTest
         {
             try
             {
-                _db.Users.All().Count();
+                TargetDb.Users.All().Count();
             }
             catch (SimpleDataException)
             {
@@ -126,7 +126,7 @@ namespace Simple.Data.IntegrationTest
         {
             try
             {
-                _db.Users.All().Exists();
+                TargetDb.Users.All().Exists();
             }
             catch (InvalidOperationException)
             {
@@ -141,7 +141,7 @@ namespace Simple.Data.IntegrationTest
         {
             try
             {
-                _db.Users.All().Any();
+                TargetDb.Users.All().Any();
             }
             catch (InvalidOperationException)
             {
@@ -156,7 +156,7 @@ namespace Simple.Data.IntegrationTest
         {
             try
             {
-                _db.Users.All().Select(_db.Users.Age.Min()).ToScalar();
+                TargetDb.Users.All().Select(TargetDb.Users.Age.Min()).ToScalar();
             }
             catch (InvalidOperationException)
             {
@@ -175,7 +175,7 @@ namespace Simple.Data.IntegrationTest
         {
             try
             {
-                _db.Users.All().Select(_db.Users.Name, _db.Users.Age.Min().As("Youngest")).ToList();
+                TargetDb.Users.All().Select(TargetDb.Users.Name, TargetDb.Users.Age.Min().As("Youngest")).ToList();
             }
             catch (InvalidOperationException)
             {
@@ -190,7 +190,7 @@ namespace Simple.Data.IntegrationTest
         {
             try
             {
-                _db.Users.All().Select(_db.Users.Name.Length(), _db.Users.Age.Min().As("Youngest")).ToList();
+                TargetDb.Users.All().Select(TargetDb.Users.Name.Length(), TargetDb.Users.Age.Min().As("Youngest")).ToList();
             }
             catch (InvalidOperationException)
             {
@@ -205,7 +205,7 @@ namespace Simple.Data.IntegrationTest
         {
             try
             {
-                _db.Users.All().Select(_db.Users.Name, _db.Users.Name.Length().As("NameLength")).ToList();
+                TargetDb.Users.All().Select(TargetDb.Users.Name, TargetDb.Users.Name.Length().As("NameLength")).ToList();
             }
             catch (InvalidOperationException)
             {
@@ -219,7 +219,7 @@ namespace Simple.Data.IntegrationTest
         {
             try
             {
-                _db.Users.QueryById(1).UserBio.ToList();
+                TargetDb.Users.QueryById(1).UserBio.ToList();
             }
             catch (InvalidOperationException)
             {
@@ -232,13 +232,13 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void SpecifyOrderByWithoutReferenceThrowsException()
         {
-            Assert.Throws<ArgumentException>(() => _db.Users.All().OrderBy(1));
+            Assert.Throws<ArgumentException>(() => TargetDb.Users.All().OrderBy(1));
         }
         
         [Test]
         public void SpecifyOrderByDescendingWithoutReferenceThrowsException()
         {
-            Assert.Throws<ArgumentException>(() => _db.Users.All().OrderByDescending(1));
+            Assert.Throws<ArgumentException>(() => TargetDb.Users.All().OrderByDescending(1));
         }
     }
 }

@@ -12,6 +12,7 @@ namespace Simple.Data.Ado
 
     class AdoAdapterInserter
     {
+        private static readonly IDictionary<string, object> NullDictionary = null;
         private readonly AdoAdapter _adapter;
         private readonly IDbConnection _connection;
         private readonly IDbTransaction _transaction;
@@ -47,7 +48,7 @@ namespace Simple.Data.Ado
             return bulkInserter.Insert(_adapter, tableName, list, _transaction, onError, resultRequired);
         }
 
-        public IDictionary<string, object> Insert(string tableName, IEnumerable<KeyValuePair<string, object>> data, bool resultRequired)
+        public Task<IDictionary<string, object>> Insert(string tableName, IEnumerable<KeyValuePair<string, object>> data, bool resultRequired)
         {
             var table = _adapter.GetSchema().FindTable(tableName);
             var dataArray = data.ToArray();
@@ -90,7 +91,7 @@ namespace Simple.Data.Ado
             }
 
             Execute(insertSql, dataDictionary.Keys, dataDictionary.Values);
-            return null;
+            return Task.FromResult(NullDictionary);
         }
 
         private void CheckInsertablePropertiesAreAvailable(Table table, IEnumerable<KeyValuePair<string, object>> data)
@@ -103,7 +104,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        internal IDictionary<string, object> ExecuteSingletonQuery(string sql, IEnumerable<Column> columns, IEnumerable<Object> values)
+        internal Task<IDictionary<string, object>> ExecuteSingletonQuery(string sql, IEnumerable<Column> columns, IEnumerable<Object> values)
         {
             if (_transaction != null)
             {
@@ -123,7 +124,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        internal IDictionary<string, object> ExecuteSingletonQuery(string insertSql, string selectSql, IEnumerable<Column> columns, IEnumerable<Object> values)
+        internal Task<IDictionary<string, object>> ExecuteSingletonQuery(string insertSql, string selectSql, IEnumerable<Column> columns, IEnumerable<Object> values)
         {
             if (_transaction != null)
             {
@@ -149,9 +150,9 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static IDictionary<string, object> TryExecuteSingletonQuery(IDbCommand command)
+        private async Task<IDictionary<string, object>> TryExecuteSingletonQuery(IDbCommand command)
         {
-            using (var reader = command.TryExecuteReader())
+            using (var reader = await _adapter.CommandExecutor.ExecuteReader(command))
             {
                 if (reader.Read())
                 {

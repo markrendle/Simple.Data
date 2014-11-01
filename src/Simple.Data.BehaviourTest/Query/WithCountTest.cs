@@ -30,7 +30,7 @@ namespace Simple.Data.IntegrationTest.Query
                 @"select [dbo].[users].[name],[dbo].[users].[password] from [dbo].[users] where [dbo].[users].[name] = @p1_c1";
 
             Future<int> count;
-            var q = _db.Users.QueryByName("Foo")
+            var q = TargetDb.Users.QueryByName("Foo")
                 .WithTotalCount(out count);
 
             EatException<InvalidOperationException>(() => q.ToList());
@@ -45,7 +45,7 @@ namespace Simple.Data.IntegrationTest.Query
                 @"select [dbo].[users].[name],[dbo].[users].[password] from [dbo].[users] where [dbo].[users].[name] = @p1_c1";
 
             Promise<int> count;
-            var q = _db.Users.QueryByName("Foo")
+            var q = TargetDb.Users.QueryByName("Foo")
                 .WithTotalCount(out count);
 
             EatException<InvalidOperationException>(() => q.ToList());
@@ -60,8 +60,8 @@ namespace Simple.Data.IntegrationTest.Query
                 @"select [dbo].[users].[name] from [dbo].[users] where [dbo].[users].[name] = @p1_c1";
 
             Promise<int> count;
-            var q = _db.Users.QueryByName("Foo")
-                .Select(_db.Users.Name)
+            var q = TargetDb.Users.QueryByName("Foo")
+                .Select(TargetDb.Users.Name)
                 .WithTotalCount(out count);
 
             EatException<InvalidOperationException>(() => q.ToList());

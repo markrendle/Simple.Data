@@ -13,9 +13,9 @@ namespace Simple.Data.SqlServer
         {
         }
 
-        public override ICommandBuilder Build(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
+        public override ICommandBuilder Build(SimpleQuery query, List<SimpleQueryClauseBase> unhandledClauses)
         {
-            _unhandledClauses = new List<SimpleQueryClauseBase>();
+            _unhandledClauses = unhandledClauses;
             SetQueryContext(query);
 
             HandleJoins();
@@ -24,7 +24,6 @@ namespace Simple.Data.SqlServer
             HandleHavingCriteria();
             HandleOrderBy();
 
-            unhandledClauses = _unhandledClauses;
             return _commandBuilder;
         }
 

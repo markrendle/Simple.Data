@@ -26,7 +26,7 @@
                 var originalValuesDict = operation.Originals.Single();
                 criteria = CreateCriteriaFromOriginalValues(adapter, operation.TableName, newValuesDict, originalValuesDict);
                 var changedValuesDict = CreateChangedValuesDict(newValuesDict, originalValuesDict);
-                return new CommandResult(Update(adapter, operation.TableName, changedValuesDict, criteria, transaction.TransactionOrDefault()));
+                return new CommandResult(await Update(adapter, operation.TableName, changedValuesDict, criteria, transaction.TransactionOrDefault()));
             }
 
             string[] keyFieldNames = adapter.GetKeyNames(operation.TableName).ToArray();
@@ -34,7 +34,7 @@
             var dict = checkedEnumerable.Single;
 
             criteria = Adapter.GetCriteria(operation.TableName, keyFieldNames, ref dict);
-            return new CommandResult(Update(adapter, operation.TableName, dict, criteria, transaction.TransactionOrDefault()));
+            return new CommandResult(await Update(adapter, operation.TableName, dict, criteria, transaction.TransactionOrDefault()));
         }
 
         private static Task<int> Update(AdoAdapter adapter, string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria, IDbTransaction transaction)

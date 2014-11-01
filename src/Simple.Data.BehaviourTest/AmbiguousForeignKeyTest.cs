@@ -1,9 +1,8 @@
 ﻿namespace Simple.Data.IntegrationTest
 {
     using Mocking.Ado;
-    using NUnit.Framework;
+    using Xunit;
 
-    [TestFixture]
     public class AmbiguousForeignKeyTest : DatabaseIntegrationContext
     {
         protected override void SetSchema(MockSchemaProvider schemaProvider)
@@ -21,8 +20,8 @@
                 new object[] { "FK_Fixture_AwayTeam", "dbo", "Fixture", "AwayTeamId", "dbo", "Team", "Id", 0 });
         }
 
-        [Test]
-        public void CanSelectTwoWithUsingExplicitJoin()
+        [Fact]
+        public async void CanSelectTwoWithUsingExplicitJoin()
         {
             const string expectedSql =
                 "select [dbo].[Fixture].[Id],[dbo].[Fixture].[HomeTeamId],[dbo].[Fixture].[AwayTeamId],[Home].[Id] AS [__withn__Home__Id],[Home].[Name] AS [__withn__Home__Name]," +
@@ -33,15 +32,15 @@
             dynamic homeTeam;
             dynamic awayTeam;
 
-            var q = _db.Fixture.All()
-                .Join(_db.Team.As("Home"), out homeTeam)
-                .On(_db.Fixture.HomeTeamId == homeTeam.Id)
-                .Join(_db.Team.As("Away"), out awayTeam)
-                .On(_db.Fixture.AwayTeamId == awayTeam.Id)
+            var q = TargetDb.Fixture.All()
+                .Join(TargetDb.Team.As("Home"), out homeTeam)
+                .On(TargetDb.Fixture.HomeTeamId == homeTeam.Id)
+                .Join(TargetDb.Team.As("Away"), out awayTeam)
+                .On(TargetDb.Fixture.AwayTeamId == awayTeam.Id)
                 .With(homeTeam)
                 .With(awayTeam);
 
-            EatException(() => q.ToList());
+            EatException(async () => await q.ToList());
             GeneratedSqlIs(expectedSql);
         }
     }

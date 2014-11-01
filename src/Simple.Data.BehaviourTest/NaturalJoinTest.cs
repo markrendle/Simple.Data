@@ -9,7 +9,8 @@ using Simple.Data.Mocking.Ado;
 
 namespace Simple.Data.IntegrationTest
 {
-    [TestFixture]
+    using Xunit;
+
     public class NaturalJoinTest : DatabaseIntegrationContext
     {
         protected override void SetSchema(MockSchemaProvider schemaProvider)
@@ -24,27 +25,27 @@ namespace Simple.Data.IntegrationTest
             schemaProvider.SetForeignKeys(new object[] { "FK_Orders_Customer", "dbo", "Orders", "CustomerId", "dbo", "Customer", "CustomerId", 0 });
         }
 
-        [Test]
-        public void NaturalJoinCreatesCorrectCommand()
+        [Fact]
+        public async void NaturalJoinCreatesCorrectCommand()
         {
             var orderDate = new DateTime(2010, 1, 1);
             const string expectedSql =
                 "select [dbo].[Customer].[CustomerId] from [dbo].[Customer] join [dbo].[Orders] on ([dbo].[Customer].[CustomerId] = [dbo].[Orders].[CustomerId]) where [dbo].[Orders].[OrderDate] = @p1";
 
-            _db.Customer.Find(_db.Customer.Orders.OrderDate == orderDate);
+            await TargetDb.Customer.Find(TargetDb.Customer.Orders.OrderDate == orderDate);
             GeneratedSqlIs(expectedSql);
 
             Parameter(0).Is(orderDate);
         }
 
-        [Test]
-        public void NaturalJoinViaFindAllCreatesCorrectCommand()
+        [Fact]
+        public async void NaturalJoinViaFindAllCreatesCorrectCommand()
         {
             var orderDate = new DateTime(2010, 1, 1);
             const string expectedSql =
                 "select [dbo].[Customer].[CustomerId] from [dbo].[Customer] join [dbo].[Orders] on ([dbo].[Customer].[CustomerId] = [dbo].[Orders].[CustomerId]) where [dbo].[Orders].[OrderDate] = @p1";
 
-            _db.Customer.FindAll(_db.Customer.Orders.OrderDate == orderDate).ToList<dynamic>();
+            await TargetDb.Customer.FindAll(TargetDb.Customer.Orders.OrderDate == orderDate).ToList<dynamic>();
             GeneratedSqlIs(expectedSql);
 
             Parameter(0).Is(orderDate);

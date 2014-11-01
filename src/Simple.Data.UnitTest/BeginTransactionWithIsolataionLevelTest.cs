@@ -6,6 +6,8 @@ using Simple.Data.Operations;
 
 namespace Simple.Data.UnitTest
 {
+    using System.Threading.Tasks;
+
     [TestFixture]
     class BeginTransactionWithIsolataionLevelTest
     {
@@ -58,7 +60,7 @@ namespace Simple.Data.UnitTest
             return null;
         }
 
-        public OperationResult Execute(IOperation operation, IAdapterTransaction transaction)
+        public Task<OperationResult> Execute(IOperation operation, IAdapterTransaction transaction)
         {
             throw new NotImplementedException();
         }

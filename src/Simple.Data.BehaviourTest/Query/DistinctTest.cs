@@ -20,7 +20,7 @@ namespace Simple.Data.IntegrationTest.Query
         {
             const string expected = @"select distinct [dbo].[users].[name],[dbo].[users].[password] from [dbo].[users] where [dbo].[users].[name] = @p1";
 
-            var q = _db.Users.QueryByName("Foo")
+            var q = TargetDb.Users.QueryByName("Foo")
                 .Distinct();
 
             EatException<InvalidOperationException>(() => q.ToList());
@@ -33,7 +33,7 @@ namespace Simple.Data.IntegrationTest.Query
         {
             const string expected = @"select [dbo].[users].[name],[dbo].[users].[password] from [dbo].[users] where [dbo].[users].[name] = @p1";
 
-            var q = _db.Users.QueryByName("Foo");
+            var q = TargetDb.Users.QueryByName("Foo");
 
             EatException<InvalidOperationException>(() => q.ToList());
 

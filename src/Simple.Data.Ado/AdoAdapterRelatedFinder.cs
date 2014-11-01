@@ -9,6 +9,8 @@ using Simple.Data.Operations;
 
 namespace Simple.Data.Ado
 {
+    using System.Threading.Tasks;
+
     class AdoAdapterRelatedFinder
     {
         private readonly Lazy<ConcurrentDictionary<Tuple<string, string>, TableJoin>> _tableJoins =
@@ -61,13 +63,13 @@ namespace Simple.Data.Ado
             return _adapter.GetSchema().FindTable(tableName).GetDetail(relatedTableName);
         }
 
-        private IDictionary<string, object> GetMaster(IDictionary<string, object> row, TableJoin masterJoin, DataStrategy database)
+        private async Task<IDictionary<string, object>> GetMaster(IDictionary<string, object> row, TableJoin masterJoin, DataStrategy database)
         {
             //throw new NotImplementedException();
             var criteria = new Dictionary<string, object> { { masterJoin.MasterColumn.ActualName, row[masterJoin.DetailColumn.HomogenizedName] } };
             var expression = ExpressionHelper.CriteriaDictionaryToExpression(masterJoin.Master.ActualName, criteria);
-            IEnumerable<SimpleQueryClauseBase> _;
-            return _adapter.RunQuery(new SimpleQuery(database, masterJoin.Master.ActualName).Where(expression), null, out _).FirstOrDefault();
+            var _ = new List<SimpleQueryClauseBase>();
+            return (await _adapter.RunQuery(new SimpleQuery(database, masterJoin.Master.ActualName).Where(expression), null, _)).FirstOrDefault();
         }
 
         private SimpleQuery GetDetail(IDictionary<string, object> row, TableJoin join)

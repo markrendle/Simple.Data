@@ -27,7 +27,7 @@ namespace Simple.Data.IntegrationTest.Query
             const string expected = @"select [dbo].[users].[name],[dbo].[users].[password] from [dbo].[users] where substring([dbo].[users].[name],@p1,@p2) = @p3";
 
             EatException<InvalidOperationException>(() =>
-                _db.Users.FindAll(_db.Users.Name.Substring(0, 1) == "A").ToList());
+                TargetDb.Users.FindAll(TargetDb.Users.Name.Substring(0, 1) == "A").ToList());
 
             GeneratedSqlIs(expected);
             Parameter(0).Is(0);
@@ -40,7 +40,7 @@ namespace Simple.Data.IntegrationTest.Query
         {
             const string expected = @"select " + usersColumns + " from [dbo].[users] where substring([dbo].[users].[name],@p1,@p2) = @p3";
 
-            _db.Users.Find(_db.Users.Name.Substring(0, 1) == "A");
+            TargetDb.Users.Find(TargetDb.Users.Name.Substring(0, 1) == "A");
 
             GeneratedSqlIs(expected);
             Parameter(0).Is(0);
@@ -54,9 +54,9 @@ namespace Simple.Data.IntegrationTest.Query
             const string expected =
                 @"select substring([dbo].[users].[name],@p1,@p2) as [foo],max(substring([dbo].[users].[name],@p3,@p4)) as [bar] from [dbo].[users] group by substring([dbo].[users].[name],@p5,@p6) order by bar desc";
 
-            var column1 = _db.Users.Name.Substring(0, 5).As("Foo");
-            var column2 = _db.Users.Name.Substring(5, 5).Max().As("Bar");
-            EatException<InvalidOperationException>( () => _db.Users.All()
+            var column1 = TargetDb.Users.Name.Substring(0, 5).As("Foo");
+            var column2 = TargetDb.Users.Name.Substring(5, 5).Max().As("Bar");
+            EatException<InvalidOperationException>( () => TargetDb.Users.All()
                                                                .Select(column1, column2)
                                                                .OrderByBarDescending()
                                                                .ToList());
@@ -70,7 +70,7 @@ namespace Simple.Data.IntegrationTest.Query
             const string expected =
                 @"select [dbo].[users].[name],count(distinct isnull([dbo].[users].[password],@p1)) as [c] from [dbo].[users] group by [dbo].[users].[name]";
             EatException<InvalidOperationException>(
-                () => _db.Users.All().Select(_db.Users.Name, _db.Users.Password.IsNull("No Password").CountDistinct().As("c")).ToList());
+                () => TargetDb.Users.All().Select(TargetDb.Users.Name, TargetDb.Users.Password.IsNull("No Password").CountDistinct().As("c")).ToList());
             GeneratedSqlIs(expected);
         }
     }

@@ -1,9 +1,8 @@
 namespace Simple.Data.IntegrationTest
 {
     using Mocking.Ado;
-    using NUnit.Framework;
+    using Xunit;
 
-    [TestFixture]
     public class DeleteTest : DatabaseIntegrationContext
     {
         protected override void SetSchema(MockSchemaProvider schemaProvider)
@@ -16,41 +15,41 @@ namespace Simple.Data.IntegrationTest
             schemaProvider.SetPrimaryKeys(new object[] { "dbo", "Users", "Id", 0 });
         }
 
-        [Test]
-        public void TestDeleteWithNamedArguments()
+        [Fact]
+        public async void TestDeleteWithNamedArguments()
         {
-            _db.Users.Delete(Id: 1);
+            await TargetDb.Users.Delete(Id: 1);
             GeneratedSqlIs("delete from [dbo].[Users] where [dbo].[Users].[Id] = @p1");
             Parameter(0).Is(1);
         }
 
-        [Test]
-        public void TestDeleteBy()
+        [Fact]
+        public async void TestDeleteBy()
         {
-            _db.Users.DeleteById(1);
+            await TargetDb.Users.DeleteById(1);
             GeneratedSqlIs("delete from [dbo].[Users] where [dbo].[Users].[Id] = @p1");
             Parameter(0).Is(1);
         }
 
-        [Test]
-        public void TestDeleteAllWithNoCriteria()
+        [Fact]
+        public async void TestDeleteAllWithNoCriteria()
         {
-            _db.Users.DeleteAll();
+            await TargetDb.Users.DeleteAll();
             GeneratedSqlIs("delete from [dbo].[Users]");
         }
 
-        [Test]
-        public void TestDeleteAllWithSimpleCriteria()
+        [Fact]
+        public async void TestDeleteAllWithSimpleCriteria()
         {
-            _db.Users.DeleteAll(_db.Users.Age > 42);
+            await TargetDb.Users.DeleteAll(TargetDb.Users.Age > 42);
             GeneratedSqlIs("delete from [dbo].[Users] where [dbo].[Users].[Age] > @p1");
             Parameter(0).Is(42);
         }
 
-        [Test]
-        public void TestDeleteAllMoreComplexCriteria()
+        [Fact]
+        public async void TestDeleteAllMoreComplexCriteria()
         {
-            _db.Users.DeleteAll(_db.Users.Age > 42 && _db.Users.Name.Like("J%"));
+            await TargetDb.Users.DeleteAll(TargetDb.Users.Age > 42 && TargetDb.Users.Name.Like("J%"));
             GeneratedSqlIs("delete from [dbo].[Users] where ([dbo].[Users].[Age] > @p1 AND [dbo].[Users].[Name] LIKE @p2)");
             Parameter(0).Is(42);
             Parameter(1).Is("J%");

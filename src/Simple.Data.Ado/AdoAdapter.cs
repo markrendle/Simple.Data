@@ -180,7 +180,7 @@
                     && args[0] is string);
         }
 
-        private IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data, bool resultRequired)
+        private Task<IDictionary<string, object>> Insert(string tableName, IDictionary<string, object> data, bool resultRequired)
         {
             return new AdoAdapterInserter(this).Insert(tableName, data, resultRequired);
         }
@@ -288,19 +288,19 @@
             return _schema ?? (_schema = DatabaseSchema.Get(_connectionProvider, _providerHelper));
         }
 
-        private IDictionary<string, object> Upsert(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria, bool resultRequired)
+        private Task<IDictionary<string, object>> Upsert(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria, bool resultRequired)
         {
             return new AdoAdapterUpserter(this).Upsert(tableName, data, criteria, resultRequired);
         }
 
-        private IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list, bool isResultRequired,
+        private Task<IEnumerable<IDictionary<string, object>>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list, bool isResultRequired,
             Func<IReadOnlyDictionary<string, object>, Exception, bool> errorCallback)
         {
             var upserter = new AdoAdapterUpserter(this);
             return upserter.UpsertMany(tableName, list, isResultRequired, errorCallback);
         }
 
-        private IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list,
+        private Task<IEnumerable<IDictionary<string, object>>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list,
             IEnumerable<string> keyFieldNames, bool isResultRequired, Func<IReadOnlyDictionary<string, object>, Exception, bool> errorCallback)
         {
             return new AdoAdapterUpserter(this).UpsertMany(tableName, list, keyFieldNames.ToArray(), isResultRequired, errorCallback);

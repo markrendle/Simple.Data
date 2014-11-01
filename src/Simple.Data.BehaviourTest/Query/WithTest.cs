@@ -71,7 +71,7 @@ namespace Simple.Data.IntegrationTest.Query
                 "[dbo].[department].[id] as [__with1__department__id],[dbo].[department].[name] as [__with1__department__name]"+
                 " from [dbo].[employee] left join [dbo].[department] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])";
 
-            var q = _db.Employees.All().WithDepartment();
+            var q = TargetDb.Employees.All().WithDepartment();
 
             EatException(() => q.ToList());
 
@@ -87,7 +87,7 @@ namespace Simple.Data.IntegrationTest.Query
                 "[dbo].[employee].[managerid] as [__withn__employees__managerid],[dbo].[employee].[departmentid] as [__withn__employees__departmentid]"+
                 " from [dbo].[department] left join [dbo].[employee] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])";
 
-            var q = _db.Departments.All().WithEmployees();
+            var q = TargetDb.Departments.All().WithEmployees();
 
             EatException(() => q.ToList());
 
@@ -102,7 +102,7 @@ namespace Simple.Data.IntegrationTest.Query
                 "[dbo].[department].[id] as [__with1__department__id],[dbo].[department].[name] as [__with1__department__name]" +
                 " from [dbo].[employee] left join [dbo].[department] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])";
 
-            var q = _db.Employees.All().With(_db.Employees.Department);
+            var q = TargetDb.Employees.All().With(TargetDb.Employees.Department);
 
             EatException(() => q.ToList());
 
@@ -118,7 +118,7 @@ namespace Simple.Data.IntegrationTest.Query
                 "[dbo].[employee].[managerid] as [__with1__employee__managerid],[dbo].[employee].[departmentid] as [__with1__employee__departmentid]" +
                 " from [dbo].[department] left join [dbo].[employee] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])";
 
-            var q = _db.Departments.All().WithOne(_db.Departments.Employee);
+            var q = TargetDb.Departments.All().WithOne(TargetDb.Departments.Employee);
 
             EatException(() => q.ToList());
 
@@ -133,7 +133,7 @@ namespace Simple.Data.IntegrationTest.Query
                 "[foo].[id] as [__with1__foo__id],[foo].[name] as [__with1__foo__name]" +
                 " from [dbo].[employee] left join [dbo].[department] [foo] on ([foo].[id] = [dbo].[employee].[departmentid])";
 
-            var q = _db.Employees.All().With(_db.Employees.Department.As("Foo"));
+            var q = TargetDb.Employees.All().With(TargetDb.Employees.Department.As("Foo"));
 
             EatException(() => q.ToList());
 
@@ -152,7 +152,7 @@ namespace Simple.Data.IntegrationTest.Query
                 "left join [dbo].[activity_join] on ([dbo].[activity].[id] = [dbo].[activity_join].[id_activity]) "+
                 "left join [dbo].[location] on ([dbo].[location].[id] = [dbo].[activity_join].[id_location])";
 
-            var q = _db.Activity.All().With(_db.Activity.ActivityJoin.Location);
+            var q = TargetDb.Activity.All().With(TargetDb.Activity.ActivityJoin.Location);
 
             EatException(() => q.ToList());
 
@@ -169,8 +169,8 @@ namespace Simple.Data.IntegrationTest.Query
                 " from [dbo].[employee] left join [dbo].[employee] [manager] on ([manager].[id] = [dbo].[employee].[managerid])";
 
             dynamic manager;
-            var q = _db.Employees.All()
-                .OuterJoin(_db.Employees.As("Manager"), out manager).On(Id: _db.Employees.ManagerId)
+            var q = TargetDb.Employees.All()
+                .OuterJoin(TargetDb.Employees.As("Manager"), out manager).On(Id: TargetDb.Employees.ManagerId)
                 .With(manager);
 
             EatException(() => q.ToList());
@@ -188,8 +188,8 @@ namespace Simple.Data.IntegrationTest.Query
                 " from [dbo].[employee] left join [dbo].[employee] [manager] on ([manager].[id] = [dbo].[employee].[managerid])";
 
             dynamic manager;
-            var q = _db.Employees.All()
-                .OuterJoin(_db.Employees.As("Manager"), out manager).On(Id: _db.Employees.ManagerId)
+            var q = TargetDb.Employees.All()
+                .OuterJoin(TargetDb.Employees.As("Manager"), out manager).On(Id: TargetDb.Employees.ManagerId)
                 .WithOne(manager);
 
             EatException(() => q.ToList());
@@ -209,8 +209,8 @@ namespace Simple.Data.IntegrationTest.Query
                 " left join [dbo].[department] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])";
 
             dynamic manager;
-            var q = _db.Employees.All()
-                .OuterJoin(_db.Employees.As("Manager"), out manager).On(Id: _db.Employees.ManagerId)
+            var q = TargetDb.Employees.All()
+                .OuterJoin(TargetDb.Employees.As("Manager"), out manager).On(Id: TargetDb.Employees.ManagerId)
                 .With(manager)
                 .WithDepartment();
 
@@ -232,7 +232,7 @@ namespace Simple.Data.IntegrationTest.Query
                                        " left join [dbo].[order] on ([dbo].[customer].[id] = [dbo].[order].[customerid])" +
                                        " left join [dbo].[note] on ([dbo].[customer].[id] = [dbo].[note].[customerid])";
 
-            var q = _db.Customers.All().WithOrders().WithNotes();
+            var q = TargetDb.Customers.All().WithOrders().WithNotes();
             EatException(() => q.ToList());
 
             GeneratedSqlIs(expectedSql);
@@ -248,7 +248,7 @@ namespace Simple.Data.IntegrationTest.Query
                 " from [dbo].[Customer] LEFT JOIN [dbo].[Order] ON ([dbo].[Customer].[Id] = [dbo].[Order].[CustomerId])" +
                 " LEFT JOIN [dbo].[Item] ON ([dbo].[Order].[Id] = [dbo].[Item].[OrderId])";
 
-            var q = _db.Customers.All().With(_db.Customers.Orders).With(_db.Customers.Orders.Items);
+            var q = TargetDb.Customers.All().With(TargetDb.Customers.Orders).With(TargetDb.Customers.Orders.Items);
             EatException(() => q.ToList());
 
             GeneratedSqlIs(expectedSql);
@@ -266,7 +266,7 @@ namespace Simple.Data.IntegrationTest.Query
                 " from [dbo].[employee] join [dbo].[department] on ([dbo].[department].[id] = [dbo].[employee].[departmentid])" +
                 " where [dbo].[department].[name] = @p1";
 
-            var q = _db.Employees.FindAll(_db.Employees.Department.Name == "Dev").WithDepartment();
+            var q = TargetDb.Employees.FindAll(TargetDb.Employees.Department.Name == "Dev").WithDepartment();
             EatException(() => q.ToList());
 
             GeneratedSqlIs(expectedSql);
@@ -286,9 +286,9 @@ namespace Simple.Data.IntegrationTest.Query
                 " and [foo].[name] = @p2)";
 
             dynamic foo;
-            var q = _db.Employees.Query()
-                .Where(_db.Employees.Name.Like("A%"))
-                .WithOne(_db.Employees.Department.As("Foo"), out foo)
+            var q = TargetDb.Employees.Query()
+                .Where(TargetDb.Employees.Name.Like("A%"))
+                .WithOne(TargetDb.Employees.Department.As("Foo"), out foo)
                 .Where(foo.Name == "Admin");
             EatException(() => q.ToList());
 
@@ -310,10 +310,10 @@ namespace Simple.Data.IntegrationTest.Query
                 " where ([dbo].[employee].[name] like @p1" +
                 " and [dbo].[department].[name] = @p2)";
 
-            var q = _db.Employees.Query()
-                .Where(_db.Employees.Name.Like("A%"))
-                .WithOne(_db.Employees.Department.As("Foo"))
-                .Where(_db.Employees.Department.Name == "Admin");
+            var q = TargetDb.Employees.Query()
+                .Where(TargetDb.Employees.Name.Like("A%"))
+                .WithOne(TargetDb.Employees.Department.As("Foo"))
+                .Where(TargetDb.Employees.Department.Name == "Admin");
             EatException(() => q.ToList());
 
             GeneratedSqlIs(expectedSql);

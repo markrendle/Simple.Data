@@ -9,10 +9,13 @@ using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.SqlServer
 {
+    using System.Data.SqlClient;
+    using System.Threading.Tasks;
+
     [Export(typeof(ICustomInserter))]
     public class SqlCustomInserter : ICustomInserter
     {
-        public IDictionary<string, object> Insert(AdoAdapter adapter, string tableName, IDictionary<string, object> data, IDbTransaction transaction = null, bool resultRequired = false)
+        public Task<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IDictionary<string, object> data, IDbTransaction transaction = null, bool resultRequired = false)
         {
             var table = adapter.GetSchema().FindTable(tableName);
             var dataDictionary = BuildDataDictionary(adapter, data, table);
@@ -74,7 +77,7 @@ namespace Simple.Data.SqlServer
             return dataDictionary;
         }
 
-        internal IDictionary<string, object> ExecuteSingletonQuery(AdoAdapter adapter, string sql, IEnumerable<Column> columns, IEnumerable<Object> values, IDbTransaction transaction)
+        internal Task<IDictionary<string, object>> ExecuteSingletonQuery(AdoAdapter adapter, string sql, IEnumerable<Column> columns, IEnumerable<Object> values, IDbTransaction transaction)
         {
             if (transaction != null)
             {
@@ -94,11 +97,11 @@ namespace Simple.Data.SqlServer
             }
         }
 
-        private static IDictionary<string, object> TryExecuteSingletonQuery(IDbCommand command)
+        private static async Task<IDictionary<string, object>> TryExecuteSingletonQuery(IDbCommand command)
         {
-            using (var reader = command.TryExecuteReader())
+            using (var reader = await ((SqlCommand)command).ExecuteReaderAsync())
             {
-                if (reader.Read())
+                if (await reader.ReadAsync())
                 {
                     return reader.ToDictionary();
                 }

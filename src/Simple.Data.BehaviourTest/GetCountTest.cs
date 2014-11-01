@@ -20,47 +20,47 @@
         [Test]
         public void GetCountBasic()
         {
-            EatException<SimpleDataException>(() => _db.Users.GetCount());
+            EatException<SimpleDataException>(() => TargetDb.Users.GetCount());
             GeneratedSqlIs("select count(*) from [dbo].[users]");
         }
 
         [Test]
         public void QueryCountBasic()
         {
-            EatException<SimpleDataException>(() => _db.Users.All().Count());
+            EatException<SimpleDataException>(() => TargetDb.Users.All().Count());
             GeneratedSqlIs("select count(*) from [dbo].[users]");
         }
 
         [Test]
         public void GetCountByBasic()
         {
-            EatException<SimpleDataException>(() => _db.Users.GetCountByAge(42));
+            EatException<SimpleDataException>(() => TargetDb.Users.GetCountByAge(42));
             GeneratedSqlIs("select count(*) from [dbo].[users] where [dbo].[users].[age] = @p1");
         }
 
         [Test]
         public void GetCountByNamedParameters()
         {
-            EatException<SimpleDataException>(() => _db.Users.GetCountBy(Age: 42));
+            EatException<SimpleDataException>(() => TargetDb.Users.GetCountBy(Age: 42));
             GeneratedSqlIs("select count(*) from [dbo].[users] where [dbo].[users].[age] = @p1");
         }
 
         [Test]
         public void GetCountWithColumnThrowsException()
         {
-            Assert.Throws<BadExpressionException>(() => _db.Users.GetCount(_db.Users.Id));
+            Assert.Throws<BadExpressionException>(() => TargetDb.Users.GetCount(TargetDb.Users.Id));
         }
 
         [Test]
         public void AssigningToColumnThrowsException()
         {
-            Assert.Throws<BadExpressionException>(() => _db.Users.GetCount(_db.Users.Id = 1));
+            Assert.Throws<BadExpressionException>(() => TargetDb.Users.GetCount(TargetDb.Users.Id = 1));
         }
         
         [Test]
         public void MultipleArgumentsThrowsException()
         {
-            Assert.Throws<ArgumentException>(() => _db.Users.GetCount(_db.Users.Id == 1, _db.Users.Name == "Bob"));
+            Assert.Throws<ArgumentException>(() => TargetDb.Users.GetCount(TargetDb.Users.Id == 1, TargetDb.Users.Name == "Bob"));
         }
     }
 }

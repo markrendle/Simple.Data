@@ -28,7 +28,7 @@ namespace Simple.Data.IntegrationTest
         public void NaturalJoinWithIndexersCreatesCorrectCommand()
         {
             var orderDate = new DateTime(2010, 1, 1);
-            _db["Customer"].Find(_db["Customers"]["Orders"]["OrderDate"] == orderDate);
+            TargetDb["Customer"].Find(TargetDb["Customers"]["Orders"]["OrderDate"] == orderDate);
             
             GeneratedSqlIs("select [dbo].[Customer].[CustomerId] from [dbo].[Customer] join [dbo].[Orders] on ([dbo].[Customer].[CustomerId] = [dbo].[Orders].[CustomerId]) where [dbo].[Orders].[OrderDate] = @p1");
             Parameter(0).Is(orderDate);
@@ -55,14 +55,14 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void IndexerMethodWorksWithPluralFromSingular()
         {
-            _db["Customer"].All().ToList();
+            TargetDb["Customer"].All().ToList();
             GeneratedSqlIs("select [dbo].[Customers].[CustomerId] from [dbo].[Customers]");
         }
 
         [Test]
         public void IndexerMethodWorksWithSchemaAndPluralFromSingular()
         {
-            _db["dbo"]["Customer"].All().ToList();
+            TargetDb["dbo"]["Customer"].All().ToList();
             GeneratedSqlIs("select [dbo].[Customers].[CustomerId] from [dbo].[Customers]");
         }
 
@@ -71,7 +71,7 @@ namespace Simple.Data.IntegrationTest
         public void CompaniesPluralizationIsResolved()
         {
             Database.SetPluralizer(new EntityPluralizer());
-            _db.Companies.All().ToList();
+            TargetDb.Companies.All().ToList();
             GeneratedSqlIs("select [dbo].[Company].[Id] from [dbo].[Company]");
         }
 
@@ -123,14 +123,14 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void IndexerMethodWorksWithShoutyFromSingular()
         {
-            _db["Customer"].All().ToList();
+            TargetDb["Customer"].All().ToList();
             GeneratedSqlIs("select [dbo].[CUSTOMER].[CUSTOMER_ID] from [dbo].[CUSTOMER]");
         }
 
         [Test]
         public void IndexerMethodWorksWithSchemaAndShoutyFromSingular()
         {
-            _db["dbo"]["Customer"].All().ToList();
+            TargetDb["dbo"]["Customer"].All().ToList();
             GeneratedSqlIs("select [dbo].[CUSTOMER].[CUSTOMER_ID] from [dbo].[CUSTOMER]");
         }
 
@@ -139,7 +139,7 @@ namespace Simple.Data.IntegrationTest
         public void NaturalJoinWithShoutyCaseCreatesCorrectCommand()
         {
             var orderDate = new DateTime(2010, 1, 1);
-            _db.Customer.Find(_db.Customers.Orders.OrderDate == orderDate);
+            TargetDb.Customer.Find(TargetDb.Customers.Orders.OrderDate == orderDate);
             const string expectedSql = "select [dbo].[CUSTOMER].[CUSTOMER_ID] from [dbo].[CUSTOMER] join [dbo].[ORDER] on " + 
                                        "([dbo].[CUSTOMER].[CUSTOMER_ID] = [dbo].[ORDER].[CUSTOMER_ID])"
                                      + " where [dbo].[ORDER].[ORDER_DATE] = @p1";

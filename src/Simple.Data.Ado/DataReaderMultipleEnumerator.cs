@@ -42,21 +42,23 @@ namespace Simple.Data.Ado
 
         public bool MoveNext()
         {
-            if (_reader == null)
-            {
-                ExecuteReader();
-                _lastRead = true;
-                return true;
-            }
-            _lastRead = _reader.NextResult();
-            return _lastRead;
+            throw new NotImplementedException();
+            //if (_reader == null)
+            //{
+            //    ExecuteReader();
+            //    _lastRead = true;
+            //    return true;
+            //}
+            //_lastRead = _reader.NextResult();
+            //return _lastRead;
         }
 
         private void ExecuteReader()
         {
-            _connection.OpenIfClosed();
-            _reader = _command.TryExecuteReader();
-            _index = _index ?? _reader.CreateDictionaryIndex();
+            throw new NotImplementedException();
+            //_connection.OpenIfClosed();
+            //_reader = _command.TryExecuteReader();
+            //_index = _index ?? _reader.CreateDictionaryIndex();
         }
 
         public void Reset()
@@ -69,12 +71,13 @@ namespace Simple.Data.Ado
         {
             get
             {
-                if (!_lastRead) throw new InvalidOperationException();
-                var index = _reader.CreateDictionaryIndex();
-                while (_reader.Read())
-                {
-                    yield return _reader.ToDictionary(index);
-                }
+                throw new NotImplementedException();
+                //if (!_lastRead) throw new InvalidOperationException();
+                //var index = _reader.CreateDictionaryIndex();
+                //while (_reader.Read())
+                //{
+                //    yield return _reader.ToDictionary(index);
+                //}
             }
         }
 

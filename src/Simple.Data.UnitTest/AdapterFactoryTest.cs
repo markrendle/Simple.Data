@@ -4,6 +4,7 @@ namespace Simple.Data.UnitTest
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using NUnit.Framework;
 
     [TestFixture]
@@ -64,7 +65,7 @@ namespace Simple.Data.UnitTest
             throw new NotImplementedException();
         }
 
-        public override OperationResult Execute(IOperation operation)
+        public override Task<OperationResult> Execute(IOperation operation)
         {
             throw new NotImplementedException();
         }

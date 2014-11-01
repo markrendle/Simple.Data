@@ -13,12 +13,13 @@
     {
         public static Task<IEnumerable<IDictionary<string, object>>> ToEnumerable(this IDbCommand command, Func<IDbConnection> createConnection)
         {
-            return ToEnumerable(command, createConnection, null);
+            return Task.FromResult(ToEnumerable(command, createConnection, null));
         }
 
         public static IEnumerable<Task<IEnumerable<IDictionary<string, object>>>> ToEnumerables(this IDbCommand command, IDbConnection connection)
         {
-            return new DataReaderMultipleEnumerator(command, connection).Wrap();
+            throw new NotImplementedException();
+            //return new DataReaderMultipleEnumerator(command, connection).Wrap();
         }
 
         public static IEnumerable<IDictionary<string, object>> ToEnumerable(this IDbCommand command, Func<IDbConnection> createConnection, IDictionary<string, int> index)

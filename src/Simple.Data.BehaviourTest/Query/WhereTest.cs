@@ -10,19 +10,19 @@ namespace Simple.Data.IntegrationTest
         [Test]
         public void WhereWithNoParametersShouldThrowBadExpressionException()
         {
-            Assert.Throws<BadExpressionException>(() => _db.Users.All().Where());
+            Assert.Throws<BadExpressionException>(() => TargetDb.Users.All().Where());
         }
 
         [Test]
         public void WhereWithStringParameterShouldThrowBadExpressionException()
         {
-            Assert.Throws<BadExpressionException>(() => _db.Users.All().Where("Answers"));
+            Assert.Throws<BadExpressionException>(() => TargetDb.Users.All().Where("Answers"));
         }
 
         [Test]
         public void WhereWithNullParameterShouldThrowArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => _db.Users.All().Where(null));
+            Assert.Throws<ArgumentNullException>(() => TargetDb.Users.All().Where(null));
         }
 
         protected override void SetSchema(MockSchemaProvider schemaProvider)

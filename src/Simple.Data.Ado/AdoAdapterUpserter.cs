@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Data;
     using System.Linq;
+    using System.Threading.Tasks;
     using Extensions;
 
     class AdoAdapterUpserter
@@ -29,24 +30,24 @@
             if (transaction != null) _connection = transaction.Connection;
         }
 
-        public IDictionary<string, object> Upsert(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria, bool resultRequired)
+        public async Task<IDictionary<string, object>> Upsert(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria, bool resultRequired)
         {
             var connection = _connection ?? _adapter.CreateConnection();
             using (connection.MaybeDisposable())
             {
-                connection.OpenIfClosed();
-                return Upsert(tableName, data, criteria, resultRequired, connection);
+                await _adapter.CommandExecutor.OpenIfClosed(connection);
+                return await Upsert(tableName, data, criteria, resultRequired, connection);
             }
         }
 
-        private IDictionary<string, object> Upsert(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria, bool resultRequired,
+        private async Task<IDictionary<string, object>> Upsert(string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria, bool resultRequired,
                                    IDbConnection connection)
         {
             var finder = _transaction == null
                              ? new AdoAdapterFinder(_adapter, connection)
                              : new AdoAdapterFinder(_adapter, _transaction);
 
-            var existing = finder.FindOne(tableName, criteria);
+            var existing = await finder.FindOne(tableName, criteria);
             if (existing != null)
             {
                 // Don't update columns used as criteria
@@ -66,17 +67,18 @@
                 {
                     _adapter.Execute(commandBuilder, _transaction);
                 }
-                return resultRequired ? finder.FindOne(tableName, criteria) : null;
+                return resultRequired ? await finder.FindOne(tableName, criteria) : null;
             }
             var inserter = _transaction == null
                                ? new AdoAdapterInserter(_adapter, connection)
                                : new AdoAdapterInserter(_adapter, _transaction);
-            return inserter.Insert(tableName, data, resultRequired);
+            return await inserter.Insert(tableName, data, resultRequired);
         }
 
 
-        public IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list, bool isResultRequired, Func<IReadOnlyDictionary<string, object>, Exception, bool> errorCallback)
+        public async Task<IEnumerable<IDictionary<string, object>>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list, bool isResultRequired, Func<IReadOnlyDictionary<string, object>, Exception, bool> errorCallback)
         {
+            var results = new List<IDictionary<string, object>>();
             foreach (var row in list)
             {
                 IDictionary<string, object> result;
@@ -85,13 +87,13 @@
                     var key = _adapter.GetKey(tableName, row);
                     if (key.Count == 0)
                     {
-                        result = new AdoAdapterInserter(_adapter).Insert(tableName, row, isResultRequired);
+                        result = await new AdoAdapterInserter(_adapter).Insert(tableName, row, isResultRequired);
                     }
                     else
                     {
                         var criteria = ExpressionHelper.CriteriaDictionaryToExpression(tableName,
                                                                                        key);
-                        result = Upsert(tableName, row, criteria, isResultRequired);
+                        result = await Upsert(tableName, row, criteria, isResultRequired);
                     }
                 }
                 catch (Exception ex)
@@ -100,12 +102,14 @@
                     throw;
                 }
 
-                yield return result;
+                results.Add(result);
             }
+            return results;
         }
         
-        public IEnumerable<IDictionary<string, object>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list, IList<string> keyFieldNames, bool isResultRequired, Func<IReadOnlyDictionary<string, object>, Exception, bool> errorCallback)
+        public async Task<IEnumerable<IDictionary<string, object>>> UpsertMany(string tableName, IList<IReadOnlyDictionary<string, object>> list, IList<string> keyFieldNames, bool isResultRequired, Func<IReadOnlyDictionary<string, object>, Exception, bool> errorCallback)
         {
+            var results = new List<IDictionary<string, object>>();
             foreach (var row in list)
             {
                 IDictionary<string, object> result;
@@ -113,7 +117,7 @@
                 {
                     var copy = row;
                     var criteria = GetCriteria(tableName, keyFieldNames, ref copy);
-                    result = Upsert(tableName, copy, criteria, isResultRequired);
+                    result = await Upsert(tableName, copy, criteria, isResultRequired);
                 }
                 catch (Exception ex)
                 {
@@ -121,8 +125,9 @@
                     throw;
                 }
 
-                yield return result;
+                results.Add(result);
             }
+            return results;
         }
 
         private static SimpleExpression GetCriteria(string tableName, IEnumerable<string> criteriaFieldNames,

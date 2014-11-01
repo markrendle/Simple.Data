@@ -42,7 +42,7 @@
             else
             {
                 var row = checkedEnumerable.Single;
-                dataResult = new DataResult(upserter.Upsert(operation.TableName, checkedEnumerable.Single, operation.Criteria, operation.ResultRequired));
+                dataResult = new DataResult(await upserter.Upsert(operation.TableName, checkedEnumerable.Single, operation.Criteria, operation.ResultRequired));
             }
             return dataResult;
         }

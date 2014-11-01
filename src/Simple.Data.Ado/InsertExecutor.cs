@@ -20,7 +20,9 @@
                     await inserter.InsertMany(operation.TableName, checkedEnumerable, operation.ErrorCallback,
                         operation.ResultRequired));
             }
-            return new DataResult(await inserter.Insert(operation.TableName, checkedEnumerable.Single, operation.ResultRequired));
+            var single = checkedEnumerable.Single;
+            var data = await inserter.Insert(operation.TableName, single, operation.ResultRequired);
+            return new DataResult(data);
         }
     }
 }

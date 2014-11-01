@@ -8,12 +8,13 @@ namespace Simple.Data.SqlServer
     using System.ComponentModel.Composition;
     using System.Data;
     using System.Data.SqlClient;
+    using System.Threading.Tasks;
     using Ado;
 
     [Export(typeof(IBulkInserter))]
     public class SqlBulkInserter : IBulkInserter
     {
-        public IEnumerable<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IEnumerable<IReadOnlyDictionary<string, object>> data, IDbTransaction transaction, ErrorCallback onError, bool resultRequired)
+        public Task<IEnumerable<IDictionary<string, object>>> Insert(AdoAdapter adapter, string tableName, IEnumerable<IReadOnlyDictionary<string, object>> data, IDbTransaction transaction, ErrorCallback onError, bool resultRequired)
         {
             if (resultRequired)
             {

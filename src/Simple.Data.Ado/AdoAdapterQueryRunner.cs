@@ -45,12 +45,17 @@
                 }
                 else
                 {
-                    result = command.ToEnumerable(_adapter.CreateConnection);
+                    result = await command.ToEnumerable(_adapter.CreateConnection);
                 }
             }
             else
             {
-                result = commandBuilders.SelectMany(cb => cb.GetCommand(connection, _adapter.AdoOptions).ToEnumerable(_adapter.CreateConnection));
+                var list = new List<IDictionary<string, object>>();
+                result = list;
+                foreach (var builder in commandBuilders)
+                {
+                    list.AddRange(await builder.GetCommand(connection, _adapter.AdoOptions).ToEnumerable(_adapter.CreateConnection));
+                }
             }
 
             if (query.Clauses.OfType<WithClause>().Any())
@@ -117,10 +122,8 @@
         {
             var commandBuilders = new List<ICommandBuilder>();
 
-            IEnumerable<SimpleQueryClauseBase> unhandledClausesForPagedQuery;
-            ICommandBuilder mainCommandBuilder = new QueryBuilder(_adapter, bulkIndex).Build(query,
-                                                                                             out
-                                                                                                 unhandledClausesForPagedQuery);
+            var unhandledClausesForPagedQuery = new List<SimpleQueryClauseBase>();
+            ICommandBuilder mainCommandBuilder = new QueryBuilder(_adapter, bulkIndex).Build(query, unhandledClausesForPagedQuery);
             unhandledClauses.AddRange(unhandledClausesForPagedQuery);
 
             SkipClause skipClause = query.Clauses.OfType<SkipClause>().FirstOrDefault();

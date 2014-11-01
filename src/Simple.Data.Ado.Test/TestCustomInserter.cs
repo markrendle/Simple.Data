@@ -10,6 +10,8 @@ using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Ado.Test
 {
+    using System.Threading.Tasks;
+
     [TestFixture]
     public class TestCustomInserter
     {
@@ -117,7 +119,7 @@ namespace Simple.Data.Ado.Test
     [Export(typeof(ICustomInserter))]
     public class StubCustomInserter : ICustomInserter
     {
-        public IDictionary<string, object> Insert(AdoAdapter adapter, string tableName, IDictionary<string, object> data, IDbTransaction transaction = null, bool resultRequired = false)
+        public Task<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IDictionary<string, object> data, IDbTransaction transaction = null, bool resultRequired = false)
         {
             throw new NotImplementedException();
         }

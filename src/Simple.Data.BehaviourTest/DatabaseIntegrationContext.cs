@@ -7,20 +7,21 @@ using Simple.Data.Mocking.Ado;
 namespace Simple.Data.IntegrationTest
 {
     using System.Diagnostics;
+    using System.Threading.Tasks;
 
     public abstract class DatabaseIntegrationContext
     {
         protected MockDatabase _mockDatabase;
         protected Mocking.Ado.MockConnectionProvider _MockConnectionProvider;
-        protected dynamic _db;
+
+        protected DatabaseIntegrationContext()
+        {
+            TargetDb = GetOpenDataBase();
+        }
+
+        protected dynamic TargetDb { get; private set; }
 
         protected abstract void SetSchema(MockSchemaProvider schemaProvider);
-
-        [SetUp]
-        public void Setup()
-        {
-            _db = GetOpenDataBase();
-        }
 
         protected Database GetOpenDataBase()
         {
@@ -69,6 +70,20 @@ namespace Simple.Data.IntegrationTest
             try
             {
                 action();
+            }
+            catch (TException ex)
+            {
+                // This won't work on Mock provider, but the SQL should be generated OK
+                Trace.TraceError(ex.Message);
+            }
+
+        }
+        protected static async Task EatExceptionAsync<TException>(Func<Task> action)
+            where TException : Exception
+        {
+            try
+            {
+                await action();
             }
             catch (TException ex)
             {
