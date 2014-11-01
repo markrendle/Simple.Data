@@ -64,6 +64,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SqlBulkInserter.cs" />
+    <Compile Include="SqlCommandExecutor.cs" />
     <Compile Include="SqlCustomInserter.cs" />
     <Compile Include="SqlCustomQueryBuilder.cs" />
     <Compile Include="SqlDbParameterFactory.cs" />

@@ -33,9 +33,7 @@ namespace Simple.Data.Commands
         {
             if (args.Length == 1 && args[0] is SimpleExpression)
             {
-                var result = (QueryResult)dataStrategy.Run.Execute(new QueryOperation(dataStrategy, table.GetQualifiedName(), (SimpleExpression)args[0]));
-                var data = result.Data.FirstOrDefault();
-                return data != null ? new SimpleRecord(data, table.GetQualifiedName(), dataStrategy) : null;
+                return new SimpleQuery(dataStrategy, table.GetName()).Where((SimpleExpression) args[0]).Singleton();
             }
 
             throw new BadExpressionException("Find only accepts a criteria expression.");

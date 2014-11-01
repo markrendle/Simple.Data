@@ -4,11 +4,12 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Data;
+    using System.Threading.Tasks;
     using Schema;
 
     public class BulkInserter : IBulkInserter
     {
-        public IEnumerable<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IEnumerable<IReadOnlyDictionary<string, object>> data, IDbTransaction transaction, ErrorCallback onError, bool resultRequired)
+        public async Task<IEnumerable<IDictionary<string, object>>> Insert(AdoAdapter adapter, string tableName, IEnumerable<IReadOnlyDictionary<string, object>> data, IDbTransaction transaction, ErrorCallback onError, bool resultRequired)
         {
             var table = adapter.GetSchema().FindTable(tableName);
             var columns = table.Columns.Where(c => c.IsWriteable).ToList();
@@ -30,7 +31,7 @@
                     var identityFunction = adapter.GetIdentityFunction();
                     if (!string.IsNullOrWhiteSpace(identityFunction))
                     {
-                        return InsertRowsAndReturn(adapter, identityFunction, helper, insertSql, table, onError);
+                        return await InsertRowsAndReturn(adapter, identityFunction, helper, insertSql, table, onError);
                     }
                 }
             }
@@ -40,7 +41,7 @@
             return null;
         }
 
-        private static IEnumerable<IDictionary<string, object>> InsertRowsAndReturn(AdoAdapter adapter, string identityFunction, BulkInserterHelper helper, string insertSql, Table table, ErrorCallback onError)
+        private static Task<IEnumerable<IDictionary<string, object>>> InsertRowsAndReturn(AdoAdapter adapter, string identityFunction, BulkInserterHelper helper, string insertSql, Table table, ErrorCallback onError)
         {
             var identityColumn = table.Columns.FirstOrDefault(col => col.IsIdentity);
 

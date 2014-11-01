@@ -5,21 +5,24 @@ namespace Simple.Data.Ado
     using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
+    using System.Threading.Tasks;
 
-    class DataReaderMultipleEnumerator : IEnumerator<IEnumerable<IDictionary<string, object>>>
+    class DataReaderMultipleEnumerator : IEnumerator<Task<IEnumerable<IDictionary<string, object>>>>
     {
+        private readonly ICommandExecutor _executor;
         private readonly IDisposable _connectionDisposable;
         private readonly IDbConnection _connection;
         private IDictionary<string, int> _index;
         private readonly IDbCommand _command;
-        private IDataReader _reader;
+        private Task<IDataReader> _reader;
         private bool _lastRead;
 
-        public DataReaderMultipleEnumerator(IDbCommand command, IDbConnection connection) : this(command, connection, null)
+        public DataReaderMultipleEnumerator(IDbCommand command, IDbConnection connection, ICommandExecutor executor) : this(command, connection, executor, null)
         {
+            _executor = executor;
         }
 
-        public DataReaderMultipleEnumerator(IDbCommand command, IDbConnection connection, IDictionary<string, int> index)
+        public DataReaderMultipleEnumerator(IDbCommand command, IDbConnection connection, ICommandExecutor executor, IDictionary<string, int> index)
         {
             _command = command;
             _connection = connection;
@@ -62,7 +65,7 @@ namespace Simple.Data.Ado
             ExecuteReader();
         }
 
-        public IEnumerable<IDictionary<string, object>> Current
+        public Task<IEnumerable<IDictionary<string, object>>> Current
         {
             get
             {

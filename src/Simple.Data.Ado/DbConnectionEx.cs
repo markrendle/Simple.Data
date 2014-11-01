@@ -6,6 +6,8 @@ using System.Text;
 namespace Simple.Data.Ado
 {
     using System.Data;
+    using System.Data.SqlClient;
+    using System.Threading.Tasks;
 
     public static class DbConnectionEx
     {
@@ -14,6 +16,15 @@ namespace Simple.Data.Ado
             if (connection.State == ConnectionState.Closed)
             {
                 connection.Open();
+            }
+        }
+
+        public static async Task OpenIfClosedAsync(this IDbConnection connection)
+        {
+            if (connection.State == ConnectionState.Closed)
+            {
+                await connection.OpenAsync();
+                await ((SqlConnection) connection).OpenAsync();
             }
         }
 

@@ -130,13 +130,6 @@ namespace Simple.Data
         /// </returns>
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            if (binder.Name == "All")
-            {
-                SimpleDataTraceSources.TraceSource.TraceEvent(TraceEventType.Warning, SimpleDataTraceSources.ObsoleteWarningMessageId,
-                    "The dynamic 'All' property is deprecated; use the 'All()' method instead.");
-                result = GetAll().ToList();
-                return true;
-            }
             result = new ObjectReference(binder.Name, new ObjectReference(_tableName, (_schema != null ? new ObjectReference(_schema.GetName()) : null), _dataStrategy));
             return true;
         }
@@ -168,12 +161,6 @@ namespace Simple.Data
         internal string GetQualifiedName()
         {
             return _schema != null ? _schema.GetName() + "." + _tableName : _tableName;
-        }
-
-        private IEnumerable<dynamic> GetAll()
-        {
-            var result = (DataResult) _dataStrategy.Run.Execute(new QueryOperation(null));
-            return result.Data.Select(dict => new SimpleRecord(dict, _tableName, _dataStrategy));
         }
 
         public AllColumnsSpecialReference AllColumns()

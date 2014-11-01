@@ -32,12 +32,12 @@ namespace Simple.Data.Commands
                 objects = args;
             }
 
-            var result = UpsertUsingKeys(dataStrategy, table, objects, !binder.IsResultDiscarded());
+            var operation = UpsertUsingKeys(dataStrategy, table, objects, !binder.IsResultDiscarded());
 
-            return ResultHelper.TypeResult(result, table, dataStrategy);
+            return new InsertAwaitable(dataStrategy, operation, table);
         }
 
-        private static OperationResult UpsertUsingKeys(DataStrategy dataStrategy, DynamicTable table, object[] args, bool isResultRequired)
+        private static IOperation UpsertUsingKeys(DataStrategy dataStrategy, DynamicTable table, object[] args, bool isResultRequired)
         {
             var record = ObjectToDictionary(args[0], dataStrategy.GetAdapter().KeyComparer);
             var list = record as IList<IReadOnlyDictionary<string, object>>;
@@ -45,16 +45,16 @@ namespace Simple.Data.Commands
             {
                 ErrorCallback errorCallback = (args.Length == 2 ? args[1] as ErrorCallback : null) ??
                  ((item, exception) => false);
-                return dataStrategy.Run.Execute(new UpsertOperation(table.GetQualifiedName(), list, isResultRequired, null, errorCallback));
+                return new UpsertOperation(table.GetQualifiedName(), list, isResultRequired, null, errorCallback);
             }
 
             var dict = record as IReadOnlyDictionary<string, object>;
             if (dict == null) throw new InvalidOperationException("Could not resolve data from passed object.");
             var key = dataStrategy.GetAdapter().GetKey(table.GetQualifiedName(), dict);
             if (key == null) throw new InvalidOperationException(string.Format("No key columns defined for table \"{0}\"",table.GetQualifiedName()));
-            if (key.Count == 0) return dataStrategy.Run.Execute(new InsertOperation(table.GetQualifiedName(), dict, isResultRequired));
+            if (key.Count == 0) return new InsertOperation(table.GetQualifiedName(), dict, isResultRequired);
             var criteria = ExpressionHelper.CriteriaDictionaryToExpression(table.GetQualifiedName(), key);
-            return dataStrategy.Run.Execute(new UpsertOperation(table.GetQualifiedName(), dict, isResultRequired, criteria));
+            return new UpsertOperation(table.GetQualifiedName(), dict, isResultRequired, criteria);
         }
 
         internal static object ObjectToDictionary(object obj, IEqualityComparer<string> keyComparer)

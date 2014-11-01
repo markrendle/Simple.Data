@@ -7,6 +7,7 @@ using Simple.Data.Extensions;
 
 namespace Simple.Data.Ado
 {
+    using System.Threading.Tasks;
     using Schema;
 
     class AdoAdapterInserter
@@ -32,7 +33,7 @@ namespace Simple.Data.Ado
             if (transaction != null) _connection = transaction.Connection;
         }
 
-        public IEnumerable<IDictionary<string, object>> InsertMany(string tableName, CheckedEnumerable<IReadOnlyDictionary<string, object>> data, ErrorCallback onError, bool resultRequired)
+        public Task<IEnumerable<IDictionary<string, object>>> InsertMany(string tableName, CheckedEnumerable<IReadOnlyDictionary<string, object>> data, ErrorCallback onError, bool resultRequired)
         {
             if (data == null) throw new ArgumentNullException("data");
             var list = data.ToList();

@@ -9,6 +9,7 @@ namespace Simple.Data.Ado
     using System.Data;
     using System.Data.Common;
     using System.Threading;
+    using System.Threading.Tasks;
 
     internal class DataReaderEnumerable : IEnumerable<IDictionary<string, object>>
     {
@@ -104,6 +105,11 @@ namespace Simple.Data.Ado
                 }
             }
 
+            public async Task Start()
+            {
+                
+            }
+
             public bool MoveNext()
             {
                 if (_reader == null)
@@ -151,6 +157,13 @@ namespace Simple.Data.Ado
             }
 
             private void ExecuteReader()
+            {
+                _command.Connection.OpenIfClosed();
+                _reader = _command.TryExecuteReader();
+                CreateIndexIfNecessary();
+            }
+
+            private async Task ExecuteReaderAsync()
             {
                 _command.Connection.OpenIfClosed();
                 _reader = _command.TryExecuteReader();

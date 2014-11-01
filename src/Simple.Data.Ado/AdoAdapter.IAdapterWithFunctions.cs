@@ -7,6 +7,8 @@ using ResultSet = System.Collections.Generic.IEnumerable<System.Collections.Gene
 
 namespace Simple.Data.Ado
 {
+    using System.Threading.Tasks;
+
     public partial class AdoAdapter
 	{
 	    private readonly ConcurrentDictionary<string, IProcedureExecutor> _executors = new ConcurrentDictionary<string, IProcedureExecutor>();
@@ -16,13 +18,7 @@ namespace Simple.Data.Ado
 	        return _connectionProvider.SupportsStoredProcedures && _schema.IsProcedure(functionName);
 	    }
 
-	    public IEnumerable<ResultSet> Execute(string functionName, IDictionary<string, object> parameters)
-	    {
-	        var executor = _executors.GetOrAdd(functionName, f => _connectionProvider.GetProcedureExecutor(this, _schema.BuildObjectName(f)));
-	        return executor.Execute(parameters);
-	    }
-
-        public IEnumerable<ResultSet> Execute(string functionName, IDictionary<string, object> parameters, IAdapterTransaction transaction)
+        public Task<IEnumerable<ResultSet>> Execute(string functionName, IDictionary<string, object> parameters, IAdapterTransaction transaction)
         {
             var executor = _executors.GetOrAdd(functionName, f => _connectionProvider.GetProcedureExecutor(this, _schema.BuildObjectName(f)));
             return transaction == null

@@ -4,9 +4,10 @@
     using System.Collections.Generic;
     using System.Data;
     using System.Linq;
+    using System.Threading.Tasks;
     using Operations;
-    using ExecuteFunc = System.Func<Operations.IOperation, AdoAdapter, AdoAdapterTransaction, OperationResult>;
-    using FuncDict = System.Collections.Generic.Dictionary<System.Type, System.Func<Operations.IOperation, AdoAdapter, AdoAdapterTransaction, OperationResult>>;
+    using ExecuteFunc = System.Func<Operations.IOperation, AdoAdapter, AdoAdapterTransaction, System.Threading.Tasks.Task<OperationResult>>;
+    using FuncDict = System.Collections.Generic.Dictionary<System.Type, System.Func<Operations.IOperation, AdoAdapter, AdoAdapterTransaction, System.Threading.Tasks.Task<OperationResult>>>;
 
     internal class ExecutorFactory
     {
@@ -19,14 +20,13 @@
             dict.Add(CreateFunction<InsertOperation>(InsertExecutor.ExecuteInsert));
             dict.Add(CreateFunction<UpdateEntityOperation>(UpdateEntityExecutor.ExecuteUpdateEntity));
             dict.Add(CreateFunction<DeleteOperation>(DeleteExecutor.Execute));
-            dict.Add(CreateFunction<GetOperation>(GetExecutor.ExecuteGet));
             dict.Add(CreateFunction<UpdateByCriteriaOperation>(UpdateByCriteriaExecutor.ExecuteUpdate));
             dict.Add(CreateFunction<FunctionOperation>(FunctionExecutor.ExecuteFunction));
             dict.Add(CreateFunction<UpsertOperation>(ExecuteUpsert));
             return (FuncDict)dict;
         }
 
-        private static OperationResult ExecuteUpsert(UpsertOperation operation, AdoAdapter adapter, AdoAdapterTransaction transaction)
+        private static async Task<OperationResult> ExecuteUpsert(UpsertOperation operation, AdoAdapter adapter, AdoAdapterTransaction transaction)
         {
             var checkedEnumerable = CheckedEnumerable.Create(operation.Data);
             if (checkedEnumerable.IsEmpty) return CommandResult.Empty;
@@ -35,7 +35,7 @@
             if (checkedEnumerable.HasMoreThanOneValue)
             {
                 dataResult =
-                    new DataResult(upserter.UpsertMany(operation.TableName, checkedEnumerable.ToList(),
+                    new DataResult(await upserter.UpsertMany(operation.TableName, checkedEnumerable.ToList(),
                         operation.ResultRequired,
                         (d, e) => operation.ErrorCallback(d, e)));
             }
@@ -47,7 +47,7 @@
             return dataResult;
         }
 
-        private static KeyValuePair<Type, ExecuteFunc> CreateFunction<T>(Func<T, AdoAdapter, AdoAdapterTransaction, OperationResult> target)
+        private static KeyValuePair<Type, ExecuteFunc> CreateFunction<T>(Func<T, AdoAdapter, AdoAdapterTransaction, Task<OperationResult>> target)
         {
             ExecuteFunc func = (o, a, t) => target((T)o, a, t);
             return new KeyValuePair<Type, ExecuteFunc>(typeof(T), func);

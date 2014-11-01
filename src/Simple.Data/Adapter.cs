@@ -7,6 +7,7 @@ namespace Simple.Data
     using System.Collections.ObjectModel;
     using System.Dynamic;
     using System.Linq;
+    using System.Threading.Tasks;
     using Extensions;
 
     /// <summary>
@@ -79,7 +80,7 @@ namespace Simple.Data
         /// <returns>An <c>IList&lt;string&gt;</c> containing the key names that uniquely identify a record in the database.</returns>
         public abstract IList<string> GetKeyNames(string tableName);
 
-        public abstract OperationResult Execute(IOperation operation);
+        public abstract Task<OperationResult> Execute(IOperation operation);
 
         /// <summary>
         /// Checks to see whether the passed function name is a valid function for the Adapter.

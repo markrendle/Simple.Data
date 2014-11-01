@@ -7,11 +7,13 @@ using Simple.Data.Operations;
 
 namespace Simple.Data
 {
+    using System.Threading.Tasks;
+
     public interface IAdapterWithTransactions
     {
         IAdapterTransaction BeginTransaction(IsolationLevel isolationLevel = IsolationLevel.Unspecified);
         IAdapterTransaction BeginTransaction(string name, IsolationLevel isolationLevel = IsolationLevel.Unspecified);
 
-        OperationResult Execute(IOperation operation, IAdapterTransaction transaction);
+        Task<OperationResult> Execute(IOperation operation, IAdapterTransaction transaction);
     }
 }

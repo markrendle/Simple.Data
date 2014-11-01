@@ -19,18 +19,13 @@ namespace Simple.Data.Commands
 
             if (args.Length == 0)
             {
-                result = dataStrategy.Run.Execute(new DeleteOperation(table.GetQualifiedName(), new SimpleEmptyExpression()));
+                return new CommandResultAwaitable(new DeleteOperation(table.GetQualifiedName(), new SimpleEmptyExpression()), dataStrategy);
             }
-            else if (args.Length == 1 && args[0] is SimpleExpression)
+            if (args.Length == 1 && args[0] is SimpleExpression)
             {
-                result = dataStrategy.Run.Execute(new DeleteOperation(table.GetQualifiedName(), (SimpleExpression)args[0]));
+                return dataStrategy.Run.Execute(new DeleteOperation(table.GetQualifiedName(), (SimpleExpression)args[0]));
             }
-            else
-            {
-                throw new InvalidOperationException();
-            }
-
-            return ((CommandResult)result).RowsAffected.ResultSetFromModifiedRowCount();
+            throw new InvalidOperationException();
         }
     }
 }

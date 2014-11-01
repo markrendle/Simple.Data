@@ -106,6 +106,8 @@
     <Compile Include="GraphMap.cs" />
     <Compile Include="GraphNode.cs" />
     <Compile Include="CollectionGraphNode.cs" />
+    <Compile Include="ICommandExecutor.cs" />
+    <Compile Include="IDbConnectionAsync.cs" />
     <Compile Include="SingleRecordGraphNode.cs" />
     <Compile Include="HomogenizedDictionaryIndex.cs" />
     <Compile Include="IBulkInserter.cs" />
@@ -158,6 +160,7 @@
     <Compile Include="Schema\TableJoin.cs" />
     <Compile Include="Schema\TableType.cs" />
     <Compile Include="ObjectName.cs" />
+    <Compile Include="Sql\Select.cs" />
     <Compile Include="SubDictionary.cs" />
     <Compile Include="TraceHelper.cs" />
     <Compile Include="TupleExtensions.cs" />

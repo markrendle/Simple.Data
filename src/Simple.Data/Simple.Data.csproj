@@ -68,6 +68,7 @@
     <Compile Include="CommandResult.cs" />
     <Compile Include="Commands\CommandFactory.cs" />
     <Compile Include="Commands\ArgumentHelper.cs" />
+    <Compile Include="Commands\CommandResultAwaitable.cs" />
     <Compile Include="Commands\GetCommand.cs" />
     <Compile Include="Commands\GetCountByCommand.cs" />
     <Compile Include="Commands\GetCountCommand.cs" />
@@ -99,9 +100,6 @@
     <Compile Include="ErrorCallback.cs" />
     <Compile Include="ForUpdateClause.cs" />
     <Compile Include="FunctionSignature.cs" />
-    <Compile Include="InMemoryAdapter.cs" />
-    <Compile Include="InMemoryAdapterIAdapterWithRelation.cs" />
-    <Compile Include="InMemoryAdapterIAdapterWithTransactions.cs" />
     <Compile Include="BadExpressionException.cs" />
     <Compile Include="JoinType.cs" />
     <Compile Include="MultiDataResult.cs" />

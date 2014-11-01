@@ -3,11 +3,12 @@
     using System.Collections.Generic;
     using System.Data;
     using System.Linq;
+    using System.Threading.Tasks;
     using Operations;
 
     internal class UpdateEntityExecutor
     {
-        public static CommandResult ExecuteUpdateEntity(UpdateEntityOperation operation, AdoAdapter adapter,
+        public static async Task<OperationResult> ExecuteUpdateEntity(UpdateEntityOperation operation, AdoAdapter adapter,
             AdoAdapterTransaction transaction)
         {
             var checkedEnumerable = CheckedEnumerable.Create(operation.Data);
@@ -36,7 +37,7 @@
             return new CommandResult(Update(adapter, operation.TableName, dict, criteria, transaction.TransactionOrDefault()));
         }
 
-        private static int Update(AdoAdapter adapter, string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria, IDbTransaction transaction)
+        private static Task<int> Update(AdoAdapter adapter, string tableName, IReadOnlyDictionary<string, object> data, SimpleExpression criteria, IDbTransaction transaction)
         {
             ICommandBuilder commandBuilder = new UpdateHelper(adapter.GetSchema()).GetUpdateCommand(tableName, data, criteria);
             return transaction == null ? adapter.Execute(commandBuilder) : adapter.Execute(commandBuilder, transaction);

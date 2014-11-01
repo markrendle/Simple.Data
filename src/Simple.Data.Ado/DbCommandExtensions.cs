@@ -7,15 +7,16 @@
     using System.Data.Common;
     using System.Dynamic;
     using System.Linq;
+    using System.Threading.Tasks;
 
     public static class DbCommandExtensions
     {
-        public static IEnumerable<IDictionary<string, object>> ToEnumerable(this IDbCommand command, Func<IDbConnection> createConnection)
+        public static Task<IEnumerable<IDictionary<string, object>>> ToEnumerable(this IDbCommand command, Func<IDbConnection> createConnection)
         {
             return ToEnumerable(command, createConnection, null);
         }
 
-        public static IEnumerable<IEnumerable<IDictionary<string, object>>> ToEnumerables(this IDbCommand command, IDbConnection connection)
+        public static IEnumerable<Task<IEnumerable<IDictionary<string, object>>>> ToEnumerables(this IDbCommand command, IDbConnection connection)
         {
             return new DataReaderMultipleEnumerator(command, connection).Wrap();
         }

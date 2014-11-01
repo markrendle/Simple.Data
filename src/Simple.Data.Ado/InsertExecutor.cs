@@ -1,10 +1,11 @@
 ﻿namespace Simple.Data.Ado
 {
+    using System.Threading.Tasks;
     using Operations;
 
     internal class InsertExecutor
     {
-        public static DataResult ExecuteInsert(InsertOperation operation, AdoAdapter adapter, AdoAdapterTransaction transaction)
+        public static async Task<OperationResult> ExecuteInsert(InsertOperation operation, AdoAdapter adapter, AdoAdapterTransaction transaction)
         {
             var checkedEnumerable = CheckedEnumerable.Create(operation.Data);
             if (checkedEnumerable.IsEmpty) return DataResult.Empty;
@@ -16,10 +17,10 @@
             if (checkedEnumerable.HasMoreThanOneValue)
             {
                 return new DataResult(
-                    inserter.InsertMany(operation.TableName, checkedEnumerable, operation.ErrorCallback,
+                    await inserter.InsertMany(operation.TableName, checkedEnumerable, operation.ErrorCallback,
                         operation.ResultRequired));
             }
-            return new DataResult(inserter.Insert(operation.TableName, checkedEnumerable.Single, operation.ResultRequired));
+            return new DataResult(await inserter.Insert(operation.TableName, checkedEnumerable.Single, operation.ResultRequired));
         }
     }
 }

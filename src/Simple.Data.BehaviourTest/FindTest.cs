@@ -3,11 +3,14 @@ namespace Simple.Data.IntegrationTest
     using System;
     using System.Collections.Generic;
     using Mocking.Ado;
-    using NUnit.Framework;
+    using Xunit;
 
-    [TestFixture]
     public class FindTest : DatabaseIntegrationContext
     {
+        public FindTest()
+        {
+            _db = GetOpenDataBase();
+        }
         protected override void SetSchema(MockSchemaProvider schemaProvider)
         {
 // ReSharper disable CoVariantArrayConversion
@@ -23,22 +26,22 @@ namespace Simple.Data.IntegrationTest
         }
 
         private const string UsersColumns = "[dbo].[Users].[Id],[dbo].[Users].[Name],[dbo].[Users].[Password],[dbo].[Users].[Age]";
-        [Test]
-        public void TestFindEqualWithInt32()
+        [Fact]
+        public async void TestFindEqualWithInt32()
         {
             _db.Users.Find(_db.Users.Id == 1);
             GeneratedSqlIs("select " + UsersColumns + " from [dbo].[users] where [dbo].[users].[id] = @p1");
             Parameter(0).Is(1);
         }
 
-        [Test]
+        [Fact]
         public void TestFindWithNull()
         {
             _db.Users.Find(_db.Users.Id == null);
             GeneratedSqlIs("select " + UsersColumns + " from [dbo].[users] where [dbo].[users].[id] IS NULL");
         }
 
-        [Test]
+        [Fact]
         public void TestFindWithTwoCriteriasOneBeingNull()
         {
             _db.Users.Find(_db.Users.Id == 1 || _db.Users.Id == null);
@@ -47,7 +50,7 @@ namespace Simple.Data.IntegrationTest
             Parameter(1).DoesNotExist();
         }
 
-        [Test]
+        [Fact]
         public void TestFindNotEqualWithInt32()
         {
             _db.Users.Find(_db.Users.Id != 1);
@@ -55,7 +58,7 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is(1);
         }
 
-        [Test]
+        [Fact]
         public void TestFindGreaterThanWithInt32()
         {
             _db.Users.Find(_db.Users.Id > 1);
@@ -63,7 +66,7 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is(1);
         }
 
-        [Test]
+        [Fact]
         public void TestFindGreaterThanOrEqualWithInt32()
         {
             _db.Users.Find(_db.Users.Id >= 1);
@@ -71,7 +74,7 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is(1);
         }
 
-        [Test]
+        [Fact]
         public void TestFindLessThanWithInt32()
         {
             _db.Users.Find(_db.Users.Id < 1);
@@ -79,7 +82,7 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is(1);
         }
 
-        [Test]
+        [Fact]
         public void TestFindLessThanOrEqualWithInt32()
         {
             _db.Users.Find(_db.Users.Id <= 1);
@@ -87,7 +90,7 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is(1);
         }
 
-        [Test]
+        [Fact]
         public void TestFindModulo()
         {
             _db.Users.Find(_db.Users.Id % 2 == 1);
@@ -96,7 +99,7 @@ namespace Simple.Data.IntegrationTest
             Parameter(1).Is(1);
         }
 
-        [Test]
+        [Fact]
         public void TestFindWithAdd()
         {
             _db.Users.Find(_db.Users.Id + _db.Users.Age == 42);
@@ -104,7 +107,7 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is(42);
         }
 
-        [Test]
+        [Fact]
         public void TestFindWithAddAndMultiply()
         {
             _db.Users.Find((_db.Users.Id + _db.Users.Age) * 2 == 42);
@@ -113,7 +116,7 @@ namespace Simple.Data.IntegrationTest
             Parameter(1).Is(42);
         }
 
-        [Test]
+        [Fact]
         public void TestFindWithSubtract()
         {
             _db.Users.Find(_db.Users.Id - _db.Users.Age == 42);
@@ -121,7 +124,7 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is(42);
         }
 
-        [Test]
+        [Fact]
         public void TestFindWithMultiply()
         {
             _db.Users.Find(_db.Users.Id * _db.Users.Age == 42);
@@ -129,7 +132,7 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is(42);
         }
 
-        [Test]
+        [Fact]
         public void TestFindWithDivide()
         {
             _db.Users.Find(_db.Users.Id / _db.Users.Age == 42);
@@ -137,7 +140,7 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is(42);
         }
         
-        [Test]
+        [Fact]
         public void TestFindByNamedParameterSingleColumn()
         {
             _db.Users.FindBy(Name: "Foo");
@@ -145,14 +148,14 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is("Foo");
         }
         
-        [Test]
+        [Fact]
         public void TestFindByNamedParameterSingleColumnNullValue()
         {
             _db.Users.FindBy(Name: null);
             GeneratedSqlIs("select " + UsersColumns + " from [dbo].[Users] where [dbo].[Users].[name] is null");
         }
 
-        [Test]
+        [Fact]
         public void TestFindByNamedParameterTwoColumns()
         {
             _db.Users.FindBy(Name: "Foo", Password: "password");
@@ -161,22 +164,22 @@ namespace Simple.Data.IntegrationTest
             Parameter(1).Is("password");
         }
 
-        [Test]
-        public void TestFindByDynamicSingleColumn()
+        [Fact]
+        public async void TestFindByDynamicSingleColumn()
         {
-            _db.Users.FindByName("Foo");
+            var user = await _db.Users.FindByName("Foo");
             GeneratedSqlIs("select " + UsersColumns + " from [dbo].[Users] where [dbo].[Users].[name] = @p1");
             Parameter(0).Is("Foo");
         }
 
-        [Test]
+        [Fact]
         public void TestFindByDynamicSingleColumnNull()
         {
             _db.MyTable.FindByColumn1(null);
             GeneratedSqlIs("select [dbo].[MyTable].[Column1] from [dbo].[MyTable] where [dbo].[MyTable].[Column1] is null");
         }
 
-        [Test]
+        [Fact]
         public void TestFindAllByDynamicSingleColumnNull()
         {
 #pragma warning disable 168
@@ -185,7 +188,7 @@ namespace Simple.Data.IntegrationTest
             GeneratedSqlIs("select [dbo].[MyTable].[Column1] from [dbo].[MyTable] where [dbo].[MyTable].[Column1] is null");
         }
 
-        [Test]
+        [Fact]
         public void TestFindByWithAnonymousObject()
         {
             _db.MyTable.FindBy(new { Column1 = 1 });
@@ -193,14 +196,14 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is(1);
         }
 
-        [Test]
+        [Fact]
         public void TestFindByWithAnonymousObjectNullValue()
         {
             _db.MyTable.FindBy(new { Column1 = (object)null });
             GeneratedSqlIs("select [dbo].[MyTable].[Column1] from [dbo].[MyTable] where [dbo].[MyTable].[Column1] is null");
         }
 
-        [Test]
+        [Fact]
         public void TestFindWithLike()
         {
             _db.Users.Find(_db.Users.Name.Like("Foo"));
@@ -208,7 +211,7 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is("Foo");
         }
 
-        [Test]
+        [Fact]
         public void TestFindWithNotLike()
         {
             _db.Users.Find(_db.Users.Name.NotLike("Foo"));
@@ -216,7 +219,7 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is("Foo");
         }
 
-        [Test]
+        [Fact]
         public void TestFindAllWithLike()
         {
             _db.Users.FindAll(_db.Users.Name.Like("Foo")).ToList();
@@ -224,19 +227,19 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is("Foo");
         }
 
-        [Test]
+        [Fact]
         public void FindAllWithNoParametersThrowsBadExpressionException()
         {
             Assert.Throws<BadExpressionException>(() => _db.Users.FindAll().ToList());
         }
 
-        [Test]
+        [Fact]
         public void FindAllWithStringParameterThrowsBadExpressionException()
         {
             Assert.Throws<BadExpressionException>(() => _db.Users.FindAll("Answer").ToList());
         }
 
-        [Test]
+        [Fact]
         public void TestFindAllWithNotLike()
         {
             _db.Users.FindAll(_db.Users.Name.NotLike("Foo")).ToList();
@@ -244,7 +247,7 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is("Foo");
         }
 
-        [Test]
+        [Fact]
         public void TestFindAllByNamedParameterSingleColumn()
         {
             _db.Users.FindAllBy(Name: "Foo").ToList();
@@ -252,14 +255,14 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is("Foo");
         }
 
-        [Test]
+        [Fact]
         public void TestFindAllByNamedParameterSingleColumnNull()
         {
             _db.Users.FindAllBy(Name: null).ToList();
             GeneratedSqlIs("select [dbo].[Users].[id],[dbo].[Users].[name],[dbo].[Users].[password],[dbo].[Users].[age] from [dbo].[Users] where [dbo].[Users].[name] is null");
         }
 
-        [Test]
+        [Fact]
         public void TestFindAllByNamedParameterTwoColumns()
         {
             _db.Users.FindAllBy(Name: "Foo", Password: "password").ToList();
@@ -269,7 +272,7 @@ namespace Simple.Data.IntegrationTest
         }
 
 
-        [Test]
+        [Fact]
         public void TestFindByDynamicTwoColumns()
         {
             _db.Users.FindByNameAndPassword("Foo", "secret");
@@ -278,7 +281,7 @@ namespace Simple.Data.IntegrationTest
             Parameter(1).Is("secret");
         }
 
-        [Test]
+        [Fact]
         public void TestFindAllByDynamic()
         {
             _db.Users.FindAllByName("Foo").ToList();
@@ -286,13 +289,13 @@ namespace Simple.Data.IntegrationTest
             Parameter(0).Is("Foo");
         }
 
-        [Test]
+        [Fact]
         public void FindByWithoutArgsThrowsArgumentException()
         {
             Assert.Throws<ArgumentException>(() => _db.Users.FindBy());
         }
  
-        [Test]
+        [Fact]
         public void FindAllByWithoutArgsThrowsArgumentException()
         {
             Assert.Throws<ArgumentException>(() => _db.Users.FindAllBy());

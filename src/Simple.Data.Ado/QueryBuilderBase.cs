@@ -38,7 +38,7 @@ namespace Simple.Data.Ado
             _simpleReferenceFormatter = new SimpleReferenceFormatter(_schema, _commandBuilder, functionNameConverter);
         }
 
-        public abstract ICommandBuilder Build(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses);
+        public abstract ICommandBuilder Build(SimpleQuery query, List<SimpleQueryClauseBase> simpleQueryClauseBases);
 
         protected virtual void SetQueryContext(SimpleQuery query)
         {

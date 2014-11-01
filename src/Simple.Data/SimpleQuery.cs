@@ -6,6 +6,7 @@
     using System.Dynamic;
     using System.Linq;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using Commands;
@@ -19,6 +20,7 @@
 
         private readonly SimpleQueryClauseBase[] _clauses;
         private readonly string _tableName;
+        private readonly bool _singleton;
         private Func<IObservable<dynamic>> _asObservableImplementation;
         private DataStrategy _dataStrategy;
         private JoinClause _tempJoinWaitingForOn;
@@ -46,7 +48,17 @@
             _adapter = source._adapter;
             _dataStrategy = source._dataStrategy;
             _tableName = source.TableName;
+            _singleton = source._singleton;
             _clauses = clauses;
+        }
+
+        private SimpleQuery(SimpleQuery source, SingletonIndicator singletonIndicator)
+        {
+            _adapter = source._adapter;
+            _dataStrategy = source._dataStrategy;
+            _tableName = source.TableName;
+            _clauses = source._clauses;
+            _singleton = true;
         }
 
         private SimpleQuery(SimpleQuery source,
@@ -57,6 +69,7 @@
             _dataStrategy = source._dataStrategy;
             _tableName = tableName;
             _clauses = clauses;
+            _singleton = source._singleton;
         }
 
         public IEnumerable<SimpleQueryClauseBase> Clauses
@@ -73,7 +86,7 @@
 
         public IEnumerator GetEnumerator()
         {
-            return Run().GetEnumerator();
+            return Run().Result.GetEnumerator();
         }
 
         #endregion
@@ -312,10 +325,10 @@
             return new SimpleQuery(this, _clauses.Where(c => !(c is WithCountClause)).ToArray());
         }
 
-        protected IEnumerable<dynamic> Run()
+        protected async Task<IEnumerable<dynamic>> Run()
         {
             IEnumerable<SimpleQueryClauseBase> unhandledClauses;
-            var result = (QueryResult)_dataStrategy.Run.Execute(new QueryOperation(this));
+            var result = (QueryResult)(await _dataStrategy.Run.Execute(new QueryOperation(this)));
 
             if (result.UnhandledClauses != null)
             {
@@ -711,29 +724,29 @@
             return ThenBy(ObjectReference.FromString(_tableName + "." + methodName));
         }
 
-        public IEnumerable<T> Cast<T>()
+        public async Task<IEnumerable<T>> Cast<T>()
         {
-            return new CastEnumerable<T>(Run());
+            return new CastEnumerable<T>(await Run());
         }
 
-        public IEnumerable<T> OfType<T>()
+        public async Task<IEnumerable<T>> OfType<T>()
         {
-            return new OfTypeEnumerable<T>(Run());
+            return new OfTypeEnumerable<T>(await Run());
         }
 
-        public IList<dynamic> ToList()
+        public async Task<IList<dynamic>> ToList()
         {
-            return Run().ToList();
+            return (await Run()).ToList();
         }
 
-        public dynamic[] ToArray()
+        public async Task<dynamic[]> ToArray()
         {
-            return Run().ToArray();
+            return (await Run()).ToArray();
         }
 
-        public dynamic ToScalar()
+        public async Task<dynamic> ToScalar()
         {
-            var data = Run().OfType<IDictionary<string, object>>().ToArray();
+            var data = (await Run()).OfType<IDictionary<string, object>>().ToArray();
             if (data.Length == 0)
             {
                 throw new SimpleDataException("Query returned no rows; cannot return scalar value.");
@@ -745,9 +758,9 @@
             return data[0].First().Value;
         }
 
-        public dynamic ToScalarOrDefault()
+        public async Task<dynamic> ToScalarOrDefault()
         {
-            var data = Run().OfType<IDictionary<string, object>>().ToArray();
+            var data = (await Run()).OfType<IDictionary<string, object>>().ToArray();
             if (data.Length == 0)
             {
                 return null;
@@ -759,123 +772,123 @@
             return data[0].First().Value;
         }
 
-        public IList ToScalarList()
+        public async Task<List<dynamic>> ToScalarList()
         {
-            return ToScalarEnumerable().ToList();
+            return (await ToScalarEnumerable()).ToList();
         }
 
-        public dynamic[] ToScalarArray()
+        public async Task<dynamic[]> ToScalarArray()
         {
-            return ToScalarEnumerable().ToArray();
+            return (await ToScalarEnumerable()).ToArray();
         }
 
-        public IList<T> ToScalarList<T>()
+        public async Task<List<T>> ToScalarList<T>()
         {
-            return ToScalarEnumerable().Cast<T>().ToList();
+            return (await ToScalarEnumerable()).Cast<T>().ToList();
         }
 
-        public T[] ToScalarArray<T>()
+        public async Task<T[]> ToScalarArray<T>()
         {
-            return ToScalarEnumerable().Cast<T>().ToArray();
+            return (await ToScalarEnumerable()).Cast<T>().ToArray();
         }
 
-        private IEnumerable<dynamic> ToScalarEnumerable()
+        private async Task<IEnumerable<dynamic>> ToScalarEnumerable()
         {
-            return Run().OfType<IDictionary<string, object>>().Select(dict => dict.Values.FirstOrDefault());
+            return (await Run()).OfType<IDictionary<string, object>>().Select(dict => dict.Values.FirstOrDefault());
         }
 
-        public IList<T> ToList<T>()
+        public async Task<IList<T>> ToList<T>()
         {
-            return Cast<T>().ToList();
+            return (await Cast<T>()).ToList();
         }
 
-        public T[] ToArray<T>()
+        public async Task<T[]> ToArray<T>()
         {
-            return Cast<T>().ToArray();
+            return (await Cast<T>()).ToArray();
         }
 
-        public T ToScalar<T>()
+        public async Task<T> ToScalar<T>()
         {
-            return (T) ToScalar();
+            return (T) (await ToScalar());
         }
 
-        public T ToScalarOrDefault<T>()
+        public async Task<T> ToScalarOrDefault<T>()
         {
-            return ToScalarOrDefault() ?? default(T);
+            return (await ToScalarOrDefault()) ?? default(T);
         }
 
-        public dynamic First()
+        public async Task<dynamic> First()
         {
-            return Take(1).Run().First();
+            return (await Take(1).Run()).First();
         }
 
-        public dynamic FirstOrDefault()
+        public async Task<dynamic> FirstOrDefault()
         {
-            return Take(1).Run().FirstOrDefault();
+            return (await Take(1).Run()).FirstOrDefault();
         }
 
-        public T First<T>()
+        public async Task<T> First<T>()
         {
-            return Take(1).Cast<T>().First();
+            return (await Take(1).Cast<T>()).First();
         }
 
-        public T FirstOrDefault<T>()
+        public async Task<T> FirstOrDefault<T>()
         {
-            return Take(1).Cast<T>().FirstOrDefault();
+            return (await Take(1).Cast<T>()).FirstOrDefault();
         }
 
-        public T First<T>(Func<T, bool> predicate)
+        public async Task<T> First<T>(Func<T, bool> predicate)
         {
-            return Cast<T>().First(predicate);
+            return (await Cast<T>()).First(predicate);
         }
 
-        public T FirstOrDefault<T>(Func<T, bool> predicate)
+        public async Task<T> FirstOrDefault<T>(Func<T, bool> predicate)
         {
-            return Cast<T>().FirstOrDefault(predicate);
+            return (await Cast<T>()).FirstOrDefault(predicate);
         }
 
-        public dynamic Single()
+        public async Task<dynamic> Single()
         {
-            return Take(1).Run().First();
+            return (await Take(1).Run()).First();
         }
 
-        public dynamic SingleOrDefault()
+        public async Task<dynamic> SingleOrDefault()
         {
-            return Take(1).Run().FirstOrDefault();
+            return (await Take(1).Run()).FirstOrDefault();
         }
 
-        public T Single<T>()
+        public async Task<T> Single<T>()
         {
-            return Take(1).Cast<T>().Single();
+            return (await Take(1).Cast<T>()).Single();
         }
 
-        public T SingleOrDefault<T>()
+        public async Task<T> SingleOrDefault<T>()
         {
-            return Take(1).Cast<T>().SingleOrDefault();
+            return (await Take(1).Cast<T>()).SingleOrDefault();
         }
 
-        public T Single<T>(Func<T, bool> predicate)
+        public async Task<T> Single<T>(Func<T, bool> predicate)
         {
-            return Cast<T>().Single(predicate);
+            return (await Cast<T>()).Single(predicate);
         }
 
-        public T SingleOrDefault<T>(Func<T, bool> predicate)
+        public async Task<T> SingleOrDefault<T>(Func<T, bool> predicate)
         {
-            return Cast<T>().SingleOrDefault(predicate);
+            return (await Cast<T>()).SingleOrDefault(predicate);
         }
 
-        public int Count()
+        public async Task<int> Count()
         {
-            return Convert.ToInt32(Select(new CountSpecialReference()).ToScalar());
+            return Convert.ToInt32(await Select(new CountSpecialReference()).ToScalar());
         }
 
         /// <summary>
         /// Checks whether the query matches any records without running the full query.
         /// </summary>
         /// <returns><c>true</c> if the query matches any record; otherwise, <c>false</c>.</returns>
-        public bool Exists()
+        public async Task<bool> Exists()
         {
-            return Select(new ExistsSpecialReference()).Run().Count() == 1;
+            return (await Select(new ExistsSpecialReference()).Run()).Count() == 1;
         }
 
         /// <summary>
@@ -883,7 +896,7 @@
         /// </summary>
         /// <returns><c>true</c> if the query matches any record; otherwise, <c>false</c>.</returns>
         /// <remarks>This method is an alias for <see cref="Exists"/>.</remarks>
-        public bool Any()
+        public Task<bool> Any()
         {
             return Exists();
         }
@@ -898,11 +911,6 @@
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<dynamic>> RunTask()
-        {
-            return Task.Factory.StartNew<IEnumerable<dynamic>>(Run);
-        }
-
         public SimpleQuery ClearOrderBy()
         {
             return new SimpleQuery(this, _clauses.Where(c => !(c is OrderByClause)).ToArray());
@@ -911,6 +919,33 @@
         public SimpleQuery ClearWith()
         {
             return new SimpleQuery(this, _clauses.Where(c => !(c is WithClause)).ToArray());
+        }
+
+        public SimpleQuery Singleton()
+        {
+            return new SimpleQuery(this, default(SingletonIndicator));
+        }
+
+        private async Task<dynamic> RunSingleton()
+        {
+            var list = await Take(1).Run();
+            return list.FirstOrDefault();
+        }
+
+        public dynamic GetAwaiter()
+        {
+            if (_singleton)
+            {
+                return RunSingleton().GetAwaiter();
+            }
+            else
+            {
+                return Run().GetAwaiter();
+            }
+        }
+
+        private struct SingletonIndicator
+        {
         }
     }
 }

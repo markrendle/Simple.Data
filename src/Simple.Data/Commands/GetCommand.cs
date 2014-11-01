@@ -18,13 +18,14 @@ namespace Simple.Data.Commands
 
         public object Execute(DataStrategy dataStrategy, DynamicTable table, InvokeMemberBinder binder, object[] args)
         {
-            var result = (DataResult)dataStrategy.Run.Execute(new GetOperation(table.GetName(), args));
-            if (result == null) return null;
-            var record = result.Data.FirstOrDefault();
-            if (record == null) return null;
-            return binder.Name.Equals("get", StringComparison.OrdinalIgnoreCase)
-                       ? new SimpleRecord(record, table.GetQualifiedName(), dataStrategy)
-                       : record.First().Value;
+            throw new NotImplementedException();
+            //var result = (DataResult)dataStrategy.Run.Execute(new GetOperation(table.GetName(), args));
+            //if (result == null) return null;
+            //var record = result.Data.FirstOrDefault();
+            //if (record == null) return null;
+            //return binder.Name.Equals("get", StringComparison.OrdinalIgnoreCase)
+            //           ? new SimpleRecord(record, table.GetQualifiedName(), dataStrategy)
+            //           : record.First().Value;
         }
 
         public object Execute(DataStrategy dataStrategy, SimpleQuery query, InvokeMemberBinder binder, object[] args)
@@ -41,5 +42,10 @@ namespace Simple.Data.Commands
         {
             return null;
         }
+    }
+
+    public class GetCommandAwaitable
+    {
+        
     }
 }

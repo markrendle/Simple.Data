@@ -9,10 +9,12 @@ using ResultSet = System.Collections.Generic.IEnumerable<System.Collections.Gene
 
 namespace Simple.Data.Ado
 {
+    using System.Threading.Tasks;
+
     public interface IProcedureExecutor
     {
-        IEnumerable<ResultSet> Execute(IDictionary<string, object> suppliedParameters);
-        IEnumerable<ResultSet> Execute(IDictionary<string, object> suppliedParameters, IDbTransaction transaction);
+        Task<IEnumerable<ResultSet>> Execute(IDictionary<string, object> suppliedParameters);
+        Task<IEnumerable<ResultSet>> Execute(IDictionary<string, object> suppliedParameters, IDbTransaction transaction);
     }
 
     public class ProcedureExecutor : IProcedureExecutor
@@ -21,7 +23,7 @@ namespace Simple.Data.Ado
 
         private readonly AdoAdapter _adapter;
         private readonly ObjectName _procedureName;
-        private Func<IDbCommand, IEnumerable<ResultSet>> _executeImpl;
+        private Func<IDbCommand, Task<IEnumerable<ResultSet>>> _executeImpl;
 
         public ProcedureExecutor(AdoAdapter adapter, ObjectName procedureName)
         {
@@ -30,12 +32,12 @@ namespace Simple.Data.Ado
             _executeImpl = ExecuteReader;
         }
 
-        public IEnumerable<ResultSet> Execute(IDictionary<string, object> suppliedParameters)
+        public Task<IEnumerable<ResultSet>> Execute(IDictionary<string, object> suppliedParameters)
         {
             return Execute(suppliedParameters, null);
         }
 
-        public IEnumerable<ResultSet> Execute(IDictionary<string, object> suppliedParameters, IDbTransaction transaction)
+        public Task<IEnumerable<ResultSet>> Execute(IDictionary<string, object> suppliedParameters, IDbTransaction transaction)
         {
             var procedure = _adapter.GetSchema().FindProcedure(_procedureName);
             if (procedure == null)
@@ -75,7 +77,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        public IEnumerable<ResultSet> ExecuteReader(IDbCommand command)
+        public async Task<IEnumerable<ResultSet>> ExecuteReader(IDbCommand command)
         {
             command.Connection.OpenIfClosed();
             using (var reader = command.TryExecuteReader())
@@ -92,13 +94,13 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static IEnumerable<ResultSet> ExecuteNonQuery(IDbCommand command)
+        private async Task<IEnumerable<ResultSet>> ExecuteNonQuery(IDbCommand command)
         {
 #if(DEBUG)
             SimpleDataTraceSources.TraceSource.TraceEvent(TraceEventType.Verbose, SimpleDataTraceSources.DebugMessageId, "Simple.Data.SqlTest ExecuteNonQuery");
 #endif
-            command.Connection.OpenIfClosed();
-            command.TryExecuteNonQuery();
+            await _adapter.CommandExecutor.OpenIfClosed(command.Connection);
+            await _adapter.CommandExecutor.ExecuteNonQuery(command);
             return Enumerable.Empty<ResultSet>();
         }
 

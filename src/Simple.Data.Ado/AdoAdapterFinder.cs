@@ -7,6 +7,7 @@
     using System.Data;
     using System.Data.Common;
     using System.Linq;
+    using System.Threading.Tasks;
 
     class AdoAdapterFinder
     {
@@ -45,7 +46,7 @@
             return ExecuteSingletonQuery(commandTemplate, criteria.GetValues());
         }
 
-        public Func<object[],IDictionary<string,object>> CreateFindOneDelegate(string tableName, SimpleExpression criteria)
+        public Func<object[],Task<IDictionary<string,object>>> CreateFindOneDelegate(string tableName, SimpleExpression criteria)
         {
             if (criteria == null)
             {
@@ -102,12 +103,12 @@
                                                   .GetCommandTemplate(_adapter.GetSchema().FindTable(_adapter.GetSchema().BuildObjectName(tableName))));
         }
 
-        private IEnumerable<IDictionary<string, object>> FindAll(ObjectName tableName)
+        private Task<IEnumerable<IDictionary<string, object>>> FindAll(ObjectName tableName)
         {
             return ExecuteQuery("select * from " + _adapter.GetSchema().FindTable(tableName).QualifiedName);
         }
 
-        private IEnumerable<IDictionary<string, object>> ExecuteQuery(CommandTemplate commandTemplate, IEnumerable<object> parameterValues)
+        private Task<IEnumerable<IDictionary<string, object>>> ExecuteQuery(CommandTemplate commandTemplate, IEnumerable<object> parameterValues)
         {
             var connection = _connection ?? _adapter.CreateConnection();
             var command = commandTemplate.GetDbCommand(_adapter, connection, parameterValues);
@@ -115,7 +116,7 @@
             return TryExecuteQuery(connection, command, commandTemplate.Index);
         }
 
-        private IDictionary<string, object> ExecuteSingletonQuery(CommandTemplate commandTemplate, IEnumerable<object> parameterValues)
+        private Task<IDictionary<string, object>> ExecuteSingletonQuery(CommandTemplate commandTemplate, IEnumerable<object> parameterValues)
         {
             var connection = _connection ?? _adapter.CreateConnection();
             var command = commandTemplate.GetDbCommand(_adapter, connection, parameterValues);
@@ -123,7 +124,7 @@
             return TryExecuteSingletonQuery(connection, command, commandTemplate.Index);
         }
 
-        private IEnumerable<IDictionary<string, object>> ExecuteQuery(string sql, params object[] values)
+        private Task<IEnumerable<IDictionary<string, object>>> ExecuteQuery(string sql, params object[] values)
         {
             var connection = _connection ?? _adapter.CreateConnection();
             var command = new CommandHelper(_adapter).Create(connection, sql, values);
@@ -131,7 +132,7 @@
             return TryExecuteQuery(connection, command);
         }
 
-        private IEnumerable<IDictionary<string, object>> TryExecuteQuery(IDbConnection connection, IDbCommand command)
+        private Task<IEnumerable<IDictionary<string, object>>> TryExecuteQuery(IDbConnection connection, IDbCommand command)
         {
             try
             {

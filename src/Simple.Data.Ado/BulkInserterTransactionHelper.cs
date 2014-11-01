@@ -4,6 +4,7 @@ namespace Simple.Data.Ado
     using System.Collections.Generic;
     using System.Data;
     using System.Linq;
+    using System.Threading.Tasks;
     using Schema;
 
     class BulkInserterTransactionHelper : BulkInserterHelper
@@ -16,32 +17,42 @@ namespace Simple.Data.Ado
             _transaction = transaction;
         }
 
-        public override IEnumerable<IDictionary<string, object>> InsertRowsWithSeparateStatements(string insertSql, string selectSql, ErrorCallback onError)
+        public override async Task<IEnumerable<IDictionary<string, object>>> InsertRowsWithSeparateStatements(string insertSql, string selectSql, ErrorCallback onError)
         {
             var insertCommand = new CommandHelper(Adapter).Create(_transaction.Connection, insertSql);
             var selectCommand = _transaction.Connection.CreateCommand(Adapter.AdoOptions);
             selectCommand.CommandText = selectSql;
             insertCommand.Transaction = _transaction;
             selectCommand.Transaction = _transaction;
-            return Data.Select(row => InsertRow(row, insertCommand, selectCommand, onError)).ToList();
+            var list = new List<IDictionary<string, object>>();
+            foreach (var row in Data)
+            {
+                list.Add(await InsertRow(row, insertCommand, selectCommand, onError));
+            }
+            return list.Where(r => r != null);
         }
 
-        public override IEnumerable<IDictionary<string, object>> InsertRowsWithCompoundStatement(string insertSql, string selectSql, ErrorCallback onError)
+        public override async Task<IEnumerable<IDictionary<string, object>>> InsertRowsWithCompoundStatement(string insertSql, string selectSql, ErrorCallback onError)
         {
             insertSql += "; " + selectSql;
             var command = new CommandHelper(Adapter).Create(_transaction.Connection, insertSql);
             command.Transaction = _transaction;
-            return Data.Select(row => InsertRowAndSelect(row, command, onError)).ToList();
+            var list = new List<IDictionary<string, object>>();
+            foreach (var row in Data)
+            {
+                list.Add(await InsertRowAndSelect(row, command, onError));
+            }
+            return list.Where(r => r != null);
         }
 
-        public override void InsertRowsWithoutFetchBack(string insertSql, ErrorCallback onError)
+        public override async Task InsertRowsWithoutFetchBack(string insertSql, ErrorCallback onError)
         {
             using (var insertCommand = new CommandHelper(Adapter).Create(_transaction.Connection, insertSql))
             {
                 insertCommand.Transaction = _transaction;
                 foreach (var row in Data)
                 {
-                    InsertRow(row, insertCommand, onError);
+                    await InsertRow(row, insertCommand, onError);
                 }
             }
 

@@ -5,6 +5,7 @@ namespace Simple.Data.Ado
     using System.Data;
     using System.Diagnostics;
     using System.Linq;
+    using System.Threading.Tasks;
     using Schema;
 
     class BulkInserterHelper
@@ -23,7 +24,7 @@ namespace Simple.Data.Ado
             _columns = columns;
         }
 
-        public virtual void InsertRowsWithoutFetchBack(string insertSql, ErrorCallback onError)
+        public virtual async Task InsertRowsWithoutFetchBack(string insertSql, ErrorCallback onError)
         {
             var connection = Adapter.CreateConnection();
             using (connection.MaybeDisposable())
@@ -34,13 +35,13 @@ namespace Simple.Data.Ado
                     TryPrepare(insertCommand);
                     foreach (var row in Data)
                     {
-                        InsertRow(row, insertCommand, onError);
+                        await InsertRow(row, insertCommand, onError);
                     }
                 }
             }
         }
 
-        public virtual IEnumerable<IDictionary<string, object>> InsertRowsWithSeparateStatements(string insertSql, string selectSql, ErrorCallback onError)
+        public virtual async Task<IEnumerable<IDictionary<string, object>>> InsertRowsWithSeparateStatements(string insertSql, string selectSql, ErrorCallback onError)
         {
             var connection = Adapter.CreateConnection();
             using (connection.MaybeDisposable())
@@ -51,12 +52,17 @@ namespace Simple.Data.Ado
                     selectCommand.CommandText = selectSql;
                     connection.OpenIfClosed();
                     TryPrepare(insertCommand, selectCommand);
-                    return Data.Select(row => InsertRow(row, insertCommand, selectCommand, onError)).Where(r => r != null).ToList();
+                    var list = new List<IDictionary<string, object>>();
+                    foreach (var row in Data)
+                    {
+                        list.Add(await InsertRow(row, insertCommand, selectCommand, onError));
+                    }
+                    return list.Where(r => r != null);
                 }
             }
         }
 
-        public virtual IEnumerable<IDictionary<string, object>> InsertRowsWithCompoundStatement(string insertSql, string selectSql, ErrorCallback onError)
+        public virtual async Task<IEnumerable<IDictionary<string, object>>> InsertRowsWithCompoundStatement(string insertSql, string selectSql, ErrorCallback onError)
         {
             insertSql += "; " + selectSql;
 
@@ -67,19 +73,24 @@ namespace Simple.Data.Ado
                 {
                     connection.OpenIfClosed();
                     TryPrepare(command);
-                    return Data.Select(row => InsertRowAndSelect(row, command, onError)).Where(r => r != null).ToList();
+                    var result = new List<IDictionary<string, object>>();
+                    foreach (var row in Data)
+                    {
+                        result.Add(await InsertRowAndSelect(row, command, onError));
+                    }
+                    return result.Where(r => r != null);
                 }
             }
         }
 
-        protected IDictionary<string, object> InsertRowAndSelect(IReadOnlyDictionary<string, object> row, IDbCommand command, ErrorCallback onError)
+        protected async Task<IDictionary<string, object>> InsertRowAndSelect(IReadOnlyDictionary<string, object> row, IDbCommand command, ErrorCallback onError)
         {
             if (_parameterSetter == null) _parameterSetter = BuildParameterSettingAction(row);
             _parameterSetter(row, command);
 
             try
             {
-                var insertedRow = TryExecuteSingletonQuery(command);
+                var insertedRow = await TryExecuteSingletonQuery(command);
                 return insertedRow;
             }
             catch (Exception ex)
@@ -89,14 +100,14 @@ namespace Simple.Data.Ado
             }
         }
 
-        protected int InsertRow(IReadOnlyDictionary<string, object> row, IDbCommand command, ErrorCallback onError)
+        protected async Task<int> InsertRow(IReadOnlyDictionary<string, object> row, IDbCommand command, ErrorCallback onError)
         {
             if (_parameterSetter == null) _parameterSetter = BuildParameterSettingAction(row);
             _parameterSetter(row, command);
 
             try
             {
-                return command.TryExecuteNonQuery();
+                return await this.Adapter.CommandExecutor.ExecuteNonQuery(command);
             }
             catch (Exception ex)
             {
@@ -105,7 +116,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        protected IDictionary<string, object> InsertRow(IReadOnlyDictionary<string, object> row, IDbCommand insertCommand, IDbCommand selectCommand, ErrorCallback onError)
+        protected Task<IDictionary<string, object>> InsertRow(IReadOnlyDictionary<string, object> row, IDbCommand insertCommand, IDbCommand selectCommand, ErrorCallback onError)
         {
             if (_parameterSetter == null) _parameterSetter = BuildParameterSettingAction(row);
             _parameterSetter(row, insertCommand);
@@ -123,9 +134,9 @@ namespace Simple.Data.Ado
             return null;
         }
 
-        private static IDictionary<string, object> TryExecuteSingletonQuery(IDbCommand command)
+        private async Task<IDictionary<string, object>> TryExecuteSingletonQuery(IDbCommand command)
         {
-            using (var reader = command.TryExecuteReader())
+            using (var reader = await this.Adapter.CommandExecutor.ExecuteReader(command))
             {
                 if (reader.Read())
                 {

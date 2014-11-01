@@ -16,13 +16,13 @@ namespace Simple.Data.Ado
         {
         }
 
-        public override ICommandBuilder Build(SimpleQuery query, out IEnumerable<SimpleQueryClauseBase> unhandledClauses)
+        public override ICommandBuilder Build(SimpleQuery query, List<SimpleQueryClauseBase> unhandledClauses)
         {
 
             var customBuilder = _adoAdapter.ProviderHelper.GetCustomProvider<ICustomQueryBuilder>(_adoAdapter.ConnectionProvider);
             if (customBuilder != null)
             {
-                return customBuilder.Build(_adoAdapter, _bulkIndex, query, out unhandledClauses);
+                return customBuilder.Build(_adoAdapter, _bulkIndex, query, unhandledClauses);
             }
 
             _unhandledClauses = new List<SimpleQueryClauseBase>();

@@ -29,6 +29,7 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -87,10 +88,6 @@
       <Project>{ECC2D7DB-EC7F-44B6-B09F-5B471C629685}</Project>
       <Name>Simple.Data.Ado</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Simple.Data.SqlCe40\Simple.Data.SqlCe40.csproj">
-      <Project>{43BA3D2C-10D8-470D-A60B-4F06D2F9D539}</Project>
-      <Name>Simple.Data.SqlCe40</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Simple.Data.TestHelper\Simple.Data.TestHelper.csproj">
       <Project>{7DAB2F13-0392-435E-A934-4567266714BF}</Project>
       <Name>Simple.Data.TestHelper</Name>
@@ -148,6 +145,13 @@ copy "..\..\packages\SqlServerCompact.4.0.8482.1\NativeBinaries\amd64\*.dll" "$(
   <PropertyGroup Condition="'$(SolutionDir)' == '' or '$(SolutionDir)' == '*undefined*'">
     <SolutionDir>..\..\</SolutionDir>
   </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

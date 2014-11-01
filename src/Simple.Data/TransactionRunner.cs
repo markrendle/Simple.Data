@@ -4,6 +4,7 @@ namespace Simple.Data
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
 
     internal class TransactionRunner : RunStrategy
     {
@@ -21,7 +22,7 @@ namespace Simple.Data
             get { return (Adapter) _adapter; }
         }
 
-        internal override OperationResult Execute(IOperation operation)
+        internal override Task<OperationResult> Execute(IOperation operation)
         {
             return _adapter.Execute(operation, _adapterTransaction);
         }
