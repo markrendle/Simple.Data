@@ -31,6 +31,27 @@ namespace Simple.Data.SqlTest
         }
 
         [Test]
+        public void GetWithSelectClauseShouldRestrictColumn()
+        {
+            var db = DatabaseHelper.Open();
+           
+            var actual = db.Users.Select(db.Users.Name, db.Users.Age).Get(1);
+            
+            Assert.AreEqual("Bob", actual.Name);
+            Assert.AreEqual(32, actual.Age);
+            Assert.Throws<UnresolvableObjectException>(() => Console.WriteLine(actual.Id), "Column 'Id' not found.");
+            Assert.Throws<UnresolvableObjectException>(() => Console.WriteLine(actual.Password), "Column 'Password' not found.");
+        }
+
+        [Test]
+        public void GetWithMisplacedSelectClauseThrowsException()
+        {
+            var db = DatabaseHelper.Open();
+            Assert.Throws<UnresolvableObjectException>(
+                        () => db.Users.Get(1).Select(db.Users.Name, db.Users.Age));
+        }
+
+        [Test]
         public void SelectClauseWithGetScalarShouldLimitQuery()
         {
             var db = DatabaseHelper.Open();
