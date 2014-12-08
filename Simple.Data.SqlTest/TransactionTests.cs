@@ -55,6 +55,27 @@ namespace Simple.Data.SqlTest
             Assert.AreEqual(1, db.OrderItems.All().ToList().Count);
         }
 
+        [Test, Ignore("TODO: fix transactions?")]
+        public void TestRollbackOnProcedureWithSpecifiedSchema()
+        {
+            var db = DatabaseHelper.Open();
+
+            int customerId;
+            using (var tx = db.BeginTransaction())
+            {
+                var customer = tx.dbo.CreateCustomer().FirstOrDefault();
+                customerId = customer.CustomerId;
+                
+                var customerBeforeRollback = db.Customers.FindByCustomerId(customerId);
+                Assert.IsNotNull(customerBeforeRollback);
+                
+                tx.Rollback();
+            }
+
+            var customerAfterRollback = db.Customers.FindByCustomerId(customerId);
+            Assert.IsNull(customerAfterRollback);
+        }
+        
         [Test]
         public void TestWithOptionsTransaction()
         {
