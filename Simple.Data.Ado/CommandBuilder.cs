@@ -22,7 +22,8 @@ namespace Simple.Data.Ado
 
         public string Joins { get; set; }
 
-        public CommandBuilder(DatabaseSchema schema) : this(schema, -1)
+        public CommandBuilder(DatabaseSchema schema)
+            : this(schema, -1)
         {
         }
 
@@ -226,7 +227,7 @@ namespace Simple.Data.Ado
                     else
                     {
                         var list = value as IEnumerable;
-                        if (list != null)
+                        if (list != null && list.GetEnumerator().MoveNext())
                         {
                             var builder = new StringBuilder();
                             var array = list.Cast<object>().ToArray();
@@ -252,7 +253,8 @@ namespace Simple.Data.Ado
                         }
                         else
                         {
-                            yield return CreateSingleParameter(parameterFactory, value, template);
+                            //When the value is IEnumerable and Empty is it safe to pass null?
+                            yield return CreateSingleParameter(parameterFactory, null, template);
                         }
                     }
                 }
@@ -273,7 +275,7 @@ namespace Simple.Data.Ado
             }
         }
 
-        private static IDbDataParameter CreateSingleParameter(IDbParameterFactory parameterFactory, object value, ParameterTemplate template)    
+        private static IDbDataParameter CreateSingleParameter(IDbParameterFactory parameterFactory, object value, ParameterTemplate template)
         {
             if (template.Column != null)
             {
