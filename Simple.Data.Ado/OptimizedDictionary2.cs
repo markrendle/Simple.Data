@@ -209,7 +209,8 @@ namespace Simple.Data.Ado
                 // Rethrow exceptions from here to hide implementation details.
                 try
                 {
-                    return _values[_index[key]];
+                    var ordinal = _index[key];
+                    return ordinal < _values.Count ? _values[ordinal] : default(TValue);
                 }
                 catch (ArgumentNullException)
                 {
@@ -218,10 +219,6 @@ namespace Simple.Data.Ado
                 catch (KeyNotFoundException)
                 {
                     throw new KeyNotFoundException();
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                    return default(TValue);
                 }
             }
             set
