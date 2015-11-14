@@ -7,6 +7,7 @@
     public class SimpleDataExceptionTest
     {
         [Test]
+        [SetUICulture("en-US")]
         public void EmptyConstructor()
         {
             var actual = new SimpleDataException();
