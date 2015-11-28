@@ -834,5 +834,22 @@
 
             Assert.AreEqual(0, rowsUpdated);
         }
+
+        [Test]
+        public void FindAll_When2ColumnsAreCompared_ReturnsMatchingRows()
+        {
+            Database.UseMockAdapter(new InMemoryAdapter());
+            var db = Database.Open();
+            db.Translations.Insert(
+                Text: "some text",
+                Language: "pl",
+                OriginalLanguage: "pl"
+            );
+
+            var result = db.Translations
+                .FindAll(db.Translations.Language == db.Translations.OriginalLanguage);
+
+            Assert.AreEqual(1, result.Count());
+        }
     }
 }
