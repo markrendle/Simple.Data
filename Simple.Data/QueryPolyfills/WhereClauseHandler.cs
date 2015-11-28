@@ -110,6 +110,16 @@ namespace Simple.Data.QueryPolyfills
                         };
             }
 
+            if (arg.RightOperand.GetType() == typeof(ObjectReference))
+            {
+                return d => {
+                    var leftOperandResolved = Resolve(d, arg.LeftOperand);
+                    var rightOperandResolved = Resolve(d, arg.RightOperand);
+
+                    return Enumerable.SequenceEqual(leftOperandResolved, rightOperandResolved);
+                };
+            }
+
             return d => Resolve(d, arg.LeftOperand).Contains(arg.RightOperand);
         }
 
