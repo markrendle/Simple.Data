@@ -5,31 +5,35 @@ Prompted by the need for an easy-to-use database access component which prevents
 
 Instead of
 
-    public User FindUserByEmail(string email)
-	{
-		User user = null;
-        using (var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["Default"].ConnectionString))
-	    using (var command = new SqlCommand("select id, email, hashed_password, salt from users where email = @email", connection))
+```cs
+public User FindUserByEmail(string email)
+{
+    User user = null;
+    using (var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["Default"].ConnectionString))
+    using (var command = new SqlCommand("select id, email, hashed_password, salt from users where email = @email", connection))
+    {
+        command.Parameters.Add("@email", SqlDbType.NVarChar, 50).Value = form.Email);
+	    connection.Open();
+	    using (var reader = command.ExecuteReader())
 	    {
-	        command.Parameters.Add("@email", SqlDbType.NVarChar, 50).Value = form.Email);
-		    connection.Open();
-		    using (var reader = command.ExecuteReader())
+		    if (reader.Read())
 		    {
-			    if (reader.Read())
-			    {
-				    user = new User {Id = reader.GetInt32(0), Email = reader.GetString(1), Password = reader.GetString(2), salt = reader.GetString(3)};
-				}
+			    user = new User {Id = reader.GetInt32(0), Email = reader.GetString(1), Password = reader.GetString(2), salt = reader.GetString(3)};
 			}
 		}
-		return user;
 	}
+	return user;
+}
+```
 
 why not just write
 
-	public User FindUserByEmail(string email)
-	{
-		return Database.Open().Users.FindAllByEmail(email).FirstOrDefault();
-	}
+```cs
+public User FindUserByEmail(string email)
+{
+	return Database.Open().Users.FindAllByEmail(email).FirstOrDefault();
+}
+```
 
 and take the rest of the morning off?
 
