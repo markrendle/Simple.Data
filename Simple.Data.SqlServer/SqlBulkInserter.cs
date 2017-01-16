@@ -79,6 +79,9 @@ namespace Simple.Data.SqlServer
                 options |= (adapter.AdoOptions.FireTriggersOnBulkInserts
                                 ? SqlBulkCopyOptions.FireTriggers
                                 : SqlBulkCopyOptions.Default);
+                options |= (adapter.AdoOptions.IdentityInsert
+                               ? SqlBulkCopyOptions.KeepIdentity
+                               : SqlBulkCopyOptions.Default);
             }
 
             return options;
@@ -113,7 +116,7 @@ namespace Simple.Data.SqlServer
             foreach (DataColumn column in dataTable.Columns)
             {
                 if (record.ContainsKey(column.ColumnName))
-                    dataRow[column] = record[column.ColumnName];
+                    dataRow[column] = record[column.ColumnName] ?? DBNull.Value;
             }
             dataTable.Rows.Add(dataRow);
         }
