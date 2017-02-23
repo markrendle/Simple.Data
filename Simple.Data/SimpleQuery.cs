@@ -281,6 +281,36 @@
             return ThenBy(reference, OrderByDirection.Descending);
         }
 
+        public SimpleQuery OrderBy(string column)
+        {
+            return ParseOrderBy(string.Format("OrderBy{0}", column));
+        }
+
+        public SimpleQuery OrderByDescending(string column)
+        {
+            return ParseOrderBy(string.Format("OrderBy{0}Descending", column));
+        }
+
+        public SimpleQuery OrderBy(string column, OrderByDirection direction)
+        {
+            return direction == OrderByDirection.Ascending ? OrderBy(column) : OrderByDescending(column);
+        }
+
+        public SimpleQuery ThenBy(string column)
+        {
+            return ParseThenBy(string.Format("ThenBy{0}", column));
+        }
+
+        public SimpleQuery ThenByDescending(string column)
+        {
+            return ParseThenBy(string.Format("ThenBy{0}Descending", column));
+        }
+
+        public SimpleQuery ThenBy(string column, OrderByDirection direction)
+        {
+            return direction == OrderByDirection.Ascending ? ThenBy(column) : ThenByDescending(column);
+        }
+
         public SimpleQuery Skip(int skip)
         {
             return new SimpleQuery(this, _clauses.ReplaceOrAppend(new SkipClause(skip)));
