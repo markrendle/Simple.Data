@@ -38,6 +38,11 @@ namespace Simple.Data.SqlServer
                 bulkCopy = new SqlBulkCopy(connection, sqlBulkCopyOptions, null);
             }
 
+            if (adapter.AdoOptions != null)
+            {
+                bulkCopy.BulkCopyTimeout = adapter.AdoOptions.BulkCopyTimeout;
+            }
+
             bulkCopy.DestinationTableName = adapter.GetSchema().FindTable(tableName).QualifiedName;
 
             using (connection.MaybeDisposable())
