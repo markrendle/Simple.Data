@@ -5,9 +5,9 @@ using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Simple.Data.Commands;
+using Shitty.Data.Commands;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     /// <summary>
     /// Represents a qualified reference to a data store object, such as a table or column.

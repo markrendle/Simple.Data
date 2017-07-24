@@ -4,9 +4,9 @@ using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using Simple.Data.Extensions;
+using Shitty.Data.Extensions;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     public partial class SimpleRecord : DynamicObject, ICloneable
     {

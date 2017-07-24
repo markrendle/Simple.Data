@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Dynamic;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     using System.Text;
 

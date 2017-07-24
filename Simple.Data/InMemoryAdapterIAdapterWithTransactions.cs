@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     public partial class InMemoryAdapter : IAdapterWithTransactions
     {

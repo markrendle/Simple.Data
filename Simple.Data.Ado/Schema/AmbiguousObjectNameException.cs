@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Simple.Data.Ado.Schema
+namespace Shitty.Data.Ado.Schema
 {
     using System.Security;
 

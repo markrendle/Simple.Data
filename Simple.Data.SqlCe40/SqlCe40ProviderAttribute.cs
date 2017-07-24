@@ -1,8 +1,8 @@
 using System;
 using System.Data.SqlServerCe;
-using Simple.Data.Ado;
+using Shitty.Data.Ado;
 
-namespace Simple.Data.SqlCe40
+namespace Shitty.Data.SqlCe40
 {
     public class SqlCe40ProviderAttribute : ProviderAssemblyAttributeBase
     {

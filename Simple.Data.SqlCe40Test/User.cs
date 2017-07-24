@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data.SqlCeTest
+namespace Shitty.Data.SqlCeTest
 {
     class User
     {

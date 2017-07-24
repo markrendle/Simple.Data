@@ -1,4 +1,4 @@
-namespace Simple.Data.IntegrationTest
+namespace Shitty.Data.IntegrationTest
 {
     using System;
     using Mocking.Ado;

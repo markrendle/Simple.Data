@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     [Serializable]
     public class BadExpressionException : ArgumentException

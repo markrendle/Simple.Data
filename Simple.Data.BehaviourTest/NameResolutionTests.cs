@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Data.Entity.Design.PluralizationServices;
 using NUnit.Framework;
-using Simple.Data.Ado;
-using Simple.Data.Mocking.Ado;
+using Shitty.Data.Mocking.Ado;
+using Shitty.Data.Ado;
 
-namespace Simple.Data.IntegrationTest
+namespace Shitty.Data.IntegrationTest
 {
     using System.Globalization;
     using Extensions;

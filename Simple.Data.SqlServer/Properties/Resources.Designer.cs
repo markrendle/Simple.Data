@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Simple.Data.SqlServer.Properties {
+namespace Shitty.Data.SqlServer.Properties {
     using System;
     
     

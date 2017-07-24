@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 
-namespace Simple.Data.Commands
+namespace Shitty.Data.Commands
 {
     using Extensions;
 

@@ -2,7 +2,7 @@
 using System.Data;
 using System.Linq;
 
-namespace Simple.Data.Mocking.Ado
+namespace Shitty.Data.Mocking.Ado
 {
     static class DataRowExtensions
     {

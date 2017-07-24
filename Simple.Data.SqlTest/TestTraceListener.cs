@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data.SqlTest
+namespace Shitty.Data.SqlTest
 {
     public class TestTraceListener : TraceListener
     {

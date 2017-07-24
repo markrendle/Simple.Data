@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 
-namespace Simple.Data.SqlTest
+namespace Shitty.Data.SqlTest
 {
     using Ado;
     using SqlServer;

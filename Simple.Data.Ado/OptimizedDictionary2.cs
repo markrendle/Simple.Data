@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     public class OptimizedDictionary<TKey,TValue> : IDictionary<TKey,TValue>, ICloneable
     {

@@ -1,5 +1,5 @@
 ﻿#if(!MONO)
-namespace Simple.Data.UnitTest
+namespace Shitty.Data.UnitTest
 {
     using System.Data.Entity.Design.PluralizationServices;
     using System.Globalization;

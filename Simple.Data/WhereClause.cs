@@ -1,4 +1,4 @@
-namespace Simple.Data
+namespace Shitty.Data
 {
     /// <summary>
     /// Represents the filtering criteria for a <see cref="SimpleQuery"/>.

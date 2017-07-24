@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     using Schema;
 

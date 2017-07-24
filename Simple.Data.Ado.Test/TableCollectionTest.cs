@@ -1,8 +1,8 @@
-﻿using Simple.Data.Ado.Schema;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
+using Shitty.Data.Ado.Schema;
 
-namespace Simple.Data.UnitTest
+namespace Shitty.Data.UnitTest
 {
 
 

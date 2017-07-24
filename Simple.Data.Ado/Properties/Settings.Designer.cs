@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Simple.Data.Ado.Properties {
+namespace Shitty.Data.Ado.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

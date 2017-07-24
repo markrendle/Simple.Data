@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 
-namespace Simple.Data.SqlTest
+namespace Shitty.Data.SqlTest
 {
     [TestFixture]
     public class OrderDetailTests

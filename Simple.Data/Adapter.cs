@@ -1,4 +1,4 @@
-﻿namespace Simple.Data
+﻿namespace Shitty.Data
 {
     using System;
     using System.Collections.Generic;
@@ -286,7 +286,7 @@
         /// <returns>The number of records affected by the update operation.</returns>
         /// <remarks>For example, the Ado adapter will fulfil this functionality using Primary Key data.</remarks>
         /// <remarks>This method has a default implementation based on the
-        /// <see cref="Update(string,System.Collections.Generic.IDictionary{string,object},Simple.Data.SimpleExpression)"/> method.
+        /// <see cref="Update(string,System.Collections.Generic.IDictionary{string,object},SimpleExpression)"/> method.
         /// You should override this method if your adapter can optimize the operation.</remarks>
         public virtual int UpdateMany(string tableName, IEnumerable<IDictionary<string, object>> dataList,
                                       IEnumerable<string> criteriaFieldNames)

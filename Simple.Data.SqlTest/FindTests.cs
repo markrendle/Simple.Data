@@ -4,11 +4,11 @@ using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using System.IO;
-using Simple.Data.Ado;
-using Simple.Data.SqlServer;
-using Simple.Data.TestHelper;
+using Shitty.Data.Ado;
+using Shitty.Data.SqlServer;
+using Shitty.Data.TestHelper;
 
-namespace Simple.Data.SqlTest
+namespace Shitty.Data.SqlTest
 {
     using System;
 

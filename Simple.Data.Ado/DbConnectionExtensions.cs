@@ -5,7 +5,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
 public static class DbConnectionExtensions
 {

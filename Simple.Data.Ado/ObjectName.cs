@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Simple.Data.Ado.Schema;
+using Shitty.Data.Ado.Schema;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     public class ObjectName : IEquatable<ObjectName>
     {

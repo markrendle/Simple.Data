@@ -1,8 +1,8 @@
 using System.Data;
 using System.Data.Common;
-using Simple.Data.Ado.Schema;
+using Shitty.Data.Ado.Schema;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     public interface IConnectionProvider
     {

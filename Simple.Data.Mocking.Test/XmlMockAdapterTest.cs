@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 
-namespace Simple.Data.Mocking.Test
+namespace Shitty.Data.Mocking.Test
 {
     /// <summary>
     ///This is a test class for XmlStubAdapterTest and is intended

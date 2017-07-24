@@ -1,4 +1,4 @@
-﻿namespace Simple.Data
+﻿namespace Shitty.Data
 {
     using System;
     using System.Threading;

@@ -1,4 +1,4 @@
-namespace Simple.Data
+namespace Shitty.Data
 {
     /// <summary>
     /// Represents a number of records to take from the results returned by a <see cref="SimpleQuery"/>.

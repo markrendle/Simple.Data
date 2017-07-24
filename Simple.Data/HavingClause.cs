@@ -1,4 +1,4 @@
-namespace Simple.Data
+namespace Shitty.Data
 {
     /// <summary>
     /// Represents the "HAVING" clause (i.e. criteria over aggregations) of a <see cref="SimpleQuery"/>.

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace Simple.Data.Mocking
+namespace Shitty.Data.Mocking
 {
     public class XmlMockAdapter : Adapter, IAdapterWithRelation
     {

@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     public class Promise<T>
     {

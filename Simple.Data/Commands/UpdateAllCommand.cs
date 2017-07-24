@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Dynamic;
 using System.Linq;
-using Simple.Data.Extensions;
+using Shitty.Data.Extensions;
 
-namespace Simple.Data.Commands
+namespace Shitty.Data.Commands
 {
     using System.Collections.Generic;
 

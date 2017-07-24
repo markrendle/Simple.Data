@@ -4,10 +4,10 @@ using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
-using Simple.Data.Ado.Schema;
+using Shitty.Data.Ado.Schema;
 using ResultSet = System.Collections.Generic.IEnumerable<System.Collections.Generic.IDictionary<string, object>>;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     public interface IProcedureExecutor
     {

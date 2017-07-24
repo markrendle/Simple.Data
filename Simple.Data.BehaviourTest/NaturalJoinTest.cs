@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using Simple.Data.Ado;
-using Simple.Data.Mocking.Ado;
+using Shitty.Data.Mocking.Ado;
+using Shitty.Data.Ado;
 
-namespace Simple.Data.IntegrationTest
+namespace Shitty.Data.IntegrationTest
 {
     [TestFixture]
     public class NaturalJoinTest : DatabaseIntegrationContext

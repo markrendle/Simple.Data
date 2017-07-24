@@ -1,9 +1,11 @@
-namespace Simple.Data.SqlCe40Test
+using Shitty.Data.SqlCe40;
+
+namespace Shitty.Data.SqlCe40Test
 {
     using System;
     using System.Linq;
     using NUnit.Framework;
-    using Simple.Data.SqlCe40;
+    using Shitty.Data.SqlCe40;
 
     [TestFixture]
     public class SchemaProviderTest

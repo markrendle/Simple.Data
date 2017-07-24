@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Simple.Data.SqlTest
+namespace Shitty.Data.SqlTest
 {
     internal static class DatabaseHelper
     {

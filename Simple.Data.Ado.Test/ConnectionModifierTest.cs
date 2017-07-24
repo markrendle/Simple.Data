@@ -1,7 +1,7 @@
 using System.Data;
 using NUnit.Framework;
 
-namespace Simple.Data.Ado.Test
+namespace Shitty.Data.Ado.Test
 {
     using System;
 

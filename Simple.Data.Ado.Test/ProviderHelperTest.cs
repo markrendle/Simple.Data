@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using System.Data;
-using Simple.Data.Ado.Schema;
 using System.ComponentModel.Composition;
+using Shitty.Data.Ado.Schema;
 
-namespace Simple.Data.Ado.Test
+namespace Shitty.Data.Ado.Test
 {
     [TestFixture]
     public class ProviderHelperTest

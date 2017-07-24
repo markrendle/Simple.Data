@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Simple.Data.SqlTest.Properties {
+namespace Shitty.Data.SqlTest.Properties {
     using System;
     
     

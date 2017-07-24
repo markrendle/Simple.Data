@@ -2,7 +2,7 @@
 using System.Reflection;
 using NUnit.Framework;
 
-namespace Simple.Data.SqlCe40Test
+namespace Shitty.Data.SqlCe40Test
 {
     [TestFixture]
     public class QueryTest

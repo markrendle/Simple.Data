@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.Common;
 
-namespace Simple.Data.Mocking.Ado
+namespace Shitty.Data.Mocking.Ado
 {
     public class MockDbConnection : DbConnection
     {

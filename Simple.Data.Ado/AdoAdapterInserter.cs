@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
-using Simple.Data.Extensions;
+using Shitty.Data.Extensions;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     using Schema;
 

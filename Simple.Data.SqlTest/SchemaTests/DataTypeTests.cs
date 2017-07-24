@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 
-namespace Simple.Data.SqlTest.SchemaTests
+namespace Shitty.Data.SqlTest.SchemaTests
 {
     [TestFixture]
     public class DataTypeTests

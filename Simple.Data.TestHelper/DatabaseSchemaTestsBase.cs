@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Simple.Data.Ado;
-using Simple.Data.Ado.Schema;
+using Shitty.Data.Ado;
+using Shitty.Data.Ado.Schema;
 
-namespace Simple.Data.TestHelper
+namespace Shitty.Data.TestHelper
 {
     [TestFixture]
     public abstract class DatabaseSchemaTestsBase

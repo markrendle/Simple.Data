@@ -6,7 +6,7 @@ using System.Data.Common;
 using System.Dynamic;
 using System.Linq;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     class AdoAdapterGetter
     {

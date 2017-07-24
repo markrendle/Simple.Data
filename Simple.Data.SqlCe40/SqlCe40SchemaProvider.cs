@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlServerCe;
 using System.Linq;
-using Simple.Data.Ado;
-using Simple.Data.Ado.Schema;
+using Shitty.Data.Ado;
+using Shitty.Data.Ado.Schema;
 
-namespace Simple.Data.SqlCe40
+namespace Shitty.Data.SqlCe40
 {
     class SqlCe40SchemaProvider : ISchemaProvider
     {

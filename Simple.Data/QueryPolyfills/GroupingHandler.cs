@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data.QueryPolyfills
+namespace Shitty.Data.QueryPolyfills
 {
     using Extensions;
 

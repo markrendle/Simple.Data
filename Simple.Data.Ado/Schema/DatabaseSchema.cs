@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
-namespace Simple.Data.Ado.Schema
+namespace Shitty.Data.Ado.Schema
 {
     public class DatabaseSchema
     {

@@ -1,4 +1,4 @@
-﻿namespace Simple.Data.UnitTest
+﻿namespace Shitty.Data.UnitTest
 {
     using NUnit.Framework;
 

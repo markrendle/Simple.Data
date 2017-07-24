@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
-using Simple.Data.Ado;
-using Simple.Data.Ado.Schema;
+using Shitty.Data.Ado;
+using Shitty.Data.Ado.Schema;
 
-namespace Simple.Data.Mocking.Ado
+namespace Shitty.Data.Mocking.Ado
 {
     using System.ComponentModel.Composition;
 

@@ -1,4 +1,4 @@
-﻿namespace Simple.Data.SqlTest
+﻿namespace Shitty.Data.SqlTest
 {
     public class DbImage
     {

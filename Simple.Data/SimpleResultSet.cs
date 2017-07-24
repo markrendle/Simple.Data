@@ -6,7 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     public sealed class SimpleResultSet : DynamicObject, IEnumerable
     {

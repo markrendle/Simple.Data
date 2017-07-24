@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using ResultSet = System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, object>>>;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     public partial class AdoAdapter : IAdapterWithFunctions
 	{

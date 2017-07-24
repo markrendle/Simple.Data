@@ -5,7 +5,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data.Mocking.Ado
+namespace Shitty.Data.Mocking.Ado
 {
     public class MockDbTransaction : DbTransaction
     {

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ProfilingApp
 {
-    using Simple.Data;
+    using Shitty.Data;
 
     class FindByTask : IProfileTask
     {

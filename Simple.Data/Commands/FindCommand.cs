@@ -4,7 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data.Commands
+namespace Shitty.Data.Commands
 {
     class FindCommand : ICommand, IQueryCompatibleCommand
     {

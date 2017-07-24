@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
-using Simple.Data.Extensions;
+using Shitty.Data.Extensions;
 
-namespace Simple.Data.Commands
+namespace Shitty.Data.Commands
 {
     using System.Collections;
 

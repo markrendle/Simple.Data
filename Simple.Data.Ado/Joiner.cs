@@ -3,10 +3,10 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Simple.Data.Ado.Schema;
-using Simple.Data.Extensions;
+using Shitty.Data.Ado.Schema;
+using Shitty.Data.Extensions;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     public class Joiner
     {

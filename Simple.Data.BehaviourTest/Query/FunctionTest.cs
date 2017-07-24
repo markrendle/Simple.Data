@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data.IntegrationTest.Query
+namespace Shitty.Data.IntegrationTest.Query
 {
     using Mocking.Ado;
     using NUnit.Framework;

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Simple.Data.QueryPolyfills
+namespace Shitty.Data.QueryPolyfills
 {
     class ObjectValueResolver : ValueResolver
     {

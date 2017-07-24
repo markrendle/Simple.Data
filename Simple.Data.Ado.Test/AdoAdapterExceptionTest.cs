@@ -1,4 +1,4 @@
-﻿namespace Simple.Data.Ado.Test
+﻿namespace Shitty.Data.Ado.Test
 {
     using System;
     using System.Collections.Generic;

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     /// <summary>
     /// Represents a query criteria expression.

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     using System.Diagnostics;
 

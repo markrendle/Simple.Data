@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data.Mocking.Ado
+namespace Shitty.Data.Mocking.Ado
 {
     static class DataTableExtensions
     {

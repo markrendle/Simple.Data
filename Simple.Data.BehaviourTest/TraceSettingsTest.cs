@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 
-namespace Simple.Data.IntegrationTest
+namespace Shitty.Data.IntegrationTest
 {
     [TestFixture]
     public class TraceSettingsTest

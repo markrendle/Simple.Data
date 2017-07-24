@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using Simple.Data.Ado;
+using Shitty.Data.Ado;
 
-namespace Simple.Data.SqlServer
+namespace Shitty.Data.SqlServer
 {
     public class SqlServerProviderAttribute : ProviderAssemblyAttributeBase
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 
-namespace Simple.Data.Mocking
+namespace Shitty.Data.Mocking
 {
     class XmlPredicateBuilder
     {

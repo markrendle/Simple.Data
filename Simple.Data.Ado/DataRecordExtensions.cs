@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Data;
-using Simple.Data.Extensions;
+using Shitty.Data.Extensions;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     public static class DataRecordExtensions
     {

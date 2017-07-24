@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Simple.Data.Commands;
+using Shitty.Data.Commands;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     //internal static class AdapterWithFunctionsExtensions
     //{

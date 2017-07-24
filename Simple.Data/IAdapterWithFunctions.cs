@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using ResultSet = System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, object>>>;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     /// <summary>
     /// Represents an Adapter which supports functions; for example, the Ado adapter supports this with Stored Procedures.

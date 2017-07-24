@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Simple.Data.Ado.Schema
+namespace Shitty.Data.Ado.Schema
 {
     public sealed class Key
     {

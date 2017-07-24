@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using NUnit.Framework;
 
-namespace Simple.Data.SqlCe40Test
+namespace Shitty.Data.SqlCe40Test
 {
     [TestFixture]
     public class NorthwindTests

@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using NUnit.Framework;
 
-namespace Simple.Data.InMemoryTest
+namespace Shitty.Data.InMemoryTest
 {
     [TestFixture]
     public class SimpleQueryConversionTests

@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 
-namespace Simple.Data.SqlTest
+namespace Shitty.Data.SqlTest
 {
     using System.Diagnostics;
 

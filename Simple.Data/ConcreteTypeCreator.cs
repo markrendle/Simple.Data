@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Simple.Data.Extensions;
+using Shitty.Data.Extensions;
 using System.Collections;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     using System.Diagnostics;
     using System.Linq.Expressions;

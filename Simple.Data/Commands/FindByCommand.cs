@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 
-namespace Simple.Data.Commands
+namespace Shitty.Data.Commands
 {
     using System.Reflection;
     using Extensions;

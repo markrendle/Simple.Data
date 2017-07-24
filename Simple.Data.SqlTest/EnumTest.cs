@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data.SqlTest
+namespace Shitty.Data.SqlTest
 {
     using NUnit.Framework;
 

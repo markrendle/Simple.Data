@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 
-namespace Simple.Data.Ado.Schema
+namespace Shitty.Data.Ado.Schema
 {
     public interface ISchemaProvider
     {

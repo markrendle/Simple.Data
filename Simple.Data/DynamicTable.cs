@@ -5,10 +5,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Dynamic;
-using Simple.Data.Commands;
-using Simple.Data.Extensions;
+using Shitty.Data.Commands;
+using Shitty.Data.Extensions;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     using System.Collections;
 

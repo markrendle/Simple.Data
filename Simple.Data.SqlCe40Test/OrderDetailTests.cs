@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using NUnit.Framework;
 
-namespace Simple.Data.SqlCeTest
+namespace Shitty.Data.SqlCeTest
 {
     [TestFixture]
     public class OrderDetailTests

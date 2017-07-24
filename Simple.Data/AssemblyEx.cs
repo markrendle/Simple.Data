@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     public static class AssemblyEx
     {

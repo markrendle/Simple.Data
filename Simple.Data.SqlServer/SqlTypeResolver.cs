@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data.SqlServer
+namespace Shitty.Data.SqlServer
 {
     static class SqlTypeResolver
     {

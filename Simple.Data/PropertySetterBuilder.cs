@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     using System;
     using System.Collections;

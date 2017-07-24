@@ -3,7 +3,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Data;
 
-namespace Simple.Data.Mocking.Ado
+namespace Shitty.Data.Mocking.Ado
 {
     class MockDbCommand : DbCommand, ICloneable
     {

@@ -2,10 +2,10 @@
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
-using Simple.Data.Commands;
-using Simple.Data.Extensions;
+using Shitty.Data.Commands;
+using Shitty.Data.Extensions;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     /// <summary>
     /// The entry class for Simple.Data. Provides static methods for opening databases,

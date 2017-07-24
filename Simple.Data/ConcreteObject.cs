@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     internal class ConcreteObject
     {

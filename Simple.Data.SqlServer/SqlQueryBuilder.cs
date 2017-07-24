@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Simple.Data.Ado;
+using Shitty.Data.Ado;
 
-namespace Simple.Data.SqlServer
+namespace Shitty.Data.SqlServer
 {
     public class SqlQueryBuilder : QueryBuilderBase
     {

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Simple.Data.SqlCe40.Properties {
+namespace Shitty.Data.SqlCe40.Properties {
     using System;
     
     
