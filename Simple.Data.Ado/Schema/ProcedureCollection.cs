@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using Simple.Data.Extensions;
+using Shitty.Data.Extensions;
 
-namespace Simple.Data.Ado.Schema
+namespace Shitty.Data.Ado.Schema
 {
     class ProcedureCollection : Collection<Procedure>
     {

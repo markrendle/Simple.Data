@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     public static class SimpleDataTraceSources
     {

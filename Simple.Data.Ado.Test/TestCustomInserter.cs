@@ -6,9 +6,9 @@ using System.Data.OleDb;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Simple.Data.Ado.Schema;
+using Shitty.Data.Ado.Schema;
 
-namespace Simple.Data.Ado.Test
+namespace Shitty.Data.Ado.Test
 {
     [TestFixture]
     public class TestCustomInserter

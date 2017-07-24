@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     /// <summary>
     /// Represents a method to be called when an error occurs in a batch process.

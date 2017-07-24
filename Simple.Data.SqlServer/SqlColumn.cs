@@ -1,4 +1,4 @@
-﻿namespace Simple.Data.SqlServer
+﻿namespace Shitty.Data.SqlServer
 {
     using System.Data;
     using Ado.Schema;

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Simple.Data.Ado;
+using Shitty.Data.Ado;
 
-namespace Simple.Data.Mocking
+namespace Shitty.Data.Mocking
 {
     public static class MockHelper
     {

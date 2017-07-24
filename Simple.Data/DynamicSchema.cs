@@ -5,7 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     using Commands;
 

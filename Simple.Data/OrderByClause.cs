@@ -1,4 +1,4 @@
-namespace Simple.Data
+namespace Shitty.Data
 {
     /// <summary>
     /// Represents the ordering clause of a <see cref="SimpleQuery"/>.

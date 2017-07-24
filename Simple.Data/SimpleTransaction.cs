@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.Text;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     using Commands;
 

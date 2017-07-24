@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data.UnitTest
+namespace Shitty.Data.UnitTest
 {
     using NUnit.Framework;
     using QueryPolyfills;

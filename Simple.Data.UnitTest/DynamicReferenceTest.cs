@@ -1,8 +1,8 @@
-﻿using Simple.Data;
+﻿using Shitty.Data;
 using NUnit.Framework;
 using System;
 
-namespace Simple.Data.UnitTest
+namespace Shitty.Data.UnitTest
 {
     
     

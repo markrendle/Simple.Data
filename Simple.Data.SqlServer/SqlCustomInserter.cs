@@ -4,10 +4,10 @@ using System.ComponentModel.Composition;
 using System.Data;
 using System.Linq;
 using System.Text;
-using Simple.Data.Ado;
-using Simple.Data.Ado.Schema;
+using Shitty.Data.Ado;
+using Shitty.Data.Ado.Schema;
 
-namespace Simple.Data.SqlServer
+namespace Shitty.Data.SqlServer
 {
     [Export(typeof(ICustomInserter))]
     public class SqlCustomInserter : ICustomInserter

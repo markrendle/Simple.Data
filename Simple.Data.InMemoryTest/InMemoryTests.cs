@@ -1,4 +1,4 @@
-﻿namespace Simple.Data.InMemoryTest
+﻿namespace Shitty.Data.InMemoryTest
 {
     using System;
 	using System.Linq;

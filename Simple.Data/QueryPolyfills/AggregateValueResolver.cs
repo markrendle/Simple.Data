@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Simple.Data.QueryPolyfills
+namespace Shitty.Data.QueryPolyfills
 {
     internal class AggregateValueResolver : ValueResolver
     {

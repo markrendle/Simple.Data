@@ -1,4 +1,4 @@
-﻿namespace Simple.Data.SqlCe40
+﻿namespace Shitty.Data.SqlCe40
 ﻿{
 ﻿    using System.ComponentModel.Composition;
 ﻿    using System.Data;

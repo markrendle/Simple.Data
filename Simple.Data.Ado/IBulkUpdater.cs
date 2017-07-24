@@ -1,4 +1,4 @@
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     using System.Collections.Generic;
     using System.Data;

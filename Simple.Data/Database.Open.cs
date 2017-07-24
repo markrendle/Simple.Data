@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     public partial class Database
     {

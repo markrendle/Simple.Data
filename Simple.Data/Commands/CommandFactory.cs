@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Simple.Data.Commands
+namespace Shitty.Data.Commands
 {
     class CommandFactory
     {

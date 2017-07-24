@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Data;
 using System.Linq;
-using Simple.Data.Ado.Schema;
+using Shitty.Data.Ado.Schema;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     using Extensions;
 

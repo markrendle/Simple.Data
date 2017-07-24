@@ -5,9 +5,9 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using Simple.Data.Ado.Schema;
+using Shitty.Data.Ado.Schema;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     public class CommandBuilder : ICommandBuilder
     {

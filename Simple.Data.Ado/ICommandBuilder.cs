@@ -1,7 +1,7 @@
 using System.Data;
-using Simple.Data.Ado.Schema;
+using Shitty.Data.Ado.Schema;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     using System.Collections.Generic;
 

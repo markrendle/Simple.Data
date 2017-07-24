@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data.Extensions
+namespace Shitty.Data.Extensions
 {
     public static class ArrayExtensions
     {

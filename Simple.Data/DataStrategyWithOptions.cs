@@ -1,7 +1,7 @@
 ﻿using System.Data;
-using Simple.Data.Commands;
+using Shitty.Data.Commands;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     internal class DataStrategyWithOptions : DataStrategy
     {

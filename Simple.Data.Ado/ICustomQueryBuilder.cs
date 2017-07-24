@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     public interface ICustomQueryBuilder
     {

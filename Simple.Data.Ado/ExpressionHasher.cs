@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Linq;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     using System;
 

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Simple.Data.Extensions
+namespace Shitty.Data.Extensions
 {
     internal static class ResultSetExtensions
     {

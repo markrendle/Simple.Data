@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     using System;
     using System.Linq;

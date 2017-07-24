@@ -1,4 +1,4 @@
-namespace Simple.Data
+namespace Shitty.Data
 {
     /// <summary>
     /// Provides a base type for representing a clause within a <see cref="SimpleQuery"/>.

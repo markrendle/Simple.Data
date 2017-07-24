@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     internal interface IAdapterFactory
     {

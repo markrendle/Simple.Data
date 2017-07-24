@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using System;
 
-namespace Simple.Data.Extensions
+namespace Shitty.Data.Extensions
 {
     public static class HomogenizeEx
     {

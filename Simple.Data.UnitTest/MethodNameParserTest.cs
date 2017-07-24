@@ -1,9 +1,9 @@
 ﻿using NUnit.Framework;
-using Simple.Data;
+using Shitty.Data;
 using System;
 using System.Collections.Generic;
 
-namespace Simple.Data.UnitTest
+namespace Shitty.Data.UnitTest
 {
     
     

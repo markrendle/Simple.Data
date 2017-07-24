@@ -1,6 +1,6 @@
 using NUnit.Framework;
 
-namespace Simple.Data.SqlTest
+namespace Shitty.Data.SqlTest
 {
     using System;
     using System.Linq;

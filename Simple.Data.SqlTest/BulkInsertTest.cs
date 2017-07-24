@@ -1,6 +1,6 @@
-﻿using Simple.Data.Ado;
+﻿using Shitty.Data.Ado;
 
-namespace Simple.Data.SqlTest
+namespace Shitty.Data.SqlTest
 {
     using System.Collections.Generic;
     using System.Diagnostics;

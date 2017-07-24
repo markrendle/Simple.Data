@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Microsoft.CSharp.RuntimeBinder;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     class OfTypeEnumerable<T> : IEnumerable<T>
     {

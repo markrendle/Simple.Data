@@ -4,10 +4,10 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlServerCe;
 using System.Linq;
-using Simple.Data.Ado;
-using Simple.Data.Ado.Schema;
+using Shitty.Data.Ado;
+using Shitty.Data.Ado.Schema;
 
-namespace Simple.Data.SqlCe40
+namespace Shitty.Data.SqlCe40
 {
     [Export(typeof(IConnectionProvider))]
     [Export("sdf", typeof(IConnectionProvider))]

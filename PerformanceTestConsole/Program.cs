@@ -9,7 +9,7 @@ using System.Text;
 namespace PerformanceTestConsole
 {
     using System.Data;
-    using Simple.Data.Ado;
+    using Shitty.Data.Ado;
 
     class Post
     {
@@ -169,7 +169,7 @@ end
         public void Run(int iterations)
         {
             var tests = new Tests();
-            var simpleDb = Simple.Data.Database.OpenConnection(Program.ConnectionString);
+            var simpleDb = Shitty.Data.Database.OpenConnection(Program.ConnectionString);
             SqlConnection connection = Program.GetOpenConnection();
             simpleDb.UseSharedConnection(connection);
             simpleDb.Posts.FindById(1);

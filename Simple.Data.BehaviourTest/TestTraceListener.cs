@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data.IntegrationTest
+namespace Shitty.Data.IntegrationTest
 {
     class TestTraceListener : TraceListener
     {

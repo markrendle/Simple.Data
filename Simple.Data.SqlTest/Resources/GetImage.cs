@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Simple.Data.SqlTest.Resources
+namespace Shitty.Data.SqlTest.Resources
 {
     public static class GetImage
     {

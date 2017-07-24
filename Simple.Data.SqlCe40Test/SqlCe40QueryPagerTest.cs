@@ -1,9 +1,9 @@
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using Simple.Data.SqlCe40;
 using System.Linq;
+using Shitty.Data.SqlCe40;
 
-namespace Simple.Data.SqlCe40Test
+namespace Shitty.Data.SqlCe40Test
 {
     [TestFixture]
     public class SqlCe40QueryPagerTest

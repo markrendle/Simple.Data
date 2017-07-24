@@ -4,9 +4,9 @@ using System.Data;
 using System.Dynamic;
 using System.Text;
 using System.Text.RegularExpressions;
-using Simple.Data.Ado.Schema;
+using Shitty.Data.Ado.Schema;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     using System.Linq;
 

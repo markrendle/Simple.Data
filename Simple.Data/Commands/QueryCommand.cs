@@ -1,4 +1,4 @@
-namespace Simple.Data.Commands
+namespace Shitty.Data.Commands
 {
     using System;
     using System.Dynamic;

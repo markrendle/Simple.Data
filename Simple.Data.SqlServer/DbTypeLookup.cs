@@ -1,4 +1,4 @@
-namespace Simple.Data.SqlServer
+namespace Shitty.Data.SqlServer
 {
     using System.Collections.Generic;
     using System.Data;

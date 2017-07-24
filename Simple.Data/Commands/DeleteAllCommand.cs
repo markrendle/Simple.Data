@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Dynamic;
-using Simple.Data.Extensions;
+using Shitty.Data.Extensions;
 
-namespace Simple.Data.Commands
+namespace Shitty.Data.Commands
 {
     class DeleteAllCommand : ICommand
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     public static class OptimizedDictionary
     {

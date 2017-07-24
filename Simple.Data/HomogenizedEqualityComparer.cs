@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Simple.Data.Extensions;
+using Shitty.Data.Extensions;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     public class HomogenizedEqualityComparer : IEqualityComparer<string>
     {

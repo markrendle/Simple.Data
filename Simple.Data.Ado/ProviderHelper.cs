@@ -10,7 +10,7 @@ using System.Reflection;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     using Schema;
 

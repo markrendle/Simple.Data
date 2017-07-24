@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Simple.Data.Extensions;
+using Shitty.Data.Extensions;
 
-namespace Simple.Data.UnitTest
+namespace Shitty.Data.UnitTest
 {
     [TestFixture]
     public class DynamicStringExtensionsTest

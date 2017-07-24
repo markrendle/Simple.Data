@@ -1,4 +1,4 @@
-namespace Simple.Data.QueryPolyfills
+namespace Shitty.Data.QueryPolyfills
 {
     using System;
     using System.Collections;

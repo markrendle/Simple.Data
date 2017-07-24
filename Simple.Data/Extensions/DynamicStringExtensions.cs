@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Simple.Data.Extensions
+namespace Shitty.Data.Extensions
 {
     public static class DynamicStringExtensions
     {

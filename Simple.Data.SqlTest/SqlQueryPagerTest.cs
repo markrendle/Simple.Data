@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using Simple.Data.Ado;
-using Simple.Data.SqlServer;
+using Shitty.Data.Ado;
+using Shitty.Data.SqlServer;
 
-namespace Simple.Data.SqlTest
+namespace Shitty.Data.SqlTest
 {
     [TestFixture]
     public class SqlQueryPagerTest

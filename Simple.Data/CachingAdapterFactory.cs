@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     class CachingAdapterFactory : AdapterFactory
     {

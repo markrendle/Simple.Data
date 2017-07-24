@@ -6,10 +6,10 @@ using System.Dynamic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Simple.Data.Ado;
-using Simple.Data.Mocking.Ado;
+using Shitty.Data.Ado;
+using Shitty.Data.Mocking.Ado;
 
-namespace Simple.Data.IntegrationTest
+namespace Shitty.Data.IntegrationTest
 {
     [TestFixture]
     public class TransactionTest

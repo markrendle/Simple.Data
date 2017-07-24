@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     public interface ICustomInserter
     {

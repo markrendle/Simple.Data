@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     /// <summary>
     /// Represents the set of columns/fields to be returned by a <see cref="SimpleQuery"/>.

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Simple.Data.SqlCe40
+namespace Shitty.Data.SqlCe40
 {
     static class SqlTypeResolver
     {

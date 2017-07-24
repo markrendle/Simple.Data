@@ -5,7 +5,7 @@ using System.Text;
 using System.Dynamic;
 using System.Collections.ObjectModel;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     public class SimpleFunction
     {

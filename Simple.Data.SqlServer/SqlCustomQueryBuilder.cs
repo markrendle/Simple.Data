@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using Simple.Data.Ado;
+using Shitty.Data.Ado;
 
-namespace Simple.Data.SqlServer
+namespace Shitty.Data.SqlServer
 {
 
     [Export(typeof(ICustomQueryBuilder))]

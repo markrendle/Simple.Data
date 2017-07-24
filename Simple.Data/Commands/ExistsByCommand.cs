@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Dynamic;
 
-namespace Simple.Data.Commands
+namespace Shitty.Data.Commands
 {
     class ExistsByCommand : ICommand
     {

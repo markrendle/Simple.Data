@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace Simple.Data.Ado.Schema
+namespace Shitty.Data.Ado.Schema
 {
     public class ForeignKeyCollection : Collection<ForeignKey>
     {

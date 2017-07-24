@@ -1,4 +1,4 @@
-﻿namespace Simple.Data
+﻿namespace Shitty.Data
 {
     public class ForUpdateClause : SimpleQueryClauseBase
     {

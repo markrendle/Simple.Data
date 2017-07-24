@@ -1,7 +1,7 @@
 namespace ProfilingApp
 {
     using System;
-    using Simple.Data;
+    using Shitty.Data;
 
     class QueryWithCountTask : IProfileTask
     {

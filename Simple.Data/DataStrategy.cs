@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
-using Simple.Data.Commands;
+using Shitty.Data.Commands;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     using System.Reflection;
 

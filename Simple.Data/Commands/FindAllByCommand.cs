@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 
-namespace Simple.Data.Commands
+namespace Shitty.Data.Commands
 {
     class FindAllByCommand : ICommand
     {

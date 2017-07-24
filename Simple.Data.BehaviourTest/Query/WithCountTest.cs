@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Simple.Data.Ado;
-using Simple.Data.Mocking;
+using Shitty.Data.Ado;
+using Shitty.Data.Mocking;
 
-namespace Simple.Data.IntegrationTest.Query
+namespace Shitty.Data.IntegrationTest.Query
 {
     using Mocking.Ado;
     using NUnit.Framework;

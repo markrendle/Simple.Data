@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data.AdapterApi
+namespace Shitty.Data.AdapterApi
 {
     /// <summary>
     /// Provides access to internal types and methods of the Simple.Data main assembly

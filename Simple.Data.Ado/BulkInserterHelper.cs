@@ -1,6 +1,6 @@
-using Simple.Data.Extensions;
+using Shitty.Data.Extensions;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     using System;
     using System.Collections.Generic;

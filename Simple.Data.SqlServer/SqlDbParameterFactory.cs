@@ -1,4 +1,4 @@
-﻿namespace Simple.Data.SqlServer
+﻿namespace Shitty.Data.SqlServer
 ﻿{
 ﻿    using System.ComponentModel.Composition;
 ﻿    using System.Data;

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Simple.Data.Ado.Test
+namespace Shitty.Data.Ado.Test
 {
     public class TestProviderAssemblyAttribute : ProviderAssemblyAttributeBase
     {

@@ -4,9 +4,9 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Simple.Data.Ado;
+using Shitty.Data.Ado;
 
-namespace Simple.Data.SqlCe40
+namespace Shitty.Data.SqlCe40
 {
     [Export(typeof(IQueryPager))]
     public class SqlCe40QueryPager : IQueryPager

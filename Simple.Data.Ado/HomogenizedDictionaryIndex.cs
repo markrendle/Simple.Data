@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Simple.Data.Extensions;
+using Shitty.Data.Extensions;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     public class HomogenizedDictionaryIndex : OptimizedDictionaryIndex<string>
     {

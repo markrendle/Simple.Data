@@ -3,7 +3,7 @@ using System.Linq;
 using System.Data;
 using System.Text.RegularExpressions;
 
-namespace Simple.Data.Mocking.Ado
+namespace Shitty.Data.Mocking.Ado
 {
     public class MockDatabase
     {

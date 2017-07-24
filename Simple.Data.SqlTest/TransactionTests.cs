@@ -4,9 +4,9 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Simple.Data.Ado;
+using Shitty.Data.Ado;
 
-namespace Simple.Data.SqlTest
+namespace Shitty.Data.SqlTest
 {
     [TestFixture]
     public class TransactionTests

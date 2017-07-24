@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
-namespace Simple.Data.Mocking.Test
+namespace Shitty.Data.Mocking.Test
 {
     [TestFixture]
     public class MockConnectionSchemaTest

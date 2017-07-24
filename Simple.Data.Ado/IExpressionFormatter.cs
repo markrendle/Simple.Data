@@ -1,4 +1,4 @@
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     public interface IExpressionFormatter
     {

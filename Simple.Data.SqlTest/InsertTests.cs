@@ -2,10 +2,10 @@
 using System.Dynamic;
 using System.Linq;
 using NUnit.Framework;
-using Simple.Data.Ado;
-using Simple.Data.SqlTest.Resources;
+using Shitty.Data.Ado;
+using Shitty.Data.SqlTest.Resources;
 
-namespace Simple.Data.SqlTest
+namespace Shitty.Data.SqlTest
 {
     using System;
 

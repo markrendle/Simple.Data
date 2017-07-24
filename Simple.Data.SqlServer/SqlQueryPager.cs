@@ -4,9 +4,9 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Simple.Data.Ado;
+using Shitty.Data.Ado;
 
-namespace Simple.Data.SqlServer
+namespace Shitty.Data.SqlServer
 {
     [Export(typeof(IQueryPager))]
     public class SqlQueryPager : IQueryPager

@@ -1,4 +1,4 @@
-﻿namespace Simple.Data.Extensions
+﻿namespace Shitty.Data.Extensions
 {
     using System;
     using System.Dynamic;

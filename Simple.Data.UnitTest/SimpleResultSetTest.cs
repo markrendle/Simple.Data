@@ -1,4 +1,4 @@
-﻿namespace Simple.Data.UnitTest
+﻿namespace Shitty.Data.UnitTest
 {
     using System;
     using System.Collections;

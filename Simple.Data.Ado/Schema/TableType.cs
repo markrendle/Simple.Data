@@ -1,4 +1,4 @@
-﻿namespace Simple.Data.Ado.Schema
+﻿namespace Shitty.Data.Ado.Schema
 {
     public enum TableType
     {

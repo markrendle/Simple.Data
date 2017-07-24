@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Data.Common;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     /// <summary>
     /// Provides a base class for implementing <see cref="IDbConnection"/> which delegates all the interface methods

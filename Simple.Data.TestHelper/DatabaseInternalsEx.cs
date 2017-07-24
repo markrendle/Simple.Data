@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data.TestHelper
+namespace Shitty.Data.TestHelper
 {
     public static class DatabaseInternalsEx
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Simple.Data.Ado.Schema
+namespace Shitty.Data.Ado.Schema
 {
     public sealed class ForeignKey
     {

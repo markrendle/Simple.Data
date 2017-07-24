@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 
-namespace Simple.Data.UnitTest
+namespace Shitty.Data.UnitTest
 {
     [TestFixture]
     public class SimpleQueryTest

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using System.IO;
-using Simple.Data.Ado;
-using Simple.Data.SqlCe40;
-using Simple.Data.SqlCeTest;
+using Shitty.Data.Ado;
+using Shitty.Data.SqlCe40;
+using Shitty.Data.SqlCeTest;
 
-namespace Simple.Data.SqlCe40Test
+namespace Shitty.Data.SqlCe40Test
 {
     /// <summary>
     /// Summary description for FindTests

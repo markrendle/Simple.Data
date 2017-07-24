@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Simple.Data.QueryPolyfills
+namespace Shitty.Data.QueryPolyfills
 {
     internal class FunctionValueResolver : ValueResolver
     {

@@ -1,6 +1,6 @@
 using System.Data;
 
-namespace Simple.Data.Ado
+namespace Shitty.Data.Ado
 {
     public interface ISchemaGetter
     {

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Dynamic;
 using NUnit.Framework;
-using Simple.Data.Mocking;
-using Simple.Data.Mocking.Ado;
+using Shitty.Data.Mocking;
+using Shitty.Data.Mocking.Ado;
 
-namespace Simple.Data.IntegrationTest
+namespace Shitty.Data.IntegrationTest
 {
     using System.Diagnostics;
 

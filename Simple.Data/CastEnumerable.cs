@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Simple.Data
+namespace Shitty.Data
 {
     class CastEnumerable<T> : IEnumerable<T>
     {

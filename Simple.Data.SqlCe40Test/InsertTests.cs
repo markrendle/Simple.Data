@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Simple.Data.SqlCe40Test
+namespace Shitty.Data.SqlCe40Test
 {
     using System.Dynamic;
     using System.IO;
