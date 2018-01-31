@@ -314,7 +314,7 @@ namespace Simple.Data.Ado
             }
             else
             {
-                var table = _schema.FindTable(item.Reference.GetOwner().GetName());
+                var table = _schema.FindTable(item.Reference.GetOwner().ToString());
                 name = table.FindColumn(item.Reference.GetName()).QualifiedName;
             }
 
